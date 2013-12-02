@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20131.4
+ * Wijmo Library 3.20132.9
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -48,3936 +48,4171 @@ var __extends = this.__extends || function (d, b) {
 };
 var wijmo;
 (function (wijmo) {
-    "use strict";
-    var $ = jQuery;
-    var wijgrid = (function (_super) {
-        __extends(wijgrid, _super);
-        function wijgrid() {
-            _super.apply(this, arguments);
-
-            // private fields **
-            this._dataOffset = 0;
-            this._scrollingState = {
-                x: null,
-                y: // h. pos
-                null,
-                index: // v. pos
-                0
-            };// scroll index (virtual scrolling)
-
-            this._windowResizeTimer = 0;
+    (function (grid) {
+        "use strict";
+        var $ = jQuery;
+        /** @ignore */
+        function extendWidgetOptions(baseOptions, newOptions) {
+            var result = $.extend(true, {
+            }, baseOptions, newOptions);
+            delete result.constructor// Remove the constructor because the widget.options object is a ts class now (widgetName_options).
+            ;
+            return result;
         }
-        wijgrid.prototype._createWidget = // * override
-        function (options, element) {
-            // Late binding, a fix for the case if options.data contains a complex object leading to stack overflow when $.extend is called in the widget factory.
-            var data = options && (wijmo).data.util.isClassInstance(options.data) && !((typeof wijdatasource === "function") && (options.data instanceof wijdatasource)) && options.data;
-            if(data) {
-                delete options.data;
+        grid.extendWidgetOptions = extendWidgetOptions;
+        /** @widget
+        * Represents the wijgrid widget.
+        */
+        var wijgrid = (function (_super) {
+            __extends(wijgrid, _super);
+            function wijgrid() {
+                _super.apply(this, arguments);
+
+                // private fields **
+                this._dataOffset = 0;
+                this._scrollingState = {
+                    x: null,
+                    y: // h. pos
+                    null,
+                    index: // v. pos
+                    0
+                };// scroll index (virtual scrolling)
+
+                this._windowResizeTimer = 0;
             }
-            _super.prototype._createWidget.apply(this, arguments);
-            if(data) {
-                this.option("data", data);
-            }
-        };
-        wijgrid.prototype._create = function () {
-            var self = this;
-            if(!this.element.is("table")) {
-                throw "invalid markup";
-            }
-            this._windowResizeTimer = 0;
-            this._dataOffset = 0;
-            this._scrollingState = {
-                x: null,
-                y: null,
-                index: 0
+            wijgrid.prototype._createWidget = // stores the deficient filters (one of the filterOperator\ filterValue values ​​is unknown) during the dataView round trip by the dataKey.
+            // * override
+            function (options, element) {
+                // Late binding, a fix for the case if options.data contains a complex object leading to stack overflow when $.extend is called in the widget factory.
+                var data = options && (wijmo).data.util.isClassInstance(options.data) && !((typeof wijdatasource === "function") && (options.data instanceof wijdatasource)) && options.data;
+                if(data) {
+                    delete options.data;
+                }
+                _super.prototype._createWidget.apply(this, arguments);
+                if(data) {
+                    options.data = data// restore option value (fixes an issue when a single options object is passed to multiple instances of the wijgrid: $("table").wijgrid({...});
+                    ;
+                    this.option("data", data);
+                }
             };
-            this._initialized = false;
-            this._destroyed = false;
-            this._rendered = false;
-            this._eventUID = undefined;
-            ;
-            this._dataViewWrapper = undefined;
-            this._originalHtml = undefined;
-            this._originalAttr = undefined;
-            this._originalCssText = undefined;
-            this._autoHeight = undefined;
-            this._autoWidth = undefined;
-            this._renderCounter = 0;
-            this.$superPanelHeader = undefined;
-            this.$topPagerDiv = undefined;
-            this.$bottomPagerDiv = undefined;
-            this.$groupArea = undefined;
-            this.__uid = undefined;
-            this._wijDataView = undefined;
-            this.outerDiv = undefined;
-            this.sketchTable = undefined;
-            this.cellFormatter = undefined;
-            this.rowStyleFormatter = undefined;
-            this.cellStyleFormatter = undefined;
-            this._eventUID = wijmo.grid.getUID();
-            this._spinnerIsActivated = false;
-            // ** jQuery UI 1.9.0 fix
-            this.options = $.extend(true, {
-            }, this.options);
-            // jQuery UI 1.9.0 fix **
-            // enable touch support:
-            if(window.wijmoApplyWijTouchUtilEvents) {
-                $ = window.wijmoApplyWijTouchUtilEvents($);
-            }
-            // handle juice objectValue serialize
-            if($.isFunction(window["wijmoASPNetParseOptions"])) {
-                window["wijmoASPNetParseOptions"](this.options);
-            }
-            this._initialized = false;
-            this._destroyed = false;
-            var styleHeight = this.element[0].style.height, styleWidth = this.element[0].style.width;
-            // initialize data
-            this._dataViewWrapper = new wijmo.grid.dataViewWrapper(this);
-            this._originalHtml = this.element.html()// store original html. Will be restored in the destroy() method.
-            ;
-            this._originalAttr = {
-            };
-            this._originalCssText = this.element[0].style.cssText;
-            this.element.addClass("wijmo-wijgrid-root");
-            this.element.wrap("<div class=\"" + this.options.wijCSS.widget + " wijmo-wijgrid " + this.options.wijCSS.content + " " + this.options.wijCSS.cornerAll + "\"></div>")// outer div
-            ;
-            this.outerDiv = this.element.parent();
-            // -
-            //this.outerDiv.css({ "height": this.element.css("height"), "width": this.element.css("width") });
-            if(styleHeight) {
-                this.outerDiv.css("height", this.element[0].style.height);
-            }
-            if(styleHeight !== "" && styleHeight !== "auto") {
-                this._autoHeight = false;
-            } else {
-                this._autoHeight = true;
-            }
-            if(styleWidth) {
-                this.outerDiv.css("width", this.element[0].style.width);
-            }
-            if(styleWidth !== "" && styleWidth !== "auto") {
-                this._autoWidth = false;
-            } else {
-                this._autoWidth = true;
-            }
-            this.element.css({
-                "height": "",
-                "width": ""
-            });
-            if(this.options.disabled) {
-                this.disable();
-            }
-            // formatters
-            this.cellFormatter = new wijmo.grid.cellFormatterHelper();
-            this.rowStyleFormatter = new wijmo.grid.rowStyleFormatterHelper(this);
-            this.cellStyleFormatter = new wijmo.grid.cellStyleFormatterHelper(this);
-            // * set bounds
-            this._field("viewRenderBounds", {
-                start: 0,
-                end: 0
-            });
-            if(this._allowVirtualScrolling()) {
-                this._field("viewRenderBounds").start = this._scrollingState.index// == 0 by default.
+            wijgrid.prototype._create = function () {
+                var self = this;
+                if(!this.element.is("table")) {
+                    throw "invalid markup";
+                }
+                this._windowResizeTimer = 0;
+                this._dataOffset = 0;
+                this._scrollingState = {
+                    x: null,
+                    y: null,
+                    index: 0
+                };
+                this._initialized = false;
+                this._destroyed = false;
+                this._rendered = false;
+                this._eventUID = undefined;
                 ;
-                if(this._serverSideVirtualScrolling()) {
-                    this._dataOffset = this._scrollingState.index;
+                this._dataViewWrapper = undefined;
+                this._originalHtml = undefined;
+                this._originalAttr = undefined;
+                this._originalCssText = undefined;
+                this._autoHeight = undefined;
+                this._autoWidth = undefined;
+                this._renderCounter = 0;
+                this.$superPanelHeader = undefined;
+                this.$topPagerDiv = undefined;
+                this.$bottomPagerDiv = undefined;
+                this.$groupArea = undefined;
+                this.__uid = undefined;
+                this._wijDataView = undefined;
+                this.outerDiv = undefined;
+                this.sketchTable = undefined;
+                this.cellFormatter = undefined;
+                this.rowStyleFormatter = undefined;
+                this.cellStyleFormatter = undefined;
+                this._eventUID = wijmo.grid.getUID();
+                this._spinnerIsActivated = false;
+                this.deficientFilters = {
+                };
+                // ** jQuery UI 1.9.0 fix
+                                var hasData = ("data" in this.options), data = hasData && this.options.data;
+                if(hasData) {
+                    delete this.options.data;
                 }
-            }
-            // set bounds *
-            // wijObservable
-            if(this.element.wijAddVisibilityObserver) {
-                this.element.wijAddVisibilityObserver(function () {
-                    //if (self.element.is(":visible")) {
-                    if(self._initialized && !self._destroyed) {
-                        self.setSize();
-                    }
-                    //}
-                                    }, "wijgrid");
-            }
-            this._renderCounter = 0;
-        };
-        wijgrid.prototype._destroy = function () {
-            var tmp, self = this;
-            try  {
-                this._view().dispose();
-                this._detachEvents(true);
-                if(tmp = this._field("resizer")) {
-                    tmp.dispose();
+                this.options = $.extend(true, {
+                }, this.options);
+                if(hasData) {
+                    this.options.data = data;
                 }
-                if(tmp = this._field("frozener")) {
-                    tmp.dispose();
+                // jQuery UI 1.9.0 fix **
+                // enable touch support:
+                if(window.wijmoApplyWijTouchUtilEvents) {
+                    $ = window.wijmoApplyWijTouchUtilEvents($);
                 }
-                if(tmp = this._field("selectionui")) {
-                    tmp.dispose();
+                // handle juice objectValue serialize
+                if($.isFunction(window["wijmoASPNetParseOptions"])) {
+                    window["wijmoASPNetParseOptions"](this.options);
                 }
-                if(tmp = this._field("dragndrop")) {
-                    tmp.dispose();
+                this._initialized = false;
+                this._destroyed = false;
+                // culture
+                this._field("closestCulture", Globalize.findClosestCulture(this.options.culture) || Globalize.findClosestCulture("default"));
+                // initialize data
+                this._dataViewWrapper = new wijmo.grid.dataViewWrapper(this);
+                this._originalHtml = this.element.html()// store original html. Will be restored in the destroy() method.
+                ;
+                this._originalAttr = {
+                };
+                this._originalCssText = this.element[0].style.cssText;
+                this.element.addClass("wijmo-wijgrid-root");
+                this.element.wrap("<div class=\"" + this.options.wijCSS.widget + " wijmo-wijgrid " + this.options.wijCSS.content + " " + this.options.wijCSS.cornerAll + "\"></div>")// outer div
+                ;
+                this.outerDiv = this.element.parent();
+                var styleHeight = this.element[0].style.height, styleWidth = this.element[0].style.width;
+                if(styleHeight) {
+                    this.outerDiv.css("height", styleHeight);
                 }
-                this._dataViewWrapper.dispose();
-                // cleanup $data
-                wijmo.grid.remove$dataByPrefix(this.element, this._data$prefix);
-                if(this.element.wijRemoveVisibilityObserver) {
-                    this.element.wijRemoveVisibilityObserver();
+                this._autoHeight = (styleHeight == "" || styleHeight == "auto");
+                if(styleWidth) {
+                    this.outerDiv.css("width", this.element[0].style.width);
                 }
-                // ** restore original content
-                // restore content and destroy children widgets + data.
-                this.element.insertBefore(this.outerDiv);
-                this.outerDiv.remove();
-                this.element.html(this._originalHtml);
-                // restore attributes
-                $.each(this._originalAttr, function (key, value) {
-                    if(value === undefined) {
-                        self.element.removeAttr(key);
-                    } else {
-                        self.element.attr(key, value);
-                    }
+                this._autoWidth = (styleWidth == "" || styleWidth == "auto");
+                this.element.css({
+                    "height": "",
+                    "width": ""
                 });
-                this.element.removeClass("wijmo-wijgrid-root");
-                this.element[0].style.cssText = this._originalCssText// restore style properties
+                if(this.options.disabled) {
+                    this.disable();
+                }
+                // formatters
+                this.cellFormatter = new wijmo.grid.cellFormatterHelper();
+                this.rowStyleFormatter = new wijmo.grid.rowStyleFormatterHelper(this);
+                this.cellStyleFormatter = new wijmo.grid.cellStyleFormatterHelper(this);
+                // * set bounds
+                this._field("viewRenderBounds", {
+                    start: 0,
+                    end: 0
+                });
+                if(this._allowVirtualScrolling()) {
+                    this._field("viewRenderBounds").start = this._scrollingState.index// == 0 by default.
+                    ;
+                    if(this._serverSideVirtualScrolling()) {
+                        this._dataOffset = this._scrollingState.index;
+                    }
+                }
+                // set bounds *
+                // wijObservable
+                if(this.element.wijAddVisibilityObserver) {
+                    this.element.wijAddVisibilityObserver(function () {
+                        //if (self.element.is(":visible")) {
+                        if(self._initialized && !self._destroyed) {
+                            self.setSize();
+                        }
+                        //}
+                                            }, "wijgrid");
+                }
+                this._renderCounter = 0;
+            };
+            wijgrid.prototype._destroy = function () {
+                var tmp, self = this;
+                try  {
+                    this._view().dispose();
+                    this._detachEvents(true);
+                    if(tmp = this._field("resizer")) {
+                        tmp.dispose();
+                    }
+                    if(tmp = this._field("frozener")) {
+                        tmp.dispose();
+                    }
+                    if(tmp = this._field("selectionui")) {
+                        tmp.dispose();
+                    }
+                    if(tmp = this._field("dragndrop")) {
+                        tmp.dispose();
+                    }
+                    this._dataViewWrapper.dispose();
+                    // cleanup $data
+                    wijmo.grid.remove$dataByPrefix(this.element, this._data$prefix);
+                    if(this.element.wijRemoveVisibilityObserver) {
+                        this.element.wijRemoveVisibilityObserver();
+                    }
+                    // ** restore original content
+                    // restore content and destroy children widgets + data.
+                    this.element.insertBefore(this.outerDiv);
+                    this.outerDiv.remove();
+                    this.element.html(this._originalHtml);
+                    // restore attributes
+                    $.each(this._originalAttr, function (key, value) {
+                        if(value === undefined) {
+                            self.element.removeAttr(key);
+                        } else {
+                            self.element.attr(key, value);
+                        }
+                    });
+                    this.element.removeClass("wijmo-wijgrid-root");
+                    this.element[0].style.cssText = this._originalCssText// restore style properties
+                    ;
+                    // restore original content **
+                                    }finally {
+                    this._destroyed = true;
+                }
+            };
+            wijgrid.prototype._init = function () {
+                this.$superPanelHeader = null;
+                this.$topPagerDiv = null;
+                this.$bottomPagerDiv = null;
+                this.$groupArea = null;
+                // culture
+                this._field("closestCulture", Globalize.findClosestCulture(this.options.culture) || Globalize.findClosestCulture("default"));
+                if(!this.options.data) {
+                    // dataSource is a domTable
+                    if(!this._field("thead")) {
+                        // read tHead section
+                        this._field("thead", wijmo.grid.readTableSection(this.element, 1));
+                    }
+                    if(!this._field("tfoot")) {
+                        // read tFoot section
+                        this._field("tfoot", wijmo.grid.readTableSection(this.element, 3));
+                    }
+                }
+                /*if (this._serverSideVirtualScrolling()) {
+                this._dataOffset = this.options.pageIndex * this.options.pageSize;
+                }*/
+                this._initialized = this._initialized || false// to avoid reinitialization.
                 ;
-                // restore original content **
-                            }finally {
-                this._destroyed = true;
-            }
-        };
-        wijgrid.prototype._init = function () {
-            this.$superPanelHeader = null;
-            this.$topPagerDiv = null;
-            this.$bottomPagerDiv = null;
-            this.$groupArea = null;
-            // culture
-            this._field("closestCulture", Globalize.findClosestCulture(this.options.culture) || Globalize.findClosestCulture("default"));
-            if(!this.options.data) {
-                // dataSource is a domTable
-                if(!this._field("thead")) {
-                    // read tHead section
-                    this._field("thead", wijmo.grid.readTableSection(this.element, 1));
-                }
-                if(!this._field("tfoot")) {
-                    // read tFoot section
-                    this._field("tfoot", wijmo.grid.readTableSection(this.element, 3));
-                }
-            }
-            /*if (this._serverSideVirtualScrolling()) {
-            this._dataOffset = this.options.pageIndex * this.options.pageSize;
-            }*/
-            this._initialized = this._initialized || false// to avoid reinitialization.
-            ;
-            this.ensureControl(true);
-        };
-        wijgrid.prototype._setOption = function (key, value) {
-            var presetFunc = this["_preset_" + key], oldValue = this.options[key], optionChanged, postsetFunc;
-            if(presetFunc !== undefined) {
-                value = presetFunc.apply(this, [
-                    value,
-                    oldValue
-                ]);
-            }
-            optionChanged = (value !== oldValue);
-            //$.Widget.prototype._setOption.apply(this, arguments); note: there is no dynamic linkage between the arguments and the formal parameter values when strict mode is used
-            _super.prototype._setOption.apply(this, [
-                key,
-                value
-            ])// update this.options
-            ;
-            if(optionChanged) {
-                postsetFunc = this["_postset_" + key];
-                if(postsetFunc !== undefined) {
-                    postsetFunc.apply(this, [
+                this.ensureControl(true);
+            };
+            wijgrid.prototype._setOption = function (key, value) {
+                var presetFunc = this["_preset_" + key], oldValue = this.options[key], optionChanged, postsetFunc;
+                if(presetFunc !== undefined) {
+                    value = presetFunc.apply(this, [
                         value,
                         oldValue
                     ]);
                 }
-            }
-        };
-        wijgrid.prototype.columns = // * override
-        // * public
-        function () {
-            /// <summary>
-            /// Returns a one-dimensional array of widgets bound to visible column headers.
-            /// Code example: var colWidgets = $("#element").wijgrid("columns");
-            /// </summary>
-            /// <returns type="Array" elementType="$.wijmo.c1basefield">A one-dimensional array of widgets bound to visible column headers.</returns>
-            return this._field("columns") || [];
-        };
-        wijgrid.prototype.currentCell = // setter 2
-        function (a, b) {
-            /// <summary>
-            /// Gets or sets the current cell for the grid.
-            /// Note: Use (-1, -1) value to hide the current cell.
-            /// Code example:
-            /// -) Getter:
-            ///   var current = $("#element).wijgrid("currentCell");
-            /// -) Setter:
-            ///   $("#element).wijgrid("currentCell", new $.wijmo.wijgrid.cellInfo(0, 0));
-            ///   or
-            ///   $("#element).wijgrid("currentCell", 0, 0);
-            /// </summary>
-            /// <param name="cellInfo" type="$.wijmo.wijgrid.cellInfo">Object that represents a single cell.</param>
-            /// <param name="cellIndex" type="Number" integer="true" optional="true">Zero-based index of the required cell inside the corresponding row.</param>
-            /// <param name="rowIndex" type="Number" integer="true" optional="true">Zero-based index of the row that contains required cell.</param>
-            /// <returns type="$.wijmo.wijgrid.cellInfo">Object that represents current cell of the grid.</returns>
-                        var currentCell, view = this._view(), rows = this._rows();
-            if(arguments.length === 0) {
-                // getter
-                currentCell = this._field("currentCell");
-                if(!currentCell) {
-                    this._field("currentCell", currentCell = wijmo.grid.cellInfo.outsideValue);
-                }
-                return currentCell;
-            } else {
-                // setter
-                currentCell = (arguments.length === 1) ? (a)._clone() : new wijmo.grid.cellInfo(a, b);
-                if(!currentCell.isEqual(wijmo.grid.cellInfo.outsideValue)) {
-                    if(!currentCell._isValid()) {
-                        throw "invalid arguments";
+                optionChanged = (value !== oldValue);
+                //$.Widget.prototype._setOption.apply(this, arguments); note: there is no dynamic linkage between the arguments and the formal parameter values when strict mode is used
+                _super.prototype._setOption.apply(this, [
+                    key,
+                    value
+                ])// update this.options
+                ;
+                if(optionChanged) {
+                    postsetFunc = this["_postset_" + key];
+                    if(postsetFunc !== undefined) {
+                        postsetFunc.apply(this, [
+                            value,
+                            oldValue
+                        ]);
                     }
-                    currentCell._clip(this._getDataCellsRange());
-                    if(currentCell.rowIndex() >= 0) {
-                        if(!(view._getRowInfo(rows.item(currentCell.rowIndex())).type & wijmo.grid.rowType.data)) {
-                            return;
+                }
+            };
+            wijgrid.prototype.columns = // * override
+            // * public
+            /** Returns a one-dimensional array of widgets bound to visible column headers.
+            * @example
+            * var colWidgets = $("#element").wijgrid("columns");
+            * @remarks
+            * wijgrid columns are represented as widgets. This method returns a one-dimensional array of widgets that are bound to visible column headers.
+            *
+            * The column widget is initiated with values taken from the corresponding item in the wijgrid.options.columns array. However, the options of a column widget instance reference not the original object but a copy created by the widget factory. Due to that, changes to the wijgrid.options.columns options are not automatically propagated to the column widget options and vice versa.
+            * To solve this issue, the wijgrid synchronized the column widget option values with the source items. This synchronization occurs inside the ensureControl() method which is automatically called at each action requiring the wijgrid to enter.
+            *
+            * Still, there is a drawback. For example, a user may want to filter wijgrid data from user code as in this sample:
+            *
+            *	$("#element").wijgrid("option", "columns")[0].filterValue = "newValue";
+            *	$("#element").wijgrid("ensureControl", true); // make wijgrid re-shape data and re-render.
+            *
+            * In the sample above, nothing will happen since at synchronization user changes will be ignored.You need to change the filterValue of a column widget. This is what the columns() method is for:
+            *
+            *	$("#element").wijgrid("columns")[0].options.filterValue = "newValue";
+            *	$("#element").wijgrid("ensureControl", true); // make wijgrid re-shape data and re-render.
+            *
+            * Here's the best way to change the filterValue:
+            *
+            *	$("#element").wijgrid("columns")[0].option("filterValue", "newValue"); // column widget handles all the needful.
+            *
+            * @returns {Object[]} A one-dimensional array of widgets bound to visible column headers.
+            */
+            function () {
+                return this._field("columns") || [];
+            };
+            wijgrid.prototype.currentCell = // setter 2
+            /** @ignore */
+            function (a, b) {
+                var currentCell, view = this._view(), rows = this._rows();
+                if(arguments.length === 0) {
+                    // getter
+                    currentCell = this._field("currentCell");
+                    if(!currentCell) {
+                        this._field("currentCell", currentCell = wijmo.grid.cellInfo.outsideValue);
+                    }
+                    return currentCell;
+                } else {
+                    // setter
+                    currentCell = (arguments.length === 1) ? (a)._clone() : new wijmo.grid.cellInfo(a, b);
+                    if(!currentCell.isEqual(wijmo.grid.cellInfo.outsideValue)) {
+                        if(!currentCell._isValid()) {
+                            throw "invalid arguments";
+                        }
+                        currentCell._clip(this._getDataCellsRange());
+                        if(currentCell.rowIndex() >= 0) {
+                            if(!(view._getRowInfo(rows.item(currentCell.rowIndex())).type & wijmo.grid.rowType.data)) {
+                                return;
+                            }
+                        }
+                    }
+                    currentCell._setGridView(this);
+                    this._changeCurrentCell(null, currentCell);
+                    return this._field("currentCell");
+                }
+            };
+            wijgrid.prototype.data = /** Gets an array of underlying data.
+            * @example
+            * var data = $("#element").wijgrid("data");
+            * @returns {object[]} An array of underlying data.
+            */
+            function () {
+                //return this._dataViewWrapper.dataView()();
+                return this._dataViewWrapper.dataView().getSource();
+            };
+            wijgrid.prototype.dataView = /** Gets an underlying wijdataview instance.
+            * @example
+            * var dataView = $("#element").wijgrid("dataView");
+            * @returns {wijmo.data.IDataView} An underlying wijdataview instance.
+            */
+            function () {
+                return this._dataViewWrapper.dataView();
+            };
+            wijgrid.prototype.doRefresh = /** Re-renders wijgrid.
+            * @example
+            * $("#element").wijgrid("doRefresh");
+            */
+            function (userData) {
+                if(!$.isPlainObject(userData)) {
+                    userData = {
+                    };
+                }
+                var leaves, self = this, uid = wijmo.grid.EXPANDO, virtualRefresh = userData && userData.virtualScrollData;
+                if(!this._initialized) {
+                    try  {
+                        this._prepareColumnOptions(this.options.columns, this.options.columnsAutogenerationMode, this._dataViewWrapper.getFieldsInfo(), true, true)// prepare static and dynamic columns
+                        ;
+                    } catch (e) {
+                        throw e;
+                    }finally {
+                        //ownerise the column for bug 16936, 17079
+                        this._ownerise(true);
+                        this._initialized = true;
+                    }
+                } else {
+                    //				if (userData && $.isFunction(userData.beforeRefresh)) {
+                    //					userData.beforeRefresh.apply(this);
+                    //				}
+                                    }
+                if(!virtualRefresh) {
+                    // do not rebuild leaves during virtual scrolling callback
+                    this._rebuildLeaves()// build leaves, visible leaves, set dataIndex etc
+                    ;
+                    var dataSlice = this._dataViewWrapper.data();
+                    var dataView = this._dataViewWrapper.dataView();
+                    $.each(this._field("leaves"), function () {
+                        // copy totals
+                        this._totalsValue = (dataSlice.totals) ? dataSlice.totals[this.dataKey] : undefined;
+                    });
+                    // this._setPageCount(dataSlice);
+                    this.sketchTable = [];
+                    if(dataSlice.data && dataSlice.data.length) {
+                        // process data items
+                        leaves = this._field("leaves");
+                        $.each(dataSlice.data, function (i, item) {
+                            self.sketchTable.push(self._buildSketchRow(item, leaves));
+                        });
+                    } else {
+                        if(dataSlice.emptyData) {
+                            // process empty data row
+                            leaves = this._field("visibleLeaves");
+                            $.each(dataSlice.emptyData, function (i, item) {
+                                self.sketchTable.push(self._buildSketchRowEmptyDataItem(item, leaves, i === dataSlice.emptyData.length - 1));
+                            });
                         }
                     }
                 }
-                currentCell._setGridView(this);
-                this._changeCurrentCell(null, currentCell);
-                return this._field("currentCell");
-            }
-        };
-        wijgrid.prototype.data = function () {
-            /// <summary>
-            /// Gets a array of the underlying data.
-            /// Code example: var data = $("#element").wijgrid("data");
-            /// </summary>
-            /// <returns type="Array"></returns>
-            //return this._dataViewWrapper.dataView()();
-            return this._dataViewWrapper.dataView().getSource();
-        };
-        wijgrid.prototype.dataView = function () {
-            /// <summary>
-            /// Gets an underlying wijdataview instance.
-            /// Code example: var dataView = $("#element").wijgrid("dataView");
-            /// </summary>
-            /// <returns type="Object"></returns>
-            return this._dataViewWrapper.dataView();
-        };
-        wijgrid.prototype.doRefresh = function (userData) {
-            /// <summary>
-            /// Re-renders wijgrid.
-            /// Code example: $("#element").wijgrid("doRefresh");
-            /// </summary>
-            if(!$.isPlainObject(userData)) {
-                userData = {
-                };
-            }
-            var leaves, self = this, uid = wijmo.grid.EXPANDO, virtualRefresh = userData && userData.virtualScrollData;
-            if(!this._initialized) {
-                try  {
-                    this._prepareColumnOptions(true, true)// prepare static and dynamic columns
-                    ;
-                } catch (e) {
-                    throw e;
-                }finally {
-                    //ownerise the column for bug 16936, 17079
-                    this._ownerise(true);
-                    this._initialized = true;
-                }
-            } else {
-                //				if (userData && $.isFunction(userData.beforeRefresh)) {
-                //					userData.beforeRefresh.apply(this);
-                //				}
-                            }
-            if(!virtualRefresh) {
-                // do not rebuild leaves during virtual scrolling callback
-                this._rebuildLeaves()// build leaves, visible leaves, set dataIndex etc
-                ;
-                var dataSlice = this._dataViewWrapper.data();
-                var dataView = this._dataViewWrapper.dataView();
-                $.each(this._field("leaves"), function () {
-                    // copy totals
-                    this._totalsValue = (dataSlice.totals) ? dataSlice.totals[this.dataKey] : undefined;
-                });
-                // this._setPageCount(dataSlice);
-                this.sketchTable = [];
-                if(dataSlice.data && dataSlice.data.length) {
-                    // process data items
-                    leaves = this._field("leaves");
-                    $.each(dataSlice.data, function (i, item) {
-                        self.sketchTable.push(self._buildSketchRow(item, leaves));
-                    });
+                this._onRendering(userData);
+                if(!virtualRefresh) {
+                    this._refresh(userData);
                 } else {
-                    if(dataSlice.emptyData) {
-                        // process empty data row
-                        leaves = this._field("visibleLeaves");
-                        $.each(dataSlice.emptyData, function (i, item) {
-                            self.sketchTable.push(self._buildSketchRowEmptyDataItem(item, leaves, i === dataSlice.emptyData.length - 1));
+                    this._refreshVirtual(userData);
+                }
+                this._onRendered(userData);
+                if(userData && $.isFunction(userData.afterRefresh)) {
+                    userData.afterRefresh.apply(this, [
+                        userData
+                    ]);
+                }
+            };
+            wijgrid.prototype.beginEdit = /** Puts the current cell into edit mode, as long as the allowEditing option is set to "true."
+            * @example
+            * $("#element").wijgrid({}
+            *		allowEditing: true,
+            *		currentCellChanged: function (e, args) {
+            *			if ($(e.target).wijgrid("option", "isLoaded")) {
+            *				window.setTimeout(function () {
+            *					$(e.target).wijgrid("beginEdit");
+            *				}, 100);
+            *			}
+            *		}
+            * });
+            * @returns {Boolean} True if the cell is successfully put into edit mode, otherwise false.
+            */
+            function () {
+                return this._beginEditInternal(null);
+            };
+            wijgrid.prototype.endEdit = /** Finishes editing the current cell.
+            * @example
+            * // endEdit is being called from within the saveChanges function
+            * function saveChanges() {
+            *		$("#element").wijgrid("endEdit");
+            * }
+            * @returns {Boolean} True if the editing was finished successfully, othewise false.
+            */
+            function () {
+                return this._endEditInternal(null);
+            };
+            wijgrid.prototype.ensureControl = /** Moves the column widget options to the wijgrid options and renders the wijgrid. Use this method when you need to re-render the wijgrid and reload remote data from the datasource.
+            * @example
+            * // Adds a new row to the viewModel and refreshes the wijgrid
+            * var len = viewModel.data().length;
+            * viewModel.data.push(new Person({ ID: len, Company: "New Company" + len, Name: "New Name" + len }));
+            * $("#element").wijgrid("ensureControl", true);
+            * @param {Boolean} loadData Determines if the wijgrid must load data from a linked data source before rendering.
+            */
+            function (loadData, userData) {
+                this._loading();
+                if(!$.isPlainObject(userData)) {
+                    userData = {
+                        data: null,
+                        afterRefresh: null,
+                        beforeRefresh: null
+                    };
+                }
+                userData._wijgridMarker = true;
+                if(this._initialized) {
+                    this._convertWidgetsToOptions();
+                } else {
+                    // this._prepareColumnOptions(false); // prepare static columns only
+                    this._prepareColumnOptions(this.options.columns, this.options.columnsAutogenerationMode, this._dataViewWrapper.isDataLoaded() && this._dataViewWrapper.getFieldsInfo(), this._dataViewWrapper.isDataLoaded(), false);
+                    if(!this._dataViewWrapper.isOwnDataView()) {
+                        // map sorting\ filtering\ paging settings from external dataView to the grid's options during initialization stage
+                        (new wijmo.grid.settingsManager(this)).MapDVToWG();
+                    }
+                }
+                this._ownerise(true);
+                // * TODO: move to the doRefresh?
+                if(this._initialized) {
+                    if(userData && $.isFunction(userData.beforeRefresh)) {
+                        userData.beforeRefresh.apply(this);
+                    }
+                }
+                // *
+                this._field("allowVirtualScrolling", null);
+                if(loadData === true) {
+                    this._dataViewWrapper.load(userData);
+                } else {
+                    this.doRefresh(userData);
+                    this._loaded();
+                }
+            };
+            wijgrid.prototype.getCellInfo = /** Gets an instance of the wijmo.grid.cellInfo class that represents the grid's specified cell.
+            * @example
+            * var cellInfo = $("#element").wijgrid("getCellInfo", domCell);
+            * @param {Object} domCell A HTML DOM Table cell object
+            * @returns {wijmo.grid.cellInfo} Object that represents a cell of the grid.
+            */
+            function (domCell) {
+                var cellInfo = null;
+                if(domCell && (domCell = this._findUntilOuterDiv(domCell, {
+                    td: true,
+                    th: true
+                }))) {
+                    // test affinity
+                    cellInfo = this._view().getAbsoluteCellInfo(domCell);
+                }
+                return cellInfo;
+            };
+            wijgrid.prototype.getFilterOperatorsByDataType = /** Returns a one-dimensional array of filter operators which are applicable to the specified data type.
+            * @example
+            * var operators = $("#element").wijgrid("getFilterOperatorsByDataType", "string");
+            * @param {String} dataType Specifies the type of data to which you apply the filter operators. Possible values are: "string", "number", "datetime", "currency" and "boolean".
+            * @returns {wijmo.grid.IFilterOperator[]} A one-dimensional array of filter operators.
+            */
+            function (dataType) {
+                return (new wijmo.grid.filterOperatorsCache(this)).getByDataType(dataType || "string");
+            };
+            wijgrid.prototype.pageCount = /** Gets the number of pages.
+            * @example
+            * var pageCount = $("#element").wijgrid("pageCount");
+            * @returns {Number} The number of pages.
+            */
+            function () {
+                if(this._customPagingEnabled()) {
+                    return Math.ceil(this.options.totalRows / this.options.pageSize) || 1;
+                }
+                return this.options.allowPaging ? (this._dataViewWrapper.dataView()).pageCount() : 1;
+            };
+            wijgrid.prototype._serverShaping = function () {
+                // used to support asp.net C1GridView
+                return false;
+            };
+            wijgrid.prototype._pageIndexForDataView = function () {
+                /** Infrastructure */
+                return this.options.pageIndex;
+            };
+            wijgrid.prototype.setSize = /** Sets the size of the grid using the width and height parameters.
+            * @example
+            * $("#element").wijgrid("setSize", 200, 200);
+            * @param {String|Number} width Determines the width of the grid.
+            * @param {String|Number} height Determines the height of the grid.
+            */
+            function (width, height) {
+                var view = this._view(), scrollValue = {
+                    type: "",
+                    hScrollValue: null,
+                    vScrollValue: null
+                }, outerDiv = this.outerDiv, frozener = this._field("frozener"), visibleLeaves = this._field("visibleLeaves"), leavesWithFilter = [];
+                if(view && view.getScrollValue) {
+                    scrollValue = view.getScrollValue();
+                }
+                if(width || (width === 0)) {
+                    this._autoWidth = false;
+                    outerDiv.width(width);
+                }
+                if(height || (height === 0)) {
+                    this._autoHeight = false;
+                    outerDiv.height(height);
+                }
+                $.each(visibleLeaves, function (index, leaf) {
+                    var th = view.getHeaderCell(index), cols = view.getJoinedCols(index);
+                    $(th).css("width", "");
+                    $.each(cols, function (index, col) {
+                        $(col).css("width", "");
+                    });
+                });
+                // recalculate sizes
+                this._view().updateSplits(scrollValue);
+                if(frozener) {
+                    frozener.refresh();
+                }
+            };
+            wijgrid.prototype.selection = /** Gets an object that manages selection in the grid.
+            * @example
+            * // Use the row index to add the row to the selection object
+            * var selection = $("#element").wijgrid("selection");
+            * selection.addRows(2);
+            * @remarks
+            * See the description of the wijmo.grid.selection class for more details.
+            * @returns {wijmo.grid.selection} Object that manages selection in the grid.
+            */
+            function () {
+                var selection = this._field("selection");
+                if(!selection) {
+                    this._field("selection", selection = new wijmo.grid.selection(this));
+                }
+                return selection;
+            };
+            wijgrid.prototype._onDataViewCurrentPositionChanged = // * public
+            function (e, args) {
+                var cellInfo = this._currentCellFromDataView(), selection = this.selection();
+                // move currentCell to the new position
+                cellInfo = this.currentCell(cellInfo);
+                // * move selection to the current position *
+                selection.beginUpdate();
+                selection.clear();
+                if(cellInfo._isValid()) {
+                    // attach selection to the current cell
+                    selection._startNewTransaction(cellInfo);
+                    selection._selectRange(new wijmo.grid.cellInfoRange(cellInfo, cellInfo), false, false, 0/* none */ , null);
+                }
+                selection.endUpdate();
+            };
+            wijgrid.prototype._resetDataProperties = function () {
+                this.options.pageIndex = 0;
+                var bounds = this._field("viewRenderBounds");
+                bounds.start = bounds.end = 0;
+            };
+            wijgrid.prototype._onDataViewLoading = function () {
+                this._activateSpinner()// if data loading proccess was triggered outside the wijgrid.
+                ;
+                this._trigger("dataLoading");
+            };
+            wijgrid.prototype._onDataViewReset = function (userData) {
+                (new wijmo.grid.settingsManager(this)).MapDVToWG();
+                this._trigger("dataLoaded");
+                this.doRefresh(userData);
+                this._loaded();
+            };
+            wijgrid.prototype._onDataViewLoaded = function () {
+            };
+            wijgrid.prototype._loading = function () {
+                this._activateSpinner();
+                this._trigger("loading");
+            };
+            wijgrid.prototype._loaded = function () {
+                this._deactivateSpinner();
+                this._trigger("loaded");
+            };
+            wijgrid.prototype._buildSketchRow = function (wrappedDataItem, leaves) {
+                var i, len, leaf, cellAttr, value, tmp, sketchRow = [], expando = wijmo.data.Expando.getFrom(wrappedDataItem.values, false), rowAttributes = expando ? expando[wijmo.grid.EXPANDO] : null;
+                for(i = 0 , len = leaves.length; i < len; i++) {
+                    leaf = leaves[i];
+                    if(wijmo.grid.validDataKey(leaf.dataKey)) {
+                        cellAttr = (rowAttributes && rowAttributes.cellsAttributes) ? rowAttributes.cellsAttributes[leaf.dataKey] : {
+                        };
+                        value = this._dataViewWrapper.getValue(wrappedDataItem.values, leaf.dataKey);
+                        sketchRow.push({
+                            value: this.parse(leaf, value),
+                            __attr: cellAttr || {
+                            },
+                            __style: {
+                            }
                         });
                     }
                 }
-            }
-            this._onRendering(userData);
-            if(!virtualRefresh) {
-                this._refresh(userData);
-            } else {
-                this._refreshVirtual(userData);
-            }
-            this._onRendered(userData);
-            if(userData && $.isFunction(userData.afterRefresh)) {
-                userData.afterRefresh.apply(this, [
-                    userData
-                ]);
-            }
-        };
-        wijgrid.prototype.beginEdit = function () {
-            /// <summary>
-            /// Puts the current cell in editing mode.
-            /// Note: works only if the allowEditing option is set to true.
-            /// Code example: $("#element").wijgrid("beginEdit");
-            /// </summary>
-            /// <returns type="Boolean">True if the cell is successfully put in edit mode, otherwise false.</returns>
-            return this._beginEditInternal(null);
-        };
-        wijgrid.prototype.endEdit = function () {
-            /// <summary>
-            /// Finishes editing the current cell.
-            /// Code example: $("#element").wijgrid("endEdit");
-            /// </summary>
-            return this._endEditInternal(null);
-        };
-        wijgrid.prototype.ensureControl = function (loadData, userData) {
-            /// <summary>
-            /// Moves column widgets options to wijgrid options and renders wijgrid
-            /// Code example: $("#element").wijgrid("ensureControl", true);
-            /// </summary>
-            /// <param name="loadData" type="Boolean">Determines if wijgrid must load data from linked data source before rendering.</param>
-            this._loading();
-            if(!$.isPlainObject(userData)) {
-                userData = {
-                    data: null,
-                    afterRefresh: null,
-                    beforeRefresh: null
+                (sketchRow).originalRowIndex = wrappedDataItem.originalRowIndex;
+                (sketchRow).rowType = wijmo.grid.rowType.data;
+                if(wrappedDataItem.originalRowIndex % 2 !== 0) {
+                    (sketchRow).rowType |= wijmo.grid.rowType.dataAlt;
+                }
+                (sketchRow).__style = {
                 };
-            }
-            userData._wijgridMarker = true;
-            if(this._initialized) {
-                this._convertWidgetsToOptions();
-            } else {
-                // this._prepareColumnOptions(false); // prepare static columns only
-                this._prepareColumnOptions(this._dataViewWrapper.isDataLoaded(), false);
-                if(!this._dataViewWrapper.isOwnDataView()) {
-                    // map sorting\ filtering\ paging settings from external dataView to the grid's options during initialization stage
-                    (new wijmo.grid.settingsManager(this)).MapDVToWG();
-                }
-            }
-            this._ownerise(true);
-            // * TODO: move to the doRefresh?
-            if(this._initialized) {
-                if(userData && $.isFunction(userData.beforeRefresh)) {
-                    userData.beforeRefresh.apply(this);
-                }
-            }
-            // *
-            this._field("allowVirtualScrolling", null);
-            if(loadData === true) {
-                this._dataViewWrapper.load(userData);
-            } else {
-                this.doRefresh(userData);
-                this._loaded();
-            }
-        };
-        wijgrid.prototype.getCellInfo = function (domCell) {
-            /// <summary>
-            /// Gets an instance of the $.wijmo.wijgrid.cellInfo class that represents the specified cell of the grid.
-            /// Code example: var cellInfo = $("#element").wijgrid("getCellInfo", domCell);
-            /// <param name="domCell" type="Object">A HTML DOM Table cell object.</param>
-            /// </summary>
-            /// <returns type="$.wijmo.wijgrid.cellInfo">Object that represents a cell of the grid.</returns>
-            var cellInfo = null;
-            if(domCell && (domCell = this._findUntilOuterDiv(domCell, {
-                td: true,
-                th: true
-            }))) {
-                // test affinity
-                cellInfo = this._view().getAbsoluteCellInfo(domCell);
-            }
-            return cellInfo;
-        };
-        wijgrid.prototype.getFilterOperatorsByDataType = function (dataType) {
-            /// <summary>
-            /// Returns a one-dimensional array of filter operators which are applicable to the specified data type.
-            /// Code example: var operators = $("#element").wijgrid("getFilterOperatorsByDataType", "string");
-            /// <param name="dataType" type="String">Data type. Possible values are: "string", "number", "datetime", "currency" and "boolean".</param>
-            /// </summary>
-            /// <returns type="Array">A one-dimensional array of filter operators.</returns>
-            return (new wijmo.grid.filterOperatorsCache(this)).getByDataType(dataType || "string");
-        };
-        wijgrid.prototype.pageCount = function () {
-            /// <summary>
-            /// Gets the number of pages.
-            /// Code example:
-            /// var pageCount = $("#element").wijgrid("pageCount");
-            /// </summary>
-            /// <returns type="Number" integer="true"></returns>
-            if(this._customPagingEnabled()) {
-                return Math.ceil(this.options.totalRows / this.options.pageSize) || 1;
-            }
-            return this.options.allowPaging ? (this._dataViewWrapper.dataView()).pageCount() : 1;
-        };
-        wijgrid.prototype._serverShaping = function () {
-            // used to support asp.net C1GridView
-            return false;
-        };
-        wijgrid.prototype._pageIndexForDataView = function () {
-            /// <summary>
-            /// Infrastructure
-            /// </summary>
-            return this.options.pageIndex;
-        };
-        wijgrid.prototype.setSize = function (width, height) {
-            /// <summary>
-            /// Set the size of grid.
-            /// Code example: $("#element").wijgrid("setSize", 200, 200);
-            /// <param name="width" type="Object" optional="true">Determines the width of the grid.</param>
-            /// <param name="height" type="Object" optional="true">Determines the height of the grid.</param>
-            /// </summary>
-                        var view = this._view(), scrollValue = {
-                type: "",
-                hScrollValue: null,
-                vScrollValue: null
-            }, outerDiv = this.outerDiv, frozener = this._field("frozener"), visibleLeaves = this._field("visibleLeaves"), leavesWithFilter = [];
-            if(view && view.getScrollValue) {
-                scrollValue = view.getScrollValue();
-            }
-            if(width || (width === 0)) {
-                this._autoWidth = false;
-                outerDiv.width(width);
-            }
-            if(height || (height === 0)) {
-                this._autoHeight = false;
-                outerDiv.height(height);
-            }
-            $.each(visibleLeaves, function (index, leaf) {
-                var th = view.getHeaderCell(index), cols = view.getJoinedCols(index);
-                $(th).css("width", "");
-                $.each(cols, function (index, col) {
-                    $(col).css("width", "");
-                });
-            });
-            // recalculate sizes
-            this._view().updateSplits(scrollValue);
-            if(frozener) {
-                frozener.refresh();
-            }
-        };
-        wijgrid.prototype.selection = function () {
-            /// <summary>
-            /// Gets an object that manages selection in the grid.
-            /// Code example:
-            ///   var selection = $("#element").wijgrid("selection");
-            /// </summary>
-            /// <returns type="$.wijmo.wijgrid.selection">Object that manages selection in the grid.</returns>
-            var selection = this._field("selection");
-            if(!selection) {
-                this._field("selection", selection = new wijmo.grid.selection(this));
-            }
-            return selection;
-        };
-        wijgrid.prototype._onDataViewCurrentPositionChanged = // * public
-        function (e, args) {
-            var dataViewRowIndex = this._dataViewWrapper.currentPosition(), cc = new wijmo.grid.cellInfo(this.currentCell().cellIndex(), this._dataViewDataRowIndexToGrid(dataViewRowIndex), null), selection = this.selection();
-            // normalize
-            if(cc.rowIndex() < 0) {
-                cc.cellIndex(-1);
-            } else {
-                if(cc.cellIndex() < 0) {
-                    cc.cellIndex(0);
-                }
-            }
-            // move currentCell to the new position
-            cc = this.currentCell(cc);
-            // * move selection to the current position *
-            selection.beginUpdate();
-            selection.clear();
-            if(cc && cc._isValid()) {
-                selection._selectRange(new wijmo.grid.cellInfoRange(cc, cc), false, false, 0/* none */ , null);
-            }
-            selection.endUpdate();
-        };
-        wijgrid.prototype._resetDataProperties = function () {
-            this.options.pageIndex = 0;
-            var bounds = this._field("viewRenderBounds");
-            bounds.start = bounds.end = 0;
-        };
-        wijgrid.prototype._onDataViewLoading = function () {
-            this._activateSpinner()// if data loading proccess was triggered outside the wijgrid.
-            ;
-            this._trigger("dataLoading");
-        };
-        wijgrid.prototype._onDataViewReset = function (userData) {
-            (new wijmo.grid.settingsManager(this)).MapDVToWG();
-            this._trigger("dataLoaded");
-            this.doRefresh(userData);
-            this._loaded();
-        };
-        wijgrid.prototype._onDataViewLoaded = function () {
-        };
-        wijgrid.prototype._loading = function () {
-            this._activateSpinner();
-            this._trigger("loading");
-        };
-        wijgrid.prototype._loaded = function () {
-            this._deactivateSpinner();
-            this._trigger("loaded");
-        };
-        wijgrid.prototype._buildSketchRow = function (wrappedDataItem, leaves) {
-            var i, len, leaf, cellAttr, value, tmp, sketchRow = [], expando = wijmo.data.Expando.getFrom(wrappedDataItem.values, false), rowAttributes = expando ? expando[wijmo.grid.EXPANDO] : null;
-            for(i = 0 , len = leaves.length; i < len; i++) {
-                leaf = leaves[i];
-                if(wijmo.grid.validDataKey(leaf.dataKey)) {
-                    cellAttr = (rowAttributes && rowAttributes.cellsAttributes) ? rowAttributes.cellsAttributes[leaf.dataKey] : {
-                    };
-                    value = this._dataViewWrapper.getValue(wrappedDataItem.values, leaf.dataKey);
+                (sketchRow).__attr = (rowAttributes && rowAttributes.rowAttributes) ? rowAttributes.rowAttributes : {
+                };
+                return sketchRow;
+            };
+            wijgrid.prototype._buildSketchRowEmptyDataItem = function (dataItem, leaves, isLastRow) {
+                var i, len, sketchRow = [], leavesLen = leaves.length;
+                for(i = 0 , len = dataItem.length; i < len; i++) {
                     sketchRow.push({
-                        value: this._parse(leaf, value),
-                        __attr: cellAttr || {
+                        html: dataItem[i],
+                        __attr: {
+                            colSpan: (leavesLen > 0 && isLastRow) ? leavesLen : 1
                         },
                         __style: {
                         }
                     });
                 }
-            }
-            (sketchRow).originalRowIndex = wrappedDataItem.originalRowIndex;
-            (sketchRow).rowType = wijmo.grid.rowType.data;
-            if(wrappedDataItem.originalRowIndex % 2 !== 0) {
-                (sketchRow).rowType |= wijmo.grid.rowType.dataAlt;
-            }
-            (sketchRow).__style = {
+                (sketchRow).rowType = wijmo.grid.rowType.emptyDataRow;
+                (sketchRow).__style = {
+                };
+                (sketchRow).__attr = {
+                };
+                return sketchRow;
             };
-            (sketchRow).__attr = (rowAttributes && rowAttributes.rowAttributes) ? rowAttributes.rowAttributes : {
-            };
-            return sketchRow;
-        };
-        wijgrid.prototype._buildSketchRowEmptyDataItem = function (dataItem, leaves, isLastRow) {
-            var i, len, sketchRow = [], leavesLen = leaves.length;
-            for(i = 0 , len = dataItem.length; i < len; i++) {
-                sketchRow.push({
-                    html: dataItem[i],
-                    __attr: {
-                        colSpan: (leavesLen > 0 && isLastRow) ? leavesLen : 1
-                    },
-                    __style: {
+            wijgrid.prototype._prepareColumnOptions = function (columns, generationMode, fieldsInfo, dataLoaded, finalStage) {
+                wijmo.grid.traverse(columns, function (column) {
+                    column.isBand = ($.isArray(column.columns) || (column.clientType === "c1band"));
+                    column._originalDataKey = column.dataKey;
+                    column._originalHeaderText = column.headerText;
+                });
+                // set .isLeaf
+                new wijmo.grid.bandProcessor().getVisibleHeight(columns, true);
+                // prepare leaves
+                                var leaves = [], headerRow = this._originalHeaderRowData(), footerRow = this._originalFooterRowData(), autogenerationMode = (generationMode || "").toLowerCase(), self = this;
+                if(dataLoaded) {
+                    wijmo.grid.columnsGenerator.generate(autogenerationMode, fieldsInfo, columns);
+                }
+                wijmo.grid.setTraverseIndex(columns)// build indices (linearIdx, travIdx, parentIdx)
+                ;
+                // * merge options with defaults and build "pure" leaves list.
+                wijmo.grid.traverse(columns, function (column) {
+                    // merge options **
+                    column.isBand = ($.isArray(column.columns) || (column.clientType === "c1band"));
+                    wijmo.grid.shallowMerge(column, grid.c1basefield.prototype.options)// merge with the c1basefield default options
+                    ;
+                    if(!column.isBand) {
+                        wijmo.grid.shallowMerge(column, grid.c1field.prototype.options)// merge with the c1field default options
+                        ;
+                        column.groupInfo = column.groupInfo || {
+                        };
+                        wijmo.grid.shallowMerge(column.groupInfo, grid.c1field.prototype.options.groupInfo);
+                        if(!column.clientType) {
+                            column.clientType = "c1field";
+                        }
+                    } else {
+                        column.clientType = "c1band";
+                    }
+                    // ** merge options
+                    if(column.isLeaf && !column.isBand) {
+                        leaves.push(column);
                     }
                 });
-            }
-            (sketchRow).rowType = wijmo.grid.rowType.emptyDataRow;
-            (sketchRow).__style = {
-            };
-            (sketchRow).__attr = {
-            };
-            return sketchRow;
-        };
-        wijgrid.prototype._prepareColumnOptions = function (dataLoaded, finalStage) {
-            wijmo.grid.traverse(this.options.columns, function (column) {
-                column.isBand = ($.isArray(column.columns) || (column.clientType === "c1band"));
-                column._originalDataKey = column.dataKey;
-                column._originalHeaderText = column.headerText;
-            });
-            // set .isLeaf
-            new wijmo.grid.bandProcessor().getVisibleHeight(this.options.columns, true);
-            // prepare leaves
-                        var leaves = [], headerRow = this._originalHeaderRowData(), footerRow = this._originalFooterRowData(), autogenerationMode = (this.options.columnsAutogenerationMode || "").toLowerCase();
-            if(dataLoaded) {
-                wijmo.grid.columnsGenerator.generate(autogenerationMode, this._dataViewWrapper.getFieldsInfo(), this.options.columns);
-            }
-            wijmo.grid.setTraverseIndex(this.options.columns)// build indices (linearIdx, travIdx, parentIdx)
-            ;
-            // * merge options with defaults and build "pure" leaves list.
-            wijmo.grid.traverse(this.options.columns, function (column) {
-                // merge options **
-                column.isBand = ($.isArray(column.columns) || (column.clientType === "c1band"));
-                wijmo.grid.shallowMerge(column, wijmo.c1basefield.prototype.options)// merge with the c1basefield default options
+                this._field("leaves", leaves)// contains static columns only when dataLoaded == false, used by the "dynamic data load" feature during request initialization.
                 ;
-                if(!column.isBand) {
-                    wijmo.grid.shallowMerge(column, wijmo.c1field.prototype.options)// merge with the c1field default options
-                    ;
-                    column.groupInfo = column.groupInfo || {
-                    };
-                    wijmo.grid.shallowMerge(column.groupInfo, wijmo.c1field.prototype.options.groupInfo);
-                    if(!column.clientType) {
-                        column.clientType = "c1field";
-                    }
-                } else {
-                    column.clientType = "c1band";
-                }
-                // ** merge options
-                if(column.isLeaf && !column.isBand) {
-                    leaves.push(column);
-                }
-            });
-            this._field("leaves", leaves)// contains static columns only when dataLoaded == false, used by the "dynamic data load" feature during request initialization.
-            ;
-            if(dataLoaded) {
-                // assume headerText and footerText
-                $.each(leaves, $.proxy(function (i, leaf) {
-                    var thIndex = (typeof (leaf.dataKey) === "number") ? leaf.dataKey : i;
-                    if(autogenerationMode === "merge" || leaf.dynamic === true) {
-                        // assume headerText options of the static columns only when using "merge" mode.
-                        if(leaf.headerText === undefined) {
-                            if(this._dataViewWrapper.isBoundedToDOM() && headerRow && (thIndex < headerRow.length)) {
-                                leaf.headerText = $.trim(headerRow[thIndex])// copy th
-                                ;
-                            } else {
-                                if(wijmo.grid.validDataKey(leaf.dataKey)) {
-                                    leaf.headerText = "" + leaf.dataKey// copy dataKey
+                if(dataLoaded) {
+                    // assume headerText and footerText
+                    $.each(leaves, $.proxy(function (i, leaf) {
+                        var thIndex = (typeof (leaf.dataKey) === "number") ? leaf.dataKey : i;
+                        if(autogenerationMode === "merge" || leaf.dynamic === true) {
+                            // assume headerText options of the static columns only when using "merge" mode.
+                            if(leaf.headerText === undefined) {
+                                if(self._dataViewWrapper && self._dataViewWrapper.isBoundedToDOM() && headerRow && (thIndex < headerRow.length)) {
+                                    leaf.headerText = $.trim(headerRow[thIndex])// copy th
                                     ;
+                                } else {
+                                    if(wijmo.grid.validDataKey(leaf.dataKey)) {
+                                        leaf.headerText = "" + leaf.dataKey// copy dataKey
+                                        ;
+                                    }
                                 }
                             }
                         }
-                    }
-                    if(this._dataViewWrapper.isBoundedToDOM() && footerRow && (thIndex < footerRow.length)) {
-                        leaf._footerTextDOM = $.trim(footerRow[thIndex]);
-                    }
-                }, this));
-            }
-        };
-        wijgrid.prototype._rebuildLeaves = function () {
-            var tmpColumns = [], leaves = [], tmp;
-            if(this.options.showRowHeader) {
-                // append rowHeader
-                tmp = wijmo.grid.createDynamicField({
-                    clientType: "c1basefield",
-                    dataIndex: -1,
-                    travIdx: -1,
-                    parentVis: true,
-                    allowMoving: false,
-                    allowSizing: false,
-                    allowSort: false,
-                    isRowHeader: true
+                        if(self._dataViewWrapper && self._dataViewWrapper.isBoundedToDOM() && footerRow && (thIndex < footerRow.length)) {
+                            leaf._footerTextDOM = $.trim(footerRow[thIndex]);
+                        }
+                    }, this));
+                }
+            };
+            wijgrid.prototype._rebuildLeaves = function () {
+                var tmpColumns = [], leaves = [], tmp;
+                if(this._showRowHeader()) {
+                    // append rowHeader
+                    tmp = wijmo.grid.createDynamicField({
+                        clientType: "c1basefield",
+                        dataIndex: -1,
+                        travIdx: -1,
+                        parentVis: true,
+                        allowMoving: false,
+                        allowSizing: false,
+                        allowSort: false,
+                        isRowHeader: true
+                    });
+                    tmp.owner = this;
+                    tmpColumns.push(tmp);
+                }
+                $.each(this.options.columns, function (index, item) {
+                    tmpColumns.push(item)// append columns
+                    ;
                 });
-                tmp.owner = this;
-                tmpColumns.push(tmp);
-            }
-            $.each(this.options.columns, function (index, item) {
-                tmpColumns.push(item)// append columns
-                ;
-            });
-            // generate span table and build leaves
-            this._columnsHeadersTable(new wijmo.grid.bandProcessor().generateSpanTable(tmpColumns, leaves));
-            this._field("leaves", leaves);
-            this._onLeavesCreated();
-        };
-        wijgrid.prototype._onLeavesCreated = function () {
-            var leaves = this._field("leaves"), fieldsInfo = this._dataViewWrapper.getFieldsInfo(), meta, dataIndex = 0, visLeavesIdx = 0, self = this;
-            // build visible leaves list, set dataParsers, dataIndices
-            this._field("visibleLeaves", $.grep(leaves, function (leaf, index) {
-                leaf.leavesIdx = index;
-                if(wijmo.grid.validDataKey(leaf.dataKey)) {
-                    leaf.dataIndex = dataIndex++;
-                } else {
-                    leaf.dataIndex = -1;
-                }
-                if(!leaf.isBand) {
-                    meta = fieldsInfo[leaf.dataKey];
-                    if(meta) {
-                        leaf._underlyingDataType = meta.type;
-                        leaf._underlyingDataFormatString = meta.format;
+                // generate span table and build leaves
+                this._columnsHeadersTable(new wijmo.grid.bandProcessor().generateSpanTable(tmpColumns, leaves));
+                this._field("leaves", leaves);
+                this._onLeavesCreated();
+            };
+            wijgrid.prototype._onLeavesCreated = function () {
+                var leaves = this._field("leaves"), fieldsInfo = this._dataViewWrapper.getFieldsInfo(), meta, dataIndex = 0, visLeavesIdx = 0, self = this;
+                // build visible leaves list, set dataParsers, dataIndices
+                this._field("visibleLeaves", $.grep(leaves, function (leaf, index) {
+                    leaf.leavesIdx = index;
+                    if(wijmo.grid.validDataKey(leaf.dataKey)) {
+                        leaf.dataIndex = dataIndex++;
+                    } else {
+                        leaf.dataIndex = -1;
                     }
-                    if($.isFunction(leaf.dataParser)) {
-                        leaf.dataParser = new leaf.dataParser();
+                    if(!leaf.isBand) {
+                        meta = fieldsInfo[leaf.dataKey];
+                        if(meta) {
+                            leaf._underlyingDataType = meta.type;
+                            leaf._underlyingDataFormatString = meta.format;
+                        }
+                        if($.isFunction(leaf.dataParser)) {
+                            leaf.dataParser = new (leaf.dataParser)();
+                        }
                     }
-                }
-                if(leaf.parentVis) {
-                    leaf.visLeavesIdx = visLeavesIdx++;
-                    return true;
-                }
-                return false;
-            }));
-        };
-        wijgrid.prototype._allowVirtualScrolling = function () {
-            var val = this._field("allowVirtualScrolling");
-            if(!val) {
-                val = this._field("allowVirtualScrolling", !this.options.allowPaging && this.options.allowVirtualScrolling && (this.options.staticRowIndex < 0) && (this.options.scrollMode !== "none") && !this._hasMerging());
-            }
-            return val;
-        };
-        wijgrid.prototype._dragndrop = function (force) {
-            if (typeof force === "undefined") { force = false; }
-            var dnd = this._field("dragndrop");
-            if(!dnd && force) {
-                this._field("dragndrop", dnd = new wijmo.grid.uiDragndrop(this));
-            }
-            return dnd;
-        };
-        wijgrid.prototype._headerRows = function () {
-            return this._view().headerRows();
-        };
-        wijgrid.prototype._filterRow = function () {
-            return this._view().filterRow();
-        };
-        wijgrid.prototype._rows = function () {
-            return this._view().bodyRows();
-        };
-        wijgrid.prototype._localizeFilterOperators = function (locArray) {
-            var self = this, helper = new wijmo.grid.filterOperatorsCache(this);
-            $.each(locArray, function (i, o) {
-                if(o.name) {
-                    var fop = helper.getByName(o.name);
-                    if(fop) {
-                        fop.displayName = o.displayName;
+                    if(leaf.parentVis) {
+                        leaf.visLeavesIdx = visLeavesIdx++;
+                        return true;
                     }
-                }
-            });
-        };
-        wijgrid.prototype._selectionui = function (force) {
-            var selectionui = this._field("selectionui");
-            if(!selectionui && force) {
-                this._field("selectionui", selectionui = new wijmo.grid.uiSelection(this));
-            }
-            return selectionui;
-        };
-        wijgrid.prototype._postset_allowColMoving = /*_setPageCount (dataSlice) {
-        this._field("pageCount", Math.ceil(dataSlice.totalRows / this.options.pageSize) || 1);
-        },*/
-        // * propeties (pre-\ post-)
-        function (value, oldValue) {
-            var self = this;
-            $.each(this.columns(), function (idx, wijField) {
-                if(value) {
-                    self._dragndrop(true).attach(wijField);
-                } else {
-                    self._dragndrop(true).detach(wijField);
-                }
-            });
-            $.each(this._field("groupedWidgets"), function (idx, wijField) {
-                if(value) {
-                    self._dragndrop(true).attach(wijField);
-                } else {
-                    self._dragndrop(true).detach(wijField);
-                }
-            });
-        };
-        wijgrid.prototype._postset_allowSorting = function (value, oldValue) {
-            this.ensureControl(false);
-        };
-        wijgrid.prototype._postset_columns = function (value, oldValue) {
-            this._initialized = false;
-            this.ensureControl(true);
-        };
-        wijgrid.prototype._postset_allowPaging = function (value, oldValue) {
-            this.ensureControl(true);
-        };
-        wijgrid.prototype._postset_culture = function (value, oldValue) {
-            //this._field("closestCulture", Globalize.findClosestCulture(this.options.culture));
-            throw "read-only";
-        };
-        wijgrid.prototype._postset_customFilterOperators = function (value, oldValue) {
-            var dataView = this._dataViewWrapper.dataView();
-        };
-        wijgrid.prototype._postset_data = function (value, oldValue) {
-            this._ownerise(false);
-            wijmo.grid.traverse(this.options.columns, function (column, columns) {
-                if(column.dynamic) {
-                    // remove autogenerated columns
-                    var idx = $.inArray(column, columns);
-                    if(idx >= 0) {
-                        columns.splice(idx, 1);
-                    }
-                } else {
-                    // restore original values
-                    column.dataKey = column._originalDataKey;
-                    column.headerText = column._originalHeaderText;
-                }
-            });
-            this._initialized = false;
-            // this._resetDataProperties();
-            if(this._dataViewWrapper) {
-                this._dataViewWrapper.dispose();
-            }
-            this._dataViewWrapper = new wijmo.grid.dataViewWrapper(this);
-            this.ensureControl(true);
-        };
-        wijgrid.prototype._postset_disabled = function (value, oldValue) {
-            // update children widgets
-                        var self = this, view = this._view();
-            wijmo.grid.iterateChildrenWidgets(this.outerDiv, function (index, widget) {
-                if(widget !== self) {
-                    widget.option("disabled", value);
-                }
-            });
-            if(view) {
-                view.ensureDisabledState();
-            }
-        };
-        wijgrid.prototype._postset_groupIndent = function (value, oldValue) {
-            this.ensureControl(false);
-        };
-        wijgrid.prototype._postset_groupAreaCaption = function (value, oldValue) {
-            var groupedColumns = this._field("groupedColumns");
-            if(this.$groupArea && (!groupedColumns || !groupedColumns.length)) {
-                // update html when the group area is empty only.
-                this.$groupArea.html(value || "&nbsp;");
-            }
-        };
-        wijgrid.prototype._postset_highlightCurrentCell = function (value, oldValue) {
-            var currentCell = this.currentCell();
-            if(currentCell && currentCell._isValid()) {
-                this._highlightCellPosition(currentCell, value);
-            }
-        };
-        wijgrid.prototype._preset_pageIndex = function (value, oldValue) {
-            if(isNaN(value)) {
-                throw "out of range";
-            }
-            var pageCount = this.pageCount(), fn = function (val) {
-                if(val > pageCount - 1) {
-                    val = pageCount - 1;
-                }
-                if(val < 0) {
-                    val = 0;
+                    return false;
+                }));
+            };
+            wijgrid.prototype._allowVirtualScrolling = function () {
+                var val = this._field("allowVirtualScrolling");
+                if(!val) {
+                    val = this._field("allowVirtualScrolling", !this.options.allowPaging && this.options.allowVirtualScrolling && (this.options.staticRowIndex < 0) && (this.options.scrollMode !== "none") && !this._hasMerging());
                 }
                 return val;
-            }, args;
-            value = fn(value);
-            if(this.options.allowPaging && value !== oldValue) {
-                args = {
-                    newPageIndex: value
-                };
-                if(!this._onPageIndexChanging(args)) {
-                    value = oldValue;
-                } else {
-                    value = fn(args.newPageIndex);
+            };
+            wijgrid.prototype._dragndrop = function (force) {
+                if (typeof force === "undefined") { force = false; }
+                var dnd = this._field("dragndrop");
+                if(!dnd && force) {
+                    this._field("dragndrop", dnd = new wijmo.grid.uiDragndrop(this));
                 }
-            }
-            return value;
-        };
-        wijgrid.prototype._postset_pageIndex = function (value, oldValue) {
-            if(this.options.allowPaging) {
-                var args = {
-                    newPageIndex: value
-                };
-                if(this._customPagingEnabled()) {
-                    this._convertWidgetsToOptions();
-                    this._onPageIndexChanged(args)// Allow user the ability to load a new data and refresh the grid.
-                    ;
-                } else {
-                    this.ensureControl(true, {
-                        afterRefresh: function () {
-                            this._onPageIndexChanged(args);
+                return dnd;
+            };
+            wijgrid.prototype._headerRows = function () {
+                return this._view().headerRows();
+            };
+            wijgrid.prototype._filterRow = function () {
+                return this._view().filterRow();
+            };
+            wijgrid.prototype._rows = function () {
+                return this._view().bodyRows();
+            };
+            wijgrid.prototype._localizeFilterOperators = function (locArray) {
+                var self = this, helper = new wijmo.grid.filterOperatorsCache(this);
+                $.each(locArray, function (i, o) {
+                    if(o.name) {
+                        var fop = helper.getByName(o.name);
+                        if(fop) {
+                            fop.displayName = o.displayName;
+                        }
+                    }
+                });
+            };
+            wijgrid.prototype._selectionui = function (force) {
+                var selectionui = this._field("selectionui");
+                if(!selectionui && force) {
+                    this._field("selectionui", selectionui = new wijmo.grid.uiSelection(this));
+                }
+                return selectionui;
+            };
+            wijgrid.prototype._postset_allowColMoving = /*_setPageCount (dataSlice) {
+            this._field("pageCount", Math.ceil(dataSlice.totalRows / this.options.pageSize) || 1);
+            },*/
+            // * propeties (pre-\ post-)
+            function (value, oldValue) {
+                var self = this;
+                $.each(this.columns(), function (idx, wijField) {
+                    if(value) {
+                        self._dragndrop(true).attach(wijField);
+                    } else {
+                        self._dragndrop(true).detach(wijField);
+                    }
+                });
+                var groupedWidgets = this._field("groupedWidgets");
+                if(groupedWidgets) {
+                    $.each(groupedWidgets, function (idx, wijField) {
+                        if(value) {
+                            self._dragndrop(true).attach(wijField);
+                        } else {
+                            self._dragndrop(true).detach(wijField);
                         }
                     });
                 }
-            }
-        };
-        wijgrid.prototype._preset_pageSize = function (value, oldValue) {
-            if(isNaN(value)) {
-                throw "out of range";
-            }
-            if(value <= 0) {
-                value = 1;
-            }
-            return value;
-        };
-        wijgrid.prototype._postset_pageSize = function (value, oldValue) {
-            this._resetDataProperties();
-            if(this.options.allowPaging && !this._customPagingEnabled()) {
+            };
+            wijgrid.prototype._postset_allowSorting = function (value, oldValue) {
+                this.ensureControl(false);
+            };
+            wijgrid.prototype._postset_columns = function (value, oldValue) {
+                this._initialized = false;
                 this.ensureControl(true);
-            }
-        };
-        wijgrid.prototype._postset_pagerSettings = function (value, oldValue) {
-            this.ensureControl(false);
-        };
-        wijgrid.prototype._postset_scrollMode = function (value, oldValue) {
-            this.ensureControl(false);
-        };
-        wijgrid.prototype._postset_selectionMode = function (value, oldValue) {
-            var selection = this.selection(), currentCell = this.currentCell(), hasSelection = this.selection().selectedCells().length();
-            selection.beginUpdate();
-            selection.clear();
-            if(currentCell && currentCell._isValid() && hasSelection) {
-                selection._selectRange(new wijmo.grid.cellInfoRange(currentCell, currentCell), false, false, 0/* none */ , null);
-            }
-            selection.endUpdate();
-            this._view().toggleDOMSelection(value === "none")// disable or enable DOM selection
-            ;
-        };
-        wijgrid.prototype._postset_showFilter = function (value, oldValue) {
-            this.ensureControl(false);
-        };
-        wijgrid.prototype._postset_showGroupArea = function (value, oldValue) {
-            this.ensureControl(false);
-        };
-        wijgrid.prototype._postset_showRowHeader = function (value, oldValue) {
-            this.ensureControl(false);
-        };
-        wijgrid.prototype._postset_staticRowIndex = function () {
-            if(this.options.scrollMode !== "none") {
-                // staticRowIndex is ignored when scrolling is turned off.
-                this.ensureControl(false);
-            }
-        };
-        wijgrid.prototype._postset_staticColumnIndex = function () {
-            if(this.options.scrollMode !== "none") {
-                this.ensureControl(false);
-            }
-        };
-        wijgrid.prototype._postset_allowVirtualScrolling = function (value, oldValue) {
-            this.ensureControl(false);
-        };
-        wijgrid.prototype._preset_allowVirtualScrolling = function (value, oldValue) {
-            if(isNaN(value) || value < 0) {
-                throw "out of range";
-            }
-            return value;
-        };
-        wijgrid.prototype._activateSpinner = // * propeties (pre-\ post-)
-        // * private
-        function () {
-            if(!this._spinnerIsActivated) {
-                var wijCSS = this.options.wijCSS, loadingText = this.outerDiv.append("<div class=\"wijmo-wijgrid-overlay " + wijCSS.overlay + "\"></div>" + "<span class=\"wijmo-wijgrid-loadingtext " + wijCSS.content + " " + wijCSS.cornerAll + "\">" + "<span class=\"" + wijCSS.icon + " ui-icon-clock\"></span>" + this.options.loadingText + "</span>").find("> .wijmo-wijgrid-loadingtext");
-                loadingText.position({
-                    my: "center",
-                    at: "center center",
-                    of: this.outerDiv,
-                    collision: "none"
-                });
-                this._spinnerIsActivated = true;
-            }
-        };
-        wijgrid.prototype._customPagingEnabled = function () {
-            return this.options.allowPaging && this.options.totalRows >= 0;
-        };
-        wijgrid.prototype._deactivateSpinner = function () {
-            if(this._spinnerIsActivated) {
-                try  {
-                    this.outerDiv.find("> .wijmo-wijgrid-overlay, > .wijmo-wijgrid-loadingtext").remove();
-                }finally {
-                    this._spinnerIsActivated = false;
-                }
-            }
-        };
-        wijgrid.prototype._columnWidgetsFactory = function ($node, columnOpt) {
-            var columnWidget, clientType = columnOpt.clientType;
-            if(!clientType && columnOpt.isBand) {
-                clientType = "c1band";
-            }
-            columnOpt = $.extend({
-            }, columnOpt, {
-                disabled: this.options.disabled
-            });
-            try  {
-                $.data($node[0], "wijgridowner", this)// pass owner to the widget constructor
-                ;
-                switch(clientType) {
-                    case "c1basefield":
-                        columnWidget = $node.c1basefield(columnOpt);
-                        break;
-                    case "c1band":
-                        columnWidget = $node.c1band(columnOpt);
-                        break;
-                    default:
-                        columnWidget = $node.c1field(columnOpt);
-                }
-            }finally {
-                $.removeData($node[0], "wijgridowner");
-            }
-            return columnWidget;
-        };
-        wijgrid.prototype._convertWidgetsToOptions = function () {
-            if(this._initialized && this._mergeWidgetsWithOptions) {
+            };
+            wijgrid.prototype._postset_allowPaging = function (value, oldValue) {
+                this.ensureControl(true);
+            };
+            wijgrid.prototype._postset_culture = function (value, oldValue) {
+                //this._field("closestCulture", Globalize.findClosestCulture(this.options.culture));
+                throw "read-only";
+            };
+            wijgrid.prototype._postset_customFilterOperators = function (value, oldValue) {
+                var dataView = this._dataViewWrapper.dataView();
+            };
+            wijgrid.prototype._postset_data = function (value, oldValue) {
                 this._ownerise(false);
-                this._widgetsToOptions();
-                this._ownerise(true);
-            }
-        };
-        wijgrid.prototype._field = function (name, value) {
-            return wijmo.grid.dataPrefix(this.element, this._data$prefix, name, value);
-        };
-        wijgrid.prototype._removeField = function (name) {
-            var internalDataName = this._data$prefix + name;
-            this.element.removeData(internalDataName);
-        };
-        wijgrid.prototype._prepareTotalsRequest = function (isLocal) {
-            var leaves = this._field("leaves"), result, test;
-            if(!leaves || !this.options.showFooter) {
-                return [];
-            }
-            result = $.map((leaves), function (element, index) {
-                if(!element.isBand && wijmo.grid.validDataKey(element.dataKey) && element.aggregate && element.aggregate !== "none") {
-                    if(isLocal) {
-                        return [
-                            {
-                                column: element,
-                                aggregate: element.aggregate
-                            }
-                        ];
+                wijmo.grid.traverse(this.options.columns, function (column, columns) {
+                    if(column.dynamic) {
+                        // remove autogenerated columns
+                        var idx = $.inArray(column, columns);
+                        if(idx >= 0) {
+                            columns.splice(idx, 1);
+                        }
                     } else {
-                        return [
-                            {
-                                dataKey: element.dataKey,
-                                aggregate: element.aggregate
-                            }
-                        ];
-                    }
-                }
-                return null;
-            });
-            return result;
-        };
-        wijgrid.prototype._widgetsToOptions = function () {
-            var colOptionsList = wijmo.grid.flatten(this.options.columns);
-            $.each(this.columns(), function (index, colWidget) {
-                delete colWidget.options.columns// only options of the column itself will be merged at the next step.
-                ;
-                var congruentColOption = colOptionsList[colWidget.options.travIdx];
-                $.extend(true, congruentColOption, colWidget.options);
-                congruentColOption.filterValue = colWidget.options.filterValue;
-                congruentColOption.filterOperator = colWidget.options.filterOperator;
-            });
-        };
-        wijgrid.prototype._recreateColumnWidgets = function () {
-            $.each(this.columns(), function (index, item) {
-                item.destroy();
-            });
-            var columns = [], headerRows = this._headerRows(), visibleColumns, i, len, column, headerRowObj, th, columnWidget;
-            if(/* tHead.length*/ headerRows && headerRows.length()) {
-                visibleColumns = []// visible bands and leaves
-                ;
-                wijmo.grid.traverse(this.options.columns, function (column) {
-                    if(column.parentVis) {
-                        visibleColumns.push(column);
+                        // restore original values
+                        column.dataKey = column._originalDataKey;
+                        column.headerText = column._originalHeaderText;
                     }
                 });
-                for(i = 0 , len = visibleColumns.length; i < len; i++) {
-                    column = visibleColumns[i];
-                    headerRowObj = headerRows.item(column.thY);
-                    th = wijmo.grid.rowAccessor.getCell(headerRowObj, column.thX);
-                    columnWidget = this._columnWidgetsFactory($(th), column);
-                    columns.push(columnWidget.data(wijmo.grid.widgetName(columnWidget)))// store actual widget instance
-                    ;
+                this._initialized = false;
+                // this._resetDataProperties();
+                if(this._dataViewWrapper) {
+                    this._dataViewWrapper.dispose();
                 }
-            }
-            this._field("columns", columns);
-        };
-        wijgrid.prototype._ownerise = function (flag) {
-            if(flag) {
-                var self = this;
-                wijmo.grid.traverse(this.options.columns, function (column) {
-                    column.owner = self;
-                    var tmp, i, len;
-                    if((tmp = column.groupInfo)) {
-                        tmp.owner = column;
-                        if(tmp.expandInfo) {
-                            for(i = 0 , len = tmp.expandInfo.length; i < len; i++) {
-                                tmp.expandInfo[i].owner = tmp;
-                            }
-                        }
-                    }
-                });
-            } else {
-                wijmo.grid.traverse(this.options.columns, function (column) {
-                    delete column.owner;
-                    var tmp, i, len;
-                    if((tmp = column.groupInfo)) {
-                        delete tmp.owner;
-                        if(tmp.expandInfo) {
-                            for(i = 0 , len = tmp.expandInfo.length; i < len; i++) {
-                                delete tmp.expandInfo[i].owner;
-                            }
-                        }
-                    }
-                });
-            }
-        };
-        wijgrid.prototype._ensureRenderBounds = function (bounds) {
-            var total = this._totalRowsCount();// sketchTable.length or totalRows -- depends on data mode.
-
-            if(bounds.start < 0) {
-                bounds.start = 0;
-            }
-            bounds.start = Math.min(bounds.start, total - 1);
-            if(bounds.end < 0) {
-                bounds.end = 0;
-            }
-            bounds.end = Math.min(bounds.end, total - 1);
-            return bounds;
-        };
-        wijgrid.prototype._refresh = function (userData) {
-            // apply grouping
-            new wijmo.grid.grouper().group(this, this.sketchTable, this._field("leaves"));
-            // apply merging
-            new wijmo.grid.merger().merge(this.sketchTable, this._field("visibleLeaves"));
-            var bounds = this._field("viewRenderBounds");
-            this._ensureRenderBounds(bounds);
-            // view
-            if(this.options.scrollMode !== "none") {
-                this._field("view", new wijmo.grid.fixedView(this, this._field("viewRenderBounds")));
-            } else {
-                this._field("view", new wijmo.grid.flatView(this, this._field("viewRenderBounds")));
-            }
-            this._render();
-            // (re)create iternal widgets
-            this._ownerise(false);
-            this._recreateColumnWidgets();
-            this._ownerise(true);
-            // pager
-            if(this.options.allowPaging) {
-                // top pager
-                if(this.$topPagerDiv) {
-                    this.$topPagerDiv.wijpager(this._pagerSettings2PagerWidgetSettings()).css("zIndex", 5);
-                }
-                // bottom pager
-                if(this.$bottomPagerDiv) {
-                    this.$bottomPagerDiv.wijpager(this._pagerSettings2PagerWidgetSettings()).css("zIndex", 5);
-                }
-            }
-            // (re)create iternal widgets
-                    };
-        wijgrid.prototype._refreshVirtual = function (userData) {
-            var scrollData = userData.virtualScrollData, diffData = {
-                top: 0,
-                bottom: 0
+                this._dataViewWrapper = new wijmo.grid.dataViewWrapper(this);
+                this.ensureControl(true);
             };
-            if(scrollData.data) {
-                diffData = this._processVirtualData(scrollData);
-            }
-            this._updateRowInfos(scrollData, diffData);
-            this._renderVirtualIntoView(scrollData);
-            // debug
-            /*var rows = this._view().bodyRows();
-            for (var i = 0; i < rows.length(); i++) {
-            var ri = this._view()._getRowInfo(rows.item(i));
-            var innerDiv = ri.$rows.find("td:first .wijmo-wijgrid-innercell");
-            var html = innerDiv.html();
-
-            html = "d:" + ri.dataItemIndex + " s:" + ri.sectionRowIndex + "  ||" + ri.data[0];
-            innerDiv.html(html);
-            }*/
-            // debug
-            /*if (scrollData.data && scrollData.mode === "reset") {
-            this._view().vsUI.scrollToRow(scrollData.newBounds.start, true); // original scrollIndex could change due pageSize alignment, so we need to re-set position of the vertical scrollbar.
-            }*/
-                    };
-        wijgrid.prototype._updateRowInfos = function (scrollData, diffData) {
-            var bounds = this._field("viewRenderBounds"), view = this._view(), newBounds = scrollData.newBounds, rows = this._view().bodyRows(), relMatch, i, diff, rowInfo;
-            switch(scrollData.mode) {
-                case "reset":
-                    break;
-                case "overlapBottom":
-                    relMatch = {
-                        start: // zero-based
-                        newBounds.start - bounds.start,
-                        end: bounds.end - bounds.start
-                    };
-                    diff = newBounds.start - bounds.start;
-                    for(i = relMatch.start; i <= relMatch.end; i++) {
-                        rowInfo = view._getRowInfo(rows.item(i));
-                        rowInfo.sectionRowIndex -= diff;
-                        rowInfo.dataItemIndex += diffData.top;
-                        view._setRowInfo(rowInfo.$rows, rowInfo);
+            wijgrid.prototype._postset_disabled = function (value, oldValue) {
+                // update children widgets
+                                var self = this, view = this._view();
+                wijmo.grid.iterateChildrenWidgets(this.outerDiv, function (index, widget) {
+                    if(widget !== self) {
+                        widget.option("disabled", value);
                     }
-                    break;
-                case "overlapTop":
-                    relMatch = {
-                        start: // zero-based
-                        bounds.start - bounds.start,
-                        end: newBounds.end - bounds.start
-                    };
-                    diff = bounds.start - newBounds.start;
-                    for(i = relMatch.start; i <= relMatch.end; i++) {
-                        rowInfo = view._getRowInfo(rows.item(i));
-                        rowInfo.sectionRowIndex += diff;
-                        rowInfo.dataItemIndex += diffData.top;
-                        view._setRowInfo(rowInfo.$rows, rowInfo);
-                    }
-                    break;
-            }
-        };
-        wijgrid.prototype._renderVirtualIntoView = function (scrollData) {
-            var bounds = this._field("viewRenderBounds"), view = this._view(), fnDataItemIndex = function (sketchRow) {
-                return (sketchRow.rowType & wijmo.grid.rowType.data) ? sketchRow.originalRowIndex : -1;
-            }, match, i, sketchRow, sectionRowIndex;
-            switch(scrollData.mode) {
-                case "reset":
-                    // remove all rows
-                    view._clearBody();
-                    // add new rows
-                    for(i = scrollData.newBounds.start; i <= scrollData.newBounds.end; i++) {
-                        sketchRow = this.sketchTable[i - this._dataOffset];
-                        view._insertBodyRow(sketchRow, -1, fnDataItemIndex(sketchRow), i);
-                    }
-                    view._rebuildOffsets();
-                    break;
-                case "overlapBottom":
-                    match = {
-                        start: scrollData.newBounds.start,
-                        end: bounds.end
-                    };
-                    // remove rows from the top
-                    for(i = 0; i < match.start - bounds.start; i++) {
-                        view._removeBodyRow(0, false);
-                    }
-                    // add new rows to the bottom
-                    for(i = match.end + 1; i <= scrollData.newBounds.end; i++) {
-                        sketchRow = this.sketchTable[i - this._dataOffset];
-                        view._insertBodyRow(sketchRow, -1, fnDataItemIndex(sketchRow), i);
-                    }
-                    break;
-                case "overlapTop":
-                    match = {
-                        start: bounds.start,
-                        end: scrollData.newBounds.end
-                    };
-                    // remove rows from the bottom
-                    for(i = 0; i < bounds.end - scrollData.newBounds.end; i++) {
-                        view._removeBodyRow(match.end - match.start + 1, false)// relative index starting from zero.
-                        ;
-                    }
-                    // add new tows to the top
-                    sectionRowIndex = 0;
-                    for(i = scrollData.newBounds.start; i < bounds.start; i++) {
-                        sketchRow = this.sketchTable[i - this._dataOffset];
-                        view._insertBodyRow(sketchRow, sectionRowIndex++, fnDataItemIndex(sketchRow), i);
-                    }
-                    break;
-                default:
-                    // "none", same range
-                    break;
-            }
-        };
-        wijgrid.prototype._processVirtualData = function (scrollData) {
-            var dvw = this._dataViewWrapper, source = dvw.dataView().getSource(), dataItem, leaves = this._field("leaves"), i, alignedViewBounds, cachedBounds, exceeded = 0, dataDiff = {
-                top: 0,
-                bottom: 0
-            }, rowAttributes, margin = this._serverSideVirtualScrollingMargin();
-            //  * extend underlying data
-            switch(scrollData.mode) {
-                case "reset":
-                    // clear
-                    this.sketchTable.splice(0, this.sketchTable.length);
-                    dvw._unsafeSplice(0, source.length);
-                    //this._dataOffset = scrollData.newPageIndex * this.options.pageSize; //
-                    this._dataOffset = scrollData.request.index;
-                    // append
-                    for(i = 0; i < scrollData.data.length; i++) {
-                        dvw._unsafePush(dataItem = scrollData.data[i])// append rows to a dataStore
-                        ;
-                        this.sketchTable.push(this._buildSketchRow(dvw._wrapDataItem(dataItem, i), leaves));
-                    }
-                    break;
-                case "overlapBottom":
-                    // append
-                    for(i = 0; i < scrollData.data.length; i++) {
-                        dvw._unsafePush(dataItem = scrollData.data[i])// append rows to a dataStore
-                        ;
-                        this.sketchTable.push(this._buildSketchRow(dvw._wrapDataItem(dataItem, source.length - 1), leaves));
-                    }
-                    dataDiff.bottom = scrollData.data.length;
-                    break;
-                case "overlapTop":
-                    // prepend
-                    for(i = scrollData.data.length - 1; i >= 0; i--) {
-                        dvw._unsafeSplice(0, 0, dataItem = scrollData.data[i]);
-                        this.sketchTable.splice(0, 0, this._buildSketchRow(dvw._wrapDataItem(dataItem, i), leaves));
-                    }
-                    //this._dataOffset = scrollData.newPageIndex * this.options.pageSize;
-                    this._dataOffset = scrollData.request.index;
-                    dataDiff.top = scrollData.data.length;
-                    break;
-            }
-            // extend underlying data *
-            // * remove cached items exceeded cached bounds
-            // [margin][pageSize = viewBounds][margin]
-            alignedViewBounds = this._ensureRenderBounds({
-                start: scrollData.newBounds.start,
-                end: scrollData.newBounds.end
-            });
-            //start: Math.floor(scrollData.newBounds.start / this.options.pageSize) * this.options.pageSize,
-            //end: Math.floor(scrollData.newBounds.start / this.options.pageSize) * this.options.pageSize + this.options.pageSize - 1
-            cachedBounds = {
-                start: this._dataOffset,
-                end: this._dataOffset + source.length - 1
+                });
+                if(view) {
+                    view.ensureDisabledState();
+                }
             };
-            // remove items from the bottom
-            exceeded = (cachedBounds.end - alignedViewBounds.end) - margin;
-            if(exceeded > 0) {
-                dataDiff.bottom -= exceeded;
-                dvw._unsafeSplice(source.length - exceeded, exceeded);
-                this.sketchTable.splice(this.sketchTable.length - exceeded, exceeded);
-            }
-            // remove items from the top
-            exceeded = (alignedViewBounds.start - cachedBounds.start) - margin;
-            if(exceeded > 0) {
-                dataDiff.top -= exceeded;
-                dvw._unsafeSplice(0, exceeded);
-                this.sketchTable.splice(0, exceeded);
-                this._dataOffset += exceeded;
-            }
-            // remove data exceeded cached bounds *
-            // * update metadata
-            for(i = 0; i < this.sketchTable.length; i++) {
-                this.sketchTable[i].originalRowIndex = i;
-            }
-            // update metadata *
-            dvw._refreshSilent();
-            return dataDiff;
-        };
-        wijgrid.prototype._needToCreatePagerItem = function () {
-            return this.options.allowPaging === true;
-        };
-        wijgrid.prototype._render = function () {
-            var view = this._view(), o = this.options, wijCSS = this.options.wijCSS, content;
-            view.render();
-            // YK: for fixing pager is not align to top and bottom when header is fixed.
-            content = this.outerDiv;
-            if(o.scrollMode !== "none") {
-                // fixed header content
-                content = this.outerDiv.find("div.wijmo-wijgrid-scroller:first");
-            }
-            this.$superPanelHeader = null;
-            // ** top pager (top div)
-            if(this.$topPagerDiv) {
-                if(this.$topPagerDiv.data("wijmo-wijpager")) {
-                    this.$topPagerDiv.wijpager("destroy");
+            wijgrid.prototype._postset_groupIndent = function (value, oldValue) {
+                this.ensureControl(false);
+            };
+            wijgrid.prototype._postset_groupAreaCaption = function (value, oldValue) {
+                var groupedColumns = this._groupedColumns();
+                if(this.$groupArea && (!groupedColumns || !groupedColumns.length)) {
+                    // update html when the group area is empty only.
+                    this.$groupArea.html(value || "&nbsp;");
                 }
-                this.$topPagerDiv.remove();
-            }
-            this.$topPagerDiv = null;
-            if(this._needToCreatePagerItem() && ((o.pagerSettings.position === "top") || (o.pagerSettings.position === "topAndBottom"))) {
-                if(!this.$topPagerDiv) {
-                    content.prepend(this.$superPanelHeader = $("<div class=\"wijmo-wijsuperpanel-header\"></div>"));
-                    this.$superPanelHeader.prepend(this.$topPagerDiv = $("<div class=\"wijmo-wijgrid-header " + wijCSS.header + " " + wijCSS.cornerTop + "\"></div>"));
+            };
+            wijgrid.prototype._postset_highlightCurrentCell = function (value, oldValue) {
+                var currentCell = this.currentCell();
+                if(currentCell && currentCell._isValid()) {
+                    this._highlightCellPosition(currentCell, value);
                 }
-            }
-            // top pager **
-            if(o.showGroupArea) {
-                this._processGroupArea(content);
-            } else {
-                this.$groupArea = null;
-            }
-            // ** bottom pager (bottom div)
-            if(this.$bottomPagerDiv) {
-                if(this.$bottomPagerDiv.data("wijmo-wijpager")) {
-                    this.$bottomPagerDiv.wijpager("destroy");
+            };
+            wijgrid.prototype._preset_pageIndex = function (value, oldValue) {
+                if(isNaN(value)) {
+                    throw "out of range";
                 }
-                this.$bottomPagerDiv.remove();
-            }
-            this.$bottomPagerDiv = null;
-            if(this._needToCreatePagerItem() && ((o.pagerSettings.position === "bottom") || (o.pagerSettings.position === "topAndBottom"))) {
-                if(!this.$bottomPagerDiv) {
-                    content.append(this.$bottomPagerDiv = $("<div class=\"wijmo-wijgrid-footer wijmo-wijsuperpanel-footer " + wijCSS.stateDefault + " " + wijCSS.cornerBottom + "\"></div>"));
-                }
-            }
-            // bottom pager **
-                    };
-        wijgrid.prototype._processGroupArea = function (content) {
-            var self = this, groupCollection = this._field("groupedColumns"), groupWidgetCollection = [];
-            this.$groupArea = $("<div class=\"" + this.options.wijCSS.content + " " + this.options.wijCSS.helperClearFix + "\"></div>");
-            if(groupCollection.length > 0) {
-                $.each(groupCollection, function (index, item) {
-                    var groupElement = $("<a href=\"#\"></a>").appendTo(self.$groupArea);
-                    try  {
-                        $.data(groupElement[0], "wijgridowner", self)// pass owner to the constructor
-                        ;
-                        groupElement.c1groupedfield($.extend({
-                        }, {
-                            allowMoving: item.allowMoving,
-                            allowSort: item.allowSort,
-                            dataIndex: item.dataIndex,
-                            headerText: item.headerText,
-                            isBand: item.isBand,
-                            isLeaf: item.isLeaf,
-                            linearIdx: item.linearIdx,
-                            parentIdx: item.parentIdx,
-                            sortDirection: item.sortDirection,
-                            travIdx: item.travIdx,
-                            groupedIndex: item.groupedIndex
-                        }, {
-                            disabled: self.options.disabled
-                        }));
-                    }finally {
-                        $.removeData(groupElement[0], "wijgridowner");
+                var pageCount = this.pageCount(), fn = function (val) {
+                    if(val > pageCount - 1) {
+                        val = pageCount - 1;
                     }
-                    groupWidgetCollection.push(groupElement.data("wijmo-c1groupedfield"));
-                });
-            } else {
-                this.$groupArea.addClass("wijmo-wijgrid-group-area").css("padding", 0).html(// disable padding (inherited)
-                this.options.groupAreaCaption || "&nbsp;");
-            }
-            this._field("groupedWidgets", groupWidgetCollection);
-            if(!this.$superPanelHeader) {
-                content.prepend(this.$superPanelHeader = $("<div class=\"wijmo-wijsuperpanel-header\"></div>"));
-            }
-            this.$superPanelHeader.prepend(this.$groupArea);
-            this._dragndrop(true).attachGroupArea(this.$groupArea);
-        };
-        wijgrid.prototype._attachEvents = function () {
-            var view = this._view(), $fe = view.focusableElement(), self = this;
-            $fe.bind("keydown." + this.widgetName, $.proxy(this._onKeyDown, this));
-            $fe.bind("keypress." + this.widgetName, $.proxy(this._onKeyPress, this));
-            $.each(view.subTables(), function (index, element) {
-                var domTable = element.element();
-                if(domTable) {
-                    if(domTable.tHead) {
-                        $(domTable.tHead).bind("click." + self.widgetName, $.proxy(self._onClick, self));
+                    if(val < 0) {
+                        val = 0;
                     }
-                    if(domTable.tBodies.length) {
-                        $(domTable.tBodies[0]).bind("click." + self.widgetName, $.proxy(self._onClick, self)).bind("dblclick." + self.widgetName, $.proxy(self._onDblClick, self)).bind("mousemove." + self.widgetName, $.proxy(self._onMouseMove, self)).bind("mouseout." + self.widgetName, $.proxy(self._onMouseOut, self));
-                    }
-                }
-            });
-            $(window).bind("resize." + this.widgetName + "." + this._eventUID, $.proxy(this._onWindowResize, this));
-        };
-        wijgrid.prototype._detachEvents = function (destroy) {
-            var view = this._view(), self = this, $fe;
-            this._windowResizeTimer = 0;
-            $(window).unbind("resize." + this.widgetName + "." + this._eventUID);
-            if(view) {
-                $fe = view.focusableElement();
-                $fe.unbind("keydown." + this.widgetName);
-                $fe.unbind("keypress." + this.widgetName);
-                $.each(view.subTables(), function () {
-                    var domTable = this.element();// item (this) is a htmlTableAccessor instance
-
-                    if(domTable) {
-                        if(domTable.tHead) {
-                            $(domTable.tHead).unbind("." + self.widgetName);
-                        }
-                        if(domTable.tBodies.length) {
-                            $(domTable.tBodies[0]).unbind("." + self.widgetName);
-                        }
-                    }
-                });
-            }
-        };
-        wijgrid.prototype._handleSort = function (column, multiSort) {
-            var columns = this.options.columns, travIdx = column.travIdx, newSortDirection, args;
-            //if (this.options.allowSorting && ($.inArray(columnWidget, columns) >= 0)) {
-            if(column && this.options.allowSorting) {
-                newSortDirection = ((column.sortDirection === "none") ? "ascending" : ((column.sortDirection === "ascending") ? "descending" : "ascending"));
-                args = {
-                    column: column,
-                    sortDirection: newSortDirection,
-                    sortCommand: column.dataKey + " " + (newSortDirection === "ascending" ? "asc" : "desc")
-                };
-                if(this._onColumnSorting(args)) {
-                    column.sortDirection = args.sortDirection;
-                    if(multiSort) {
-                        column.sortOrder = this._customSortOrder++;
-                    } else {
-                        this._customSortOrder = 1000// reset to default
-                        ;
-                        // reset sortDirection for all column widgets except sorting one and grouped columns
-                        $.each(this.columns(), function (index, item) {
-                            item.options.sortOrder = 0;
-                            if(item.options.travIdx !== travIdx && !(item.options.groupInfo && item.options.groupInfo.position !== "none")) {
-                                item.options.sortDirection = "none";
-                            }
-                        });
-                        // ensure invisible columns.
-                        wijmo.grid.traverse(columns, function (item) {
-                            item.sortOrder = 0;
-                            if(item.travIdx !== travIdx && !(item.groupInfo && item.groupInfo.position !== "none")) {
-                                item.sortDirection = "none";
-                            }
-                        });
-                    }
+                    return val;
+                }, args;
+                value = fn(value);
+                if(this.options.allowPaging && value !== oldValue) {
                     args = {
-                        column: column,
-                        sortDirection: column.sortDirection,
-                        sortCommand: column.dataKey + " " + (column.sortDirection === "ascending" ? "asc" : "desc")
+                        newPageIndex: value
+                    };
+                    if(!this._onPageIndexChanging(args)) {
+                        value = oldValue;
+                    } else {
+                        value = fn(args.newPageIndex);
+                    }
+                }
+                return value;
+            };
+            wijgrid.prototype._postset_pageIndex = function (value, oldValue) {
+                if(this.options.allowPaging) {
+                    var args = {
+                        newPageIndex: value
                     };
                     if(this._customPagingEnabled()) {
                         this._convertWidgetsToOptions();
-                        this._onColumnSorted(args)// Allow user the ability to load a new data and refresh the grid.
+                        this._onPageIndexChanged(args)// Allow user the ability to load a new data and refresh the grid.
                         ;
                     } else {
                         this.ensureControl(true, {
                             afterRefresh: function () {
-                                this._onColumnSorted(args);
+                                this._onPageIndexChanged(args);
                             }
                         });
                     }
                 }
-            }
-        };
-        wijgrid.prototype._pagerSettings2PagerWidgetSettings = function () {
-            return $.extend({
-            }, this.options.pagerSettings, {
-                disabled: this.options.disabled,
-                pageCount: this.pageCount(),
-                pageIndex: this.options.pageIndex,
-                pageIndexChanging: $.proxy(this._onPagerWidgetPageIndexChanging, this),
-                pageIndexChanged: $.proxy(this._onPagerWidgetPageIndexChanged, this)
-            });
-        };
-        wijgrid.prototype._handleDragnDrop = function (dragTravIdx, dropTravIdx, at, dragInGroup, dropInGroup) {
-            var drag = wijmo.grid.getColumnByTravIdx(this.options.columns, dragTravIdx), drop = wijmo.grid.getColumnByTravIdx(this.options.columns, dropTravIdx), dragSource = dragInGroup ? "groupArea" : "columns", dropSource = dropInGroup ? "groupArea" : "columns";
-            if(dropInGroup) {
-                // drag is dropped into the group area
-                if(this._onColumnGrouping({
-                    drag: drag.found,
-                    drop: drop ? drop.found : null,
-                    dragSource: dragSource,
-                    dropSource: dropSource,
-                    at: at
-                })) {
-                    this.ensureControl(true, {
-                        beforeRefresh: function () {
-                            if(!drop) {
-                                // drag is dropped into the empty group area.
-                                drag.found.groupedIndex = 0;
-                            } else {
-                                switch(at) {
-                                    case "left":
-                                        drag.found.groupedIndex = drop.found.groupedIndex - 0.5;
-                                        break;
-                                    case "right":
-                                        drag.found.groupedIndex = drop.found.groupedIndex + 0.5;
-                                        break;
+            };
+            wijgrid.prototype._preset_pageSize = function (value, oldValue) {
+                if(isNaN(value)) {
+                    throw "out of range";
+                }
+                if(value <= 0) {
+                    value = 1;
+                }
+                return value;
+            };
+            wijgrid.prototype._postset_pageSize = function (value, oldValue) {
+                this._resetDataProperties();
+                if(this.options.allowPaging && !this._customPagingEnabled()) {
+                    this.ensureControl(true);
+                }
+            };
+            wijgrid.prototype._postset_pagerSettings = function (value, oldValue) {
+                this.ensureControl(false);
+            };
+            wijgrid.prototype._postset_scrollMode = function (value, oldValue) {
+                this.ensureControl(false);
+            };
+            wijgrid.prototype._postset_selectionMode = function (value, oldValue) {
+                var selection = this.selection(), currentCell = this.currentCell(), hasSelection = this.selection().selectedCells().length();
+                selection.beginUpdate();
+                selection.clear();
+                if(currentCell && currentCell._isValid() && hasSelection) {
+                    selection._selectRange(new wijmo.grid.cellInfoRange(currentCell, currentCell), false, false, 0/* none */ , null);
+                }
+                selection.endUpdate();
+                this._view().toggleDOMSelection(value === "none")// disable or enable DOM selection
+                ;
+            };
+            wijgrid.prototype._postset_showFilter = function (value, oldValue) {
+                this.ensureControl(false);
+            };
+            wijgrid.prototype._postset_showGroupArea = function (value, oldValue) {
+                this.ensureControl(false);
+            };
+            wijgrid.prototype._postset_showRowHeader = function (value, oldValue) {
+                this.ensureControl(false);
+            };
+            wijgrid.prototype._postset_staticRowIndex = function () {
+                if(this.options.scrollMode !== "none") {
+                    // staticRowIndex is ignored when scrolling is turned off.
+                    this.ensureControl(false);
+                }
+            };
+            wijgrid.prototype._postset_staticColumnIndex = function () {
+                if(this.options.scrollMode !== "none") {
+                    this.ensureControl(false);
+                }
+            };
+            wijgrid.prototype._postset_allowVirtualScrolling = function (value, oldValue) {
+                this.ensureControl(false);
+            };
+            wijgrid.prototype._preset_allowVirtualScrolling = function (value, oldValue) {
+                if(isNaN(value) || value < 0) {
+                    throw "out of range";
+                }
+                return value;
+            };
+            wijgrid.prototype._activateSpinner = // * propeties (pre-\ post-)
+            // * private
+            function () {
+                if(!this._spinnerIsActivated) {
+                    var wijCSS = this.options.wijCSS, loadingText = this.outerDiv.append("<div class=\"wijmo-wijgrid-overlay " + wijCSS.overlay + "\"></div>" + "<span class=\"wijmo-wijgrid-loadingtext " + wijCSS.content + " " + wijCSS.cornerAll + "\">" + "<span class=\"" + wijCSS.icon + " ui-icon-clock\"></span>" + this.options.loadingText + "</span>").find("> .wijmo-wijgrid-loadingtext");
+                    loadingText.position({
+                        my: "center",
+                        at: "center center",
+                        of: this.outerDiv,
+                        collision: "none"
+                    });
+                    this._spinnerIsActivated = true;
+                }
+            };
+            wijgrid.prototype._customPagingEnabled = function () {
+                return this.options.allowPaging && this.options.totalRows >= 0;
+            };
+            wijgrid.prototype._deactivateSpinner = function () {
+                if(this._spinnerIsActivated) {
+                    try  {
+                        this.outerDiv.find("> .wijmo-wijgrid-overlay, > .wijmo-wijgrid-loadingtext").remove();
+                    }finally {
+                        this._spinnerIsActivated = false;
+                    }
+                }
+            };
+            wijgrid.prototype._columnWidgetsFactory = function ($node, columnOpt) {
+                var columnWidget, clientType = columnOpt.clientType;
+                if(!clientType && columnOpt.isBand) {
+                    clientType = "c1band";
+                }
+                columnOpt = $.extend({
+                }, columnOpt, {
+                    disabled: this.options.disabled
+                });
+                try  {
+                    $.data($node[0], "wijgridowner", this)// pass owner to the widget constructor
+                    ;
+                    switch(clientType) {
+                        case "c1basefield":
+                            columnWidget = $node.c1basefield(columnOpt);
+                            break;
+                        case "c1band":
+                            columnWidget = $node.c1band(columnOpt);
+                            break;
+                        default:
+                            columnWidget = $node.c1field(columnOpt);
+                    }
+                }finally {
+                    $.removeData($node[0], "wijgridowner");
+                }
+                return columnWidget;
+            };
+            wijgrid.prototype._convertWidgetsToOptions = function () {
+                if(this._initialized && this._mergeWidgetsWithOptions) {
+                    this._ownerise(false);
+                    this._widgetsToOptions();
+                    this._ownerise(true);
+                }
+            };
+            wijgrid.prototype._field = function (name, value) {
+                return wijmo.grid.dataPrefix(this.element, this._data$prefix, name, value);
+            };
+            wijgrid.prototype._removeField = function (name) {
+                var internalDataName = this._data$prefix + name;
+                this.element.removeData(internalDataName);
+            };
+            wijgrid.prototype._prepareTotalsRequest = function (isLocal) {
+                var leaves = this._field("leaves"), result, test;
+                if(!leaves || !this.options.showFooter) {
+                    return [];
+                }
+                result = $.map((leaves), function (element, index) {
+                    if(!element.isBand && wijmo.grid.validDataKey(element.dataKey) && element.aggregate && element.aggregate !== "none") {
+                        if(isLocal) {
+                            return [
+                                {
+                                    column: element,
+                                    aggregate: element.aggregate
+                                }
+                            ];
+                        } else {
+                            return [
+                                {
+                                    dataKey: element.dataKey,
+                                    aggregate: element.aggregate
+                                }
+                            ];
+                        }
+                    }
+                    return null;
+                });
+                return result;
+            };
+            wijgrid.prototype._widgetsToOptions = function () {
+                var colOptionsList = wijmo.grid.flatten(this.options.columns);
+                $.each(this.columns(), function (index, colWidget) {
+                    delete colWidget.options.columns// only options of the column itself will be merged at the next step.
+                    ;
+                    var congruentColOption = colOptionsList[colWidget.options.travIdx];
+                    $.extend(true, congruentColOption, colWidget.options);
+                    congruentColOption.filterValue = colWidget.options.filterValue;
+                    congruentColOption.filterOperator = colWidget.options.filterOperator;
+                });
+            };
+            wijgrid.prototype._recreateColumnWidgets = function () {
+                $.each(this.columns(), function (index, item) {
+                    item.destroy();
+                });
+                var columns = [], headerRows = this._headerRows(), visibleColumns, i, len, column, headerRowObj, th, columnWidget;
+                if(/* tHead.length*/ headerRows && headerRows.length()) {
+                    visibleColumns = []// visible bands and leaves
+                    ;
+                    wijmo.grid.traverse(this.options.columns, function (column) {
+                        if(column.parentVis) {
+                            visibleColumns.push(column);
+                        }
+                    });
+                    for(i = 0 , len = visibleColumns.length; i < len; i++) {
+                        column = visibleColumns[i];
+                        headerRowObj = headerRows.item(column.thY);
+                        th = wijmo.grid.rowAccessor.getCell(headerRowObj, column.thX);
+                        columnWidget = this._columnWidgetsFactory($(th), column);
+                        columns.push(columnWidget.data(wijmo.grid.widgetName(columnWidget)))// store actual widget instance
+                        ;
+                    }
+                }
+                this._field("columns", columns);
+            };
+            wijgrid.prototype._groupedColumns = function (force) {
+                var result;
+                force = !(result = this._field("groupedColumns")) || force;
+                if(force) {
+                    result = [];
+                    var leaves = this._field("leaves") || [], rebuildIndexes = false, isGrouped = function (column) {
+                        return column.groupInfo && column.groupInfo.position && (column.groupInfo.position !== "none");
+                    };
+                    $.each(leaves, function (i, column) {
+                        if(isGrouped(column)) {
+                            rebuildIndexes = rebuildIndexes || (column.groupedIndex === undefined);
+                            if(!rebuildIndexes) {
+                                result.push(column);
+                            }
+                        } else {
+                            delete column.groupedIndex;
+                        }
+                    });
+                    if(rebuildIndexes) {
+                        $.each(leaves, function (i, column) {
+                            if(isGrouped(column)) {
+                                column.groupedIndex = result.length;
+                                result.push(column);
+                            }
+                        });
+                    } else {
+                        result.sort(function (a, b) {
+                            return a.groupedIndex - b.groupedIndex;
+                        });
+                        $.each(result, function (i, column) {
+                            column.groupedIndex = i;
+                        });
+                    }
+                    this._field("groupedColumns", result);
+                }
+                return result || [];
+            };
+            wijgrid.prototype._ownerise = function (flag) {
+                if(flag) {
+                    var self = this;
+                    wijmo.grid.traverse(this.options.columns, function (column) {
+                        column.owner = self;
+                        var tmp, i, len;
+                        if((tmp = column.groupInfo)) {
+                            tmp.owner = column;
+                            if(tmp.expandInfo) {
+                                for(i = 0 , len = tmp.expandInfo.length; i < len; i++) {
+                                    tmp.expandInfo[i].owner = tmp;
                                 }
                             }
-                            if(!dragInGroup) {
-                                $.extend(true, drag.found, {
-                                    groupInfo: {
-                                        position: "header"
-                                    }
-                                });
-                            }
-                        },
-                        afterRefresh: function () {
-                            this._onColumnGrouped({
-                                drag: drag.found,
-                                drop: drop ? drop.found : null,
-                                dragSource: dragSource,
-                                dropSource: dropSource,
-                                at: at
-                            });
                         }
                     });
-                }
-            } else {
-                if(this._onColumnDropping({
-                    drag: drag.found,
-                    drop: drop.found,
-                    at: at
-                })) {
-                    this.ensureControl(false, {
-                        beforeRefresh: function () {
-                            /* modifying the wijgrid.options.columns option */
-                            drag.at.splice(drag.found.linearIdx, 1);
-                            //because when drag is before drop, the index of drop is affected.
-                            switch(at) {
-                                case "left":
-                                    if(drag.at === drop.at && drag.found.linearIdx < drop.found.linearIdx) {
-                                        drop.at.splice(drop.found.linearIdx - 1, 0, drag.found);
-                                    } else {
-                                        drop.at.splice(drop.found.linearIdx, 0, drag.found);
-                                    }
-                                    break;
-                                case "right":
-                                    if(drag.at === drop.at && drag.found.linearIdx < drop.found.linearIdx) {
-                                        drop.at.splice(drop.found.linearIdx, 0, drag.found);
-                                    } else {
-                                        drop.at.splice(drop.found.linearIdx + 1, 0, drag.found);
-                                    }
-                                    break;
-                                case "center":
-                                    // drop is a band
-                                    drop.found.columns.push(drag.found);
-                                    break;
-                            }
-                            // rebuild indices (linearIdx, travIdx, parentIdx)
-                            wijmo.grid.setTraverseIndex(this.options.columns);
-                        },
-                        afterRefresh: function () {
-                            this._onColumnDropped({
-                                drag: drag.found,
-                                drop: drop.found,
-                                at: at
-                            });
-                        }
-                    });
-                }
-            }
-        };
-        wijgrid.prototype._handleFilter = function (column, rawOperator, rawValue) {
-            var operator = (new wijmo.grid.filterOperatorsCache(this)).getByName(rawOperator), value, ok, args;
-            if(operator) {
-                if(operator.arity > 1) {
-                    // check value
-                    value = this._parse(column.options, rawValue);
-                    ok = (value !== null && (wijmo.grid.getDataType(column.options) === "string" || !isNaN(value)));
                 } else {
-                    ok = true;
+                    wijmo.grid.traverse(this.options.columns, function (column) {
+                        delete column.owner;
+                        var tmp, i, len;
+                        if((tmp = column.groupInfo)) {
+                            delete tmp.owner;
+                            if(tmp.expandInfo) {
+                                for(i = 0 , len = tmp.expandInfo.length; i < len; i++) {
+                                    delete tmp.expandInfo[i].owner;
+                                }
+                            }
+                        }
+                    });
                 }
-                if(ok) {
+            };
+            wijgrid.prototype._ensureRenderBounds = function (bounds) {
+                var total = this._totalRowsCount();// sketchTable.length or totalRows -- depends on data mode.
+
+                if(bounds.start < 0) {
+                    bounds.start = 0;
+                }
+                bounds.start = Math.min(bounds.start, total - 1);
+                if(bounds.end < 0) {
+                    bounds.end = 0;
+                }
+                bounds.end = Math.min(bounds.end, total - 1);
+                return bounds;
+            };
+            wijgrid.prototype._refresh = function (userData) {
+                // apply grouping
+                new wijmo.grid.grouper().group(this, this.sketchTable, this._field("leaves"));
+                // apply merging
+                new wijmo.grid.merger().merge(this.sketchTable, this._field("visibleLeaves"));
+                var bounds = this._field("viewRenderBounds");
+                this._ensureRenderBounds(bounds);
+                // view
+                if(this.options.scrollMode !== "none") {
+                    this._field("view", new wijmo.grid.fixedView(this, this._field("viewRenderBounds")));
+                } else {
+                    this._field("view", new wijmo.grid.flatView(this, this._field("viewRenderBounds")));
+                }
+                this._render();
+                // (re)create iternal widgets
+                this._ownerise(false);
+                this._recreateColumnWidgets();
+                this._ownerise(true);
+                // pager
+                if(this.options.allowPaging) {
+                    // top pager
+                    if(this.$topPagerDiv) {
+                        this.$topPagerDiv.wijpager(this._pagerSettings2PagerWidgetSettings()).css("zIndex", 5);
+                    }
+                    // bottom pager
+                    if(this.$bottomPagerDiv) {
+                        this.$bottomPagerDiv.wijpager(this._pagerSettings2PagerWidgetSettings()).css("zIndex", 5);
+                    }
+                }
+                // (re)create iternal widgets
+                            };
+            wijgrid.prototype._refreshVirtual = function (userData) {
+                var scrollData = userData.virtualScrollData, diffData = {
+                    top: 0,
+                    bottom: 0
+                };
+                if(scrollData.data) {
+                    diffData = this._processVirtualData(scrollData);
+                }
+                this._updateRowInfos(scrollData, diffData);
+                this._renderVirtualIntoView(scrollData);
+                // debug
+                /*var rows = this._view().bodyRows();
+                for (var i = 0; i < rows.length(); i++) {
+                var ri = this._view()._getRowInfo(rows.item(i));
+                var innerDiv = ri.$rows.find("td:first .wijmo-wijgrid-innercell");
+                var html = innerDiv.html();
+
+                html = "d:" + ri.dataItemIndex + " s:" + ri.sectionRowIndex + "  ||" + ri.data[0] + "|| " + html;
+                innerDiv.html(html);
+                }*/
+                // debug
+                /*if (scrollData.data && scrollData.mode === "reset") {
+                this._view().vsUI.scrollToRow(scrollData.newBounds.start, true); // original scrollIndex could change due pageSize alignment, so we need to re-set position of the vertical scrollbar.
+                }*/
+                            };
+            wijgrid.prototype._updateRowInfos = function (scrollData, diffData) {
+                var bounds = this._field("viewRenderBounds"), view = this._view(), newBounds = scrollData.newBounds, rows = this._view().bodyRows(), relMatch, i, diff, rowInfo;
+                switch(scrollData.mode) {
+                    case "reset":
+                        break;
+                    case "overlapBottom":
+                        relMatch = {
+                            start: // zero-based
+                            newBounds.start - bounds.start,
+                            end: bounds.end - bounds.start
+                        };
+                        diff = newBounds.start - bounds.start;
+                        for(i = relMatch.start; i <= relMatch.end; i++) {
+                            rowInfo = view._getRowInfo(rows.item(i), false);
+                            rowInfo.sectionRowIndex -= diff;
+                            rowInfo.dataItemIndex += diffData.top;
+                            view._setRowInfo(rowInfo.$rows, rowInfo);
+                        }
+                        break;
+                    case "overlapTop":
+                        relMatch = {
+                            start: // zero-based
+                            bounds.start - bounds.start,
+                            end: newBounds.end - bounds.start
+                        };
+                        diff = bounds.start - newBounds.start;
+                        for(i = relMatch.start; i <= relMatch.end; i++) {
+                            rowInfo = view._getRowInfo(rows.item(i), false);
+                            rowInfo.sectionRowIndex += diff;
+                            rowInfo.dataItemIndex += diffData.top;
+                            view._setRowInfo(rowInfo.$rows, rowInfo);
+                        }
+                        break;
+                }
+            };
+            wijgrid.prototype._renderVirtualIntoView = function (scrollData) {
+                var bounds = this._field("viewRenderBounds"), view = this._view(), fnDataItemIndex = function (sketchRow) {
+                    return (sketchRow.rowType & wijmo.grid.rowType.data) ? sketchRow.originalRowIndex : -1;
+                }, match, i, sketchRow, sectionRowIndex;
+                switch(scrollData.mode) {
+                    case "reset":
+                        // remove all rows
+                        view._clearBody();
+                        // add new rows
+                        for(i = scrollData.newBounds.start; i <= scrollData.newBounds.end; i++) {
+                            sketchRow = this.sketchTable[i - this._dataOffset];
+                            view._insertBodyRow(sketchRow, -1, fnDataItemIndex(sketchRow), i);
+                        }
+                        view._rebuildOffsets();
+                        break;
+                    case "overlapBottom":
+                        match = {
+                            start: scrollData.newBounds.start,
+                            end: bounds.end
+                        };
+                        // remove rows from the top
+                        for(i = 0; i < match.start - bounds.start; i++) {
+                            view._removeBodyRow(0, false);
+                        }
+                        // add new rows to the bottom
+                        for(i = match.end + 1; i <= scrollData.newBounds.end; i++) {
+                            sketchRow = this.sketchTable[i - this._dataOffset];
+                            view._insertBodyRow(sketchRow, -1, fnDataItemIndex(sketchRow), i);
+                        }
+                        break;
+                    case "overlapTop":
+                        match = {
+                            start: bounds.start,
+                            end: scrollData.newBounds.end
+                        };
+                        // remove rows from the bottom
+                        for(i = 0; i < bounds.end - scrollData.newBounds.end; i++) {
+                            view._removeBodyRow(match.end - match.start + 1, false)// relative index starting from zero.
+                            ;
+                        }
+                        // add new tows to the top
+                        sectionRowIndex = 0;
+                        for(i = scrollData.newBounds.start; i < bounds.start; i++) {
+                            sketchRow = this.sketchTable[i - this._dataOffset];
+                            view._insertBodyRow(sketchRow, sectionRowIndex++, fnDataItemIndex(sketchRow), i);
+                        }
+                        break;
+                    default:
+                        // "none", same range
+                        break;
+                }
+            };
+            wijgrid.prototype._processVirtualData = function (scrollData) {
+                var dvw = this._dataViewWrapper, source = dvw.dataView().getSource(), dataItem, leaves = this._field("leaves"), i, alignedViewBounds, cachedBounds, exceeded = 0, dataDiff = {
+                    top: 0,
+                    bottom: 0
+                }, rowAttributes, margin = this._serverSideVirtualScrollingMargin();
+                //  * extend underlying data
+                switch(scrollData.mode) {
+                    case "reset":
+                        // clear
+                        this.sketchTable.splice(0, this.sketchTable.length);
+                        dvw._unsafeSplice(0, source.length);
+                        //this._dataOffset = scrollData.newPageIndex * this.options.pageSize; //
+                        this._dataOffset = scrollData.request.index;
+                        // append
+                        for(i = 0; i < scrollData.data.length; i++) {
+                            dvw._unsafePush(dataItem = scrollData.data[i])// append rows to a dataStore
+                            ;
+                            this.sketchTable.push(this._buildSketchRow(dvw._wrapDataItem(dataItem, i), leaves));
+                        }
+                        break;
+                    case "overlapBottom":
+                        // append
+                        for(i = 0; i < scrollData.data.length; i++) {
+                            dvw._unsafePush(dataItem = scrollData.data[i])// append rows to a dataStore
+                            ;
+                            this.sketchTable.push(this._buildSketchRow(dvw._wrapDataItem(dataItem, source.length - 1), leaves));
+                        }
+                        dataDiff.bottom = scrollData.data.length;
+                        break;
+                    case "overlapTop":
+                        // prepend
+                        for(i = scrollData.data.length - 1; i >= 0; i--) {
+                            dvw._unsafeSplice(0, 0, dataItem = scrollData.data[i]);
+                            this.sketchTable.splice(0, 0, this._buildSketchRow(dvw._wrapDataItem(dataItem, i), leaves));
+                        }
+                        //this._dataOffset = scrollData.newPageIndex * this.options.pageSize;
+                        this._dataOffset = scrollData.request.index;
+                        dataDiff.top = scrollData.data.length;
+                        break;
+                }
+                // extend underlying data *
+                // * remove cached items exceeded cached bounds
+                // [margin][pageSize = viewBounds][margin]
+                alignedViewBounds = this._ensureRenderBounds({
+                    start: scrollData.newBounds.start,
+                    end: scrollData.newBounds.end
+                });
+                //start: Math.floor(scrollData.newBounds.start / this.options.pageSize) * this.options.pageSize,
+                //end: Math.floor(scrollData.newBounds.start / this.options.pageSize) * this.options.pageSize + this.options.pageSize - 1
+                cachedBounds = {
+                    start: this._dataOffset,
+                    end: this._dataOffset + source.length - 1
+                };
+                // remove items from the bottom
+                exceeded = (cachedBounds.end - alignedViewBounds.end) - margin;
+                if(exceeded > 0) {
+                    dataDiff.bottom -= exceeded;
+                    dvw._unsafeSplice(source.length - exceeded, exceeded);
+                    this.sketchTable.splice(this.sketchTable.length - exceeded, exceeded);
+                }
+                // remove items from the top
+                exceeded = (alignedViewBounds.start - cachedBounds.start) - margin;
+                if(exceeded > 0) {
+                    dataDiff.top -= exceeded;
+                    dvw._unsafeSplice(0, exceeded);
+                    this.sketchTable.splice(0, exceeded);
+                    this._dataOffset += exceeded;
+                }
+                // remove data exceeded cached bounds *
+                // * update metadata
+                for(i = 0; i < this.sketchTable.length; i++) {
+                    this.sketchTable[i].originalRowIndex = i;
+                }
+                // update metadata *
+                dvw._refreshSilent();
+                return dataDiff;
+            };
+            wijgrid.prototype._needToCreatePagerItem = function () {
+                return this.options.allowPaging === true;
+            };
+            wijgrid.prototype._isMobileEnv = function () {
+                return this._isMobile;
+            };
+            wijgrid.prototype._render = function () {
+                var view = this._view(), o = this.options, wijCSS = this.options.wijCSS, content;
+                view.render();
+                // YK: for fixing pager is not align to top and bottom when header is fixed.
+                content = this.outerDiv;
+                if(o.scrollMode !== "none") {
+                    // fixed header content
+                    content = this.outerDiv.find("div.wijmo-wijgrid-scroller:first");
+                }
+                this.$superPanelHeader = null;
+                // ** top pager (top div)
+                if(this.$topPagerDiv) {
+                    if(this.$topPagerDiv.data("wijmo-wijpager")) {
+                        this.$topPagerDiv.wijpager("destroy");
+                    }
+                    this.$topPagerDiv.remove();
+                }
+                this.$topPagerDiv = null;
+                if(this._needToCreatePagerItem() && ((o.pagerSettings.position === "top") || (o.pagerSettings.position === "topAndBottom"))) {
+                    if(!this.$topPagerDiv) {
+                        content.prepend(this.$superPanelHeader = $("<div class=\"wijmo-wijsuperpanel-header\"></div>"));
+                        this.$superPanelHeader.prepend(this.$topPagerDiv = $("<div class=\"wijmo-wijgrid-header " + wijCSS.header + " " + wijCSS.cornerTop + "\"></div>"));
+                    }
+                }
+                // top pager **
+                if(o.showGroupArea) {
+                    this._processGroupArea(content);
+                } else {
+                    this.$groupArea = null;
+                }
+                // ** bottom pager (bottom div)
+                if(this.$bottomPagerDiv) {
+                    if(this.$bottomPagerDiv.data("wijmo-wijpager")) {
+                        this.$bottomPagerDiv.wijpager("destroy");
+                    }
+                    this.$bottomPagerDiv.remove();
+                }
+                this.$bottomPagerDiv = null;
+                if(this._needToCreatePagerItem() && ((o.pagerSettings.position === "bottom") || (o.pagerSettings.position === "topAndBottom"))) {
+                    if(!this.$bottomPagerDiv) {
+                        content.append(this.$bottomPagerDiv = $("<div class=\"wijmo-wijgrid-footer wijmo-wijsuperpanel-footer " + wijCSS.stateDefault + " " + wijCSS.cornerBottom + "\"></div>"));
+                    }
+                }
+                // bottom pager **
+                            };
+            wijgrid.prototype._processGroupArea = function (content) {
+                var self = this, groupCollection = this._groupedColumns(), groupWidgetCollection = [];
+                this.$groupArea = $("<div class=\"" + this.options.wijCSS.content + " " + this.options.wijCSS.helperClearFix + "\"></div>");
+                if(groupCollection.length > 0) {
+                    $.each(groupCollection, function (index, item) {
+                        var groupElement = $("<a href=\"#\"></a>").appendTo(self.$groupArea);
+                        try  {
+                            $.data(groupElement[0], "wijgridowner", self)// pass owner to the constructor
+                            ;
+                            groupElement.c1groupedfield($.extend({
+                            }, {
+                                allowMoving: item.allowMoving,
+                                allowSort: item.allowSort,
+                                dataIndex: item.dataIndex,
+                                headerText: item.headerText,
+                                isBand: item.isBand,
+                                isLeaf: item.isLeaf,
+                                linearIdx: item.linearIdx,
+                                parentIdx: item.parentIdx,
+                                sortDirection: item.sortDirection,
+                                travIdx: item.travIdx,
+                                groupedIndex: item.groupedIndex
+                            }, {
+                                disabled: self.options.disabled
+                            }));
+                        }finally {
+                            $.removeData(groupElement[0], "wijgridowner");
+                        }
+                        groupWidgetCollection.push(groupElement.data("wijmo-c1groupedfield"));
+                    });
+                } else {
+                    this.$groupArea.addClass("wijmo-wijgrid-group-area").css("padding", 0).html(// disable padding (inherited)
+                    this.options.groupAreaCaption || "&nbsp;");
+                }
+                this._field("groupedWidgets", groupWidgetCollection);
+                if(!this.$superPanelHeader) {
+                    content.prepend(this.$superPanelHeader = $("<div class=\"wijmo-wijsuperpanel-header\"></div>"));
+                }
+                this.$superPanelHeader.prepend(this.$groupArea);
+                this._dragndrop(true).attachGroupArea(this.$groupArea);
+            };
+            wijgrid.prototype._pagerSettings2PagerWidgetSettings = function () {
+                return $.extend({
+                }, this.options.pagerSettings, {
+                    disabled: this.options.disabled,
+                    pageCount: this.pageCount(),
+                    pageIndex: this.options.pageIndex,
+                    pageIndexChanging: $.proxy(this._onPagerWidgetPageIndexChanging, this),
+                    pageIndexChanged: $.proxy(this._onPagerWidgetPageIndexChanged, this)
+                });
+            };
+            wijgrid.prototype._showRowHeader = function () {
+                return (this.options.showRowHeader === true) && (this.options.staticColumnsAlignment !== "right");
+            };
+            wijgrid.prototype._attachEvents = function () {
+                var view = this._view(), $fe = view.focusableElement(), self = this;
+                $fe.bind("keydown." + this.widgetName, $.proxy(this._onKeyDown, this));
+                $fe.bind("keypress." + this.widgetName, $.proxy(this._onKeyPress, this));
+                $.each(view.subTables(), function (index, element) {
+                    var domTable = element.element();
+                    if(domTable) {
+                        if(domTable.tHead) {
+                            $(domTable.tHead).bind("click." + self.widgetName, $.proxy(self._onClick, self));
+                        }
+                        if(domTable.tBodies.length) {
+                            $(domTable.tBodies[0]).bind("click." + self.widgetName, $.proxy(self._onClick, self)).bind("dblclick." + self.widgetName, $.proxy(self._onDblClick, self)).bind("mousemove." + self.widgetName, $.proxy(self._onMouseMove, self)).bind("mouseout." + self.widgetName, $.proxy(self._onMouseOut, self));
+                        }
+                    }
+                });
+                $(window).bind("resize." + this.widgetName + "." + this._eventUID, $.proxy(this._onWindowResize, this));
+            };
+            wijgrid.prototype._detachEvents = function (destroy) {
+                var view = this._view(), self = this, $fe;
+                this._windowResizeTimer = 0;
+                $(window).unbind("resize." + this.widgetName + "." + this._eventUID);
+                if(view) {
+                    $fe = view.focusableElement();
+                    $fe.unbind("keydown." + this.widgetName);
+                    $fe.unbind("keypress." + this.widgetName);
+                    $.each(view.subTables(), function () {
+                        var domTable = this.element();// item (this) is a htmlTableAccessor instance
+
+                        if(domTable) {
+                            if(domTable.tHead) {
+                                $(domTable.tHead).unbind("." + self.widgetName);
+                            }
+                            if(domTable.tBodies.length) {
+                                $(domTable.tBodies[0]).unbind("." + self.widgetName);
+                            }
+                        }
+                    });
+                }
+            };
+            wijgrid.prototype._handleSort = function (column, multiSort) {
+                var columns = this.options.columns, travIdx = column.travIdx, newSortDirection, args;
+                //if (this.options.allowSorting && ($.inArray(columnWidget, columns) >= 0)) {
+                if(column && this.options.allowSorting) {
+                    newSortDirection = ((column.sortDirection === "none") ? "ascending" : ((column.sortDirection === "ascending") ? "descending" : "ascending"));
                     args = {
-                        column: column.options,
-                        operator: operator.name,
-                        value: value
+                        column: column,
+                        sortDirection: newSortDirection,
+                        sortCommand: column.dataKey + " " + (newSortDirection === "ascending" ? "asc" : "desc")
                     };
-                    if(this._onColumnFiltering(args)) {
-                        column.options.filterValue = args.value;
-                        column.options.filterOperator = args.operator;
-                        this._resetDataProperties();
+                    if(this._onColumnSorting(args)) {
+                        column.sortDirection = args.sortDirection;
+                        if(multiSort) {
+                            column.sortOrder = this._customSortOrder++;
+                        } else {
+                            this._customSortOrder = 1000// reset to default
+                            ;
+                            // reset sortDirection for all column widgets except sorting one and grouped columns
+                            $.each(this.columns(), function (index, item) {
+                                item.options.sortOrder = 0;
+                                if(item.options.travIdx !== travIdx && !(item.options.groupInfo && item.options.groupInfo.position !== "none")) {
+                                    item.options.sortDirection = "none";
+                                }
+                            });
+                            // ensure invisible columns.
+                            wijmo.grid.traverse(columns, function (item) {
+                                item.sortOrder = 0;
+                                if(item.travIdx !== travIdx && !(item.groupInfo && item.groupInfo.position !== "none")) {
+                                    item.sortDirection = "none";
+                                }
+                            });
+                        }
+                        args = {
+                            column: column,
+                            sortDirection: column.sortDirection,
+                            sortCommand: column.dataKey + " " + (column.sortDirection === "ascending" ? "asc" : "desc")
+                        };
                         if(this._customPagingEnabled()) {
                             this._convertWidgetsToOptions();
-                            this._onColumnFiltered({
-                                column: column.options
-                            })// Allow user the ability to load a new data and refresh the grid.
+                            this._onColumnSorted(args)// Allow user the ability to load a new data and refresh the grid.
                             ;
                         } else {
                             this.ensureControl(true, {
                                 afterRefresh: function () {
-                                    this._onColumnFiltered({
-                                        column: column.options
+                                    this._onColumnSorted(args);
+                                }
+                            });
+                        }
+                    }
+                }
+            };
+            wijgrid.prototype._handleDragnDrop = function (dragTravIdx, dropTravIdx, at, dragInGroup, dropInGroup) {
+                var drag = wijmo.grid.getColumnByTravIdx(this.options.columns, dragTravIdx), drop = wijmo.grid.getColumnByTravIdx(this.options.columns, dropTravIdx), dragSource = dragInGroup ? "groupArea" : "columns", dropSource = dropInGroup ? "groupArea" : "columns";
+                if(dropInGroup) {
+                    // drag is dropped into the group area
+                    if(this._onColumnGrouping({
+                        drag: drag.found,
+                        drop: drop ? drop.found : null,
+                        dragSource: dragSource,
+                        dropSource: dropSource,
+                        at: at
+                    })) {
+                        this.ensureControl(true, {
+                            beforeRefresh: function () {
+                                if(!drop) {
+                                    // drag is dropped into the empty group area.
+                                    drag.found.groupedIndex = 0;
+                                } else {
+                                    switch(at) {
+                                        case "left":
+                                            drag.found.groupedIndex = drop.found.groupedIndex - 0.5;
+                                            break;
+                                        case "right":
+                                            drag.found.groupedIndex = drop.found.groupedIndex + 0.5;
+                                            break;
+                                    }
+                                }
+                                if(!dragInGroup) {
+                                    $.extend(true, drag.found, {
+                                        groupInfo: {
+                                            position: "header"
+                                        }
                                     });
                                 }
-                            });
+                            },
+                            afterRefresh: function () {
+                                this._onColumnGrouped({
+                                    drag: drag.found,
+                                    drop: drop ? drop.found : null,
+                                    dragSource: dragSource,
+                                    dropSource: dropSource,
+                                    at: at
+                                });
+                            }
+                        });
+                    }
+                } else {
+                    if(this._onColumnDropping({
+                        drag: drag.found,
+                        drop: drop.found,
+                        at: at
+                    })) {
+                        this.ensureControl(false, {
+                            beforeRefresh: function () {
+                                /* modifying the wijgrid.options.columns option */
+                                drag.at.splice(drag.found.linearIdx, 1);
+                                //because when drag is before drop, the index of drop is affected.
+                                switch(at) {
+                                    case "left":
+                                        if(drag.at === drop.at && drag.found.linearIdx < drop.found.linearIdx) {
+                                            drop.at.splice(drop.found.linearIdx - 1, 0, drag.found);
+                                        } else {
+                                            drop.at.splice(drop.found.linearIdx, 0, drag.found);
+                                        }
+                                        break;
+                                    case "right":
+                                        if(drag.at === drop.at && drag.found.linearIdx < drop.found.linearIdx) {
+                                            drop.at.splice(drop.found.linearIdx, 0, drag.found);
+                                        } else {
+                                            drop.at.splice(drop.found.linearIdx + 1, 0, drag.found);
+                                        }
+                                        break;
+                                    case "center":
+                                        // drop is a band
+                                        drop.found.columns.push(drag.found);
+                                        break;
+                                }
+                                // rebuild indices (linearIdx, travIdx, parentIdx)
+                                wijmo.grid.setTraverseIndex(this.options.columns);
+                            },
+                            afterRefresh: function () {
+                                this._onColumnDropped({
+                                    drag: drag.found,
+                                    drop: drop.found,
+                                    at: at
+                                });
+                            }
+                        });
+                    }
+                }
+            };
+            wijgrid.prototype._handleFilter = function (column, rawOperator, rawValue) {
+                var operator = (new wijmo.grid.filterOperatorsCache(this)).getByName(rawOperator), value, ok, args;
+                if(operator) {
+                    if(operator.arity > 1) {
+                        // check value
+                        value = this.parse(column.options, rawValue);
+                        ok = (value !== null && (wijmo.grid.getDataType(column.options) === "string" || !isNaN(value)));
+                    } else {
+                        ok = true;
+                    }
+                    if(ok) {
+                        args = {
+                            column: column.options,
+                            operator: operator.name,
+                            value: value
+                        };
+                        if(this._onColumnFiltering(args)) {
+                            column.options.filterValue = args.value;
+                            column.options.filterOperator = args.operator;
+                            this._resetDataProperties();
+                            if(this._customPagingEnabled()) {
+                                this._convertWidgetsToOptions();
+                                this._onColumnFiltered({
+                                    column: column.options
+                                })// Allow user the ability to load a new data and refresh the grid.
+                                ;
+                            } else {
+                                this.ensureControl(true, {
+                                    afterRefresh: function () {
+                                        this._onColumnFiltered({
+                                            column: column.options
+                                        });
+                                    }
+                                });
+                            }
                         }
                     }
                 }
-            }
-        };
-        wijgrid.prototype._handleUngroup = function (columnTravIdx) {
-            var column = wijmo.grid.getColumnByTravIdx(this.options.columns, columnTravIdx), result;
-            if(column && column.found) {
-                result = column.found;
-                if(this._onColumnUngrouping({
-                    column: result
-                })) {
-                    this.ensureControl(false, {
-                        beforeRefresh: function () {
-                            delete result.groupedIndex;
-                            $.extend(true, result, {
-                                groupInfo: {
-                                    position: "none"
-                                }
-                            });
-                        },
-                        afterRefresh: function () {
-                            this._onColumnUngrouped({
-                                column: result
-                            });
-                        }
-                    });
+            };
+            wijgrid.prototype._handleUngroup = function (columnTravIdx) {
+                var column = wijmo.grid.getColumnByTravIdx(this.options.columns, columnTravIdx), result;
+                if(column && column.found) {
+                    result = column.found;
+                    if(this._onColumnUngrouping({
+                        column: result
+                    })) {
+                        this.ensureControl(true, {
+                            beforeRefresh: function () {
+                                delete result.groupedIndex;
+                                $.extend(true, result, {
+                                    groupInfo: {
+                                        position: "none"
+                                    }
+                                });
+                            },
+                            afterRefresh: function () {
+                                this._onColumnUngrouped({
+                                    column: result
+                                });
+                            }
+                        });
+                    }
                 }
-            }
-        };
-        wijgrid.prototype._onVirtualScrolling = function (newBounds, request, mode, scrollIndex, completeCallback, data/* opt*/ ) {
-            this.ensureControl(true, {
-                virtualScrollData: {
-                    newBounds: newBounds,
-                    request: request,
-                    mode: mode,
-                    data: data
-                },
-                afterRefresh: function (userData) {
-                    var bounds = this._field("viewRenderBounds");
-                    // set new bounds
-                    $.extend(bounds, userData.virtualScrollData.newBounds);
-                    this._view()._adjustRowsHeights();
-                    completeCallback(scrollIndex);
-                }
-            });
-        };
-        wijgrid.prototype._handleVirtualScrolling = function (scrollIndex, completeCallback) {
-            var bounds = this._field("viewRenderBounds"), newBounds = this._ensureRenderBounds({
-                start: scrollIndex,
-                end: scrollIndex + this.options.pageSize - 1
-            }), cachedDataBounds = this._ensureRenderBounds({
-                start: this._dataOffset,
-                end: this._dataOffset + this._dataViewWrapper.dataView().count() - 1
-            }), request = null, mode;
-            // check viewBounds
-            if(newBounds.start > bounds.end || newBounds.end < bounds.start) {
-                // mode = "reset"
-                mode = "reset";
-            } else {
-                if(newBounds.start > bounds.start) {
-                    mode = "overlapBottom";
-                } else {
-                    if(newBounds.start < bounds.start) {
-                        mode = "overlapTop";
-                    } else {
-                        // same range, "none"
-                                            }
-                }
-            }
-            // check dataBounds
-            if(this._serverSideVirtualScrolling()) {
-                switch(mode) {
-                    case "reset":
-                        // align view bounds by pageSize
-                        request = {
-                            index: scrollIndex,
-                            maxCount: // (scrollIndex == newBounds.start)
-                            this.options.pageSize
-                        };
-                        /*newPageIndex = Math.floor(scrollIndex / this.options.pageSize);
-
-                        scrollIndex = newPageIndex * this.options.pageSize; // note: scrollIndex can change
-
-                        newBounds = this._ensureRenderBounds({
-                        start: scrollIndex,
-                        end: scrollIndex + this.options.pageSize - 1
-                        });*/
-                        break;
-                    case "overlapBottom":
-                        if(newBounds.end > cachedDataBounds.end) {
-                            request = {
-                                index: cachedDataBounds.end + 1,
-                                maxCount: this.options.pageSize
-                            };
-                        }
-                        /*newPageIndex = Math.floor(newBounds.end / this.options.pageSize);
-                        alignIndex = newPageIndex * this.options.pageSize;
-
-                        if (alignIndex <= cachedDataBounds.end) {
-                        newPageIndex = null;
-                        }*/
-                        break;
-                    case "overlapTop":
-                        if(newBounds.start < cachedDataBounds.start) {
-                            request = {
-                                index: Math.max(0, cachedDataBounds.start - this.options.pageSize),
-                                maxCount: 0
-                            };
-                            request.maxCount = cachedDataBounds.start - request.index;
-                        }
-                        /*newPageIndex = Math.floor(newBounds.start / this.options.pageSize);
-                        alignIndex = newPageIndex * this.options.pageSize;
-
-                        if (alignIndex >= cachedDataBounds.start) {
-                        newPageIndex = null;
-                        }*/
-                        break;
-                }
-            }
-            if(mode !== "none") {
-                //this._onVirtualScrolling(newBounds, newPageIndex, mode, scrollIndex, completeCallback); // note: scrollIndex could be changed
-                this._onVirtualScrolling(newBounds, request, mode, scrollIndex, completeCallback)// note: scrollIndex could be changed
-                ;
-            }
-        };
-        wijgrid.prototype._serverSideVirtualScrolling = function () {
-            return false;
-        };
-        wijgrid.prototype._serverSideVirtualScrollingMargin = function () {
-            return this.options.pageSize * 2;
-        };
-        wijgrid.prototype._onColumnDropping = // * event handlers
-        function (args) {
-            return this._trigger("columnDropping", null, args);
-        };
-        wijgrid.prototype._onColumnDropped = function (args) {
-            this._trigger("columnDropped", null, args);
-        };
-        wijgrid.prototype._onColumnGrouping = function (args) {
-            return this._trigger("columnGrouping", null, args);
-        };
-        wijgrid.prototype._onColumnGrouped = function (args) {
-            this._trigger("columnGrouped", null, args);
-        };
-        wijgrid.prototype._onColumnUngrouping = function (args) {
-            return this._trigger("columnUngrouping", null, args);
-        };
-        wijgrid.prototype._onColumnUngrouped = function (args) {
-            this._trigger("columnUngrouped", null, args);
-        };
-        wijgrid.prototype._onColumnFiltering = function (args) {
-            return this._trigger("filtering", null, args);
-        };
-        wijgrid.prototype._onColumnFiltered = function (args) {
-            this._trigger("filtered", null, args);
-        };
-        wijgrid.prototype._onFilterOperatorsListShowing = function (args) {
-            this._trigger("filterOperatorsListShowing", null, args);
-        };
-        wijgrid.prototype._onColumnSorting = function (args) {
-            return this._trigger("sorting", null, args);
-        };
-        wijgrid.prototype._onColumnSorted = function (args) {
-            this._trigger("sorted", null, args);
-        };
-        wijgrid.prototype._onCurrentCellChanged = function (e) {
-            var o = this.options, currentCell = this._field("currentCell");
-            // notify dataView
-            this._dataViewWrapper.currentPosition(this._gridDataRowIndexToDataView(currentCell.rowIndex()));
-            //if (o.allowKeyboardNavigation) {
-            if(o.scrollMode !== "none" && currentCell && !currentCell.isEqual(wijmo.grid.cellInfo.outsideValue)) {
-                (this._view()).scrollTo(currentCell);
-            }
-            //}
-            this._trigger("currentCellChanged");
-            if(e && ((e.type || "").toLowerCase() === "click") && this._editBySingleClick()) {
-                this._beginEditInternal(e);
-            }
-        };
-        wijgrid.prototype._onPageIndexChanging = function (args) {
-            return this._trigger("pageIndexChanging", null, args);
-        };
-        wijgrid.prototype._onPageIndexChanged = function (args) {
-            this._trigger("pageIndexChanged", null, args);
-        };
-        wijgrid.prototype._onPagerWidgetPageIndexChanging = function (sender, args) {
-            args.handled = true;
-        };
-        wijgrid.prototype._onPagerWidgetPageIndexChanged = function (sender, args) {
-            this._setOption("pageIndex", args.newPageIndex);
-        };
-        wijgrid.prototype._onRendering = function (userData) {
-            var view = this._view();
-            this._rendered = false;
-            if(userData.virtualScrollData) {
-                this.selection().clear()// clear selection
-                ;
-                if(this.options.highlightCurrentCell) {
-                    this._highlightCellPosition(this.currentCell(), false)// remove highlighning
-                    ;
-                }
-            } else {
-                if(view) {
-                    view.dispose();
-                }
-                this._detachEvents(false);
-                this.element.detach();
-                this.element.empty();
-                this.outerDiv.empty();
-                this.outerDiv.append(this.element);
-                if(this._field("selectionui")) {
-                    this._field("selectionui").dispose();
-                    this._field("selectionui", null);
-                }
-                if(this._field("resizer")) {
-                    this._field("resizer").dispose();
-                    this._field("resizer", null);
-                }
-                if(this._field("frozener")) {
-                    this._field("frozener").dispose();
-                    this._field("frozener", null);
-                }
-            }
-            this._trigger("rendering");
-        };
-        wijgrid.prototype._onRendered = function (userData) {
-            var view = this._view(), currentCell, resizer, hasSelection = this.selection().selectedCells().length() > 0;
-            this._rendered = true;
-            // ** current cell
-            this._setAttr(view.focusableElement(), "tabIndex", 0)// to handle keyboard\ focus events
-            ;
-            currentCell = this.currentCell();
-            if(currentCell._isValid() && (currentCell = this.currentCell(currentCell))) {
-                currentCell._isEdit(false);
-            } else {
-                currentCell = this.currentCell(this._getFirstDataRowCell(0));
-            }
-            // current cell **
-            // ** selection
-            this._field("selection", null)// always recreate selection object
-            ;
-            currentCell = this.currentCell();
-            if(currentCell._isValid() && (hasSelection || this.options.showSelectionOnRender)) {
-                // attach selection to the current cell
-                this.selection()._startNewTransaction(currentCell);
-                this.selection()._selectRange(new wijmo.grid.cellInfoRange(currentCell, currentCell), false, false, 0/* none */ , null);
-            }
-            // selection **
-            if(!userData.virtualScrollData) {
-                // attach events
-                this._attachEvents();
-                // selection ui
-                this._selectionui(true);
-                // initialize resizer
-                resizer = new wijmo.grid.uiResizer(this);
-                $.each(this.columns(), function (index, colWidget) {
-                    var o = colWidget.options;
-                    if(o.visible && o.parentVis && o.isLeaf) {
-                        resizer.addElement(colWidget);
+            };
+            wijgrid.prototype._onVirtualScrolling = function (newBounds, request, mode, scrollIndex, completeCallback, data/* opt*/ ) {
+                this.ensureControl(true, {
+                    virtualScrollData: {
+                        newBounds: newBounds,
+                        request: request,
+                        mode: mode,
+                        data: data
+                    },
+                    afterRefresh: function (userData) {
+                        var bounds = this._field("viewRenderBounds");
+                        // set new bounds
+                        $.extend(bounds, userData.virtualScrollData.newBounds);
+                        this._view()._adjustRowsHeights();
+                        completeCallback(scrollIndex);
                     }
                 });
-                this._field("resizer", resizer);
-                view.updateSplits(this._scrollingState)// restore value
+            };
+            wijgrid.prototype._handleVirtualScrolling = function (scrollIndex, completeCallback) {
+                var bounds = this._field("viewRenderBounds"), newBounds = this._ensureRenderBounds({
+                    start: scrollIndex,
+                    end: scrollIndex + this.options.pageSize - 1
+                }), cachedDataBounds = this._ensureRenderBounds({
+                    start: this._dataOffset,
+                    end: this._dataOffset + this._dataViewWrapper.dataView().count() - 1
+                }), request = null, mode;
+                // check viewBounds
+                if(newBounds.start > bounds.end || newBounds.end < bounds.start) {
+                    // mode = "reset"
+                    mode = "reset";
+                } else {
+                    if(newBounds.start > bounds.start) {
+                        mode = "overlapBottom";
+                    } else {
+                        if(newBounds.start < bounds.start) {
+                            mode = "overlapTop";
+                        } else {
+                            // same range, "none"
+                                                    }
+                    }
+                }
+                // check dataBounds
+                if(this._serverSideVirtualScrolling()) {
+                    switch(mode) {
+                        case "reset":
+                            // align view bounds by pageSize
+                            request = {
+                                index: scrollIndex,
+                                maxCount: // (scrollIndex == newBounds.start)
+                                this.options.pageSize
+                            };
+                            /*newPageIndex = Math.floor(scrollIndex / this.options.pageSize);
+
+                            scrollIndex = newPageIndex * this.options.pageSize; // note: scrollIndex can change
+
+                            newBounds = this._ensureRenderBounds({
+                            start: scrollIndex,
+                            end: scrollIndex + this.options.pageSize - 1
+                            });*/
+                            break;
+                        case "overlapBottom":
+                            if(newBounds.end > cachedDataBounds.end) {
+                                request = {
+                                    index: cachedDataBounds.end + 1,
+                                    maxCount: this.options.pageSize
+                                };
+                            }
+                            /*newPageIndex = Math.floor(newBounds.end / this.options.pageSize);
+                            alignIndex = newPageIndex * this.options.pageSize;
+
+                            if (alignIndex <= cachedDataBounds.end) {
+                            newPageIndex = null;
+                            }*/
+                            break;
+                        case "overlapTop":
+                            if(newBounds.start < cachedDataBounds.start) {
+                                request = {
+                                    index: Math.max(0, cachedDataBounds.start - this.options.pageSize),
+                                    maxCount: 0
+                                };
+                                request.maxCount = cachedDataBounds.start - request.index;
+                            }
+                            /*newPageIndex = Math.floor(newBounds.start / this.options.pageSize);
+                            alignIndex = newPageIndex * this.options.pageSize;
+
+                            if (alignIndex >= cachedDataBounds.start) {
+                            newPageIndex = null;
+                            }*/
+                            break;
+                    }
+                }
+                if(mode !== "none") {
+                    //this._onVirtualScrolling(newBounds, newPageIndex, mode, scrollIndex, completeCallback); // note: scrollIndex could be changed
+                    this._onVirtualScrolling(newBounds, request, mode, scrollIndex, completeCallback)// note: scrollIndex could be changed
+                    ;
+                }
+            };
+            wijgrid.prototype._serverSideVirtualScrolling = function () {
+                return false;
+            };
+            wijgrid.prototype._serverSideVirtualScrollingMargin = function () {
+                return this.options.pageSize * 2;
+            };
+            wijgrid.prototype._onColumnDropping = // * event handlers
+            function (args) {
+                return this._trigger("columnDropping", null, args);
+            };
+            wijgrid.prototype._onColumnDropped = function (args) {
+                this._trigger("columnDropped", null, args);
+            };
+            wijgrid.prototype._onColumnGrouping = function (args) {
+                return this._trigger("columnGrouping", null, args);
+            };
+            wijgrid.prototype._onColumnGrouped = function (args) {
+                this._trigger("columnGrouped", null, args);
+            };
+            wijgrid.prototype._onColumnUngrouping = function (args) {
+                return this._trigger("columnUngrouping", null, args);
+            };
+            wijgrid.prototype._onColumnUngrouped = function (args) {
+                this._trigger("columnUngrouped", null, args);
+            };
+            wijgrid.prototype._onColumnFiltering = function (args) {
+                return this._trigger("filtering", null, args);
+            };
+            wijgrid.prototype._onColumnFiltered = function (args) {
+                this._trigger("filtered", null, args);
+            };
+            wijgrid.prototype._onFilterOperatorsListShowing = function (args) {
+                this._trigger("filterOperatorsListShowing", null, args);
+            };
+            wijgrid.prototype._onColumnSorting = function (args) {
+                return this._trigger("sorting", null, args);
+            };
+            wijgrid.prototype._onColumnSorted = function (args) {
+                this._trigger("sorted", null, args);
+            };
+            wijgrid.prototype._onCurrentCellChanged = function (e) {
+                var o = this.options, currentCell = this._field("currentCell");
+                // notify dataView
+                var dataIndex = this._gridDataRowIndexToDataView(currentCell.rowIndex());
+                this._dataViewWrapper.currentPosition(dataIndex);
+                //if (o.allowKeyboardNavigation) {
+                if(o.scrollMode !== "none" && currentCell && !currentCell.isEqual(wijmo.grid.cellInfo.outsideValue)) {
+                    (this._view()).scrollTo(currentCell);
+                }
+                //}
+                this._trigger("currentCellChanged");
+                if(e && ((e.type || "").toLowerCase() === "click") && this._editBySingleClick()) {
+                    this._beginEditInternal(e);
+                }
+            };
+            wijgrid.prototype._onPageIndexChanging = function (args) {
+                return this._trigger("pageIndexChanging", null, args);
+            };
+            wijgrid.prototype._onPageIndexChanged = function (args) {
+                this._trigger("pageIndexChanged", null, args);
+            };
+            wijgrid.prototype._onPagerWidgetPageIndexChanging = function (sender, args) {
+                args.handled = true;
+            };
+            wijgrid.prototype._onPagerWidgetPageIndexChanged = function (sender, args) {
+                this._setOption("pageIndex", args.newPageIndex);
+            };
+            wijgrid.prototype._onRendering = function (userData) {
+                var view = this._view();
+                this._rendered = false;
+                if(userData.virtualScrollData) {
+                    this.selection().clear()// clear selection
+                    ;
+                    if(this.options.highlightCurrentCell) {
+                        this._highlightCellPosition(this.currentCell(), false)// remove highlighning
+                        ;
+                    }
+                } else {
+                    if(view) {
+                        view.dispose();
+                    }
+                    this._detachEvents(false);
+                    this.element.detach();
+                    this.element.empty();
+                    this.outerDiv.empty();
+                    this.outerDiv.append(this.element);
+                    this._field("currentCell", null);
+                    if(this._field("selectionui")) {
+                        this._field("selectionui").dispose();
+                        this._field("selectionui", null);
+                    }
+                    if(this._field("resizer")) {
+                        this._field("resizer").dispose();
+                        this._field("resizer", null);
+                    }
+                    if(this._field("frozener")) {
+                        this._field("frozener").dispose();
+                        this._field("frozener", null);
+                    }
+                }
+                this._trigger("rendering");
+            };
+            wijgrid.prototype._onRendered = function (userData) {
+                var view = this._view(), currentCell, resizer, hasSelection = this.selection().selectedCells().length() > 0;
+                this._rendered = true;
+                // ** current cell
+                this._setAttr(view.focusableElement(), "tabIndex", 0)// to handle keyboard\ focus events
                 ;
-                //frozener
-                if(this.options.scrollMode !== "none") {
-                    this._field("frozener", new wijmo.grid.uiFrozener(this));
+                currentCell = this._currentCellFromDataView();
+                currentCell._isEdit(false);
+                if(!currentCell._isValid() || !(currentCell = this.currentCell(currentCell))) {
+                    currentCell = this.currentCell(this._getFirstDataRowCell(0));
                 }
-            }
-            this._renderCounter++;
-            this._trigger("rendered");
-        };
-        wijgrid.prototype._onClick = function (e) {
-            if(!this._canInteract() || !e.target) {
-                return;
-            }
-            var view = this._view(), clickedCell = this._findUntilOuterDiv(e.target, {
-                td: true,
-                th: true
-            }), $row, clickedCellInfo, extendMode = 0, currentCell, selection;
-            // none
-            if(clickedCell) {
-                if($(e.target).hasClass("wijmo-wijgrid-grouptogglebtn")) {
-                    this._onGroupBtnClick(e);
-                    // #29676: stop event from bubbling up to the parent grid (if available)
-                    e.stopPropagation();
-                    return false;
+                // current cell **
+                // ** selection
+                this._field("selection", null)// always recreate selection object
+                ;
+                currentCell = this.currentCell();
+                if(currentCell._isValid() && (hasSelection || this.options.showSelectionOnRender)) {
+                    // attach selection to the current cell
+                    this.selection()._startNewTransaction(currentCell);
+                    this.selection()._selectRange(new wijmo.grid.cellInfoRange(currentCell, currentCell), false, false, 0/* none */ , null);
                 }
-                $row = $(clickedCell).closest("tr");
-                if(!$row.length) {
+                // selection **
+                if(!userData.virtualScrollData) {
+                    // attach events
+                    this._attachEvents();
+                    // selection ui
+                    this._selectionui(true);
+                    // initialize resizer
+                    resizer = new wijmo.grid.uiResizer(this);
+                    $.each(this.columns(), function (index, colWidget) {
+                        var o = colWidget.options;
+                        if(o.visible && o.parentVis && o.isLeaf) {
+                            resizer.addElement(colWidget);
+                        }
+                    });
+                    this._field("resizer", resizer);
+                    view.updateSplits(this._scrollingState)// restore value
+                    ;
+                    //frozener
+                    if(this.options.scrollMode !== "none") {
+                        this._field("frozener", new wijmo.grid.uiFrozener(this));
+                    }
+                }
+                this._renderCounter++;
+                this._trigger("rendered");
+            };
+            wijgrid.prototype._onClick = function (e) {
+                if(!this._canInteract() || !e.target) {
                     return;
                 }
-                clickedCellInfo = view.getAbsoluteCellInfo(clickedCell);
-                if($row.hasClass("wijmo-wijgrid-datarow") || $row.hasClass("wijmo-wijgrid-headerrow")) {
-                    if(clickedCellInfo.cellIndex() < 0 || clickedCellInfo.rowIndex() < 0) {
-                        // header cell, rowheader cell or filter cell
-                        if(clickedCellInfo.rowIndex() >= 0) {
-                            // rowheader cell
-                            // move current cell to the first cell of the clicked row
-                            clickedCellInfo = new wijmo.grid.cellInfo(0, clickedCellInfo.rowIndex());
-                            extendMode = 2// extend to row
-                            ;
+                var view = this._view(), clickedCell = this._findUntilOuterDiv(e.target, {
+                    td: true,
+                    th: true
+                }), $row, clickedCellInfo, extendMode = 0, currentCell, selection;
+                // none
+                if(clickedCell) {
+                    if($(e.target).hasClass("wijmo-wijgrid-grouptogglebtn")) {
+                        this._onGroupBtnClick(e);
+                        // #29676: stop event from bubbling up to the parent grid (if available)
+                        e.stopPropagation();
+                        return false;
+                    }
+                    $row = $(clickedCell).closest("tr");
+                    if(!$row.length) {
+                        return;
+                    }
+                    clickedCellInfo = view.getAbsoluteCellInfo(clickedCell);
+                    if($row.hasClass("wijmo-wijgrid-datarow") || $row.hasClass("wijmo-wijgrid-headerrow")) {
+                        if(clickedCellInfo.cellIndex() < 0 || clickedCellInfo.rowIndex() < 0) {
+                            // header cell, rowheader cell or filter cell
+                            if(clickedCellInfo.rowIndex() >= 0) {
+                                // rowheader cell
+                                // move current cell to the first cell of the clicked row
+                                clickedCellInfo = new wijmo.grid.cellInfo(0, clickedCellInfo.rowIndex());
+                                extendMode = 2// extend to row
+                                ;
+                            } else {
+                                // header cell
+                                // move current cell to the first data cell of the clicked column
+                                clickedCellInfo = this._getFirstDataRowCell(clickedCellInfo.cellIndex());
+                                extendMode = 1// extend to column
+                                ;
+                            }
+                        }
+                        this._changeCurrentCell(e, clickedCellInfo, !$(e.target).is(":focus"))// change current cell and set focus to it (if the target element is not already focused)
+                        ;
+                        currentCell = this.currentCell();
+                        selection = this.selection();
+                        if(!e.shiftKey || (!selection._multipleRangesAllowed() && this.options.selectionMode.toLowerCase() !== "singlerange")) {
+                            selection._startNewTransaction(currentCell);
+                        }
+                        selection.beginUpdate();
+                        if(e.shiftKey && e.ctrlKey) {
+                            selection._clearRange(new wijmo.grid.cellInfoRange(currentCell, currentCell), extendMode);
                         } else {
-                            // header cell
-                            // move current cell to the first data cell of the clicked column
-                            clickedCellInfo = this._getFirstDataRowCell(clickedCellInfo.cellIndex());
-                            extendMode = 1// extend to column
-                            ;
+                            selection._selectRange(new wijmo.grid.cellInfoRange(selection._anchorCell(), currentCell), e.ctrlKey, e.shiftKey, extendMode, null);
+                        }
+                        selection.endUpdate();
+                    }
+                    var cellClickedArgs = {
+                        cell: clickedCellInfo
+                    };
+                    this._trigger("cellClicked", null, cellClickedArgs);
+                }
+            };
+            wijgrid.prototype._onDblClick = function (e) {
+                if(!this._editBySingleClick()) {
+                    this._beginEditInternal(e);
+                }
+            };
+            wijgrid.prototype._onGroupBtnClick = function (e) {
+                if(!this._canInteract()) {
+                    return;
+                }
+                var $row = $(e.target).closest("tr"), gh = wijmo.grid.groupHelper, groupInfo = gh.getGroupInfo($row[0]), column, group;
+                if(groupInfo) {
+                    column = gh.getColumnByGroupLevel(this._field("leaves"), groupInfo.level);
+                    if(column) {
+                        group = column.groupInfo.expandInfo[groupInfo.index];
+                        if(group.isExpanded) {
+                            group.collapse();
+                        } else {
+                            group.expand(e.shiftKey);
+                        }
+                        //this._view().ensureHeight(); /*dma*/
+                        this.setSize()// recalculate sizes (#39295)
+                        ;
+                    }
+                }
+            };
+            wijgrid.prototype._onKeyDown = function (e) {
+                if(!this._canInteract()) {
+                    return true;
+                }
+                var tag = (e.target).tagName.toLowerCase(), canChangePos = false, curPos, currentCell, selection, keyCodeEnum = wijmo.grid.getKeyCodeEnum();
+                if((tag === "input" || tag === "option" || tag === "select" || tag === "textarea") && ($(e.target).closest("tr.wijmo-wijgrid-datarow").length === 0)) {
+                    // not a datarow ?
+                    return true;
+                }
+                if(this.options.allowEditing) {
+                    // ESC: cancel editing, F2: finish editing
+                    if((e.which === keyCodeEnum.ESCAPE || e.which === 113) && (this.currentCell()._isValid() && this.currentCell()._isEdit())) {
+                        this._endEditInternal(e);
+                        return false;
+                    } else {
+                        if(e.which === 113) {
+                            // F2: start editing
+                            this._beginEditInternal(e);
+                            return false;
                         }
                     }
-                    this._changeCurrentCell(e, clickedCellInfo, !$(e.target).is(":focus"))// change current cell and set focus to it (if the target element is not already focused)
+                }
+                if(!this.options.allowKeyboardNavigation || (e.which === keyCodeEnum.TAB)) {
+                    return true;
+                }
+                //switch (args.keyCode) {
+                switch(e.which) {
+                    case keyCodeEnum.LEFT:
+                    case keyCodeEnum.RIGHT:
+                    case keyCodeEnum.DOWN:
+                    case keyCodeEnum.UP:
+                    case keyCodeEnum.PAGE_DOWN:
+                    case keyCodeEnum.PAGE_UP:
+                    case keyCodeEnum.HOME:
+                    case keyCodeEnum.END:
+                    case keyCodeEnum.TAB:
+                        curPos = this._getNextCurrencyPos(this._getDataCellsRange(), this.currentCell(), e.keyCode, e.shiftKey);
+                        canChangePos = this._canMoveToAnotherCell(e.target, e.which)// TODO: add tab navigation
+                        ;
+                        break;
+                }
+                if(canChangePos) {
+                    this._changeCurrentCell(e, new wijmo.grid.cellInfo(curPos.cellIndex, curPos.rowIndex), true)// change current cell and set focus to it
                     ;
                     currentCell = this.currentCell();
+                    // cell = currentCell.tableCell();
                     selection = this.selection();
                     if(!e.shiftKey || (!selection._multipleRangesAllowed() && this.options.selectionMode.toLowerCase() !== "singlerange")) {
                         selection._startNewTransaction(currentCell);
                     }
                     selection.beginUpdate();
-                    if(e.shiftKey && e.ctrlKey) {
-                        selection._clearRange(new wijmo.grid.cellInfoRange(currentCell, currentCell), extendMode);
-                    } else {
-                        selection._selectRange(new wijmo.grid.cellInfoRange(selection._anchorCell(), currentCell), e.ctrlKey, e.shiftKey, extendMode, null);
-                    }
+                    selection._selectRange(new wijmo.grid.cellInfoRange(selection._anchorCell(), currentCell), false, e.shiftKey, 0/* none */ , null);
                     selection.endUpdate();
-                }
-                var cellClickedArgs = {
-                    cell: clickedCellInfo
-                };
-                this._trigger("cellClicked", null, cellClickedArgs);
-            }
-        };
-        wijgrid.prototype._onDblClick = function (e) {
-            if(!this._editBySingleClick()) {
-                this._beginEditInternal(e);
-            }
-        };
-        wijgrid.prototype._onGroupBtnClick = function (e) {
-            if(!this._canInteract()) {
-                return;
-            }
-            var $row = $(e.target).closest("tr"), gh = wijmo.grid.groupHelper, groupInfo = gh.getGroupInfo($row[0]), column, group;
-            if(groupInfo) {
-                column = gh.getColumnByGroupLevel(this._field("leaves"), groupInfo.level);
-                if(column) {
-                    group = column.groupInfo.expandInfo[groupInfo.index];
-                    if(group.isExpanded) {
-                        group.collapse();
-                    } else {
-                        group.expand(e.shiftKey);
-                    }
-                    this._view().ensureHeight()/*dma*/
-                    ;
-                    // this.setSize(); // recalculate sizes
-                                    }
-            }
-        };
-        wijgrid.prototype._onKeyDown = function (e) {
-            if(!this._canInteract()) {
-                return true;
-            }
-            var tag = (e.target).tagName.toLowerCase(), canChangePos = false, curPos, currentCell, selection, keyCodeEnum = wijmo.grid.getKeyCodeEnum();
-            if((tag === "input" || tag === "option" || tag === "select" || tag === "textarea") && ($(e.target).closest("tr.wijmo-wijgrid-datarow").length === 0)) {
-                // not a datarow ?
-                return true;
-            }
-            if(this.options.allowEditing) {
-                // ESC: cancel editing, F2: finish editing
-                if((e.which === keyCodeEnum.ESCAPE || e.which === 113) && (this.currentCell()._isValid() && this.currentCell()._isEdit())) {
-                    this._endEditInternal(e);
-                    return false;
-                } else {
-                    if(e.which === 113) {
-                        // F2: start editing
-                        this._beginEditInternal(e);
-                        return false;
-                    }
-                }
-            }
-            if(!this.options.allowKeyboardNavigation || (e.which === keyCodeEnum.TAB)) {
-                return true;
-            }
-            //switch (args.keyCode) {
-            switch(e.which) {
-                case keyCodeEnum.LEFT:
-                case keyCodeEnum.RIGHT:
-                case keyCodeEnum.DOWN:
-                case keyCodeEnum.UP:
-                case keyCodeEnum.PAGE_DOWN:
-                case keyCodeEnum.PAGE_UP:
-                case keyCodeEnum.HOME:
-                case keyCodeEnum.END:
-                case keyCodeEnum.TAB:
-                    curPos = this._getNextCurrencyPos(this._getDataCellsRange(), this.currentCell(), e.keyCode, e.shiftKey);
-                    canChangePos = this._canMoveToAnotherCell(e.target, e.which)// TODO: add tab navigation
-                    ;
-                    break;
-            }
-            if(canChangePos) {
-                this._changeCurrentCell(e, new wijmo.grid.cellInfo(curPos.cellIndex, curPos.rowIndex), true)// change current cell and set focus to it
-                ;
-                currentCell = this.currentCell();
-                // cell = currentCell.tableCell();
-                selection = this.selection();
-                if(!e.shiftKey || (!selection._multipleRangesAllowed() && this.options.selectionMode.toLowerCase() !== "singlerange")) {
-                    selection._startNewTransaction(currentCell);
-                }
-                selection.beginUpdate();
-                selection._selectRange(new wijmo.grid.cellInfoRange(selection._anchorCell(), currentCell), false, e.shiftKey, 0/* none */ , null);
-                selection.endUpdate();
-                // TODO: tab navigation
-                return false;// stop bubbling
+                    // TODO: tab navigation
+                    return false;// stop bubbling
 
-            }
-            return true;
-        };
-        wijgrid.prototype._onKeyPress = function (e) {
-            if(this._canInteract() && this.options.allowEditing) {
-                var charCode = e.which, currentCell = this.currentCell(), tag, table, domSubTables;
-                if(charCode && currentCell._isValid() && !currentCell._isEdit()) {
-                    tag = (e.target).tagName.toLowerCase();
-                    if(tag !== "input" && tag !== "option" && tag !== "select" && tag !== "textarea") {
-                        table = $(e.target).closest(".wijmo-wijgrid-table");
-                        // if (table.length && (table[0] === this.$table[0])) {
-                        if(table.length) {
-                            domSubTables = $.map(this._view().subTables(), function (item, index) {
-                                return item.element();
-                            });
-                            if($.inArray(table[0], domSubTables) >= 0) {
-                                if($.wij.charValidator.isPrintableChar(String.fromCharCode(charCode))) {
-                                    //new wijmo.grid.cellEditorHelper().currentCellEditStart(this, args);
-                                    this._beginEditInternal(e);
-                                    return false;
+                }
+                return true;
+            };
+            wijgrid.prototype._onKeyPress = function (e) {
+                if(this._canInteract() && this.options.allowEditing) {
+                    var charCode = e.which, currentCell = this.currentCell(), tag, table, domSubTables;
+                    if(charCode && currentCell._isValid() && !currentCell._isEdit()) {
+                        tag = (e.target).tagName.toLowerCase();
+                        if(tag !== "input" && tag !== "option" && tag !== "select" && tag !== "textarea") {
+                            table = $(e.target).closest(".wijmo-wijgrid-table");
+                            // if (table.length && (table[0] === this.$table[0])) {
+                            if(table.length) {
+                                domSubTables = $.map(this._view().subTables(), function (item, index) {
+                                    return item.element();
+                                });
+                                if($.inArray(table[0], domSubTables) >= 0) {
+                                    if($.wij.charValidator.isPrintableChar(String.fromCharCode(charCode))) {
+                                        //new wijmo.grid.cellEditorHelper().currentCellEditStart(this, args);
+                                        this._beginEditInternal(e);
+                                        return false;
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }
-        };
-        wijgrid.prototype._onMouseMove = function (e) {
-            var view = this._view(), frozener = this._field("frozener"), hoveredCell, $hoveredRow, hoveredCellInfo, rowIndex, rowObj, rowInfo, $rs = wijmo.grid.renderState;
-            if(!this.options.highlightOnHover || !this._canInteract() || (frozener && frozener.inProgress())) {
-                return;
-            }
-            hoveredCell = this._findUntilOuterDiv(e.target, {
-                td: true,
-                th: true
-            });
-            if(hoveredCell) {
-                $hoveredRow = $(hoveredCell).closest("tr");
-                if(!$hoveredRow.length || !($hoveredRow.hasClass("wijmo-wijgrid-datarow") || $hoveredRow.hasClass("wijmo-wijgrid-headerrow"))) {
+            };
+            wijgrid.prototype._onMouseMove = function (e) {
+                var view = this._view(), frozener = this._field("frozener"), hoveredCell, $hoveredRow, hoveredCellInfo, rowIndex, rowObj, rowInfo, $rs = wijmo.grid.renderState;
+                if(!this.options.highlightOnHover || !this._canInteract() || (frozener && frozener.inProgress())) {
                     return;
                 }
-                hoveredCellInfo = view.getAbsoluteCellInfo(hoveredCell);
-                rowIndex = this._field("hoveredRow")// previous row index
-                ;
-                if(hoveredCellInfo.rowIndex() !== rowIndex) {
-                    // clear previous row
-                    if(rowIndex !== undefined) {
-                        rowObj = this._rows().item(rowIndex);
-                        if(rowObj) {
-                            rowInfo = view._getRowInfo(rowObj);
-                            view._changeRowRenderState(rowInfo, $rs.hovered, false);
-                            this.rowStyleFormatter.format(rowInfo);
-                        }
+                hoveredCell = this._findUntilOuterDiv(e.target, {
+                    td: true,
+                    th: true
+                });
+                if(hoveredCell) {
+                    $hoveredRow = $(hoveredCell).closest("tr");
+                    if(!$hoveredRow.length || !($hoveredRow.hasClass("wijmo-wijgrid-datarow") || $hoveredRow.hasClass("wijmo-wijgrid-headerrow"))) {
+                        return;
                     }
-                    // highlight current row
-                    rowIndex = hoveredCellInfo.rowIndex();
-                    this._field("hoveredRow", rowIndex);
-                    if(rowIndex >= 0) {
-                        rowObj = this._rows().item(rowIndex);
-                        if(rowObj) {
-                            rowInfo = view._getRowInfo(rowObj);
-                            view._changeRowRenderState(rowInfo, $rs.hovered, true);
-                            this.rowStyleFormatter.format(rowInfo);
-                        }
-                    }
-                }
-            }
-        };
-        wijgrid.prototype._onMouseOut = function (e) {
-            if(!this._canInteract()) {
-                return;
-            }
-            if($(e.relatedTarget).closest(".wijmo-wijgrid-data").length === 0) {
-                // remove hovering
-                                var hovRowIndex = this._field("hoveredRow"), rowObj, rowInfo, view = this._view();
-                if(hovRowIndex >= 0) {
-                    rowObj = this._rows().item(hovRowIndex);
-                    if(rowObj) {
-                        rowInfo = view._getRowInfo(rowObj);
-                        view._changeRowRenderState(rowInfo, wijmo.grid.renderState.hovered, false);
-                        this.rowStyleFormatter.format(rowInfo);
-                    }
-                }
-            }
-        };
-        wijgrid.prototype._onWindowResize = function (e) {
-            var self = this;
-            // reset timer
-            if(this._windowResizeTimer > 0) {
-                window.clearTimeout(this._windowResizeTimer);
-                this._windowResizeTimer = 0;
-            }
-            if(this._windowResizeTimer !== -1) {
-                this._windowResizeTimer = window.setTimeout(function () {
-                    self._windowResizeTimer = -1// lock
+                    hoveredCellInfo = view.getAbsoluteCellInfo(hoveredCell);
+                    rowIndex = this._field("hoveredRow")// previous row index
                     ;
-                    try  {
-                        if(!self._destroyed && self._initialized && self.element.parent().length) {
-                            self.setSize();
+                    if(hoveredCellInfo.rowIndex() !== rowIndex) {
+                        // clear previous row
+                        if(rowIndex !== undefined) {
+                            rowObj = this._rows().item(rowIndex);
+                            if(rowObj) {
+                                rowInfo = view._getRowInfo(rowObj);
+                                view._changeRowRenderState(rowInfo, $rs.hovered, false);
+                                this.rowStyleFormatter.format(rowInfo);
+                            }
                         }
-                    }finally {
-                        self._windowResizeTimer = 0// unlock
-                        ;
+                        // highlight current row
+                        rowIndex = hoveredCellInfo.rowIndex();
+                        this._field("hoveredRow", rowIndex);
+                        if(rowIndex >= 0) {
+                            rowObj = this._rows().item(rowIndex);
+                            if(rowObj) {
+                                rowInfo = view._getRowInfo(rowObj);
+                                view._changeRowRenderState(rowInfo, $rs.hovered, true);
+                                this.rowStyleFormatter.format(rowInfo);
+                            }
+                        }
                     }
-                }, 50);
-            }
-        };
-        wijgrid.prototype._fieldResized = // * event handlers
-        // * resizing
-        function (fieldWidget, oldWidth, newWidth) {
-            if(oldWidth < 0) {
-                oldWidth = 0;
-            }
-            if(newWidth <= 0) {
-                newWidth = 1;
-            }
-            var resizingArgs = {
-                column: fieldWidget.options,
-                oldWidth: oldWidth,
-                newWidth: newWidth
-            };
-            if(this._trigger("columnResizing", null, resizingArgs) !== false) {
-                if(isNaN(resizingArgs.newWidth) || resizingArgs.newWidth < 0) {
-                    resizingArgs.newWidth = 1;
                 }
-                fieldWidget.option("width", resizingArgs.newWidth)// update widget option first (tfs issue 32108)
-                ;
-                var resizedArgs = {
-                    column: fieldWidget.options
+            };
+            wijgrid.prototype._onMouseOut = function (e) {
+                if(!this._canInteract()) {
+                    return;
+                }
+                if($(e.relatedTarget).closest(".wijmo-wijgrid-data").length === 0) {
+                    // remove hovering
+                                        var hovRowIndex = this._field("hoveredRow"), rowObj, rowInfo, view = this._view();
+                    if(hovRowIndex >= 0) {
+                        rowObj = this._rows().item(hovRowIndex);
+                        if(rowObj) {
+                            rowInfo = view._getRowInfo(rowObj);
+                            view._changeRowRenderState(rowInfo, wijmo.grid.renderState.hovered, false);
+                            this.rowStyleFormatter.format(rowInfo);
+                        }
+                    }
+                }
+            };
+            wijgrid.prototype._onWindowResize = function (e) {
+                var self = this;
+                // reset timer
+                if(this._windowResizeTimer > 0) {
+                    window.clearTimeout(this._windowResizeTimer);
+                    this._windowResizeTimer = 0;
+                }
+                if(this._windowResizeTimer !== -1) {
+                    this._windowResizeTimer = window.setTimeout(function () {
+                        self._windowResizeTimer = -1// lock
+                        ;
+                        try  {
+                            if(!self._destroyed && self._initialized && self.element.parent().length) {
+                                self.setSize();
+                            }
+                        }finally {
+                            self._windowResizeTimer = 0// unlock
+                            ;
+                        }
+                    }, 50);
+                }
+            };
+            wijgrid.prototype._fieldResized = // * event handlers
+            // * resizing
+            function (fieldWidget, oldWidth, newWidth) {
+                if(oldWidth < 0) {
+                    oldWidth = 0;
+                }
+                if(newWidth <= 0) {
+                    newWidth = 1;
+                }
+                var resizingArgs = {
+                    column: fieldWidget.options,
+                    oldWidth: oldWidth,
+                    newWidth: newWidth
                 };
-                this._trigger("columnResized", null, resizedArgs);
-            }
-        };
-        wijgrid.prototype._changeCurrentCell = // * resizing
-        // * currentCell
-        function (eventArgs, cellInfo, setFocus) {
-            var currentCell = this.currentCell(), dataRange = this._getDataCellsRange(), currentCellChangingArgs, cellEditCompleted, highlight = this.options.highlightCurrentCell, domCell;
-            // if cellInfo has a valid value
-            if((dataRange._isValid() && dataRange._containsCellInfo(cellInfo)) || (cellInfo.isEqual(wijmo.grid.cellInfo.outsideValue))) {
-                // other cell than current cell
-                if(currentCell.cellIndex() !== cellInfo.cellIndex() || currentCell.rowIndex() !== cellInfo.rowIndex()) {
-                    currentCellChangingArgs = {
-                        cellIndex: cellInfo.cellIndex(),
-                        rowIndex: cellInfo.rowIndex(),
-                        oldCellIndex: currentCell.cellIndex(),
-                        oldRowIndex: currentCell.rowIndex()
+                if(this._trigger("columnResizing", null, resizingArgs) !== false) {
+                    if(isNaN(resizingArgs.newWidth) || resizingArgs.newWidth < 0) {
+                        resizingArgs.newWidth = 1;
+                    }
+                    fieldWidget.option("width", resizingArgs.newWidth)// update widget option first (tfs issue 32108)
+                    ;
+                    var resizedArgs = {
+                        column: fieldWidget.options
                     };
-                    if(this._trigger("currentCellChanging", null, currentCellChangingArgs)) {
-                        cellEditCompleted = false;
-                        if(!this.options.allowEditing || !currentCell._isEdit() || (cellEditCompleted = this._endEditInternal(null))) {
-                            if(dataRange._containsCellInfo(currentCell)) {
+                    this._trigger("columnResized", null, resizedArgs);
+                }
+            };
+            wijgrid.prototype._changeCurrentCell = // * resizing
+            // * currentCell
+            function (e, cellInfo, setFocus) {
+                var currentCell = this.currentCell(), dataRange = this._getDataCellsRange(), currentCellChangingArgs, cellEditCompleted, highlight = this.options.highlightCurrentCell, domCell;
+                // if cellInfo has a valid value
+                if((dataRange._isValid() && dataRange._containsCellInfo(cellInfo)) || (cellInfo.isEqual(wijmo.grid.cellInfo.outsideValue))) {
+                    // other cell than current cell
+                    if(currentCell.cellIndex() !== cellInfo.cellIndex() || currentCell.rowIndex() !== cellInfo.rowIndex()) {
+                        currentCellChangingArgs = {
+                            cellIndex: cellInfo.cellIndex(),
+                            rowIndex: cellInfo.rowIndex(),
+                            oldCellIndex: currentCell.cellIndex(),
+                            oldRowIndex: currentCell.rowIndex()
+                        };
+                        if(this._trigger("currentCellChanging", null, currentCellChangingArgs)) {
+                            cellEditCompleted = false;
+                            if(!this.options.allowEditing || !currentCell._isEdit() || (cellEditCompleted = this._endEditInternal(null))) {
+                                if(dataRange._containsCellInfo(currentCell)) {
+                                    if(highlight) {
+                                        this._highlightCellPosition(currentCell, false)// remove the current one
+                                        ;
+                                    }
+                                    if(domCell = currentCell.tableCell()) {
+                                        $(domCell).removeAttr("tabIndex");
+                                    }
+                                }
+                                currentCell = cellInfo._clone();
+                                currentCell._setGridView(this);
                                 if(highlight) {
-                                    this._highlightCellPosition(currentCell, false)// remove the current one
-                                    ;
+                                    this._highlightCellPosition(currentCell, true);
                                 }
                                 if(domCell = currentCell.tableCell()) {
-                                    $(domCell).removeAttr("tabIndex");
+                                    $(domCell).attr("tabIndex", 0)// make cell focusable to pass correct target (table cell) into the keyPress event handler.
+                                    ;
+                                    if(setFocus && !currentCell._isEdit()) {
+                                        // prevent moving focus from child editor
+                                        //$(domCell).focus(); <-- commented out due issue #39166 (+ fixedView.refreshPanel)
+                                                                            }
                                 }
-                            }
-                            currentCell = cellInfo._clone();
-                            currentCell._setGridView(this);
-                            if(highlight) {
-                                this._highlightCellPosition(currentCell, true);
-                            }
-                            if(domCell = currentCell.tableCell()) {
-                                $(domCell).attr("tabIndex", 0)// make cell focusable to pass correct target (table cell) into the keyPress event handler.
+                                this._field("currentCell", currentCell)// set currentCell
                                 ;
-                                if(setFocus && !currentCell._isEdit()) {
-                                    // prevent moving focus from child editor
-                                    $(domCell).focus();
-                                }
+                                this._onCurrentCellChanged(e);
                             }
-                            this._field("currentCell", currentCell)// set currentCell
+                        }
+                    } else {
+                        // the same cell
+                        if(highlight) {
+                            this._highlightCellPosition(currentCell, true)// ensure
                             ;
-                            this._onCurrentCellChanged(eventArgs);
+                        }
+                        if(domCell = currentCell.tableCell()) {
+                            $(domCell).attr("tabIndex", 0);
+                        }
+                        if(e && !currentCell._isEdit() && this._editBySingleClick()) {
+                            this._beginEditInternal(e);
                         }
                     }
                 } else {
-                    // the same cell
-                    if(highlight) {
-                        this._highlightCellPosition(currentCell, true)// ensure
+                    // cellInfo is invalid
+                    // do nothing
+                    // this._highlightCellPosition(currentCell, false);
+                    // this._field("currentCell", currentCell.outsideValue); // set currentCell
+                                    }
+            };
+            wijgrid.prototype._highlightCellPosition = function (cellInfo, add) {
+                if(cellInfo && cellInfo._isValid()) {
+                    var x = cellInfo.cellIndexAbs(), y = cellInfo.rowIndexAbs(), $rs = wijmo.grid.renderState, view = this._view(), rowInfo, obj, state;
+                    // * column header cell *
+                    obj = view.getHeaderCell(x);
+                    if(obj) {
+                        rowInfo = view._getRowInfo(this._headerRows().item(cellInfo.column().thY));
+                        obj = $(obj);
+                        state = view._changeCellRenderState(obj, $rs.current, add);
+                        // highlight column header cell
+                        this.cellStyleFormatter.format(obj, x, cellInfo.column(), rowInfo, state);
+                    }
+                    // * row header cell *
+                    obj = view.getJoinedRows(y, 0);
+                    if(obj) {
+                        // change row state
+                        rowInfo = view._getRowInfo(obj);
+                        view._changeRowRenderState(rowInfo, $rs.current, add);
+                        // highlight row header cell
+                        this.rowStyleFormatter.format(rowInfo);
+                    }
+                    // * data cell *
+                    obj = view.getCell(x, y);
+                    if(obj) {
+                        obj = $(obj);
+                        state = view._changeCellRenderState(obj, $rs.current, add);
+                        // highlight data cell
+                        this.cellStyleFormatter.format(obj, x, cellInfo.column(), rowInfo, state)// rowInfo is taken from the previous step
                         ;
                     }
-                    if(domCell = currentCell.tableCell()) {
-                        $(domCell).attr("tabIndex", 0);
+                }
+            };
+            wijgrid.prototype._beginEditInternal = // * currentCell
+            // * editing
+            function (e) {
+                if(this._canInteract() && this.options.allowEditing) {
+                    var column = this.currentCell().column(), res;
+                    if(column && !column.readOnly) {
+                        res = new wijmo.grid.cellEditorHelper().currentCellEditStart(this, e);
+                        if(res) {
+                            // this._view().ensureWidth(undefined, column.visLeavesIdx);
+                                                    }
+                        return res;
                     }
                 }
-            } else {
-                // cellInfo is invalid
-                // do nothing
-                // this._highlightCellPosition(currentCell, false);
-                // this._field("currentCell", currentCell.outsideValue); // set currentCell
-                            }
-        };
-        wijgrid.prototype._highlightCellPosition = function (cellInfo, add) {
-            if(cellInfo && cellInfo._isValid()) {
-                var x = cellInfo.cellIndexAbs(), y = cellInfo.rowIndexAbs(), $rs = wijmo.grid.renderState, view = this._view(), rowInfo, obj, state;
-                // * column header cell *
-                obj = view.getHeaderCell(x);
-                if(obj) {
-                    rowInfo = view._getRowInfo(this._headerRows().item(cellInfo.column().thY));
-                    obj = $(obj);
-                    state = view._changeCellRenderState(obj, $rs.current, add);
-                    // highlight column header cell
-                    this.cellStyleFormatter.format(obj, x, cellInfo.column(), rowInfo, state);
-                }
-                // * row header cell *
-                obj = view.getJoinedRows(y, 0);
-                if(obj) {
-                    // change row state
-                    rowInfo = view._getRowInfo(obj);
-                    view._changeRowRenderState(rowInfo, $rs.current, add);
-                    // highlight row header cell
-                    this.rowStyleFormatter.format(rowInfo);
-                }
-                // * data cell *
-                obj = view.getCell(x, y);
-                if(obj) {
-                    obj = $(obj);
-                    state = view._changeCellRenderState(obj, $rs.current, add);
-                    // highlight data cell
-                    this.cellStyleFormatter.format(obj, x, cellInfo.column(), rowInfo, state)// rowInfo is taken from the previous step
-                    ;
-                }
-            }
-        };
-        wijgrid.prototype._beginEditInternal = // * currentCell
-        // * editing
-        function (e) {
-            if(this._canInteract() && this.options.allowEditing) {
-                var column = this.currentCell().column(), res;
-                if(column && !column.readOnly) {
-                    res = new wijmo.grid.cellEditorHelper().currentCellEditStart(this, e);
-                    if(res) {
-                        // this._view().ensureWidth(undefined, column.visLeavesIdx);
-                                            }
+                return false;
+            };
+            wijgrid.prototype._endEditInternal = function (e) {
+                if(this._canInteract() && this.options.allowEditing) {
+                    //var column = this.currentCell().column(),
+                    var res = new wijmo.grid.cellEditorHelper().currentCellEditEnd(this, e);
+                    if(res && !this._allowVirtualScrolling()) {
+                        // avoid horizontal scrollbar movement.
+                        this._view().ensureHeight(this.currentCell().rowIndex());
+                    }
                     return res;
                 }
-            }
-            return false;
-        };
-        wijgrid.prototype._endEditInternal = function (e) {
-            if(this._canInteract() && this.options.allowEditing) {
-                //var column = this.currentCell().column(),
-                var res = new wijmo.grid.cellEditorHelper().currentCellEditEnd(this, e);
-                if(res && !this._allowVirtualScrolling()) {
-                    // avoid horizontal scrollbar movement.
-                    this._view().ensureHeight(this.currentCell().rowIndex());
-                }
-                return res;
-            }
-            return false;
-        };
-        wijgrid.prototype._onViewInsertEmptyRow = // * editing
-        // * view handlers
-        function (rowType, sectionRowIndex, dataRowIndex, dataItemIndex, virtualDataItemIndex) {
-            return null;// default action
-
-        };
-        wijgrid.prototype._onViewCreateEmptyCell = function (rowInfo, dataCellIndex, column) {
-            return null;// default action
-
-        };
-        wijgrid.prototype._onViewCellRendered = function (rowInfo, $cell, cellIndex, column) {
-        };
-        wijgrid.prototype._onViewRowRendered = function (rowInfo) {
-        };
-        wijgrid.prototype._getDataParser = // view handlers *
-        // misc
-        function (column) {
-            return column.dataParser || wijmo.data.defaultParsers[column.dataType] || wijmo.data.defaultParsers.string;
-        };
-        wijgrid.prototype._parse = function (column, value) {
-            //// old behaviour
-            //var parser = this._getDataParser(column);
-            //return parser.parse(value, this._field("closestCulture"), column.dataFormatString, this.options.nullString, true);
-                        var dataView = this._dataViewWrapper.dataView(), fromType = wijmo.grid.getDataType(column), toType = wijmo.grid.getDataType(column);
-            if($.isFunction(value)) {
-                value = value()// observable
-                ;
-            }
-            value = wijmo.data.convert(value, fromType, toType, {
-                culture: this._field("closestCulture"),
-                format: column.dataFormatString || column._underlyingDataFormatString,
-                nullString: this.options.nullString,
-                parser: column.dataParser
-            });
-            // custom parser
-            return value;
-        };
-        wijgrid.prototype._toStr = function (column, value) {
-            //// old behaviour
-            //var parser = this._getDataParser(column);
-            //return parser.toStr(value, this._field("closestCulture"), column.dataFormatString, this.options.nullString, true);
-                        var dataView = this._dataViewWrapper.dataView(), fromType = wijmo.grid.getDataType(column), toType = // column._underlyingDataType || "string",
-            "string";
-            value = wijmo.data.convert(value, fromType, toType, {
-                culture: this._field("closestCulture"),
-                format: column.dataFormatString || column._underlyingDataFormatString,
-                nullString: this.options.nullString,
-                parser: column.dataParser
-            });
-            // custom parser
-            return value;
-        };
-        wijgrid.prototype._funcOptions = function () {
-            return [
-                "cellStyleFormatter",
-                "rowStyleFormatter",
-                "afterCellEdit",
-                "afterCellUpdate",
-                "beforeCellEdit",
-                "beforeCellUpdate",
-                "cellClicked",
-                "columnDragging",
-                "columnDragged",
-                "columnDropping",
-                "columnDropped",
-                "columnResizing",
-                "columnResized",
-                "columnGrouping",
-                "columnGrouped",
-                "columnUngrouping",
-                "columnUngrouped",
-                "currentCellChanging",
-                "currentCellChanged",
-                "filtering",
-                "filtered",
-                "filterOperatorsListShowing",
-                "groupAggregate",
-                "groupText",
-                "invalidCellValue",
-                "pageIndexChanging",
-                "pageIndexChanged",
-                "selectionChanged",
-                "sorting",
-                "sorted",
-                /*"ajaxError",*/ "dataLoading",
-                "dataLoaded",
-                "loading",
-                "loaded",
-                "rendering",
-                "rendered"
-            ];
-        };
-        wijgrid.prototype._canInteract = function () {
-            return !this.options.disabled;/* && this._dataViewWrapper.isLoaded();*/
-
-        };
-        wijgrid.prototype._canMoveToAnotherCell = function (domElement, keyCode) {
-            var tag = domElement.tagName.toLowerCase(), len, selectionRange, kc, res;
-            switch(tag) {
-                case "input":
-                    if($(domElement).hasClass("wijgridinput")) {
-                        var input = domElement;
-                        if(input.type === "text") {
-                            len = input.value.length;
-                            selectionRange = new wijmo.grid.domSelection(input).getSelection();
-                            kc = wijmo.grid.getKeyCodeEnum();
-                            res = ((keyCode === kc.UP || keyCode === kc.DOWN || keyCode === kc.PAGE_DOWN || keyCode === kc.PAGE_UP) || (selectionRange.length === 0 && ((selectionRange.start === 0 && (keyCode === kc.LEFT || keyCode === kc.HOME)) || (selectionRange.end >= len && (keyCode === kc.RIGHT || keyCode === kc.END)))));
-                            return res;
-                        }
-                        return true;
-                    }
-                    return false;
-                case "textarea":
-                case "select":
-                    return false;
-            }
-            return true;
-        };
-        wijgrid.prototype._editBySingleClick = function () {
-            var value = (this.options.editingInitOption || "").toLowerCase();
-            switch(value) {
-                case "click":
-                case "doubleclick":
-                    break;
-                case "auto":
-                default:
-                    value = this._isMobile ? "click" : "doubleclick";
-                    break;
-            }
-            return value === "click";
-        };
-        wijgrid.prototype._getDataToAbsOffset = function () {
-            var x = 0, y = 0, headerRows = this._headerRows();
-            if(this.options.showRowHeader) {
-                x++;
-            }
-            if(headerRows) {
-                y += headerRows.length();
-            }
-            if(this._filterRow()) {
-                y++;
-            }
-            return {
-                x: x,
-                y: y
+                return false;
             };
-        };
-        wijgrid.prototype._gridDataRowIndexToDataView = function (value) {
-            var res = -1, $rt = wijmo.grid.rowType, rowInfo;
-            if(value < 0) {
-                return res;
-            }
-            rowInfo = this._view()._getRowInfo(this._rows().item(value));
-            return (rowInfo.type & wijmo.grid.rowType.data) ? rowInfo.dataItemIndex : -1;
-        };
-        wijgrid.prototype._dataViewDataRowIndexToGrid = function (value) {
-            var $rt = wijmo.grid.rowType, view = this._view(), rows = this._rows(), i, len, rowInfo;
-            if(value < 0) {
-                return -1;
-            }
-            for(i = 0 , len = rows.length(); i < len; i++) {
-                rowInfo = view._getRowInfo(rows.item(i));
-                if((rowInfo.type & $rt.data) && (rowInfo.dataItemIndex === value)) {
-                    return rowInfo.sectionRowIndex;
-                }
-            }
-            return -1;
-        };
-        wijgrid.prototype._getDataCellsRange = function () {
-            var minCol = 0, minRow = 0, maxCol = this._field("visibleLeaves").length - 1, maxRow = // = this._field("dataCache").<maxWidth>
-            (this._rendered) ? this._rows().length() - 1 : this.sketchTable.length - 1;
-            if(this.options.showRowHeader) {
-                maxCol--;
-            }
-            if(maxCol < 0 || maxRow < 0) {
-                minCol = minRow = maxCol = maxRow = -1;
-            }
-            return new wijmo.grid.cellInfoRange(new wijmo.grid.cellInfo(minCol, minRow, null), new wijmo.grid.cellInfo(maxCol, maxRow, null));
-        };
-        wijgrid.prototype._getDataItem = function (dataItemIndex) {
-            return this.dataView().item(dataItemIndex);
-        };
-        wijgrid.prototype._getFirstDataRowCell = function (absCellIndex) {
-            var rowIndex, len, rowInfo, view = this._view(), rows = this._rows(), $rt = wijmo.grid.rowType;
-            for(rowIndex = 0 , len = rows.length(); rowIndex < len; rowIndex++) {
-                rowInfo = view._getRowInfo(rows.item(rowIndex));
-                if(rowInfo.type & $rt.data) {
-                    return new wijmo.grid.cellInfo(absCellIndex, rowIndex);
-                }
-            }
-            return wijmo.grid.cellInfo.outsideValue;
-        };
-        wijgrid.prototype._getNextCurrencyPos = function (dataRange, cellInfo, keyCode, shiftKeyPressed) {
-            var cellIndex = cellInfo.cellIndex(), rowIndex = cellInfo.rowIndex(), tmp, keyCodeEnum = wijmo.grid.getKeyCodeEnum();
-            switch(keyCode) {
-                case keyCodeEnum.PAGE_UP:
-                    if(this._reverseKey && rowIndex === dataRange.topLeft().rowIndex()) {
-                        rowIndex = dataRange.bottomRight().rowIndex();
-                    } else {
-                        rowIndex -= this._pageSizeKey;
-                        if(rowIndex < (tmp = dataRange.topLeft().rowIndex())) {
-                            rowIndex = tmp;
-                        }
-                    }
-                    break;
-                case keyCodeEnum.PAGE_DOWN:
-                    if(this._reverseKey && rowIndex === dataRange.bottomRight().rowIndex()) {
-                        rowIndex = dataRange.topLeft().rowIndex();
-                    } else {
-                        rowIndex += this._pageSizeKey;
-                        if(rowIndex > (tmp = dataRange.bottomRight().rowIndex())) {
-                            rowIndex = tmp;
-                        }
-                    }
-                    break;
-                case keyCodeEnum.END:
-                    cellIndex = (this._reverseKey && cellIndex === dataRange.bottomRight().cellIndex()) ? dataRange.topLeft().cellIndex() : dataRange.bottomRight().cellIndex();
-                    break;
-                case keyCodeEnum.HOME:
-                    cellIndex = (this._reverseKey && cellIndex === dataRange.topLeft().cellIndex()) ? dataRange.bottomRight().cellIndex() : dataRange.topLeft().cellIndex();
-                    break;
-                case keyCodeEnum.LEFT:
-                    if(cellIndex > dataRange.topLeft().cellIndex()) {
-                        cellIndex--;
-                    } else if(this._reverseKey) {
-                        cellIndex = dataRange.bottomRight().cellIndex();
-                    }
-                    break;
-                case keyCodeEnum.UP:
-                    if(rowIndex > dataRange.topLeft().rowIndex()) {
-                        rowIndex--;
-                    } else if(this._reverseKey) {
-                        rowIndex = dataRange.bottomRight().rowIndex();
-                    }
-                    break;
-                case keyCodeEnum.RIGHT:
-                    if(cellIndex < dataRange.bottomRight().cellIndex()) {
-                        cellIndex++;
-                    } else if(this._reverseKey) {
-                        cellIndex = dataRange.topLeft().cellIndex();
-                    }
-                    break;
-                case keyCodeEnum.ENTER:
-                case keyCodeEnum.DOWN:
-                    if(rowIndex < dataRange.bottomRight().rowIndex()) {
-                        rowIndex++;
-                    } else {
-                        if(this._reverseKey) {
-                            rowIndex = dataRange.topLeft().rowIndex();
-                        }
-                    }
-                    break;
-                case keyCodeEnum.TAB:
-                    if(false/* TODO - tab navigation */ ) {
-                        if(shiftKeyPressed) {
-                            cellIndex--;
-                            if(cellIndex < dataRange.topLeft().cellIndex()) {
-                                cellIndex = dataRange.bottomRight().cellIndex();
-                                rowIndex--;
-                                if(rowIndex < dataRange.topLeft().rowIndex()) {
-                                    rowIndex = dataRange.bottomRight().rowIndex();
-                                }
-                            }
-                        } else {
-                            cellIndex++;
-                            if(cellIndex > dataRange.bottomRight().cellIndex()) {
-                                cellIndex = dataRange.topLeft().cellIndex();
-                                rowIndex++;
-                                if(rowIndex > dataRange.bottomRight().rowIndex()) {
-                                    rowIndex = dataRange.topLeft().rowIndex();
-                                }
-                            }
-                        }
-                    }
-                    break;
-            }
-            return {
-                cellIndex: cellIndex,
-                rowIndex: rowIndex
-            };
-        };
-        wijgrid.prototype._findUntilOuterDiv = function (start, tagsToFind) {
-            var current = start, stopper, nodeName, item = null;
-            for(; current; current = current.parentNode) {
-                nodeName = current.nodeName.toLowerCase();
-                if(nodeName) {
-                    if(current === this.outerDiv[0]) {
-                        stopper = current;
-                        break;
-                    }
-                    if(tagsToFind[nodeName]) {
-                        item = current;
-                    }
-                }
-            }
-            return stopper ? item : null;
-        };
-        wijgrid.prototype._getStaticIndex = function (bRow) {
-            var result, dataRange = this._getDataCellsRange();
-            if(this._hasSpannedCells()) {
-                return -1;// can't use static columns\ rows
+            wijgrid.prototype._onViewInsertEmptyRow = // * editing
+            // * view handlers
+            function (rowType, sectionRowIndex, dataRowIndex, dataItemIndex, virtualDataItemIndex) {
+                return null;// default action
 
-            }
-            if(bRow) {
-                result = Math.min(this.options.staticRowIndex, dataRange.bottomRight().rowIndex());
-            } else {
-                result = Math.min(this.options.staticColumnIndex, dataRange.bottomRight().cellIndex());
-            }
-            if(result < -1) {
-                result = -1;
-            }
-            return result;
-        };
-        wijgrid.prototype._getStaticOffsetIndex = function (isColumn) {
-            var index = 0;
-            if(isColumn) {
-                if(this.options.showRowHeader === true) {
-                    // row header is always fixed
-                    index++;
-                }
-            } else {
-                index = this._columnsHeadersTable().length//the whole header is fixed in case of staticRowIndex >= 0.
-                ;
-                if(this.options.showFilter) {
-                    index++// filter row is placed inside the header, so it is fixed too.
+            };
+            wijgrid.prototype._onViewCreateEmptyCell = function (rowInfo, dataCellIndex, column) {
+                return null;// default action
+
+            };
+            wijgrid.prototype._onViewCellRendered = function (rowInfo, $cell, cellIndex, column) {
+            };
+            wijgrid.prototype._onViewRowRendered = function (rowInfo) {
+            };
+            wijgrid.prototype._getDataParser = // view handlers *
+            // misc
+            function (column) {
+                return column.dataParser || wijmo.data.defaultParsers[column.dataType] || wijmo.data.defaultParsers.string;
+            };
+            wijgrid.prototype.parse = /** @ignore */
+            function (column, value) {
+                //// old behaviour
+                //var parser = this._getDataParser(column);
+                //return parser.parse(value, this._field("closestCulture"), column.dataFormatString, this.options.nullString, true);
+                                var fromType = wijmo.grid.getDataType(column), toType = wijmo.grid.getDataType(column);
+                if($.isFunction(value)) {
+                    value = value()// observable
                     ;
                 }
-            }
-            return index;
-        };
-        wijgrid.prototype._getRealStaticColumnIndex = // index of the fixed leaf inside the visibleLeaves collection.
-        function () {
-            var leaves, len, offsetStaticIndex = this._getStaticOffsetIndex(true), staticColumnIndex = this._getStaticIndex(false), resultIndex, tmp;
-            resultIndex = staticColumnIndex + offsetStaticIndex;
-            if(staticColumnIndex >= 0) {
-                leaves = this._field("visibleLeaves");
-                len = leaves.length;
-                // If child column of some band is fixed then the top and right-most column of the root band contained current column will be fixed.
-                tmp = resultIndex;
-                for(; resultIndex < len; resultIndex++) {
-                    if(leaves[resultIndex].parentIdx === -1) {
-                        // resultIndex is the index of the first leaf which is not contained inside a band.
-                        if(resultIndex > tmp) {
-                            resultIndex--;
+                value = wijmo.data.convert(value, fromType, toType, {
+                    culture: this._field("closestCulture"),
+                    format: column.dataFormatString || column._underlyingDataFormatString,
+                    nullString: this.options.nullString,
+                    parser: column.dataParser
+                });
+                // custom parser
+                return value;
+            };
+            wijgrid.prototype.toStr = /** @ignore */
+            function (column, value) {
+                //// old behaviour
+                //var parser = this._getDataParser(column);
+                //return parser.toStr(value, this._field("closestCulture"), column.dataFormatString, this.options.nullString, true);
+                                var dataView = this._dataViewWrapper.dataView(), fromType = wijmo.grid.getDataType(column), toType = // column._underlyingDataType || "string",
+                "string";
+                value = wijmo.data.convert(value, fromType, toType, {
+                    culture: this._field("closestCulture"),
+                    format: column.dataFormatString || column._underlyingDataFormatString,
+                    nullString: this.options.nullString,
+                    parser: column.dataParser
+                });
+                // custom parser
+                return value;
+            };
+            wijgrid.prototype.parseFailed = /** @ignore */
+            function (column, value, dataItem, cell) {
+                return value;
+            };
+            wijgrid.prototype._funcOptions = function () {
+                return [
+                    "cellStyleFormatter",
+                    "rowStyleFormatter",
+                    "afterCellEdit",
+                    "afterCellUpdate",
+                    "beforeCellEdit",
+                    "beforeCellUpdate",
+                    "cellClicked",
+                    "columnDragging",
+                    "columnDragged",
+                    "columnDropping",
+                    "columnDropped",
+                    "columnResizing",
+                    "columnResized",
+                    "columnGrouping",
+                    "columnGrouped",
+                    "columnUngrouping",
+                    "columnUngrouped",
+                    "currentCellChanging",
+                    "currentCellChanged",
+                    "filtering",
+                    "filtered",
+                    "filterOperatorsListShowing",
+                    "groupAggregate",
+                    "groupText",
+                    "invalidCellValue",
+                    "pageIndexChanging",
+                    "pageIndexChanged",
+                    "selectionChanged",
+                    "sorting",
+                    "sorted",
+                    /*"ajaxError",*/ "dataLoading",
+                    "dataLoaded",
+                    "loading",
+                    "loaded",
+                    "rendering",
+                    "rendered"
+                ];
+            };
+            wijgrid.prototype._canInteract = function () {
+                return !this.options.disabled;/* && this._dataViewWrapper.isLoaded();*/
+
+            };
+            wijgrid.prototype._canMoveToAnotherCell = function (domElement, keyCode) {
+                var tag = domElement.tagName.toLowerCase(), len, selectionRange, kc, res;
+                switch(tag) {
+                    case "input":
+                        if($(domElement).hasClass("wijgridinput")) {
+                            var input = domElement;
+                            if(input.type === "text") {
+                                len = input.value.length;
+                                selectionRange = new wijmo.grid.domSelection(input).getSelection();
+                                kc = wijmo.grid.getKeyCodeEnum();
+                                res = ((keyCode === kc.UP || keyCode === kc.DOWN || keyCode === kc.PAGE_DOWN || keyCode === kc.PAGE_UP) || (selectionRange.length === 0 && ((selectionRange.start === 0 && (keyCode === kc.LEFT || keyCode === kc.HOME)) || (selectionRange.end >= len && (keyCode === kc.RIGHT || keyCode === kc.END)))));
+                                return res;
+                            }
+                            return true;
                         }
+                        return false;
+                    case "textarea":
+                    case "select":
+                        return false;
+                }
+                return true;
+            };
+            wijgrid.prototype._editBySingleClick = function () {
+                var value = (this.options.editingInitOption || "").toLowerCase();
+                switch(value) {
+                    case "click":
+                    case "doubleclick":
                         break;
+                    case "auto":
+                    default:
+                        value = this._isMobileEnv() ? "click" : "doubleclick";
+                        break;
+                }
+                return value === "click";
+            };
+            wijgrid.prototype._getDataToAbsOffset = function () {
+                var x = 0, y = 0, headerRows = this._headerRows();
+                if(this._showRowHeader()) {
+                    x++;
+                }
+                if(headerRows) {
+                    y += headerRows.length();
+                }
+                if(this._filterRow()) {
+                    y++;
+                }
+                return {
+                    x: x,
+                    y: y
+                };
+            };
+            wijgrid.prototype._gridDataRowIndexToDataView = function (value) {
+                var res = -1, $rt = wijmo.grid.rowType, rowInfo;
+                if(value < 0) {
+                    return res;
+                }
+                rowInfo = this._view()._getRowInfo(this._rows().item(value));
+                return (rowInfo.type & wijmo.grid.rowType.data) ? rowInfo.dataItemIndex : -1;
+            };
+            wijgrid.prototype._currentCellFromDataView = function () {
+                var dataViewRowIndex = this._dataViewWrapper.currentPosition(), cellInfo = new wijmo.grid.cellInfo(this.currentCell().cellIndex(), this._dataViewDataRowIndexToGrid(dataViewRowIndex), null);
+                // normalize
+                if(cellInfo.rowIndex() < 0) {
+                    cellInfo.cellIndex(-1);
+                } else {
+                    if(cellInfo.cellIndex() < 0) {
+                        cellInfo.cellIndex(0);
                     }
                 }
-                if(resultIndex >= len) {
-                    resultIndex = len - 1;
+                return cellInfo;
+            };
+            wijgrid.prototype._dataViewDataRowIndexToGrid = function (value) {
+                var $rt = wijmo.grid.rowType, view = this._view(), rows = this._rows(), i, len, rowInfo;
+                if(value < 0) {
+                    return -1;
                 }
-            }
-            return resultIndex;
-        };
-        wijgrid.prototype._getRealStaticRowIndex = function () {
-            var offsetStaticIndex = this._getStaticOffsetIndex(false);
-            return this._getStaticIndex(true) + offsetStaticIndex;
-        };
-        wijgrid.prototype._hasMerging = function () {
-            var leaves = this._field("leaves"), i, len, leaf, result = false;
-            if(leaves) {
+                for(i = 0 , len = rows.length(); i < len; i++) {
+                    rowInfo = view._getRowInfo(rows.item(i));
+                    if((rowInfo.type & $rt.data) && (rowInfo.dataItemIndex === value)) {
+                        return rowInfo.sectionRowIndex;
+                    }
+                }
+                return -1;
+            };
+            wijgrid.prototype._getDataCellsRange = function () {
+                var minCol = 0, minRow = 0, maxCol = this._field("visibleLeaves").length - 1, maxRow = // = this._field("dataCache").<maxWidth>
+                (this._rendered) ? this._rows().length() - 1 : this.sketchTable.length - 1;
+                if(this._showRowHeader()) {
+                    maxCol--;
+                }
+                if(maxCol < 0 || maxRow < 0) {
+                    minCol = minRow = maxCol = maxRow = -1;
+                }
+                return new wijmo.grid.cellInfoRange(new wijmo.grid.cellInfo(minCol, minRow, null), new wijmo.grid.cellInfo(maxCol, maxRow, null));
+            };
+            wijgrid.prototype._getDataItem = function (dataItemIndex) {
+                return this.dataView().item(dataItemIndex);
+            };
+            wijgrid.prototype._getFirstDataRowCell = function (absCellIndex) {
+                var rowIndex, len, rowInfo, view = this._view(), rows = this._rows(), $rt = wijmo.grid.rowType;
+                for(rowIndex = 0 , len = rows.length(); rowIndex < len; rowIndex++) {
+                    rowInfo = view._getRowInfo(rows.item(rowIndex));
+                    if(rowInfo.type & $rt.data) {
+                        return new wijmo.grid.cellInfo(absCellIndex, rowIndex);
+                    }
+                }
+                return wijmo.grid.cellInfo.outsideValue;
+            };
+            wijgrid.prototype._getNextCurrencyPos = function (dataRange, cellInfo, keyCode, shiftKeyPressed) {
+                var cellIndex = cellInfo.cellIndex(), rowIndex = cellInfo.rowIndex(), tmp, keyCodeEnum = wijmo.grid.getKeyCodeEnum();
+                switch(keyCode) {
+                    case keyCodeEnum.PAGE_UP:
+                        if(this._reverseKey && rowIndex === dataRange.topLeft().rowIndex()) {
+                            rowIndex = dataRange.bottomRight().rowIndex();
+                        } else {
+                            rowIndex -= this._pageSizeKey;
+                            if(rowIndex < (tmp = dataRange.topLeft().rowIndex())) {
+                                rowIndex = tmp;
+                            }
+                        }
+                        break;
+                    case keyCodeEnum.PAGE_DOWN:
+                        if(this._reverseKey && rowIndex === dataRange.bottomRight().rowIndex()) {
+                            rowIndex = dataRange.topLeft().rowIndex();
+                        } else {
+                            rowIndex += this._pageSizeKey;
+                            if(rowIndex > (tmp = dataRange.bottomRight().rowIndex())) {
+                                rowIndex = tmp;
+                            }
+                        }
+                        break;
+                    case keyCodeEnum.END:
+                        cellIndex = (this._reverseKey && cellIndex === dataRange.bottomRight().cellIndex()) ? dataRange.topLeft().cellIndex() : dataRange.bottomRight().cellIndex();
+                        break;
+                    case keyCodeEnum.HOME:
+                        cellIndex = (this._reverseKey && cellIndex === dataRange.topLeft().cellIndex()) ? dataRange.bottomRight().cellIndex() : dataRange.topLeft().cellIndex();
+                        break;
+                    case keyCodeEnum.LEFT:
+                        if(cellIndex > dataRange.topLeft().cellIndex()) {
+                            cellIndex--;
+                        } else if(this._reverseKey) {
+                            cellIndex = dataRange.bottomRight().cellIndex();
+                        }
+                        break;
+                    case keyCodeEnum.UP:
+                        if(rowIndex > dataRange.topLeft().rowIndex()) {
+                            rowIndex--;
+                        } else if(this._reverseKey) {
+                            rowIndex = dataRange.bottomRight().rowIndex();
+                        }
+                        break;
+                    case keyCodeEnum.RIGHT:
+                        if(cellIndex < dataRange.bottomRight().cellIndex()) {
+                            cellIndex++;
+                        } else if(this._reverseKey) {
+                            cellIndex = dataRange.topLeft().cellIndex();
+                        }
+                        break;
+                    case keyCodeEnum.ENTER:
+                    case keyCodeEnum.DOWN:
+                        if(rowIndex < dataRange.bottomRight().rowIndex()) {
+                            rowIndex++;
+                        } else {
+                            if(this._reverseKey) {
+                                rowIndex = dataRange.topLeft().rowIndex();
+                            }
+                        }
+                        break;
+                    case keyCodeEnum.TAB:
+                        if(false/* TODO - tab navigation */ ) {
+                            if(shiftKeyPressed) {
+                                cellIndex--;
+                                if(cellIndex < dataRange.topLeft().cellIndex()) {
+                                    cellIndex = dataRange.bottomRight().cellIndex();
+                                    rowIndex--;
+                                    if(rowIndex < dataRange.topLeft().rowIndex()) {
+                                        rowIndex = dataRange.bottomRight().rowIndex();
+                                    }
+                                }
+                            } else {
+                                cellIndex++;
+                                if(cellIndex > dataRange.bottomRight().cellIndex()) {
+                                    cellIndex = dataRange.topLeft().cellIndex();
+                                    rowIndex++;
+                                    if(rowIndex > dataRange.bottomRight().rowIndex()) {
+                                        rowIndex = dataRange.topLeft().rowIndex();
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                }
+                return {
+                    cellIndex: cellIndex,
+                    rowIndex: rowIndex
+                };
+            };
+            wijgrid.prototype._findUntilOuterDiv = function (start, tagsToFind) {
+                var current = start, stopper, nodeName, item = null;
+                for(; current; current = current.parentNode) {
+                    nodeName = current.nodeName.toLowerCase();
+                    if(nodeName) {
+                        if(current === this.outerDiv[0]) {
+                            stopper = current;
+                            break;
+                        }
+                        if(tagsToFind[nodeName]) {
+                            item = current;
+                        }
+                    }
+                }
+                return stopper ? item : null;
+            };
+            wijgrid.prototype._getStaticIndex = function (bRow) {
+                var result, dataRange = this._getDataCellsRange();
+                if(this._hasSpannedCells()) {
+                    return -1;// can't use static columns\ rows
+
+                }
+                if(bRow) {
+                    result = Math.min(this.options.staticRowIndex, dataRange.bottomRight().rowIndex());
+                } else {
+                    result = Math.min(this.options.staticColumnIndex, dataRange.bottomRight().cellIndex());
+                }
+                if(result < -1) {
+                    result = -1;
+                }
+                return result;
+            };
+            wijgrid.prototype._getStaticOffsetIndex = function (isColumn) {
+                var index = 0;
+                if(isColumn) {
+                    if(this._showRowHeader()) {
+                        // row header is always fixed
+                        index++;
+                    }
+                } else {
+                    index = this._columnsHeadersTable().length//the whole header is fixed in case of staticRowIndex >= 0.
+                    ;
+                    if(this.options.showFilter) {
+                        index++// filter row is placed inside the header, so it is fixed too.
+                        ;
+                    }
+                }
+                return index;
+            };
+            wijgrid.prototype._getRealStaticColumnIndex = // index of the fixed leaf inside the visibleLeaves collection.
+            function () {
+                var leaves, len, offsetStaticIndex = this._getStaticOffsetIndex(true), staticColumnIndex = this._getStaticIndex(false), resultIndex, tmp;
+                resultIndex = staticColumnIndex + offsetStaticIndex;
+                if(staticColumnIndex >= 0) {
+                    leaves = this._field("visibleLeaves");
+                    len = leaves.length;
+                    // If child column of some band is fixed then the top and right-most column of the root band contained current column will be fixed.
+                    tmp = resultIndex;
+                    for(; resultIndex < len; resultIndex++) {
+                        if(leaves[resultIndex].parentIdx === -1) {
+                            // resultIndex is the index of the first leaf which is not contained inside a band.
+                            if(resultIndex > tmp) {
+                                resultIndex--;
+                            }
+                            break;
+                        }
+                    }
+                    if(resultIndex >= len) {
+                        resultIndex = len - 1;
+                    }
+                }
+                return resultIndex;
+            };
+            wijgrid.prototype._getRealStaticRowIndex = function () {
+                var offsetStaticIndex = this._getStaticOffsetIndex(false);
+                return this._getStaticIndex(true) + offsetStaticIndex;
+            };
+            wijgrid.prototype._hasMerging = function () {
+                var leaves = this._field("leaves"), i, len, leaf, result = false;
+                if(leaves) {
+                    for(i = 0 , len = leaves.length; (i < len) && !result; i++) {
+                        leaf = leaves[i];
+                        result = result || (leaf.parentVis && (leaf.rowMerge !== "none"))// merged visible column?
+                        ;
+                    }
+                }
+                return result;
+            };
+            wijgrid.prototype._hasGrouping = function () {
+                var leaves = this._field("leaves"), i, len, leaf, result = false;
                 for(i = 0 , len = leaves.length; (i < len) && !result; i++) {
                     leaf = leaves[i];
-                    result = result || (leaf.parentVis && (leaf.rowMerge !== "none"))// merged visible column?
+                    result = leaf.groupInfo && (leaf.groupInfo.position !== "none")// grouped column?
                     ;
                 }
-            }
-            return result;
-        };
-        wijgrid.prototype._hasGrouping = function () {
-            var leaves = this._field("leaves"), i, len, leaf, result = false;
-            for(i = 0 , len = leaves.length; (i < len) && !result; i++) {
-                leaf = leaves[i];
-                result = leaf.groupInfo && (leaf.groupInfo.position !== "none")// grouped column?
-                ;
-            }
-            return result;
-        };
-        wijgrid.prototype._hasSpannedCells = function () {
-            return this._hasGrouping() || this._hasMerging();
-        };
-        wijgrid.prototype._columnsHeadersTable = function (value) {
-            if(arguments.length) {
-                this._field("columnsHeadersTable", value);
-            }
-            return this._field("columnsHeadersTable");
-        };
-        wijgrid.prototype._view = function () {
-            return this._field("view");
-        };
-        wijgrid.prototype._originalFooterRowData = function () {
-            var footer = this._field("tfoot");
-            return (footer && footer.length) ? footer[0] : // first row only
-            null;
-        };
-        wijgrid.prototype._originalHeaderRowData = function () {
-            var header = this._field("thead");
-            return (header && header.length) ? header[0] : // first row only
-            null;
-        };
-        wijgrid.prototype._setAttr = // set one or more attribute and store original values in the this._originalAttr object if $element == this.element.
-        // (key, value), (map)
-        function ($element, key, value) {
-            var self = this;
-            if($element === this.element) {
-                // store original values
-                if(arguments.length === 2) {
-                    // map
-                    $.each(key, function (k, v) {
-                        if(!(k in self._originalAttr)) {
-                            self._originalAttr[k] = $element.attr(k);
-                        }
-                    });
-                    return $element.attr(key);
-                } else {
-                    // key, value
-                    if(!(key in this._originalAttr)) {
-                        this._originalAttr[key] = $element.attr(key);
-                    }
-                    return $element.attr(key, value);
+                return result;
+            };
+            wijgrid.prototype._hasSpannedCells = function () {
+                return this._hasGrouping() || this._hasMerging();
+            };
+            wijgrid.prototype._columnsHeadersTable = function (value) {
+                if(arguments.length) {
+                    this._field("columnsHeadersTable", value);
                 }
-            } else {
-                return (arguments.length === 3) ? $element.attr(key, value) : $element.attr(key);// .attr(map)
+                return this._field("columnsHeadersTable");
+            };
+            wijgrid.prototype._view = function () {
+                return this._field("view");
+            };
+            wijgrid.prototype._originalFooterRowData = function () {
+                var footer = this._field("tfoot");
+                return (footer && footer.length) ? footer[0] : // first row only
+                null;
+            };
+            wijgrid.prototype._originalHeaderRowData = function () {
+                var header = this._field("thead");
+                return (header && header.length) ? header[0] : // first row only
+                null;
+            };
+            wijgrid.prototype._setAttr = // set one or more attribute and store original values in the this._originalAttr object if $element == this.element.
+            // (key, value), (map)
+            function ($element, key, value) {
+                var self = this;
+                if($element === this.element) {
+                    // store original values
+                    if(arguments.length === 2) {
+                        // map
+                        $.each(key, function (k, v) {
+                            if(!(k in self._originalAttr)) {
+                                self._originalAttr[k] = $element.attr(k);
+                            }
+                        });
+                        return $element.attr(key);
+                    } else {
+                        // key, value
+                        if(!(key in this._originalAttr)) {
+                            this._originalAttr[key] = $element.attr(key);
+                        }
+                        return $element.attr(key, value);
+                    }
+                } else {
+                    return (arguments.length === 3) ? $element.attr(key, value) : $element.attr(key);// .attr(map)
 
+                }
+                return this;
+            };
+            wijgrid.prototype._totalRowsCount = // used by virtual scrolling
+            function () {
+                /*if (this._dataStore.isDynamic()) {
+                return this._dataStore.totalCount();
+                }*/
+                return this.sketchTable.length;
+            };
+            wijgrid.prototype._trackScrollingPosition = function (x, y) {
+                this._scrollingState.x = x;
+                this._scrollingState.y = y;
+            };
+            wijgrid.prototype._trackScrollingIndex = function (index) {
+                this._scrollingState.index = index;
+            };
+            wijgrid.prototype._uid = function () {
+                if(this.__uid === undefined) {
+                    this.__uid = wijmo.grid.getUID();
+                }
+                return "wijgrid" + this.__uid;
+            };
+            return wijgrid;
+        })(wijmo.wijmoWidget);
+        grid.wijgrid = wijgrid;
+        wijgrid.prototype.widgetEventPrefix = "wijgrid";
+        wijgrid.prototype._data$prefix = "wijgrid";
+        wijgrid.prototype._customSortOrder = 1000;
+        wijgrid.prototype._reverseKey = false;
+        wijgrid.prototype._pageSizeKey = 10;
+        wijgrid.prototype._mergeWidgetsWithOptions = true;
+        var wijgrid_options = (function () {
+            function wijgrid_options() {
+                /** @ignore */
+                this.wijMobileCSS = {
+                    header: "ui-header ui-bar-a",
+                    content: "ui-body-c",
+                    stateHover: "ui-btn-down-c",
+                    stateActive: "ui-btn-down-c"
+                };
+                /** A value indicating whether columns can be moved.
+                * @example
+                * // Columns cannot be dragged and moved if this option is set to false
+                * $("#element").wijgrid({ allowColMoving: false });
+                * @remarks
+                * This option must be set to true in order to drag column headers to the group area.
+                */
+                this.allowColMoving = false;
+                /** Determines whether the column width can be increased and decreased by dragging the sizing handle, or the edge of the column header, with the mouse.
+                * @example
+                * // The sizing handle cannot be dragged and column width cannot be changed if this option is set to false
+                * $("#element").wijgrid({ allowColSizing: false });
+                */
+                this.allowColSizing = false;
+                /** Determines whether the user can make changes to cell contents in the grid.
+                * @example
+                * // Users cannot change cell contents in the grid if this option is set to false
+                * $("#element").wijgrid({ allowEditing: false });
+                */
+                this.allowEditing = false;
+                /** Determines whether the user can move the current cell using the arrow keys.
+                * @example
+                * // Users cannot move the selection using arrow keys if this option is set to false
+                * $("#element").wijgrid({ allowKeyboardNavigation: false });
+                */
+                this.allowKeyboardNavigation = true;
+                /** Determines whether the grid should display paging buttons. The number of rows on a page is determined by the pageSize option.
+                * @example
+                * // Grid displays paging buttons when allowPaging is true. The pageSize here sets 5 rows to a page.
+                * $("#element").wijgrid({ allowPaging: false, pageSize: 5 });
+                */
+                this.allowPaging = false;
+                /** Determines whether the widget can be sorted by clicking the column header.
+                * @example
+                * // Sort a column by clicking its header when allowSorting is set to true
+                * $("#element").wijgrid({ allowSorting: false });
+                */
+                this.allowSorting = false;
+                /** A value that indicates whether virtual scrolling is allowed. The pageSize option determines the limit of simultaneously rendered rows when virtual scrolling is used. Set allowVirtualScrolling to true when using large amounts of data to improve efficiency.
+                * @example
+                * $("#element").wijgrid({ allowVirtualScrolling: false });
+                * @remarks
+                * This option is ignored if the grid uses paging, columns merging or fixed rows. This option cannot be enabled when using dynamic wijdatasource.
+                */
+                this.allowVirtualScrolling = false;
+                /** Function used for styling the cells in wijgrid.
+                * @example
+                * // Make the text of the current cell italic.
+                * $("#element").wijgrid({
+                *		highlightCurrentCell: true,
+                *		cellStyleFormatter: function(args) {
+                *			if ((args.row.type & wijmo.grid.rowType.data)) {
+                *				if (args.state & wijmo.grid.renderState.current) {
+                *					args.$cell.css("font-style", "italic");
+                *				} else {
+                *					args.$cell.css("font-style", "normal");
+                *				}
+                *			}
+                *		}
+                * });
+                * @param {wijmo.grid.ICellStyleFormaterArgs} args The data with this function.
+                */
+                this.cellStyleFormatter = undefined;
+                /** An array of column options.
+                * @example
+                * $("#element").wijgrid({ columns: [ { headerText: "column0", allowSort: false }, { headerText: "column1", dataType: "number" } ] });
+                */
+                this.columns = [];
+                /** Determines behavior for column autogeneration. Possible values are: "none", "append", "merge".
+                * @example
+                * $("#element").wijgrid({ columnsAutogenerationMode: "merge" });
+                * @remarks
+                * Possible values are:
+                * "none": Column auto-generation is turned off.
+                * "append": A column will be generated for each data field and added to the end of the columns collection.
+                * "merge": Each column having dataKey option not specified will be automatically bound to the first unreserved data field.For each data field not bound to any column a new column will be generated and added to the end of the columns collection.
+                *
+                * To prevent automatic binding of a column to a data field set its dataKey option to null.
+                *
+                * Note: columns autogeneration process affects the options of columns and the columns option itself.
+                */
+                this.columnsAutogenerationMode = "merge";
+                /** Determines the culture ID.
+                * @example
+                * // This code sets the culture to English.
+                * $("#element").wijgrid({ culture: "en" });
+                * @remarks
+                * Please see the https://github.com/jquery/globalize for more information.
+                */
+                this.culture = "";
+                /** An array of custom user filters. Use this option if you want to extend the default set of filter operators with your own. Custom filters will be shown in the filter dropdown.
+                * @example
+                * var oddFilterOp = {
+                *	name: "customOperator-Odd",
+                *	arity: 1,
+                *	applicableTo: ["number"],
+                *	operator: function(dataVal) { return (dataVal % 2 !== 0); }
+                * }
+                *
+                * $("#element").wijgrid({ customFilterOperators: [oddFilterOp] });
+                */
+                this.customFilterOperators = [];
+                /** Determines the datasource.
+                * Possible datasources include:
+                *		1. A DOM table. This is the default datasource, used if the data option is null. Table must have no cells with rowSpan and colSpan attributes.
+                *		2. A two-dimensional array, such as [[0, "a"], [1, "b"]].
+                *		3. An array of objects, such as [{field0: 0, field1: "a"}, {field0: 1, field1: "b'}].
+                *		4. A wijdatasource.
+                *		5. A wijdataview.
+                * @example
+                * // DOM table
+                * $("#element").wijgrid();
+                * // two-dimensional array
+                * $("#element").wijgrid({ data: [[0, "a"], [1, "b"]] });
+                */
+                this.data = null;
+                /** Determines an action to bring a cell in the editing mode. Possible values are: "click", "doubleClick", "auto".
+                * @example
+                * $("#element").wijgrid({ editingInitOption: "auto" });
+                * @remarks
+                * Possible values are:
+                *	"click": cell is edited via a single click.
+                *	"doubleClick": cell is edited via a double click.
+                *	"auto": action is determined automatically depending upon user environment. If user has a mobile platform then "click" is used, "doubleClick" otherwise.
+                */
+                this.editingInitOption = "auto";
+                /** Determines if the exact column width, in pixels, is used.
+                * @example
+                * $("#element").wijgrid({ ensureColumnsPxWidth: true });
+                * @remarks
+                * By default, wijgrid emulates the table element behavior when using a number as the width. This means wijgrid may not have the exact width specified. If exact width is needed, please set the ensureColumnsPxWidth option of wijgrid to true. If this option is set to true, wijgrid will not expand itself to fit the available space.Instead, it will use the width option of each column widget.
+                */
+                this.ensureColumnsPxWidth = false;
+                /** Determines the order of items in the filter drop-down list.
+                * Possible values are: "none", "alphabetical", "alphabeticalCustomFirst" and "alphabeticalEmbeddedFirst"
+                * @example
+                * $("#element").wijgrid({ filterOperatorsSortMode: "alphabeticalCustomFirst" });
+                * @remarks
+                * Possible values are:
+                *	"none": Operators follow the order of addition; built-in operators appear before custom ones.
+                *	"alphabetical": Operators are sorted alphabetically.
+                *	"alphabeticalCustomFirst": Operators are sorted alphabetically with custom operators appearing before built-in ones.
+                *	"alphabeticalEmbeddedFirst": Operators are sorted alphabetically with built-in operators appearing before custom operators.
+                *
+                * "NoFilter" operator is always first.
+                */
+                this.filterOperatorsSortMode = "alphabeticalCustomFirst";
+                /** Determines the caption of the group area.
+                * @example
+                * // Set the groupAreaCaption to a string and the text appears above the grid
+                * $("#element").wijgrid({ groupAreaCaption: "Drag a column here to group by that column." });
+                */
+                this.groupAreaCaption = "Drag a column here to group by that column.";
+                /** Determines the indentation of the groups, in pixels.
+                * @example
+                * // Set the groupIndent option to the number of pixels to indent data when grouping.
+                * $("#element").wijgrid({ groupIndent: 15 });
+                */
+                this.groupIndent = 10;
+                /** Determines whether the position of the current cell is highlighted or not.
+                * @example
+                * $("#element").wijgrid({ highlightCurrentCell: false });
+                */
+                this.highlightCurrentCell = false;
+                /** Determines whether hovered row is highlighted or not.
+                * @example
+                * $("#element").wijgrid({ highlightCurrentCell: true });
+                */
+                this.highlightOnHover = true;
+                /** Determines the text to be displayed when the grid is loading.
+                * @example
+                * $("#element").wijgrid({ loadingText: "Loading..."});
+                */
+                this.loadingText = "Loading...";
+                /** Cell values equal to this property value are considered null values. Use this option if you want to change default representation of null values (empty strings) with something else.
+                * @example
+                * $("#element").wijgrid({ nullString: "" });
+                * @remarks
+                * Case-sensitive for built-in parsers.
+                */
+                this.nullString = "";
+                /** Determines the zero-based index of the current page. You can use this to access a specific page, for example, when using the paging feature.
+                * @example
+                * $("#element").wijgrid({ pageIndex: 0 });
+                */
+                this.pageIndex = 0;
+                /** Number of rows to place on a single page.
+                * The default value is 10.
+                * @example
+                * // The pageSize here sets 10 rows to a page. The allowPaging option is set to true so paging buttons appear.
+                * $("#element").wijgrid({ pageSize: 10 });
+                */
+                this.pageSize = 10;
+                /** Determines the pager settings for the grid including the mode (page buttons or next/previous buttons), number of page buttons, and position where the buttons appear.
+                * @example
+                * // Display the pager at the top of the wijgrid.
+                * $("#element").wijgrid({ pagerSettings: { position: "top" } });
+                * @remarks
+                * See the wijpager documentation for more information on pager settings.
+                */
+                this.pagerSettings = {
+                    mode: "numeric",
+                    pageButtonCount: 10,
+                    position: "bottom"
+                };
+                /** A value indicating whether DOM cell attributes can be passed within a data value.
+                * @example
+                * // Render the style attribute passed within the data.
+                * $("#element").wijgrid({
+                *		readAttributesFromData: false });
+                *		data: [
+                *			[ [1, { "style": "color: red" } ], a ]
+                *		]
+                * });
+                * @remarks
+                * This option allows binding collection of values to data and automatically converting them as attributes of corresponded DOM table cells during rendering.
+                * Values should be passed as an array of two items, where first item is a value of the data field, the second item is a list of values:
+                * $("#element").wijgrid({
+                *		data: [
+                *			[ [1, { "style": "color: red", "class": "myclass" } ], a ]
+                *		]
+                * });
+                *
+                * or
+                *
+                * $("#element").wijgrid({
+                *		data: [
+                *			{ col0: [1, { "style": "color: red", "class": "myclass" }], col1: "a" }
+                *		]
+                * });
+                *
+                * Note: during conversion wijgrid extracts the first item value and makes it data field value, the second item (list of values) is removed:
+                * [ { col0: 1, col1: "a" } ]
+                *
+                * If DOM table is used as a datasource then attributes belonging to the cells in tBody section of the original table will be read and applied to the new cells.
+                *
+                * rowSpan and colSpan attributes are not allowed.
+                */
+                this.readAttributesFromData = false;
+                /** Function used for styling rows in wijgrid.
+                * @example
+                * // Make text of the alternating rows italic.
+                * $("#demo").wijgrid({
+                *		data: [
+                *			[0, "Nancy"], [1, "Susan"], [2, "Alice"], [3, "Kate"]
+                *		],
+                *		rowStyleFormatter (args) {
+                *			if ((args.state === wijmo.grid.renderState.rendering) && (args.type & wijmo.grid.rowType.dataAlt)) {
+                *				args.$rows.find("td").css("font-style", "italic");
+                *			}
+                *		}
+                * });
+                * @param {wijmo.grid.IRowInfo} args The data with this function.
+                */
+                this.rowStyleFormatter = undefined;
+                /** Determines which scrollbars are active and if they appear automatically based on content size.
+                * Possbile values are: "none", "auto", "horizontal", "vertical", "both".
+                * @example
+                * // The horizontal and vertical scrollbars are active when the scrollMode is set to both.
+                * $("#element").wijgrid({ scrollMode: "both" });
+                * @remarks
+                * Possible values are:
+                *	"none": Scrolling is not used; the staticRowIndex and staticColumnIndex values are ignored.
+                *	"auto": Scrollbars appear automatically depending upon content size.
+                *	"horizontal": The horizontal scrollbar is active.
+                *	"vertical": The vertical scrollbar is active.
+                *	"both": Both horizontal and vertical scrollbars are active.
+                */
+                this.scrollMode = "none";
+                /** Determines which cells, range of cells, columns, or rows can be selected at one time.
+                * Possible values are: "none", "singleCell", "singleColumn", "singleRow", "singleRange", "multiColumn", "multiRow" and "multiRange".
+                * @example
+                * // Set selectionMode to muliColumn and users can select more than one column using the CTRL or SHIFT keys.
+                * $("#element").wijgrid({ selectionMode: "multiColumn" });
+                * @remarks
+                * Possible values are:
+                * "none": Selection is turned off.
+                * "singleCell": Only a single cell can be selected at a time.
+                * "singleColumn": Only a single column can be selected at a time.
+                * "singleRow": Only a single row can be selected at a time.
+                * "singleRange": Only a single range of cells can be selected at a time.
+                * "multiColumn": It is possible to select more than one row at the same time using the mouse and the CTRL or SHIFT keys.
+                * "multiRow": It is possible to select more than one row at the same time using the mouse and the CTRL or SHIFT keys.
+                * "multiRange": It is possible to select more than one cells range at the same time using the mouse and the CTRL or SHIFT keys.
+                */
+                this.selectionMode = "singleRow";
+                /** A value indicating whether the filter row is visible.
+                * Filter row is used to display column filtering interface.
+                * @example
+                * // Set showFilter to true to view the filter row.
+                * $("#element").wijgrid({ showFilter: true });
+                */
+                this.showFilter = false;
+                /** A value indicating whether the footer row is visible.
+                * Footer row is used for displaying of tfoot section of original table, and to show totals.
+                * @example
+                * // Set showFooter to true to view the footer row.
+                * $("#element").wijgrid({ showFooter: true });
+                */
+                this.showFooter = false;
+                /** A value indicating whether group area is visible.
+                * Group area is used to display headers of groupped columns. User can drag columns from/to group area by dragging column headers with mouse, if allowColumnMoving option is on.
+                * @example
+                * // Set showGroupArea to true to display the group area.
+                * $("#element").wijgrid({ showGroupArea: true });
+                */
+                this.showGroupArea = false;
+                /** A value indicating whether a selection will be automatically displayed at the current cell position when the wijgrid is rendered.
+                * Set this option to false if you want to prevent wijgrid from selecting the currentCell automatically.
+                * @example
+                * $("#element").wijgrid({ showSelectionOnRender: true });
+                */
+                this.showSelectionOnRender = true;
+                /** A value indicating whether the row header is visible.
+                * @example
+                * $("#element").wijgrid({ showRowHeader: true });
+                */
+                this.showRowHeader = false;
+                /** Indicates the index of columns that will always be shown on the left when the grid view is scrolled horizontally.
+                * Note that all columns before the static column will be automatically marked as static, too.
+                * This can only take effect when the scrollMode option is not set to "none".
+                * It will be considered "-1" when grouping or row merging is enabled. A "-1" means there is no data column but the row header is static. A zero (0) means one data column and row header are static.
+                * @example
+                * $("#element").wijgrid({ staticColumnIndex: -1 });
+                */
+                this.staticColumnIndex = -1;
+                /** Gets or sets the alignment of the static columns area. Possible values are "left", "right".
+                * @example
+                * $("#element").wijgrid({ staticColumnsAlignment: "left" });
+                * @remarks
+                * The "right" mode has limited functionality:
+                *  - The showRowHeader value is ignored.
+                *  - Changing staticColumnIndex at run-time by dragging the vertical bar is disabled.
+                */
+                this.staticColumnsAlignment = "left";
+                /** Indicates the index of data rows that will always be shown on the top when the wijgrid is scrolled vertically.
+                * Note, that all rows before the static row will be automatically marked as static, too.
+                * This can only take effect when the scrollMode option is not set to "none". This will be considered "-1" when grouping or row merging is enabled.
+                * A "-1" means there is no data row but the header row is static.A zero (0) means one data row and the row header are static.
+                * @example
+                * $("#element").wijgrid({ staticRowIndex: -1 });
+                */
+                this.staticRowIndex = -1;
+                /** Gets or sets the virtual number of items in the wijgrid and enables custom paging.
+                * Setting option to a positive value activates custom paging, the number of displayed rows and the total number of pages will be determined by the totalRows and pageSize values.
+                * @example
+                * $("#element").wijgrid({ totalRows: -1 });
+                * @remarks
+                * In custom paging mode sorting, paging and filtering are not performed automatically.
+                * This must be handled manually using the sorted, pageIndexChanged, and filtered events. Load the new portion of data there followed by the ensureControl(true) method call.
+                */
+                this.totalRows = -1;
+                /* --- events */
+                /** The afterCellEdit event handler is a function called after cell editing is completed.
+                * This function can assist you in completing many tasks, such as in making changes once editing is completed; in tracking changes in cells, columns, or rows; or in integrating custom editing functions on the front end.
+                * @event
+                * @example
+                * // Once cell editing is complete, the function calls the destroy method to destroy the wijcombobox widget and the wijinputnumber widget which are used as the custom editors.
+                * $("#element").wijgrid({
+                *		afterCellEdit: function(e, args) {
+                *			switch (args.cell.column().dataKey) {
+                *				case "Position":
+                *					args.cell.container().find("input").wijcombobox("destroy");
+                *					break;
+                *				case "Acquired":
+                *					args.cell.container().find("input").wijinputnumber("destroy");
+                *					break;
+                *			}
+                *		}
+                * });
+                * @remarks
+                * You can bind to the event either by type or by name.
+                * Bind to the event by name:
+                * $("#element").wijgrid({ afterCellEdit: function (e, args) {
+                *		// some code here
+                * }});
+                *
+                * Bind to the event by type:
+                * $("#element").bind("wijgridaftercelledit", function (e, args) {
+                *		// some code here
+                * });
+                * @param {Object} e The jQuery.Event object.
+                * @param {wijmo.grid.IAfterCellEditEventArgs} args The data with this event.
+                */
+                this.afterCellEdit = null;
+                /** The afterCellUpdate event handler is a function that is called after a cell has been updated. Among other functions, this event allows you to track and store the indices of changed rows or columns.
+                * @event
+                * @example
+                * // Once the cell has been updated, the information from the underlying data is dumped into the "#log" element.
+                * $("#element").wijgrid({
+                *		afterCellUpdate: function(e, args) {
+                *			$("#log").html(dump($("#demo").wijgrid("data")));
+                *		}
+                * });
+                * @remarks
+                * You can bind to the event either by type or by name.
+                * Bind to the event by name:
+                * $("#element").wijgrid({ afterCellUpdate: function (e, args) {
+                *		// some code here
+                * }});
+                *
+                * Bind to the event by type:
+                * $("#element").bind("wijgridaftercellupdate", function (e, args) {
+                *		// some code here
+                * });
+                * @param {Object} e The jQuery.Event object.
+                * @param {wijmo.grid.IAfterCellUpdateEventArgs} args The data with this event.
+                */
+                this.afterCellUpdate = null;
+                /** The beforeCellEdit event handler is a function that is called before a cell enters edit mode.
+                * The beforeCellEdit event handler assists you in appending a widget, data, or other item to a wijgrid's cells before the cells enter edit mode. This event is cancellable.
+                * @event
+                * @example
+                * // Allow the user to change the price only if the product hasn't been discontinued:
+                * $("#element").wijgrid({
+                *		beforeCellEdit: function(e, args) {
+                *			return !((args.cell.column().dataKey === "Price") && args.cell.row().data.Discontinued);
+                *		}
+                * });
+                * @remarks
+                * You can bind to the event either by type or by name.
+                * Bind to the event by name:
+                * $("#element").wijgrid({ beforeCellEdit: function (e, args) {
+                *		// some code here
+                * }});
+                *
+                * Bind to the event by type:
+                * $("#element").bind("wijgridbeforecelledit", function (e, args) {
+                *		// some code here
+                * });
+                * @param {Object} e The jQuery.Event object.
+                * @param {wijmo.grid.IBeforeCellEditEventArgs} args The data with this event.
+                */
+                this.beforeCellEdit = null;
+                /** The beforeCellUpdate event handler is a function that is called before the cell is updated with new or user-entered data. This event is cancellable.
+                * There are many instances where this event is helpful, such as when you need to check a cell's value before the update occurs or when you need to apply an alert message based on the cell's value.
+                * @event
+                * @example
+                * // In this sample, you use args.value to check the year that the user enters in the "Acquired" column.
+                * // If it's less than 1990 or greater than the current year, then the event handler will return false to cancel updating and show the user an alert message.
+                * $("#element").wijgrid({
+                *		beforeCellUpdate: function(e, args) {
+                *			switch (args.cell.column().dataKey) {
+                *				case "Acquired":
+                *					var $editor = args.cell.container().find("input"),
+                *						value = $editor.wijinputnumber("getValue"),
+                *						curYear = new Date().getFullYear();
+                *
+                *					if (value < 1990 || value > curYear) {
+                *						$editor.addClass("ui-state-error");
+                *						alert("value must be between 1990 and " + curYear);
+                *						$editor.focus();
+                *						return false;
+                *					}
+                *
+                *					args.value = value;
+                *					break;
+                *			}
+                *		}
+                * });
+                * @remarks
+                * You can bind to the event either by type or by name.
+                * Bind to the event by name:
+                * $("#element").wijgrid({ beforeCellUpdate: function (e, args) {
+                *		// some code here
+                * }});
+                *
+                * Bind to the event by type:
+                * $("#element").bind("wijgridbeforecellupdate", function (e, args) {
+                *		// some code here
+                * });
+                * @param {Object} e The jQuery.Event object.
+                * @param {wijmo.grid.IBeforeCellUpdateEventArgs} args The data with this event.
+                */
+                this.beforeCellUpdate = null;
+                /** The cellClicked event handler is a function that is called when a cell is clicked. You can use this event to get the information of a clicked cell using the args parameter.
+                * @event
+                * @example
+                * // The sample uses the cellClicked event to trigger an alert when the cell is clicked.
+                * $("#element").wijgrid({
+                *		cellClicked: function (e, args) {
+                *			alert(args.cell.value());
+                *		}
+                * });
+                * @remarks
+                * You can bind to the event either by type or by name.
+                * Bind to the event by name:
+                * $("#element").wijgrid({ cellClicked: function (e, args) {
+                *		// some code here
+                * }});
+                *
+                * Bind to the event by type:
+                * $("#element").bind("wijgridcellclicked", function (e, args) {
+                *		// some code here
+                * });
+                * @param {Object} e The jQuery.Event object.
+                * @param {wijmo.grid.ICellClickedEventArgs} args The data with this event.
+                */
+                this.cellClicked = null;
+                /** The columnDragging event handler is a function that is called when column dragging has been started, but before the wijgrid handles the operation. This event is cancellable.
+                * @event
+                * @example
+                * // Preventing a user from dragging a specific column
+                * $("#element").wijgrid({
+                *		columnDragging: function (e, args) {
+                *			return !(args.drag.dataKey == "ID");
+                *		}
+                * });
+                * @remarks
+                * You can bind to the event either by type or by name.
+                * Bind to the event by name:
+                * $("#element").wijgrid({ columnDragging: function (e, args) {
+                *		// some code here
+                * }});
+                *
+                * Bind to the event by type:
+                * $("#element").bind("wijgridcolumndragging", function (e, args) {
+                *		// some code here
+                * });
+                * @param {Object} e The jQuery.Event object.
+                * @param {wijmo.grid.IColumnDraggingEventArgs} args The data with this event.
+                */
+                this.columnDragging = null;
+                /** The columnDragged event handler is a function that is called when column dragging has been started. You can use this event to find the column being dragged or the dragged column's location.
+                * @event
+                * @example
+                * // Supply a callback function to handle the columnDragged event:
+                * $("#element").wijgrid({
+                *		columnDragged: function (e, args) {
+                *			alert("The '" + args.drag.headerText + "' column is being dragged from the '" + args.dragSource + "' location");
+                *		}
+                * });
+                * @remarks
+                * You can bind to the event either by type or by name.
+                * Bind to the event by name:
+                * $("#element").wijgrid({ columnDragged: function (e, args) {
+                *		// some code here
+                * }});
+                *
+                * Bind to the event by type:
+                * $("#element").bind("wijgridcolumndragged", function (e, args) {
+                *		// some code here
+                * });
+                * @param {Object} e The jQuery.Event object.
+                * @param {wijmo.grid.IColumnDraggedEventArgs} args The data with this event.
+                */
+                this.columnDragged = null;
+                /** The columnDropping event handler is a function that is called when a column is dropped into the columns area, but before wijgrid handles the operation. This event is cancellable.
+                * @event
+                * @example
+                * // Preventing user from dropping any column before the "ID" column.
+                * $("#element").wijgrid({
+                *		columnDropping: function (e, args) {
+                *			return !(args.drop.dataKey == "ID" && args.at == "left");
+                *		}
+                * });
+                * @remarks
+                * You can bind to the event either by type or by name.
+                * Bind to the event by name:
+                * $("#element").wijgrid({ columnDropping: function (e, args) {
+                *		// some code here
+                * }});
+                *
+                * Bind to the event by type:
+                * $("#element").bind("wijgridcolumndropping", function (e, args) {
+                *		// some code here
+                * });
+                * @param {Object} e The jQuery.Event object.
+                * @param {wijmo.grid.IColumnDroppingEventArgs} args The data with this event.
+                */
+                this.columnDropping = null;
+                /** The columnDropped event handler is a function that is called when a column has been dropped into the columns area.
+                * @event
+                * @example
+                * // Supply a callback function to handle the columnDropped event:
+                * $("#element").wijgrid({
+                *		columnDropped: function (e, args) {
+                *			"The '" + args.drag.headerText + "' column has been dropped onto the '" + args.drop.headerText + "' column at the '" + args.at + "' position"
+                *		}
+                * });
+                * @remarks
+                * You can bind to the event either by type or by name.
+                * Bind to the event by name:
+                * $("#element").wijgrid({ columnDropped: function (e, args) {
+                *		// some code here
+                * }});
+                *
+                * Bind to the event by type:
+                * $("#element").bind("wijgridcolumndropped", function (e, args) {
+                *		// some code here
+                * });
+                * @param {Object} e The jQuery.Event object.
+                * @param {wijmo.grid.IColumnDroppedEventArgs} args The data with this event.
+                */
+                this.columnDropped = null;
+                /** The columnGrouping event handler is a function that is called when a column is dropped into the group area, but before the wijgrid handles the operation. This event is cancellable.
+                * @event
+                * @example
+                * // Preventing user from grouping the "UnitPrice" column.
+                * $("#element").wijgrid({
+                *		columnGrouping: function (e, args) {
+                *			return !(args.drag.headerText == "UnitPrice");
+                *		}
+                * });
+                * @remarks
+                * You can bind to the event either by type or by name.
+                * Bind to the event by name:
+                * $("#element").wijgrid({ columnGrouping: function (e, args) {
+                *		// some code here
+                * }});
+                *
+                * Bind to the event by type:
+                * $("#element").bind("wijgridcolumngrouping", function (e, args) {
+                *		// some code here
+                * });
+                * @param {Object} e The jQuery.Event object.
+                * @param {wijmo.grid.IColumnGroupingEventArgs} args The data with this event.
+                */
+                this.columnGrouping = null;
+                /** The columnGrouped event handler is a function that is called when a column has been dropped into the group area.
+                * @event
+                * @example
+                * // Supply a callback function to handle the columnGrouped event:
+                * $("#element").wijgrid({
+                *		columnGrouped: function (e, args) {
+                *			alert("The '" + args.drag.headerText "' column has been grouped");
+                *		}
+                * });
+                * @remarks
+                * You can bind to the event either by type or by name.
+                * Bind to the event by name:
+                * $("#element").wijgrid({ columnGrouped: function (e, args) {
+                *		// some code here
+                * }});
+                *
+                * Bind to the event by type:
+                * $("#element").bind("wijgridcolumngrouped", function (e, args) {
+                *		// some code here
+                * });
+                * @param {Object} e The jQuery.Event object.
+                * @param {wijmo.grid.IColumnGroupedEventArgs} args The data with this event.
+                */
+                this.columnGrouped = null;
+                /** The columnResizing event handler is called when a user resizes the column but before the wijgrid handles the operation. This event is cancellable.
+                * @event
+                * @example
+                * // Prevent setting the width of "ID" column less than 100 pixels
+                * $("#element").wijgrid({
+                *		columnResizing: function (e, args) {
+                *			if (args.column.dataKey == "ID" && args.newWidth < 100) {
+                *				args.newWidth = 100;
+                *			}
+                *		}
+                * });
+                * @remarks
+                * You can bind to the event either by type or by name.
+                * Bind to the event by name:
+                * $("#element").wijgrid({ columnResizing: function (e, args) {
+                *		// some code here
+                * }});
+                *
+                * Bind to the event by type:
+                * $("#element").bind("wijgridcolumnresizing", function (e, args) {
+                *		// some code here
+                * });
+                * @param {Object} e The jQuery.Event object.
+                * @param {wijmo.grid.IColumnResizingEventArgs} args The data with this event.
+                */
+                this.columnResizing = null;
+                /** The columnResized event handler is called when a user has changed a column's size.
+                * @event
+                * @example
+                * // Supply a callback function to handle the columnGrouped event:
+                * $("#element").wijgrid({
+                *		columnResized: function (e, args) {
+                *			alert("The '" + args.column.headerText + "' has been resized");
+                *		}
+                * });
+                * @remarks
+                * You can bind to the event either by type or by name.
+                * Bind to the event by name:
+                * $("#element").wijgrid({ columnResized: function (e, args) {
+                *		// some code here
+                * }});
+                *
+                * Bind to the event by type:
+                * $("#element").bind("wijgridcolumnresized", function (e, args) {
+                *		// some code here
+                * });
+                * @param {Object} e The jQuery.Event object.
+                * @param {wijmo.grid.IColumnResizedEventArgs} args The data with this event.
+                */
+                this.columnResized = null;
+                /** The columnUngrouping event handler is called when a column has been removed from the group area but before the wjgrid handles the operation. This event is cancellable.
+                * @event
+                * @example
+                * // Preventing user from ungrouping the "UnitPrice" column.
+                * $("#element").wijgrid({
+                *		columnUngrouping: function (e, args) {
+                *			return !(args.column.headerText == "UnitPrice");
+                *		}
+                * });
+                * @remarks
+                * You can bind to the event either by type or by name.
+                * Bind to the event by name:
+                * $("#element").wijgrid({ columnUngrouping: function (e, args) {
+                *		// some code here
+                * }});
+                *
+                * Bind to the event by type:
+                * $("#element").bind("wijgridcolumnungrouping", function (e, args) {
+                *		// some code here
+                * });
+                * @param {Object} e The jQuery.Event object.
+                * @param {wijmo.grid.IColumnUngroupingEventArgs} args The data with this event.
+                */
+                this.columnUngrouping = null;
+                /** The columnUngrouped event handler is called when a column has been removed from the group area.
+                * @event
+                * @example
+                * // Supply a callback function to handle the columnGrouped event:
+                * $("#element").wijgrid({
+                *		columnUngrouped: function (e, args) {
+                *			alert("The '" + args.column.headerText + "' has been ungrouped");
+                *		}
+                * });
+                * @remarks
+                * You can bind to the event either by type or by name.
+                * Bind to the event by name:
+                * $("#element").wijgrid({ columnUngrouped: function (e, args) {
+                *		// some code here
+                * }});
+                *
+                * Bind to the event by type:
+                * $("#element").bind("wijgridcolumnungrouped", function (e, args) {
+                *		// some code here
+                * });
+                * @param {Object} e The jQuery.Event object.
+                * @param {wijmo.grid.IColumnUngroupedEventArgs} args The data with this event.
+                */
+                this.columnUngrouped = null;
+                /** The currentCellChanging event handler is called before the cell is changed. You can use this event to get a selected row or column or to get a data row bound to the current cell. This event is cancellable.
+                * @event
+                * @example
+                * // Gets the data row bound to the current cell.
+                * $("#element").wijgrid({
+                *		currentCellChanging: function (e, args) {
+                *			var rowObj = $(e.target).wijgrid("currentCell").row();
+                *			if (rowObj) {
+                *				var dataItem = rowObj.data; // current data item (before the cell is changed).
+                *			}
+                *		}
+                * });
+                * @remarks
+                * You can bind to the event either by type or by name.
+                * Bind to the event by name:
+                * $("#element").wijgrid({ currentCellChanging: function (e, args) {
+                *		// some code here
+                * }});
+                *
+                * Bind to the event by type:
+                * $("#element").bind("wijgridcurrentcellchanging", function (e, args) {
+                *		// some code here
+                * });
+                * @param {Object} e The jQuery.Event object.
+                * @param {wijmo.grid.ICurrentCellChangingEventArgs} args The data with this event.
+                */
+                this.currentCellChanging = null;
+                /** The currentCellChanged event handler is called after the current cell is changed.
+                * @event
+                * @example
+                * // Gets the data row bound to the current cell.
+                * $("#element").wijgrid({
+                *		currentCellChanged: function (e, args) {
+                *			var rowObj = $(e.target).wijgrid("currentCell").row();
+                *			if (rowObj) {
+                *				var dataItem = rowObj.data; // current data item (after the cell is changed).
+                *			}
+                *		}
+                * });
+                * @remarks
+                * You can bind to the event either by type or by name.
+                * Bind to the event by name:
+                * $("#element").wijgrid({ currentCellChanged: function (e) {
+                *		// some code here
+                * }});
+                *
+                * Bind to the event by type:
+                * $("#element").bind("wijgridcurrentcellchanged", function (e) {
+                *		// some code here
+                * });
+                * @param {Object} e The jQuery.Event object.
+                */
+                this.currentCellChanged = null;
+                /** The filterOperatorsListShowing event handler is a function that is called before the filter drop-down list is shown. You can use this event to customize the list of filter operators for your users.
+                * @event
+                * @example
+                * // Limit the filters that will be shown to the "Equals" filter operator
+                * $("#element").wijgrid({
+                *		filterOperatorsListShowing: function (e, args) {
+                *			args.operators = $.grep(args.operators, function(op) {
+                *				return op.name === "Equals" || op.name === "NoFilter";
+                *			}
+                *		}
+                * });
+                * @remarks
+                * You can bind to the event either by type or by name.
+                * Bind to the event by name:
+                * $("#element").wijgrid({ filterOperatorsListShowing: function (e, args) {
+                *		// some code here
+                * }});
+                *
+                * Bind to the event by type:
+                * $("#element").bind("wijgridfilteroperatorslistshowing", function (e, args) {
+                *		// some code here
+                * });
+                * @param {Object} e The jQuery.Event object.
+                * @param {wijmo.grid.IFilterOperatorsListShowingEventArgs} args The data with this event.
+                */
+                this.filterOperatorsListShowing = null;
+                /** The filtering event handler is a function that is called before the filtering operation is started. For example, you can use this event to change a filtering condition before a filter will be applied to the data. This event is cancellable.
+                * @event
+                * @example
+                * // Prevents filtering by negative values
+                * $("#element").wijgrid({
+                *		filtering: function (e, args) {
+                *			if (args.column.dataKey == "Price" && args.value < 0) {
+                *				args.value = 0;
+                *			}
+                *		}
+                * });
+                * @remarks
+                * You can bind to the event either by type or by name.
+                * Bind to the event by name:
+                * $("#element").wijgrid({ filtering: function (e, args) {
+                *		// some code here
+                * }});
+                *
+                * Bind to the event by type:
+                * $("#element").bind("wijgridfiltering", function (e, args) {
+                *		// some code here
+                * });
+                * @param {Object} e The jQuery.Event object.
+                * @param {wijmo.grid.IFilteringEventArgs} args The data with this event.
+                */
+                this.filtering = null;
+                /** The filtered event handler is a function that is called after the wijgrid is filtered.
+                * @event
+                * @example
+                * //
+                * $("#element").wijgrid({
+                *		filtered: function (e, args) {
+                *			alert("The filtered data contains: " + $(this).wijgrid("dataView").count() + " rows");
+                *		}
+                * });
+                * @remarks
+                * You can bind to the event either by type or by name.
+                * Bind to the event by name:
+                * $("#element").wijgrid({ filtered: function (e, args) {
+                *		// some code here
+                * }});
+                *
+                * Bind to the event by type:
+                * $("#element").bind("wijgridfiltered", function (e, args) {
+                *		// some code here
+                * });
+                * @param {Object} e The jQuery.Event object.
+                * @param {wijmo.grid.IFilteredEventArgs} args The data with this event.
+                */
+                this.filtered = null;
+                /** The groupAggregate event handler is a function that is called when groups are being created and the column object's aggregate option has been set to "custom". This event is useful when you want to calculate custom aggregate values.
+                * @event
+                * @example
+                * // This sample demonstrates using the groupAggregate event handler to calculate an average in a custom aggregate:
+                * $("#element").wijgrid({
+                *		groupAggregate: function (e, args) {
+                *			if (args.column.dataKey == "Price") {
+                *				var aggregate = 0;
+                *
+                *				for (var i = args.groupingStart; i <= args.groupingEnd; i++) {
+                *					aggregate += args.data[i][args.column.dataIndex].value;
+                *				}
+                *
+                *				aggregate = aggregate/ (args.groupingEnd - args.groupingStart + 1);
+                *				args.text = aggregate;
+                *			}
+                *		}
+                * });
+                * @remarks
+                * You can bind to the event either by type or by name.
+                * Bind to the event by name:
+                * $("#element").wijgrid({ groupAggregate: function (e, args) {
+                *		// some code here
+                * }});
+                * Bind to the event by type:
+                *
+                * $("#element").bind("wijgridgroupaggregate", function (e, args) {
+                *		// some code here
+                * });
+                * @param {Object} e The jQuery.Event object.
+                * @param {wijmo.grid.IGroupAggregateEventArgs} args The data with this event.
+                */
+                this.groupAggregate = null;
+                /** The groupText event handler is a function that is called when groups are being created and the groupInfo option has the groupInfo.headerText or the groupInfo.footerText options set to "custom". This event can be used to customize group headers and group footers.
+                * @event
+                * @example
+                * // The following sample sets the groupText event handler to avoid empty cells. The custom formatting applied to group headers left certain cells appearing as if they were empty. This code avoids that:
+                * $("#element").wijgrid({
+                *		groupText: function (e, args) {
+                *			if (!args.groupText) {
+                *				args.text = "null";
+                *			}
+                *		}
+                * });
+                * @remarks
+                * You can bind to the event either by type or by name.
+                * Bind to the event by name:
+                * $("#element").wijgrid({ groupText: function (e, args) {
+                *		// some code here
+                * }});
+                *
+                * Bind to the event by type:
+                * $("#element").bind("wijgridgrouptext", function (e, args) {
+                *		// some code here
+                * });
+                * @param {Object} e The jQuery.Event object.
+                * @param {wijmo.grid.IGroupTextEventArgs} args The data with this event.
+                */
+                this.groupText = null;
+                /** The invalidCellValue event handler is a function called when a cell needs to start updating but the cell value is invalid. So if the value in a wijgrid cell can't be converted to the column target type, the invalidCellValue event will fire.
+                * @event
+                * @example
+                * // Adds a style to the cell if the value entered is invalid
+                * $("#element").wijgrid({
+                *		invalidCellValue: function (e, args) {
+                *			$(args.cell.container()).addClass("ui-state-error");
+                *		}
+                * });
+                * @remarks
+                * You can bind to the event either by type or by name.
+                * Bind to the event by name:
+                * $("#element").wijgrid({ invalidCellValue: function (e, args) {
+                *		// some code here
+                * }});
+                *
+                * Bind to the event by type:
+                * $("#element").bind("wijgridinvalidcellvalue", function (e, args) {
+                *		// some code here
+                * });
+                * @param {Object} e The jQuery.Event object.
+                * @param {wijmo.grid.IInvalidCellValueEventArgs} args The data with this event.
+                */
+                this.invalidCellValue = null;
+                /** The pageIndexChanging event handler is a function that is called before the page index is changed. This event is cancellable.
+                * @event
+                * @example
+                * // Cancel the event by returning false
+                * $("#element").wijgrid({
+                *		pageIndexChanging: function (e, args) {
+                *			return false;
+                *		}
+                * });
+                * @remarks
+                * You can bind to the event either by type or by name.
+                * Bind to the event by name:
+                * $("#element").wijgrid({ pageIndexChanging: function (e, args) {
+                *		// some code here
+                * }});
+                *
+                * Bind to the event by type:
+                * $("#element").bind("wijgridpageindexchanging", function (e, args) {
+                *		// some code here
+                * });
+                * @param {Object} e The jQuery.Event object.
+                * @param {wijmo.grid.IPageIndexChangingEventArgs} args The data with this event.
+                */
+                this.pageIndexChanging = null;
+                /** The pageIndexChanged event handler is a function that is called after the page index is changed, such as when you use the numeric buttons to swtich between pages or assign a new value to the pageIndex option.
+                * @event
+                * @example
+                * // Supply a callback function to handle the pageIndexChanged event:
+                * $("#element").wijgrid({
+                *		pageIndexChanged: function (e, args) {
+                *			alert("The new pageIndex is: " + args.newPageIndex);
+                *		}
+                * });
+                * @remarks
+                * You can bind to the event either by type or by name.
+                * Bind to the event by name:
+                * $("#element").wijgrid({ pageIndexChanged: function (e, args) {
+                *		// some code here
+                * }});
+                *
+                * Bind to the event by type:
+                * $("#element").bind("wijgridpageindexchanged", function (e, args) {
+                *		// some code here
+                * });
+                * @param {Object} e The jQuery.Event object.
+                * @param {wijmo.grid.IPageIndexChangedEventArgs} args The data with this event.
+                */
+                this.pageIndexChanged = null;
+                /** The selectionChanged event handler is a function that is called after the selection is changed.
+                * @event
+                * @example
+                * // Get the value of the first cell of the selected row.
+                * $("#element").wijgrid({
+                *		selectionMode: "singleRow",
+                *		selectionChanged: function (e, args) {
+                *			alert(args.addedCells.item(0).value());
+                *		}
+                * });
+                * @remarks
+                * You can bind to the event either by type or by name.
+                * Bind to the event by name:
+                * $("#element").wijgrid({ selectionChanged: function (e, args) {
+                *		// some code here
+                * }});
+                *
+                * Bind to the event by type:
+                * $("#element").bind("wijgridselectionchanged", function (e, args) {
+                *		// some code here
+                * });
+                * @param {Object} e The jQuery.Event object.
+                * @param {wijmo.grid.ISelectionChangedEventArgs} args The data with this event.
+                */
+                this.selectionChanged = null;
+                /** The sorting event handler is a function that is called before the sorting operation is started. This event is cancellable.
+                * The allowSorting option must be set to "true" for this event to fire.
+                * @event
+                * @example
+                * // Preventing user from sorting the "ID" column.
+                * $("#element").wijgrid({
+                *		sorting: function (e, args) {
+                *			return !(args.column.headerText === "ID");
+                *		}
+                * });
+                * @remarks
+                * You can bind to the event either by type or by name.
+                * Bind to the event by name:
+                * $("#element").wijgrid({ sorting: function (e, args) {
+                *		// some code here
+                * }});
+                *
+                * Bind to the event by type:
+                * $("#element").bind("wijgridsorting", function (e, args) {
+                *		// some code here
+                * });
+                * @param {Object} e The jQuery.Event object.
+                * @param {wijmo.grid.ISortingEventArgs} args The data with this event.
+                */
+                this.sorting = null;
+                /** The sorted event handler is a function that is called after the widget is sorted. The allowSorting option must be set to "true" to allow this event to fire.
+                * @event
+                * @example
+                * // The following code handles the sorted event and will give you access to the column and the sort direction
+                * $("#element").wijgrid({
+                *		sorted: function (e, args) {
+                *			alert("Column " + args.column.headerText + " sorted in " + args.sortDirection + " order");
+                *		}
+                * });
+                * @remarks
+                * You can bind to the event either by type or by name.
+                * Bind to the event by name:
+                * $("#element").wijgrid({ sorted: function (e, args) {
+                *		// some code here
+                * }});
+                *
+                * Bind to the event by type:
+                * $("#element").bind("wijgridsorted", function (e, args) {
+                *		// some code here
+                * });
+                * @param {Object} e The jQuery.Event object.
+                * @param {wijmo.grid.ISortedEventArgs} args The data with this event.
+                */
+                this.sorted = null;
+                /* events --- */
+                /* --- life-cycle events */
+                //			/// <summary>
+                //			/// The ajaxError event handler. A function called when wijgrid is bound to remote data and
+                //			/// the ajax request fails.
+                //			/// Default: null.
+                //			/// Type: Function.
+                //			/// Code example:
+                //			/// Supply a callback function to handle the ajaxError event:
+                //			/// $("#element").wijgrid({ ajaxError: function (e, args) { } });
+                //			/// Bind to the event by type:
+                //			/// $("#element").bind("wijgridajaxerror", function (e, args) { });
+                //			/// </summary>
+                //			/// <param name="e" type="Object">The jQuery.Event object.</param>
+                //			/// <param name="args" type="Object">
+                //			/// The data corresponded with this event.
+                //			/// args.XMLHttpRequest: the XMLHttpRequest object.
+                //			/// args.textStatus: a string describing the error type.
+                //			/// args.errorThrown: an exception object.
+                //			///
+                //			/// Refer to the jQuery.ajax.error event documentation for more details on this arguments.
+                //			/// </param>
+                //			ajaxError: null,
+                /** The dataLoading event handler is a function that is called when the wijgrid loads a portion of data from the underlying datasource. This can be used for modification of data sent to server if using dynamic remote wijdatasource.
+                * @event
+                * @example
+                * // This sample allows you to set the session ID when loading a portion of data from the remote wijdatasource:
+                * $("#element").wijgrid({
+                *		data: new wijdatasource({
+                *			proxy: new wijhttpproxy({
+                *				// some code here
+                *			})
+                *		}),
+                *		dataLoading: function (e) {
+                *			var dataSource = $(this).wijgrid("option", "data");
+                *			dataSource.proxy.options.data.sessionID = getSessionID();
+                *		}
+                * });
+                * @remarks
+                * You can bind to the event either by type or by name.
+                * Bind to the event by name:
+                * $("#element").wijgrid({ dataLoading: function (e) {
+                * // some code here
+                * }});
+                *
+                * Bind to the event by type:
+                * $("#element").bind("wijgriddataloading", function (e) {
+                * // some code here
+                * });
+                * @param {Object} e The jQuery.Event object.
+                */
+                this.dataLoading = null;
+                /** The dataLoaded event handler is a function that is called when data is loaded.
+                * @event
+                * @example
+                * // Display the number of entries found
+                * $("#element").wijgrid({
+                *		dataLoaded: function (e) {
+                *			alert($(this).wijgrid("dataView").count());
+                *		}
+                * });
+                * @remarks
+                * You can bind to the event either by type or by name.
+                * Bind to the event by name:
+                * $("#element").wijgrid({ dataLoaded: function (e) {
+                *		// some code here
+                * }});
+                *
+                * Bind to the event by type:
+                * $("#element").bind("wijgriddataloaded", function (e) {
+                *		// some code here
+                * });
+                * @param {Object} e The jQuery.Event object.
+                */
+                this.dataLoaded = null;
+                /** The loading event handler is a function that is called at the beginning of the wijgrid's lifecycle. You can use this event to activate a custom load progress indicator.
+                * @event
+                * @example
+                * // Creating an indeterminate progressbar during loading
+                * $("#element").wijgrid({
+                *		loading: function (e) {
+                *			$("#progressBar").show().progressbar({ value: false });
+                *		}
+                * });
+                * @remarks
+                * You can bind to the event either by type or by name.
+                * Bind to the event by name:
+                * $("#element").wijgrid({ loading: function (e) {
+                *		// some code here
+                * }});
+                *
+                * Bind to the event by type:
+                * $("#element").bind("wijgridloading", function (e) {
+                *		// some code here
+                * });
+                * @param {Object} e The jQuery.Event object.
+                */
+                this.loading = null;
+                /** The loaded event handler is a function that is called at the end the wijgrid's lifecycle when wijgrid is filled with data and rendered. You can use this event to manipulate the grid html content or to finish a custom load indication.
+                * @event
+                * @example
+                * // The loaded event in the sample below ensures that whatever is selected on load is cleared
+                * $("#element").wijgrid({
+                *		loaded: function (e) {
+                *			$(e.target).wijgrid("selection").clear(); // clear selection
+                *		}
+                * });
+                * @remarks
+                * You can bind to the event either by type or by name.
+                * Bind to the event by name:
+                * $("#element").wijgrid({ loaded: function (e) {
+                *		// some code here
+                * }});
+                *
+                * Bind to the event by type:
+                * $("#element").bind("wijgridloaded", function (e) {
+                *		// some code here
+                * });
+                * @param {Object} e The jQuery.Event object.
+                */
+                this.loaded = null;
+                /** The rendering event handler is a function that is called when the wijgrid is about to render. Normally you do not need to use this event.
+                * @event
+                * @example
+                * $("#element").wijgrid({
+                *		rendering: function (e) {
+                *			alert("rendering");
+                *		}
+                * });
+                * @remarks
+                * You can bind to the event either by type or by name.
+                * Bind to the event by name:
+                * $("#element").wijgrid({ rendering: function (e) {
+                *		// some code here
+                * }});
+                *
+                * Bind to the event by type:
+                * $("#element").bind("wijgridrendering", function (e) {
+                *		// some code here
+                * });
+                * @param {Object} e The jQuery.Event object.
+                */
+                this.rendering = null;
+                /** The rendered event handler is a function that is called when the wijgrid is rendered. Normally you do not need to use this event.
+                * @event
+                * @example
+                * $("#element").wijgrid({
+                *		rendered: function (e) {
+                *			alert("rendered");
+                *		}
+                * });
+                * @remarks
+                * You can bind to the event either by type or by name.
+                * Bind to the event by name:
+                * $("#element").wijgrid({ rendered: function (e) {
+                *		// some code here
+                * }});
+                *
+                * Bind to the event by type:
+                * $("#element").bind("wijgridrendered", function (e) {
+                *		// some code here
+                * });
+                * @param {Object} e The jQuery.Event object.
+                */
+                this.rendered = null;
             }
-            return this;
-        };
-        wijgrid.prototype._totalRowsCount = // used by virtual scrolling
-        function () {
-            /*if (this._dataStore.isDynamic()) {
-            return this._dataStore.totalCount();
-            }*/
-            return this.sketchTable.length;
-        };
-        wijgrid.prototype._trackScrollingPosition = function (x, y) {
-            this._scrollingState.x = x;
-            this._scrollingState.y = y;
-        };
-        wijgrid.prototype._trackScrollingIndex = function (index) {
-            this._scrollingState.index = index;
-        };
-        wijgrid.prototype._uid = function () {
-            if(this.__uid === undefined) {
-                this.__uid = wijmo.grid.getUID();
-            }
-            return "wijgrid" + this.__uid;
-        };
-        return wijgrid;
-    })(wijmo.wijmoWidget);
-    wijmo.wijgrid = wijgrid;
-    wijgrid.prototype.widgetEventPrefix = "wijgrid";
-    wijgrid.prototype._data$prefix = "wijgrid";
-    wijgrid.prototype._customSortOrder = 1000;
-    wijgrid.prototype._reverseKey = false;
-    wijgrid.prototype._pageSizeKey = 10;
-    wijgrid.prototype._mergeWidgetsWithOptions = true;
-    wijgrid.prototype.options = $.extend(true, {
-    }, wijmo.wijmoWidget.prototype.options, {
-        wijMobileCSS: {
-            header: "ui-header ui-bar-a",
-            content: "ui-body-c",
-            stateHover: "ui-btn-down-c",
-            stateActive: "ui-btn-down-c"
-        },
-        allowColMoving: /// <summary>
-        /// A value indicating whether columns can be moved.
-        /// Default: false.
-        /// Type: Boolean.
-        /// Code example: $("#element").wijgrid({ allowColMoving: false });
-        /// </summary>
-        false,
-        allowColSizing: /// <summary>
-        /// A value indicating whether columns can be sized.
-        /// Default: false.
-        /// Type: Boolean.
-        /// Code example: $("#element").wijgrid({ allowColSizing: false });
-        /// </summary>
-        false,
-        allowEditing: /// <summary>
-        /// A value indicating whether editing is enabled.
-        /// Default: false.
-        /// Type: Boolean.
-        /// Code example: $("#element").wijgrid({ allowEditing: false });
-        /// </summary>
-        false,
-        allowKeyboardNavigation: /// <summary>
-        /// A value indicating whether keyboard navigation is allowed.
-        /// Default: true.
-        /// Type: Boolean.
-        /// Code example: $("#element").wijgrid({ allowKeyboardNavigation: false });
-        /// </summary>
-        true,
-        allowPaging: /// <summary>
-        /// A value indicating whether the widget can be paged.
-        /// Default: false.
-        /// Type: Boolean.
-        /// Code example: $("#element").wijgrid({ allowPaging: false });
-        /// </summary>
-        false,
-        allowSorting: /// <summary>
-        /// A value indicating whether the widget can be sorted.
-        /// Default: false.
-        /// Type: Boolean.
-        /// Code example: $("#element").wijgrid({ allowSorting: false });
-        /// </summary>
-        false,
-        allowVirtualScrolling: /// <summary>
-        /// A value indicates whether virtual scrolling is allowed.
-        /// The pageSize option determines the limit of simultaneously rendered rows when virtual scrolling is used.
-        /// This feature improves rendering efficiency of large data amounts.
-        ///
-        /// Default: false.
-        /// Type: Boolean.
-        /// Code example: $("#element").wijgrid({ allowVirtualScrolling: false });
-        /// </summary>
-        /// <remarks>
-        /// Option is ignored if grid uses paging, columns merging or fixed rows.
-        /// Option can not be enabled when using dynamic wijdatasource.
-        /// </remarks>
-        false,
-        alwaysParseData: /// <summary>
-        /// Determines whether wijgrid should parse underlying data at each operation requiring data re-fetching, like calling the ensureControl(true) method, paging, sorting, and so on.
-        /// If the option is disabled, wijgrid parses data only at the first fetch.
-        /// The option is ignored if dynamic data load feature is used, in this case data are always parsed.
-        ///
-        /// Default: true
-        /// Type: Boolean.
-        /// Code example: $("#element").wijgrid({ alwaysParseData: true });
-        /// </summary>
-        ///
-        /// <remarks>
-        /// Turning off the option enhance wijgrid performance but if underlying data are changed by a developer it is necessary
-        /// that changes match column datatype.
-        /// </remarks>
-        true,
-        cellStyleFormatter: /// <summary>
-        /// Function used for styling the cells in wijgrid.
-        /// Default: undefined,
-        /// Type: Function.
-        /// Code example:
-        ///
-        /// Make the text of the current cell italic.
-        ///
-        /// $("#element").wijgrid({
-        ///     highlightCurrentCell: true,
-        ///     cellStyleFormatter: function(args) {
-        ///        if ((args.row.type & $.wijmo.wijgrid.rowType.data)) {
-        ///           if (args.state & $.wijmo.wijgrid.renderState.current) {
-        ///              args.$cell.css("font-style", "italic");
-        ///           } else {
-        ///              args.$cell.css("font-style", "normal");
-        ///           }
-        ///        }
-        ///     }
-        /// });
-        /// </summary>
-        /// <param name="args" type="Object">
-        /// args.$cell: jQuery object that represents cell to format.
-        /// args.column: Options of the column to which the cell belongs.
-        /// args.state: state of a cell to format, the following $.wijmo.wijgrid.renderState values or their combination can be applied to the cell: rendering, current, selected.
-        /// args.row: information about associated row.
-        /// args.row.$rows: jQuery object that represents rows to format.
-        /// args.row.data: associated data.
-        /// args.row.dataRowIndex: data row index.
-        /// args.row.dataItemIndex: data item index.
-        /// args.row.virtualDataItemIndex: virtual data item index.
-        /// args.row.type: type of the row, one of the $.wijmo.wijgrid.rowType values.
-        /// </param>
-        undefined,
-        columns: /// <summary>
-        /// An array of column options.
-        /// Default: [].
-        /// Type: Array.
-        /// Code example: $("#element").wijgrid({ columns: [ { headerText: "column0", allowSort: false }, { headerText: "column1", dataType: "number" } ] });
-        /// </summary>
-        [],
-        columnsAutogenerationMode: /// <summary>
-        /// Determines behavior for column autogeneration.
-        ///
-        /// Possible values are: "none", "append", "merge".
-        ///
-        /// "none": column auto-generation is turned off.
-        /// "append": a column will be generated for each data field and added to the end of the columns collection.
-        /// "merge": each column having dataKey option not specified will be automatically bound to the first unreserved data field.
-        /// For each data field not bound to any column a new column will be generated and added to the end of the columns collection.
-        /// To prevent automatic binding of a column to a data field set its dataKey option to null.
-        ///
-        /// Default: "merge".
-        /// Type: String.
-        /// Code example: $("#element").wijgrid({ columnsAutogenerationMode: "merge" });
-        /// </summary>
-        ///
-        /// <remarks>
-        /// Note: columns autogeneration process affects the options of columns and the columns option itself.
-        /// </remarks>
-        "merge",
-        culture: /// <summary>
-        /// Determines the culture ID.
-        /// Default: "".
-        /// Type: String.
-        /// Code example: $("#element").wijgrid({ culture: "en" });
-        /// </summary>
-        "",
-        customFilterOperators: /// <summary>
-        /// An array of custom user filters.
-        ///
-        /// Custom user filter is an object which contains the following properties:
-        ///   name - operator name.
-        ///   arity - the number of filter operands. Can be either 1 or 2.
-        ///   applicableTo - an array of datatypes to which the filter can be applied. Possible values for elements of the array are "string", "number", "datetime", "currency" and "boolean".
-        ///   operator - comparison operator, the number of accepted parameters depends upon the arity. The first parameter is a data value, the second parameter is a filter value.
-        ///
-        /// Default: [].
-        /// Type: Array.
-        /// Code example:
-        ///
-        ///   var oddFilterOp = {
-        ///     name: "customOperator-Odd",
-        ///     arity: 1,
-        ///     applicableTo: ["number"],
-        ///     operator: function(dataVal) { return (dataVal % 2 !== 0); }
-        ///  }
-        ///
-        ///  $("#element").wijgrid({ customFilterOperators: [oddFilterOp] });
-        /// </summary>
-        [],
-        data: /// <summary>
-        /// Determines the datasource.
-        /// Possible datasources include:
-        ///
-        ///   1. A DOM table. This is the default datasource, used if the data option is null.
-        ///     Table must have no cells with rowSpan and colSpan attributes.
-        ///   2. A two-dimensional array, such as [[0, "a"], [1, "b"]].
-        ///   3. An array of objects, such as [{field0: 0, field1: "a"}, {field0: 1, field1: "b'}].
-        ///
-        /// Type: Object.
-        /// Default: null
-        /// Code example:
-        /// /* DOM table */
-        /// $("#element").wijgrid();
-        ///
-        /// /* two-dimensional array */
-        /// $("#element").wijgrid({ data: [[0, "a"], [1, "b"]] });
-        /// </summary>
-        null,
-        editingInitOption: /// <summary>
-        /// Determines an action to bring a cell in the editing mode.
-        /// Possible values are: "click", "doubleClick", "auto".
-        ///
-        /// "click" - cell is edited via a single click.
-        /// "doubleClick" - cell is edited via a double click.
-        /// "auto" - action is determined automatically depending upon user environment. If user has a mobile platform then "click" is used, "doubleClick" otherwise.
-        ///
-        /// Type: string
-        /// Default: "auto"
-        /// Code example:
-        ///
-        /// $("#element").wijgrid({ editingInitOption: "auto" });
-        /// </summary>
-        "auto",
-        ensureColumnsPxWidth: /// <summary>
-        /// Determines whether to use number type column width as the real width of the column.
-        /// Default: false.
-        /// Type: Boolean.
-        /// Code example: $("#element").wijgrid({ ensureColumnsPxWidth: true });
-        /// </summary>
-        /// <remarks>
-        /// If this option is set to true, wijgrid will not expand itself to expand the available space.
-        /// Instead, it will use the width option of each column widget.
-        /// </remarks>
-        false,
-        filterOperatorsSortMode: /// <summary>
-        /// Determines the order of items in the filter dropdown list.
-        /// Possible values are: "none", "alphabetical", "alphabeticalCustomFirst" and "alphabeticalEmbeddedFirst"
-        ///
-        /// "none" - operators follow the order of addition, built-in operators goes before custom ones.
-        /// "alphabetical" - operators are sorted alphabetically.
-        /// "alphabeticalCustomFirst" - operators are sorted alphabetically with custom operators going before built-in ones.
-        /// "alphabeticalEmbeddedFirst" - operators are sorted alphabetically with built-in operators going before custom operators.
-        ///
-        /// Note: "NoFilter" operator is always first.
-        ///
-        /// Type: String.
-        /// Default: "alphabeticalCustomFirst"
-        /// Code example: $("#element").wijgrid({ filterOperatorsSortMode: "alphabeticalCustomFirst" });
-        /// </summary>
-        "alphabeticalCustomFirst",
-        groupAreaCaption: /// <summary>
-        /// Determines the caption of the group area.
-        /// Default: "Drag a column here to group by that column.".
-        /// Type: String.
-        /// Code example: $("#element").wijgrid({ groupAreaCaption: "Drag a column here to group by that column." });
-        /// </summary>
-        "Drag a column here to group by that column.",
-        groupIndent: /// <summary>
-        /// Determines the indentation of the groups.
-        /// Default: 10.
-        /// Type: Number.
-        /// Code example: $("#element").wijgrid({ groupIndent: 10 });
-        /// </summary>
-        10,
-        highlightCurrentCell: /// <summary>
-        /// Determines whether position of the current cell is highlighted or not.
-        /// Default: false.
-        /// Type: Boolean.
-        /// Code example: $("#element").wijgrid({ highlightCurrentCell: false });
-        /// </summary>
-        false,
-        highlightOnHover: /// <summary>
-        /// Determines whether hovered row is highlighted or not.
-        /// Default: true.
-        /// Type: Boolean.
-        /// Code example: $("#element").wijgrid({ highlightCurrentCell: true });
-        /// </summary>
-        true,
-        loadingText: ///<summary>
-        /// Determines the text to be displayed when the grid is loading.
-        /// Default: "Loading...".
-        /// Code example: $("#element").wijgrid({ loadingText: "Loading..."});
-        ///</summary>
-        "Loading...",
-        nullString: /// <summary>
-        /// Cell values equal to this property value are considered as null value.
-        /// Case-sensitive for built-in parsers.
-        /// Default: "".
-        /// Type: String.
-        /// Code example: $("#element").wijgrid({ nullString: "" });
-        /// </summary>
-        "",
-        pageIndex: /// <summary>
-        /// Determines the zero-based index of the current page.
-        /// The default value is 0.
-        /// Type: Number.
-        /// Code example: $("#element").wijgrid({ pageIndex: 0 });
-        /// </summary>
-        0,
-        pageSize: /// <summary>
-        /// Number of rows to place on a single page.
-        /// The default value is 10.
-        /// Type: Number.
-        /// Code example: $("#element").wijgrid({ pageSize: 10 });
-        /// </summary>
-        10,
-        pagerSettings: /// <summary>
-        /// Pager settings.
-        /// Note: See jquery.wijmo.wijpager.js for more information.
-        /// Type: Object.
-        /// Default: { mode: "numeric", pageButtonCount: 10, position: "bottom" }.
-        /// Code example: $("#element").wijgrid({ pagerSettings: { position: "bottom" } });
-        /// </summary>
-        {
-            mode: "numeric",
-            pageButtonCount: 10,
-            position: "bottom"
-        },
-        readAttributesFromData: /// A value indicating whether DOM cell attributes can be passed within a data values.
-        /// Default: false.
-        /// Type: Boolean.
-        /// Code example: $("#element").wijgrid({ readAttributesFromData: false });
-        /// </summary>
-        /// <remarks>
-        /// This option allows binding collection of values to data and automatically converting them as attributes of corresponded DOM table cells during rendering.
-        ///
-        /// Values should be passed as an array of two items, where first item is a value of the data field, the second item is a list of values:
-        ///
-        /// $("#element").wijgrid({
-        ///   data: [
-        ///     [ [1, { "style": "color: red", "class": "myclass" } ], a ]
-        ///   ]
-        /// });
-        ///
-        /// or
-        ///
-        /// $("#element").wijgrid({
-        ///   data: [
-        ///     { col0: [1, { "style": "color: red", "class": "myclass" }], col1: "a" }
-        ///   ]
-        /// });
-        ///
-        /// Note: during conversion wijgrid extracts the first item value and makes it data field value, the second item (list of values) is removed:
-        ///  [ { col0: 1, col1: "a" } ]
-        ///
-        /// If DOM table is used as a datasource then attributes belonging to the cells in tBody section of the original table will be read and applied to the new cells.
-        ///
-        /// rowSpan and colSpan attributes are not allowed.
-        /// </remarks>
-        false,
-        rowStyleFormatter: /// <summary>
-        /// Function used for styling the rows in wijgrid.
-        /// Default: undefined,
-        /// Type: Function.
-        /// Code example:
-        ///
-        /// Make text of the alternating rows italic.
-        ///
-        /// $("#demo").wijgrid({
-        ///    data: [
-        ///       [0, "a"], [1, "b"], [2, "c"], [3, "d"]
-        ///    ],
-        ///    rowStyleFormatter (args) {
-        ///       if ((args.state === $.wijmo.wijgrid.renderState.rendering) && (args.type & $.wijmo.wijgrid.rowType.dataAlt)) {
-        /// 			args.$rows.find("td").css("font-style", "italic");
-        /// 	   }
-        ///    }
-        /// });
-        /// </summary>
-        /// <param name="args" type="Object">
-        /// args.state: state of a row to format, the following $.wijmo.wijgrid.renderState values or their combination can be applied to the row: rendering, current, hovered.
-        /// args.$rows: jQuery object that represents rows to format.
-        /// args.data: associated data.
-        /// args.dataRowIndex: data row index.
-        /// args.dataItemIndex: data item index.
-        /// args.virtualDataItemIndex: virtual data item index.
-        /// args.type: type of the row, one of the $.wijmo.wijgrid.rowType values.
-        /// </param>
-        undefined,
-        scrollMode: /// <summary>
-        /// Determines the scrolling mode.
-        ///
-        /// Possible values are:
-        /// "none": scrolling is not used, staticRowIndex and staticColumnIndex are ignored.
-        /// "auto": scrollbars appear automatically depending upon content size.
-        /// "horizontal": horizontal scrollbar is active.
-        /// "vertical": vertical scrollbar is active.
-        /// "both": both horizontal and vertical scrollbars are active.
-        ///
-        /// Default: "none".
-        /// Type: String.
-        /// Code example: $("#element").wijgrid({ scrollMode: "none" });
-        /// </summary>
-        "none",
-        selectionMode: /// <summary>
-        /// Represents selection behavior.
-        /// Possible values are: "none", "singleCell", "singleColumn", "singleRow", "singleRange", "multiColumn", "multiRow" and "multiRange".
-        ///
-        /// "none": selection is turned off.
-        /// "singleCell": only a single cell can be selected at the same time.
-        /// "singleColumn": only a single column can be selected at the same time.
-        /// "singleRow": only a single row can be selected at the same time.
-        /// "singleRange": only a single range of cells can be selected at the same time.
-        /// "multiColumn": it is possible to select more than one row at the same time using the mouse and the CTRL or SHIFT keys.
-        /// "multiRow": it is possible to select more than one row at the same time using the mouse and the CTRL or SHIFT keys.
-        /// "multiRange": it is possible to select more than one cells range at the same time using the mouse and the CTRL or SHIFT keys.
-        ///
-        /// Default: "singleRow".
-        /// Type: String.
-        /// Code example: $("#element").wijgrid({ selectionMode: "singleRow" });
-        /// </summary>
-        "singleRow",
-        showFilter: /// <summary>
-        /// A value indicating whether filter row is visible.
-        /// Default: false.
-        /// Type: Boolean.
-        /// Code example: $("#element").wijgrid({ showFilter: false });
-        /// </summary>
-        false,
-        showFooter: /// <summary>
-        /// A value indicating whether footer row is visible.
-        /// Default: false.
-        /// Type: Boolean.
-        /// Code example: $("#element").wijgrid({ showFooter: false });
-        /// </summary>
-        false,
-        showGroupArea: /// <summary>
-        /// A value indicating whether group area is visible.
-        /// Default: false.
-        /// Type: Boolean.
-        /// Code example: $("#element").wijgrid({ showGroupArea: false });
-        /// </summary>
-        false,
-        showSelectionOnRender: /// <summary>
-        /// A value indicating whether selection will be automatically displayed at the current cell position when wijgrid is rendered.
-        /// Default: true.
-        /// Type: Boolean.
-        /// Code example: $("#element").wijgrid({ showSelectionOnRender: true });
-        /// </summary>
-        true,
-        showRowHeader: /// <summary>
-        /// A value indicating whether the row header is visible.
-        /// Default: false.
-        /// Type: Boolean.
-        /// Code example: $("#element").wijgrid({ showRowHeader: false });
-        /// </summary>
-        false,
-        staticColumnIndex: /*dma> Commented by YK for removing unsupported options.
-        /// <summary>
-        /// A value indicating whether the grid view should split content into several views with the ability to resize and scroll each view independently.
-        /// Default: false.
-        /// Type: Boolean.
-        /// Code example: $("#element").wijgrid({ splits: false });
-        /// </summary>
-        splits: false,
-
-        /// <summary>
-        /// Determines the distance in pixels for the vertical splitter. Applicable when the splits option is true.
-        /// Default: 50.
-        /// Type: Number.
-        /// Code example: $("#element").wijgrid({ splitDistanceX: 50 });
-        /// </summary>
-        splitDistanceX: 50,
-
-        /// <summary>
-        /// Determines the distance in pixels for the horizontal splitter. Applicable when the splits option is true.
-        /// Default: 50.
-        /// Type: Number.
-        /// Code example: $("#element").wijgrid({ splitDistanceY: 50 });
-        /// </summary>
-        splitDistanceY: 50,*/
-        /// <summary>
-        /// Indicates the index of columns that will always be shown on the left when the grid view scrolled horizontally.
-        /// Note, that all columns before the static column will be automatically marked as static, too.
-        /// It can only take effect when scrollMode is not "none".
-        /// It will be considered as -1 when grouping or row merging is enabled.
-        /// -1 means no data column but row header is static.
-        /// 0 means one data column and row header are static.
-        ///
-        /// Default: -1.
-        /// Type: Number.
-        /// Code example: $("#element").wijgrid({ staticColumnIndex: -1 });
-        /// </summary>
-        -1,
-        staticRowIndex: /// <summary>
-        /// Indicates the index of data rows that will always be shown on the
-        /// top when the wijgrid is scrolled vertically.
-        /// Note, that all rows before the static row
-        /// will be automatically marked as static, too.
-        /// It can only take effect when scrollMode is not "none".
-        /// It will be considered as -1 when grouping or row merging is enabled.
-        /// -1 means no data row but header row is static.
-        /// 0 means one data row and header row are static.
-        ///
-        /// Default: -1.
-        /// Type: Number.
-        /// Code example: $("#element").wijgrid({ staticRowIndex: -1 });
-        /// </summary>
-        -1,
-        totalRows: /*<dma*/
-        /// <summary>
-        /// Gets or sets the virtual number of items in the wijgrid and enables custom paging.
-        /// Setting option to a positive value activates custom paging, the number of displayed
-        /// rows and the total number of pages will be determined upon the totalRows and pageSize values.
-        ///
-        /// Default: -1.
-        /// Type: Number.
-        /// Code example: $("#element").wijgrid({ totalRows: -1 });
-        /// </summary>
-        /// <remarks>
-        /// In custom paging mode sorting, paging and filtering are not performed automatically.
-        /// It is needed to manually handle sorted, pageIndexChanged, filtered events, load new
-        /// portion of data there followed by ensureControl(true) method call.
-        /// </remarks>
-        -1,
-        afterCellEdit: /* --- events */
-        /// <summary>
-        /// The afterCellEdit event handler. A function called after editing is completed.
-        /// Default: null.
-        /// Type: Function.
-        /// Code example:
-        /// Supply a callback function to handle the afterCellEdit event:
-        /// $("#element").wijgrid({ afterCellEdit: function (e, args) { } });
-        /// Bind to the event by type:
-        /// $("#element").bind("wijgridaftercelledit", function (e, args) { });
-        /// </summary>
-        ///
-        /// <param name="e" type="Object">jQuery.Event object.</param>
-        /// <param name="args" type="Object">
-        /// The data with this event.
-        /// args.cell: gets the edited cell's information.
-        /// args.event: event that initiated the cell updating.
-        /// args.handled: gets or sets value determining whether the developer finalizes editing of the cell manually.
-        ///   The default value is false which means that the widget will try to finalize editing of the cell automatically.
-        ///   If the developer provides a custom editing front end then this property must be set to true.
-        /// </param>
-        null,
-        afterCellUpdate: /// <summary>
-        /// The afterCellUpdate event handler. A function called after a cell has been updated.
-        /// Default: null.
-        /// Type: Function.
-        /// Code example:
-        /// Supply a callback function to handle the afterCellUpdate event:
-        /// $("#element").wijgrid({ afterCellUpdate: function (e, args) { } });
-        /// Bind to the event by type:
-        /// $("#element").bind("wijgridaftercellupdate", function (e, args) { });
-        /// </summary>
-        ///
-        /// <param name="e" type="Object">jQuery.Event object.</param>
-        /// <param name="args" type="Object">
-        /// The data with this event.
-        /// args.cell: gets the edited cell's information.
-        /// </param>
-        null,
-        beforeCellEdit: /// <summary>
-        /// The beforeCellEdit event handler. A function called before a cell enters edit mode. Cancellable.
-        /// Default: null.
-        /// Type: Function.
-        /// Code example:
-        /// Supply a callback function to handle the beforeCellEdit event:
-        /// $("#element").wijgrid({ beforeCellEdit: function (e, args) { } });
-        /// Bind to the event by type:
-        /// $("#element").bind("wijgridbeforecelledit", function (e, args) { });
-        /// </summary>
-        ///
-        /// <param name="e" type="Object">jQuery.Event object.</param>
-        /// <param name="args" type="Object">
-        /// The data with this event.
-        /// args.cell: information about the cell to be edited.
-        /// args.event: event initiated cell editing.
-        /// args.handled: gets or sets a value determining whether developer initiates cell editor(s) manually.
-        ///   The default value is false which means that widget will trying to provide editing control automatically.
-        ///   If cells contain custom controls or if developer wants to provide a custom editing front end then he
-        ///   must set this property to true.
-        ///</param>
-        null,
-        beforeCellUpdate: /// <summary>
-        /// The beforeCellUpdate event handler. A function called before a cell is updated.
-        /// Default: null.
-        /// Type: Function.
-        ///
-        /// Code example:
-        /// Supply a callback function to handle the beforeCellUpdate event:
-        /// $("#element").wijgrid({ beforeCellUpdate: function (e, args) { } });
-        /// Bind to the event by type:
-        /// $("#element").bind("wijgridbeforecellupdate", function (e, args) { });
-        /// </summary>
-        ///
-        /// <param name="e" type="Object">jQuery.Event object.</param>
-        /// <param name="args" type="Object">
-        /// The data with this event.
-        /// args.cell: gets information of the edited cell.
-        /// args.value: returns the new cell value. If the property value is not changed the widget will try to
-        ///   extract the new cell value automatically. If the developer provides custom editing front end then
-        ///   the new cell value must be returned within this property.
-        /// </param>
-        null,
-        cellClicked: /// <summary>
-        /// The cellClicked event handler. A function called when a cell is clicked.
-        /// Default: null.
-        /// Type: Function.
-        /// Code example:
-        /// Supply a callback function to handle the cellClicked event:
-        /// $("#element").wijgrid({ cellClicked: function (e, args) { } });
-        /// Bind to the event by type:
-        /// $("#element").bind("wijgridcellclicked", function (e, args) { });
-        /// </summary>
-        ///
-        /// <param name="e" type="Object">jQuery.Event object.</param>
-        /// <param name="args" type="Object">
-        /// The data with this event.
-        /// args.cell: an instance of the $.wijmo.wijgrid.cellInfo class that represents the clicked cell.
-        /// </param>
-        null,
-        columnDragging: /// <summary>
-        /// The columnDragging event handler. A function called when column dragging is started, but before wijgrid handles the operation. Cancellable.
-        /// Default: null.
-        /// Type: Function.
-        /// Code example:
-        /// Supply a callback function to handle the columnDragging event:
-        /// $("#element").wijgrid({ columnDragging: function (e, args) { } });
-        /// Bind to the event by type:
-        /// $("#element").bind("wijgridcolumndragging", function (e, args) { });
-        /// </summary>
-        ///
-        /// <param name="e" type="Object">jQuery.Event object.</param>
-        /// <param name="args" type="Object">
-        /// The data with this event.
-        /// args.drag: drag source, column being dragged.
-        /// args.dragSource: the place where the dragged column widget is located, possible value: "groupArea", "columns".
-        /// </param>
-        null,
-        columnDragged: /// <summary>
-        /// The columnDragged event handler. A function called when column dragging has been started.
-        /// Default: null.
-        /// Type: Function.
-        /// Code example:
-        /// Supply a callback function to handle the columnDragged event:
-        /// $("#element").wijgrid({ columnDragged: function (e, args) { } });
-        /// Bind to the event by type:
-        /// $("#element").bind("wijgridcolumndragged", function (e, args) { });
-        /// </summary>
-        ///
-        /// <param name="e" type="Object">jQuery.Event object.</param>
-        /// <param name="args" type="Object">
-        /// The data with this event.
-        /// args.drag: drag source, column being dragged.
-        /// args.dragSource: the place where the dragged column widget is located, possible value: "groupArea", "columns".
-        /// </param>
-        null,
-        columnDropping: /// <summary>
-        /// The columnDropping event handler. A function called when column is dropped into the columns area, but before wijgrid handles the operation. Cancellable.
-        /// Default: null.
-        /// Type: Function.
-        /// Code example:
-        /// Supply a callback function to handle the columnDropping event:
-        /// $("#element").wijgrid({ columnDropping: function (e, args) { } });
-        /// Bind to the event by type:
-        /// $("#element").bind("wijgridcolumndropping", function (e, args) { });
-        /// </summary>
-        ///
-        /// <param name="e" type="Object">jQuery.Event object.</param>
-        /// <param name="args" type="Object">
-        /// The data with this event.
-        /// args.drag: drag source, column being dragged.
-        /// args.drop: drop target, column on which drag source is dropped.
-        /// args.at: position to drop (one of the "left", "right" and "center" values) relative to drop target.
-        /// </param>
-        null,
-        columnDropped: /// <summary>
-        /// The columnDropped event handler. A function called when column has been dropped into the columns area.
-        /// Default: null.
-        /// Type: Function.
-        /// Code example:
-        /// Supply a callback function to handle the columnDropped event:
-        /// $("#element").wijgrid({ columnDropped: function (e, args) { } });
-        /// Bind to the event by type:
-        /// $("#element").bind("wijgridcolumndropped", function (e, args) { });
-        /// </summary>
-        ///
-        /// <param name="e" type="Object">jQuery.Event object.</param>
-        /// <param name="args" type="Object">
-        /// The data with this event.
-        /// args.drag: drag source, column being dragged.
-        /// args.drop: drop target, column on which drag source is dropped.
-        /// args.at: position to drop (one of the "left", "right" and "center" values) relative to drop target.
-        /// </param>
-        null,
-        columnGrouping: /// <summary>
-        /// The columnGrouping event handler. A function called when column is dropped into the group area, but before wijgrid handles the operation. Cancellable.
-        /// Default: null.
-        /// Type: Function.
-        /// Code example:
-        /// Supply a callback function to handle the columnGrouping event:
-        /// $("#element").wijgrid({ columnGrouping: function (e, args) { } });
-        /// Bind to the event by type:
-        /// $("#element").bind("wijgridcolumngrouping", function (e, args) { });
-        /// </summary>
-        ///
-        /// <param name="e" type="Object">jQuery.Event object.</param>
-        /// <param name="args" type="Object">
-        /// The data with this event.
-        /// args.drag: drag source, column being dragged.
-        /// args.drop: drop target, column on which drag source is dropped (be null if dropping a column into empty group area).
-        /// args.dragSource: the place where the dragged column widget is located, possible value: "groupArea", "columns".
-        /// args.dropSource: the place where the dropped column widget is located, possible value: "groupArea", "columns".
-        /// args.at: position to drop (one of the "left", "right" and "center" values) relative to drop target ("left" if dropping a column into empty group area).
-        /// </param>
-        null,
-        columnGrouped: /// <summary>
-        /// The columnGrouped event handler. A function called when column has been dropped into the group area.
-        /// Default: null.
-        /// Type: Function.
-        /// Code example:
-        /// Supply a callback function to handle the columnGrouped event:
-        /// $("#element").wijgrid({ columnGrouped: function (e, args) { } });
-        /// Bind to the event by type:
-        /// $("#element").bind("wijgridcolumngrouped", function (e, args) { });
-        /// </summary>
-        ///
-        /// <param name="e" type="Object">jQuery.Event object.</param>
-        /// <param name="args" type="Object">
-        /// The data with this event.
-        /// args.drag: drag source, column being dragged.
-        /// args.drop: drop target, column on which drag source is dropped (null if dropping a column into empty group area).
-        /// args.dragSource: the place where the dragged column is located, possible values: "groupArea", "columns".
-        /// args.dropSource: the place where the dropped column is located, possible values: "groupArea", "columns".
-        /// args.at: position to drop (one of the "left", "right" and "center" values) relative to drop target ("left" if dropping a column into empty group area).
-        /// </param>
-        null,
-        columnResizing: /// <summary>
-        /// The columnResizing event handler. A function called when column is resized, but before wijgrid handles the operation. Cancellable.
-        /// Default: null.
-        /// Type: Function.
-        /// Code example:
-        /// Supply a callback function to handle the columnResizing event:
-        /// $("#element").wijgrid({ columnResizing: function (e, args) { } });
-        /// Bind to the event by type:
-        /// $("#element").bind("wijgridcolumnresizing", function (e, args) { });
-        /// </summary>
-        ///
-        /// <param name="e" type="Object">jQuery.Event object.</param>
-        /// <param name="args" type="Object">
-        /// The data with this event.
-        /// args.column: column that is being resized.
-        /// args.oldWidth: the old width of the column before resized.
-        /// args.newWidth: the new width being set to the column.
-        /// </param>
-        null,
-        columnResized: /// <summary>
-        /// The columnResized event handler. A function called when column has been resized.
-        /// Default: null.
-        /// Type: Function.
-        /// Code example:
-        /// Supply a callback function to handle the columnResized event:
-        /// $("#element").wijgrid({ columnResized: function (e) { } });
-        /// Bind to the event by type:
-        /// $("#element").bind("wijgridcolumnresized", function (e) { });
-        /// </summary>
-        ///
-        /// <param name="e" type="Object">jQuery.Event object.</param>
-        /// <param name="args" type="Object">
-        /// The data with this event.
-        /// args.column: column that is being resized.
-        /// </param>
-        null,
-        columnUngrouping: /// <summary>
-        /// The columnUngrouping event handler. A function called when column is removed from the group area, but before wijgrid handles the operation. Cancellable.
-        /// Default: null.
-        /// Type: Function.
-        /// Code example:
-        /// Supply a callback function to handle the columnUngrouping event:
-        /// $("#element").wijgrid({ columnUngrouping: function (e, args) { } });
-        /// Bind to the event by type:
-        /// $("#element").bind("wijgridcolumnungrouping", function (e, args) { });
-        /// </summary>
-        ///
-        /// <param name="e" type="Object">jQuery.Event object.</param>
-        /// <param name="args" type="Object">
-        /// The data with this event.
-        /// args.column: column being removed.
-        /// </param>
-        null,
-        columnUngrouped: /// <summary>
-        /// The columnUngrouped event handler. A function called when column has been removed from the group area.
-        /// Default: null.
-        /// Type: Function.
-        /// Code example:
-        /// Supply a callback function to handle the columnUngrouped event:
-        /// $("#element").wijgrid({ columnUngrouped: function (e, args) { } });
-        /// Bind to the event by type:
-        /// $("#element").bind("wijgridcolumnungrouped", function (e, args) { });
-        /// </summary>
-        ///
-        /// <param name="e" type="Object">jQuery.Event object.</param>
-        /// <param name="args" type="Object">
-        /// The data with this event.
-        /// args.column: column being removed.
-        /// </param>
-        null,
-        currentCellChanging: /// <summary>
-        /// The currentCellChanging event handler. A function called before the current cell is changed. Cancellable.
-        /// Default: null.
-        /// Type: Function.
-        /// Code example:
-        /// Supply a callback function to handle the currentCellChanging event:
-        /// $("#element").wijgrid({ currentCellChanging: function (e, args) { } });
-        /// Bind to the event by type:
-        /// $("#element").bind("wijgridcurrentcellchanging", function (e, args) { });
-        /// </summary>
-        ///
-        /// <param name="e" type="Object">jQuery.Event object.</param>
-        /// <param name="args" type="Object">
-        /// The data with this event.
-        /// args.cellIndex: new cell index.
-        /// args.rowIndex: new row index.
-        /// args.oldCellIndex: old cell index.
-        /// args.oldRowIndex: old row index.
-        /// </param>
-        null,
-        currentCellChanged: /// <summary>
-        /// The currentCellChanged event handler. A function called after the current cell is changed.
-        /// Default: null.
-        /// Type: Function.
-        /// Code example:
-        /// Supply a callback function to handle the currentCellChanged event:
-        /// $("#element").wijgrid({ currentCellChanged: function (e) { } });
-        /// Bind to the event by type:
-        /// $("#element").bind("wijgridcurrentcellchanged", function (e) { });
-        /// </summary>
-        ///
-        /// <param name="e" type="Object">jQuery.Event object.</param>
-        null,
-        filterOperatorsListShowing: /// <summary>
-        /// The filterOperatorsListShowing event handler. A function called before the filter drop-down list is shown.
-        /// Default: null.
-        /// Type: Function.
-        /// Code example:
-        /// Supply a callback function to handle the filterOperatorsListShowing event:
-        /// $("#element").wijgrid({ filterOperatorsListShowing: function (e, args) { } });
-        /// Bind to the event by type:
-        /// $("#element").bind("wijgridfilteroperatorslistshowing", function (e, args) { });
-        /// </summary>
-        ///
-        /// <param name="e" type="Object">jQuery.Event object.</param>
-        /// <param name="args" type="Object">
-        /// The data with this event.
-        /// args.column: associated column.
-        /// args.operators: An array of filter operators.
-        /// </param>
-        null,
-        filtering: /// <summary>
-        /// The filtering event handler. A function called before the filtering operation is started. Cancellable.
-        /// Type: Function.
-        /// Default: null.
-        /// Code example:
-        /// Supply a callback function to handle the filtering event:
-        /// $("#element").wijgrid({ filtering: function (e, args) { } });
-        /// Bind to the event by type:
-        /// $("#element").bind("wijgridfiltering", function (e, args) { });
-        /// </summary>
-        ///
-        /// <param name="e" type="Object">jQuery.Event object.</param>
-        /// <param name="args" type="Object">
-        /// The data with this event.
-        /// args.column: column that is being filtered.
-        /// args.operator: new filter operator name.
-        /// args.value: new filter value.
-        /// </param>
-        null,
-        filtered: /// <summary>
-        /// The filtered event handler. A function called after the wijgrid is filtered.
-        /// Default: null.
-        /// Type: Function.
-        /// Code example:
-        /// Supply a callback function to handle the filtered event:
-        /// $("#element").wijgrid({ filtered: function (e, args) { } });
-        /// Bind to the event by type:
-        /// $("#element").bind("wijgridfiltered", function (e, args) { });
-        /// </summary>
-        ///
-        /// <param name="e" type="Object">jQuery.Event object.</param>
-        /// <param name="args" type="Object">
-        /// The data with this event.
-        /// args.column: column that is being filtered.
-        /// </param>
-        null,
-        groupAggregate: /// <summary>
-        /// The groupAggregate event handler. A function called when groups are being created and the "aggregate" option of the column object has been set to "custom".
-        /// Default: null.
-        /// Type: Function.
-        /// Code example:
-        /// Supply a callback function to handle the groupAggregate event:
-        /// $("#element").wijgrid({ groupAggregate: function (e, args) { } });
-        /// Bind to the event by type:
-        /// $("#element").bind("wijgridgroupaggregate", function (e, args) { });
-        /// </summary>
-        ///
-        /// <param name="e" type="Object">jQuery.Event object.</param>
-        /// <param name="args" type="Object">
-        /// The data with this event.
-        /// args.data: data object.
-        /// args.column: column that is being grouped.
-        /// args.groupByColumn: column initiated grouping.
-        /// args.groupText: text that is being grouped.
-        /// args.text: text that will be displayed in the group header or group footer.
-        /// args.groupingStart: first index for the data being grouped.
-        /// args.groupingEnd: last index for the data being grouped.
-        /// args.isGroupHeader: indicates whether row that is being grouped is a group header or not.
-        /// </param>
-        null,
-        groupText: /// <summary>
-        /// The groupText event handler. A function called when groups are being created and the groupInfo.headerText or groupInfo.footerText of the groupInfo option has been set to "custom".
-        /// Default: null.
-        /// Type: Function.
-        /// Code example:
-        /// Supply a callback function to handle the groupText event:
-        /// $("#element").wijgrid({ groupText: function (e, args) { } });
-        /// Bind to the event by type:
-        /// $("#element").bind("wijgridgrouptext", function (e, args) { });
-        /// </summary>
-        ///
-        /// <param name="e" type="Object">jQuery.Event object.</param>
-        /// <param name="args" type="Object">
-        /// The data with this event.
-        /// args.data: data object.
-        /// args.column: column that is being grouped.
-        /// args.groupByColumn: column initiated grouping.
-        /// args.groupText: text that is being grouped.
-        /// args.text: text that will be displayed in the group header or group footer.
-        /// args.groupingStart: first index for the data being grouped.
-        /// args.groupingEnd: last index for the data being grouped.
-        /// args.isGroupHeader: indicates whether the row that is being grouped is a group header or not.
-        /// args.aggregate: aggregate value.
-        /// </param>
-        null,
-        invalidCellValue: /// <summary>
-        /// The invalidCellValue event handler. A function called when a cell needs to start updating but the cell value is invalid.
-        /// Default: null.
-        /// Type: Function.
-        /// Code example:
-        /// Supply a callback function to handle the invalidCellValue event:
-        /// $("#element").wijgrid({ invalidCellValue: function (e, args) { } });
-        /// Bind to the event by type:
-        /// $("#element").bind("wijgridinvalidcellvalue", function (e, args) { });
-        /// </summary>
-        ///
-        /// <param name="e" type="Object">jQuery.Event object.</param>
-        /// <param name="args" type="Object">
-        /// The data with this event.
-        /// args.cell: gets the information of edited cell.
-        /// args.value: current value.
-        /// </param>
-        null,
-        pageIndexChanging: /// <summary>
-        /// The pageIndexChanging event handler. A function called before page index is changed. Cancellable.
-        /// Default: null.
-        /// Type: Function.
-        /// Code example:
-        /// Supply a callback function to handle the pageIndexChanging event:
-        /// $("#element").wijgrid({ pageIndexChanging: function (e, args) { } });
-        /// Bind to the event by type:
-        /// $("#element").bind("wijgridpageindexchanging", function (e, args) { });
-        /// </summary>
-        ///
-        /// <param name="e" type="Object">jQuery.Event object.</param>
-        /// <param name="args" type="Object">
-        /// The data with this event.
-        /// args.newPageIndex: new page index.
-        /// </param>
-        null,
-        pageIndexChanged: /// <summary>
-        /// The pageIndexChanged event handler. A function called after page index is changed.
-        /// Default: null.
-        /// Type: Function.
-        /// Code example:
-        /// Supply a callback function to handle the pageIndexChanged event:
-        /// $("#element").wijgrid({ pageIndexChanged: function (e) { } });
-        /// Bind to the event by type:
-        /// $("#element").bind("wijgridpageindexchanged", function (e) { });
-        /// </summary>
-        ///
-        /// <param name="args" type="Object">
-        /// The data with this event.
-        /// args.newPageIndex: new page index.
-        /// </param>
-        null,
-        selectionChanged: /// <summary>
-        /// The selectionChanged event handler. A function called after the selection is changed.
-        /// Default: null.
-        /// Type: Function.
-        /// Code example:
-        /// Supply a callback function to handle the selectionChanged event:
-        /// $("#element").wijgrid({ selectionChanged: function (e, args) { } });
-        /// Bind to the event by type:
-        /// $("#element").bind("wijgridselectionchanged", function (e, args) { });
-        /// </summary>
-        ///
-        /// <param name="e" type="Object">jQuery.Event object.</param>
-        /// <param name="args" type="Object">
-        /// The data with this event.
-        /// args.addedCells: cells added to the selection.
-        /// args.removedCells: cells removed from the selection.
-        /// </param>
-        null,
-        sorting: /// <summary>
-        /// The sorting event handler. A function called before the sorting operation is started. Cancellable.
-        /// Type: Function.
-        /// Default: null.
-        /// Code example:
-        /// Supply a callback function to handle the sorting event:
-        /// $("#element").wijgrid({ sorting: function (e, args) { } });
-        /// Bind to the event by type:
-        /// $("#element").bind("wijgridsorting", function (e, args) { });
-        /// </summary>
-        ///
-        /// <param name="e" type="Object">jQuery.Event object.</param>
-        /// <param name="args" type="Object">
-        /// The data with this event.
-        /// args.column: column that is being sorted.
-        /// args.sortDirection: new sort direction.
-        /// args.sortCommand: reprerents a sorting command as a string combining args.column.dataKey and args.sortDirection in a shorthand notation: "<dataKey> <asc|desc>".
-        /// </param>
-        null,
-        sorted: /// <summary>
-        /// The sorted event handler. A function called after the widget is sorted.
-        /// Default: null.
-        /// Type: Function.
-        /// Code example:
-        /// Supply a callback function to handle the sorted event:
-        /// $("#element").wijgrid({ sorted: function (e, args) { } });
-        /// Bind to the event by type:
-        /// $("#element").bind("wijgridsorted", function (e, args) { });
-        /// </summary>
-        ///
-        /// <param name="e" type="Object">jQuery.Event object.</param>
-        /// <param name="args" type="Object">
-        /// The data with this event.
-        /// args.column: column that is being sorted.
-        /// args.sortDirection: new sort direction.
-        /// args.sortCommand: reprerents a sorting command as a string combining args.column.dataKey and args.sortDirection in a shorthand notation: "<dataKey> <asc|desc>".
-        /// </param>
-        null,
-        dataLoading: /* events --- */
-        /* --- life-cycle events */
-        //			/// <summary>
-        //			/// The ajaxError event handler. A function called when wijgrid is bound to remote data and
-        //			/// the ajax request fails.
-        //			/// Default: null.
-        //			/// Type: Function.
-        //			/// Code example:
-        //			/// Supply a callback function to handle the ajaxError event:
-        //			/// $("#element").wijgrid({ ajaxError: function (e, args) { } });
-        //			/// Bind to the event by type:
-        //			/// $("#element").bind("wijgridajaxerror", function (e, args) { });
-        //			/// </summary>
-        //			/// <param name="e" type="Object">jQuery.Event object.</param>
-        //			/// <param name="args" type="Object">
-        //			/// The data corresponded with this event.
-        //			/// args.XMLHttpRequest: the XMLHttpRequest object.
-        //			/// args.textStatus: a string describing the error type.
-        //			/// args.errorThrown: an exception object.
-        //			///
-        //			/// Refer to the jQuery.ajax.error event documentation for more details on this arguments.
-        //			/// </param>
-        //			ajaxError: null,
-        /// <summary>
-        /// The dataLoading event handler. A function called when wijgrid loads a portion of data from the underlying datasource.
-        /// Default: null.
-        /// Type: Function.
-        /// Code example:
-        /// Supply a callback function to handle the dataLoading event:
-        /// $("#element").wijgrid({ dataLoading: function (e) { } });
-        /// Bind to the event by type:
-        /// $("#element").bind("wijgriddataloading", function (e) { });
-        /// </summary>
-        /// <param name="e" type="Object">jQuery.Event object.</param>
-        null,
-        dataLoaded: /// <summary>
-        /// The dataLoaded event handler. A function called when data are loaded.
-        /// Default: null.
-        /// Type: Function.
-        /// Code example:
-        /// Supply a callback function to handle the dataLoaded event:
-        /// $("#element").wijgrid({ dataLoaded: function (e) { } });
-        /// Bind to the event by type:
-        /// $("#element").bind("wijgriddataloaded", function (e) { });
-        /// </summary>
-        /// <param name="e" type="Object">jQuery.Event object.</param>
-        null,
-        loading: /// <summary>
-        /// The loading event handler. A function called at the beginning of the wijgrid's lifecycle.
-        /// Default: null.
-        /// Type: Function.
-        /// Code example:
-        /// Supply a callback function to handle the loading event:
-        /// $("#element").wijgrid({ loading: function (e) { } });
-        /// Bind to the event by type:
-        /// $("#element").bind("wijgridloading", function (e) { });
-        /// </summary>
-        /// <param name="e" type="Object">jQuery.Event object.</param>
-        null,
-        loaded: /// <summary>
-        /// The loaded event handler. A function called at the end the wijgrid's lifecycle when wijgrid is
-        /// filled with data and rendered.
-        /// Default: null.
-        /// Type: Function.
-        /// Code example:
-        /// Supply a callback function to handle the loaded event:
-        /// $("#element").wijgrid({ loaded: function (e) { } });
-        /// Bind to the event by type:
-        /// $("#element").bind("wijgridloaded", function (e) { });
-        /// </summary>
-        /// <param name="e" type="Object">jQuery.Event object.</param>
-        null,
-        rendering: /// <summary>
-        /// The rendering event handler. A function called when wijgrid is about to render.
-        /// Default: null.
-        /// Type: Function.
-        /// Code example:
-        /// Supply a callback function to handle the rendering event:
-        /// $("#element").wijgrid({ rendering: function (e) { } });
-        /// Bind to the event by type:
-        /// $("#element").bind("wijgridrendering", function (e) { });
-        /// </summary>
-        /// <param name="e" type="Object">jQuery.Event object.</param>
-        null,
-        rendered: /// <summary>
-        /// The rendered event handler. A function called when wijgrid is rendered.
-        /// Default: null.
-        /// Type: Function.
-        /// Code example:
-        /// Supply a callback function to handle the rendered event:
-        /// $("#element").wijgrid({ rendered: function (e) { } });
-        /// Bind to the event by type:
-        /// $("#element").bind("wijgridrendered", function (e) { });
-        /// </summary>
-        /// <param name="e" type="Object">jQuery.Event object.</param>
-        null
-    });
-    $.wijmo.registerWidget("wijgrid", wijgrid.prototype);
+            return wijgrid_options;
+        })();
+        //wijgrid.prototype.options = $.extend(true, {}, wijmoWidget.prototype.options, new wijgrid_options());
+        wijgrid.prototype.options = wijmo.grid.extendWidgetOptions(wijmo.wijmoWidget.prototype.options, new wijgrid_options());
+        $.wijmo.registerWidget("wijgrid", wijgrid.prototype);
+    })(wijmo.grid || (wijmo.grid = {}));
+    var grid = wijmo.grid;
 })(wijmo || (wijmo = {}));
 
 var __extends = this.__extends || function (d, b) {
@@ -3985,322 +4220,282 @@ var __extends = this.__extends || function (d, b) {
     __.prototype = b.prototype;
     d.prototype = new __();
 };
-/// <reference path="../../../Base/jquery.wijmo.widget.ts"/>
-/// <reference path="interfaces.ts"/>
 var wijmo;
 (function (wijmo) {
-    "use strict";
-    var $ = jQuery;
-    var c1basefield = (function (_super) {
-        __extends(c1basefield, _super);
-        function c1basefield() {
-            _super.apply(this, arguments);
+    /// <reference path="../../../Base/jquery.wijmo.widget.ts"/>
+    /// <reference path="interfaces.ts"/>
+    (function (grid) {
+        "use strict";
+        var $ = jQuery;
+        /** @widget */
+        var c1basefield = (function (_super) {
+            __extends(c1basefield, _super);
+            function c1basefield() {
+                _super.apply(this, arguments);
 
-        }
-        c1basefield.prototype._create = function () {
-            var wijgrid = $.data(this.element[0], "wijgridowner");
-            this._field("owner", wijgrid);
-            wijmo.grid.widgetName(this.element[0], this.widgetFullName);
-            this._destroyed = false;
-            this.element.addClass(wijgrid.options.wijCSS.widget + " wijmo-c1basefield " + wijgrid.options.wijCSS.stateDefault);
-            if(this.options.disabled) {
-                this.disable();
             }
-            if(wijgrid.options.allowColMoving) {
-                wijgrid._dragndrop(true).attach(this);
-            }
-        };
-        c1basefield.prototype._init = function () {
-            this.element.wrapInner("<div class='wijmo-wijgrid-innercell'></div>");
-            this._refreshHeaderCell();
-        };
-        c1basefield.prototype.destroy = function () {
-            try  {
-                _super.prototype.destroy.apply(this, arguments);
-            }finally {
-                this._destroyed = true;
-            }
-        };
-        c1basefield.prototype._destroy = function () {
-            if(this._isDestroyed()) {
-                return;
-            }
-            var wijgrid = this._owner();
-            if(wijgrid && wijgrid._dragndrop(false)) {
-                wijgrid._dragndrop(false).detach(this);
-            }
-            wijmo.grid.remove$dataByPrefix(this.element, this._data$prefix);
-            this.element.removeClass(wijgrid.options.wijCSS.widget + " wijmo-c1basefield " + wijgrid.options.wijCSS.stateDefault).html(this.element.find(".wijmo-wijgrid-headertext").html())// restore initial cell content
-            ;
-        };
-        c1basefield.prototype._field = function (name, value) {
-            return wijmo.grid.dataPrefix(this.element, this._data$prefix, name, value);
-        };
-        c1basefield.prototype._removeField = function (name) {
-            var internalDataName = this._data$prefix + name;
-            this.element.removeData(internalDataName);
-        };
-        c1basefield.prototype._setOption = //isInvokedOutside stands for whether setOption is invoked by related widget
-        function (key, value) {
-            var presetFunc = this["_preset_" + key], oldValue = this.options[key], optionChanged, postsetFunc;
-            if(presetFunc !== undefined) {
-                value = presetFunc.apply(this, [
-                    value,
-                    oldValue
-                ]);
-            }
-            optionChanged = (value !== oldValue);
-            //$.Widget.prototype._setOption.apply(this, arguments);  note: there is no dynamic linkage between the arguments and the formal parameter values when strict mode is used
-            _super.prototype._setOption.apply(this, [
-                key,
-                value
-            ]);
-            if(optionChanged) {
-                if(this.options.groupedIndex !== undefined) {
-                    var groupedWidget = this._owner()._field("groupedWidgets")[this.options.groupedIndex];
-                    if(groupedWidget && (key in groupedWidget.options)) {
-                        groupedWidget._setOption(key, value)// update linked grouped column widget
-                        ;
-                    }
+            c1basefield.prototype._create = function () {
+                var wijgrid = $.data(this.element[0], "wijgridowner");
+                this._field("owner", wijgrid);
+                wijmo.grid.widgetName(this.element[0], this.widgetFullName);
+                this._destroyed = false;
+                this.element.addClass(wijgrid.options.wijCSS.widget + " wijmo-c1basefield " + wijgrid.options.wijCSS.stateDefault);
+                if(this.options.disabled) {
+                    this.disable();
                 }
-                postsetFunc = this["_postset_" + key];
-                if(postsetFunc !== undefined) {
-                    postsetFunc.apply(this, [
+                if(wijgrid.options.allowColMoving) {
+                    wijgrid._dragndrop(true).attach(this);
+                }
+            };
+            c1basefield.prototype._init = function () {
+                this.element.wrapInner("<div class='wijmo-wijgrid-innercell'></div>");
+                this._refreshHeaderCell();
+            };
+            c1basefield.prototype.destroy = function () {
+                try  {
+                    _super.prototype.destroy.apply(this, arguments);
+                }finally {
+                    this._destroyed = true;
+                }
+            };
+            c1basefield.prototype._destroy = function () {
+                if(this._isDestroyed()) {
+                    return;
+                }
+                var wijgrid = this._owner();
+                if(wijgrid && wijgrid._dragndrop(false)) {
+                    wijgrid._dragndrop(false).detach(this);
+                }
+                wijmo.grid.remove$dataByPrefix(this.element, this._data$prefix);
+                this.element.removeClass(wijgrid.options.wijCSS.widget + " wijmo-c1basefield " + wijgrid.options.wijCSS.stateDefault).html(this.element.find(".wijmo-wijgrid-headertext").html())// restore initial cell content
+                ;
+            };
+            c1basefield.prototype._field = function (name, value) {
+                return wijmo.grid.dataPrefix(this.element, this._data$prefix, name, value);
+            };
+            c1basefield.prototype._removeField = function (name) {
+                var internalDataName = this._data$prefix + name;
+                this.element.removeData(internalDataName);
+            };
+            c1basefield.prototype._setOption = //isInvokedOutside stands for whether setOption is invoked by related widget
+            function (key, value) {
+                var presetFunc = this["_preset_" + key], oldValue = this.options[key], optionChanged, postsetFunc;
+                if(presetFunc !== undefined) {
+                    value = presetFunc.apply(this, [
                         value,
                         oldValue
                     ]);
                 }
-            }
-        };
-        c1basefield.prototype._postset_allowMoving = function (value, oldValue) {
-            //no need to detach because there is allowMoving judgment in draganddrop
-            /*
-            if (value) {
-            if (this._owner().options.allowColMoving) {
-            this._owner()._dragndrop(true).attach(this);
-            }
-            } else {
-            this._owner()._dragndrop(true).detach(this);
-            }
-            */
-                    };
-        c1basefield.prototype._preset_clientType = function (value, oldValue) {
-            throw "read-only";
-        };
-        c1basefield.prototype._postset_headerText = function (value, oldValue) {
-            this._refreshHeaderCell();
-        };
-        c1basefield.prototype._postset_visible = function (value, oldValue) {
-            this._owner().ensureControl(false);
-        };
-        c1basefield.prototype._postset_width = function (value, oldValue) {
-            var wijgrid = this._owner();
-            if(wijgrid) {
-                this.options.ensurePxWidth = true// prevent auto expanding
-                ;
-                var found = wijmo.grid.getColumnByTravIdx(wijgrid.options.columns, this.options.travIdx);
-                if(found) {
-                    // *update options *
-                    found.found.width = value;
-                    found.found.ensurePxWidth = true// prevent auto expanding
+                optionChanged = (value !== oldValue);
+                //$.Widget.prototype._setOption.apply(this, arguments);  note: there is no dynamic linkage between the arguments and the formal parameter values when strict mode is used
+                _super.prototype._setOption.apply(this, [
+                    key,
+                    value
+                ]);
+                if(optionChanged) {
+                    if(this.options.groupedIndex !== undefined) {
+                        var groupedWidget = this._owner()._field("groupedWidgets")[this.options.groupedIndex];
+                        if(groupedWidget && (key in groupedWidget.options)) {
+                            groupedWidget._setOption(key, value)// update linked grouped column widget
+                            ;
+                        }
+                    }
+                    postsetFunc = this["_postset_" + key];
+                    if(postsetFunc !== undefined) {
+                        postsetFunc.apply(this, [
+                            value,
+                            oldValue
+                        ]);
+                    }
+                }
+            };
+            c1basefield.prototype._postset_allowMoving = function (value, oldValue) {
+                //no need to detach because there is allowMoving judgment in draganddrop
+                /*
+                if (value) {
+                if (this._owner().options.allowColMoving) {
+                this._owner()._dragndrop(true).attach(this);
+                }
+                } else {
+                this._owner()._dragndrop(true).detach(this);
+                }
+                */
+                            };
+            c1basefield.prototype._preset_clientType = function (value, oldValue) {
+                throw "read-only";
+            };
+            c1basefield.prototype._postset_headerText = function (value, oldValue) {
+                this._refreshHeaderCell();
+            };
+            c1basefield.prototype._postset_visible = function (value, oldValue) {
+                this._owner().ensureControl(false);
+            };
+            c1basefield.prototype._postset_width = function (value, oldValue) {
+                var wijgrid = this._owner();
+                if(wijgrid) {
+                    this.options.ensurePxWidth = true// prevent auto expanding
+                    ;
+                    var found = wijmo.grid.getColumnByTravIdx(wijgrid.options.columns, this.options.travIdx);
+                    if(found) {
+                        // *update options *
+                        found.found.width = value;
+                        found.found.ensurePxWidth = true// prevent auto expanding
+                        ;
+                    }
+                    wijgrid.setSize()// recalculate sizes and auto expand other columns if possible.
                     ;
                 }
-                wijgrid.setSize()// recalculate sizes and auto expand other columns if possible.
-                ;
-            }
-            /*// change width of column.
-            var view = this._owner()._view(),
-            index = this.options.visLeavesIdx,
-            oldRealValue = $(view.getHeaderCell(index)).outerWidth();
-            view.ensureWidth(index, value, oldRealValue);*/
-                    };
-        c1basefield.prototype._owner = function () {
-            return this._field("owner");
-        };
-        c1basefield.prototype._canSize = function () {
-            return this.options.allowSizing && this._owner().options.allowColSizing;
-        };
-        c1basefield.prototype._canDrag = // drag-n-drop
-        function () {
-            return this.options.allowMoving === true;
-        };
-        c1basefield.prototype._canDropTo = function (wijField) {
-            // parent can't be dropped into a child
-            if(wijmo.grid.isChildOf(this._owner().options.columns, wijField, this)) {
-                return false;
-            }
-            return true;
-        };
-        c1basefield.prototype._createHeaderContent = function ($container) {
-            return $container.html(this.options.headerText || "");// html(value) returns "" if value is undefined
+                /*// change width of column.
+                var view = this._owner()._view(),
+                index = this.options.visLeavesIdx,
+                oldRealValue = $(view.getHeaderCell(index)).outerWidth();
+                view.ensureWidth(index, value, oldRealValue);*/
+                            };
+            c1basefield.prototype._owner = function () {
+                return this._field("owner");
+            };
+            c1basefield.prototype._canSize = function () {
+                return this.options.allowSizing && this._owner().options.allowColSizing;
+            };
+            c1basefield.prototype._canDrag = // drag-n-drop
+            function () {
+                return this.options.allowMoving === true;
+            };
+            c1basefield.prototype._canDropTo = function (wijField) {
+                // parent can't be dropped into a child
+                if(wijmo.grid.isChildOf(this._owner().options.columns, wijField, this)) {
+                    return false;
+                }
+                return true;
+            };
+            c1basefield.prototype._createHeaderContent = function ($container) {
+                return $container.html(this.options.headerText || "&nbsp;");// html(value) returns "" if value is undefined
 
-        };
-        c1basefield.prototype._decorateHeaderContent = function ($container) {
-            return $container.wrapInner("<span class=\"wijmo-wijgrid-headertext\" />");
-        };
-        c1basefield.prototype._refreshHeaderCell = function () {
-            var $container = this.element.children(".wijmo-wijgrid-innercell").empty();
-            this._createHeaderContent($container);
-            this._decorateHeaderContent($container);
-        };
-        c1basefield.prototype._isDestroyed = function () {
-            return this._destroyed;
-        };
-        return c1basefield;
-    })(wijmo.wijmoWidget);
-    wijmo.c1basefield = c1basefield;
-    c1basefield.prototype._data$prefix = "c1basefield";
-    c1basefield.prototype.options = $.extend(true, {
-    }, wijmo.JQueryUIWidget.prototype.options, {
-        allowMoving: /// <summary>
-        /// A value indicating whether the column can be moved.
-        /// Default: true.
-        /// Type: Boolean.
-        /// Code example: $("#element").wijgrid({ columns: [ { allowMoving: true } ] });
-        /// </summary>
-        true,
-        allowSizing: /// <summary>
-        /// A value indicating whether the column can be sized.
-        /// Default: true.
-        /// Type: Boolean.
-        /// Code example: $("#element").wijgrid({ columns: [ { allowSizing: true } ] });
-        /// </summary>
-        true,
-        cellFormatter: /// <summary>
-        /// Function used for changing content, style and attributes of the column cells.
-        /// Default: undefined.
-        /// Type: Function.
-        /// Code example:
-        ///
-        /// Add an image which URL is obtained from the "Url" data field to the column cells.
-        ///
-        /// $("#demo").wijgrid({
-        ///   data: [
-        ///      { ID: 0, Url: "/images/0.jpg" },
-        ///      { ID: 1, Url: "/images/1.jpg" }
-        ///   ],
-        ///   columns: [
-        ///      {},
-        ///      {
-        ///         cellFormatter: function (args) {
-        ///            if (args.row.type & $.wijmo.wijgrid.rowType.data) {
-        ///               args.$container
-        ///                  .empty()
-        ///                  .append($("<img />")
-        ///                     .attr("src", args.row.data.Url));
-        ///
-        ///               return true;
-        ///            }
-        ///         }
-        ///      }
-        ///   ]
-        /// });
-        /// </summary>
-        /// <remarks>
-        /// Important: cellFormatter should not alter content of header and filter row cells container.
-        /// </remarks>
-        /// <param name="args" type="Object">
-        /// args.$container: jQuery object that represents cell container to format.
-        /// args.afterDefaultCallback: callback function which is invoked after applying default formatting.
-        /// args.column: Options of the formatted column.
-        /// args.formattedValue: Formatted value of the cell.
-        /// args.row: information about associated row.
-        /// args.row.$rows: jQuery object that represents rows to format.
-        /// args.row.data: associated data.
-        /// args.row.dataRowIndex: data row index.
-        /// args.row.dataItemIndex: data item index.
-        /// args.row.virtualDataItemIndex: virtual data item index.
-        /// args.row.type: type of the row, one of the $.wijmo.wijgrid.rowType values.
-        /// </param>
-        /// <returns type="Boolean">True if container content has been changed and wijgrid should not apply the default formatting to the cell.</returns>
-        undefined,
-        dataKey: /// <summary>
-        /// A value indicating the key of the data field associated with a column.
-        /// If an array of hashes is used as a datasource for wijgrid, this should be string value,
-        /// otherwise this should be an integer determining an index of the field in the datasource.
-        /// Default: undefined
-        /// Type: String or Number.
-        /// Code example: $("#element").wijgrid({ columns: [ { dataKey: "ProductID" } ] });
-        /// </summary>
-        undefined,
-        ensurePxWidth: /// <summary>
-        /// Determines whether to use number type column width as the real width of the column.
-        /// Default: undefined.
-        /// Type: Boolean.
-        /// Code example: $("#element").wijgrid({ columns: [ { ensurePxWidth: true } ] });
-        /// </summary>
-        /// <remarks>
-        /// If this option is set to true, wijgrid will use the width option of the column widget.
-        /// If this option is undefined, wijgrid will refer to the ensureColumnsPxWidth option.
-        /// </remarks>
-        undefined,
-        footerText: /// <summary>
-        /// Gets or sets the footer text.
-        /// The text may include a placeholder: "{0}" is replaced with the aggregate.
-        /// Default: undefined.
-        /// Type: String.
-        /// Code example: $("#element").wijgrid({ columns: [ { footerText: "footer" } ] });
-        /// </summary>
-        /// <remarks>
-        /// If the value is undefined the footer text will be determined automatically depending on the type of the datasource:
-        ///  DOM table - text in the footer cell.
-        /// </remarks>
-        undefined,
-        headerText: /// <summary>
-        /// Gets or sets the header text.
-        /// Default: undefined.
-        /// Type: String.
-        /// Code example: $("#element").wijgrid({ columns: [ { headerText: "column0" } ] });
-        /// </summary>
-        /// <remarks>
-        /// If the value is undefined the header text will be determined automatically depending on the type of the datasource:
-        ///  DOM table - text in the header cell.
-        ///  Array of hashes - dataKey (name of the field associated with column).
-        ///  Two-dimensional array - dataKey (index of the field associated with column).
-        /// </remarks>
-        undefined,
-        textAlignment: /// <summary>
-        /// Gets or sets the text alignment of data cells.
-        ///
-        /// Possible values are:
-        /// "left": aligns the text to the left.
-        /// "right": aligns the text to the right.
-        /// "center": centers the text.
-        ///
-        /// Default: undefined.
-        /// Type: string.
-        /// Code example: $("#element").wijgrid({ columns: [ { textAligment: "right" } ] });
-        /// </summary>
-        /// <remarks>
-        /// If the value is undefined the text alignment will be defined by the column data type.
-        /// </remarks>
-        undefined,
-        visible: /// <summary>
-        /// A value indicating whether column is visible.
-        /// Default: true.
-        /// Type: Boolean.
-        /// Code example: $("#element").wijgrid({ columns: [ { visible: true } ] });
-        /// </summary>
-        true,
-        width: /// <summary>
-        /// Determines the width of the column.
-        /// Default: undefined.
-        /// Type: Number or String.
-        /// Code example:
-        /// $("#element").wijgrid({ columns: [ { width: 150 } ] });
-        /// $("#element").wijgrid({ columns: [ { width: "10%" } ]});
-        /// </summary>
-        /// <remarks>
-        /// The option could either be a number of string.
-        /// Use number to specify width in pixel.
-        /// Use string to specify width in percentage.
-        /// By default, wijgrid emulates the table element behavior when using number as width.
-        /// This means wijgrid may not have the exact width specified.
-        /// If exact width is needed, please set ensureColumnsPxWidth option of wijgrid to true.
-        /// </remarks>
-        undefined
-    });
-    $.wijmo.registerWidget("c1basefield", c1basefield.prototype);
+            };
+            c1basefield.prototype._decorateHeaderContent = function ($container) {
+                return $container.wrapInner("<span class=\"wijmo-wijgrid-headertext\" />");
+            };
+            c1basefield.prototype._refreshHeaderCell = function () {
+                var $container = this.element.children(".wijmo-wijgrid-innercell").empty();
+                this._createHeaderContent($container);
+                this._decorateHeaderContent($container);
+            };
+            c1basefield.prototype._isDestroyed = function () {
+                return this._destroyed;
+            };
+            return c1basefield;
+        })(wijmo.wijmoWidget);
+        grid.c1basefield = c1basefield;
+        c1basefield.prototype._data$prefix = "c1basefield";
+        var c1basefield_options = (function () {
+            function c1basefield_options() {
+                /** A value indicating whether the column can be moved.
+                * @example
+                * $("#element").wijgrid({ columns: [ { allowMoving: true } ] });
+                */
+                this.allowMoving = true;
+                /** A value indicating whether the column can be sized.
+                * @example
+                * $("#element").wijgrid({ columns: [ { allowSizing: true } ] });
+                */
+                this.allowSizing = true;
+                /** Function used for changing content, style and attributes of the column cells.
+                * @example
+                * // Add an image which URL is obtained from the "Url" data field to the column cells.
+                * $("#demo").wijgrid({
+                *		data: [
+                *			{ ID: 0, Url: "/images/0.jpg" },
+                *			{ ID: 1, Url: "/images/1.jpg" }
+                *		],
+                *		columns: [
+                *			{},
+                *			{
+                *				cellFormatter: function (args) {
+                *					if (args.row.type & wijmo.grid.rowType.data) {
+                *						args.$container
+                *							.empty()
+                *							.append($("<img />")
+                *								.attr("src", args.row.data.Url));
+                *
+                *						return true;
+                *					}
+                *				}
+                *			}
+                *		]
+                * });
+                * @remarks
+                * @type {Function}
+                * Important: cellFormatter should not alter content of header and filter row cells container.
+                * @param {wijmo.grid.IC1BaseFieldCellFormatterArgs} args The data with this function.
+                * @returns {Boolean} True if container content has been changed and wijgrid should not apply the default formatting to the cell.
+                */
+                this.cellFormatter = undefined;
+                /** A value indicating the key of the data field associated with a column.
+                * If an array of objects is used as a datasource for wijgrid, this should be string value,
+                * otherwise this should be an integer determining an index of the field in the datasource.
+                * @type {String|Number}
+                * @example
+                * $("#element").wijgrid({ columns: [{ dataKey: "ProductID" }]});
+                */
+                this.dataKey = undefined;
+                /** Determines whether to use number type column width as the real width of the column.
+                * @example
+                * $("#element").wijgrid({ columns: [{ ensurePxWidth: true }]});
+                * @remarks
+                * If this option is set to true, wijgrid will use the width option of the column widget.
+                * If this option is undefined, wijgrid will refer to the ensureColumnsPxWidth option.
+                */
+                this.ensurePxWidth = undefined;
+                /** Gets or sets the footer text.
+                * The text may include a placeholder: "{0}" is replaced with the aggregate.
+                * @example
+                * $("#element").wijgrid({ columns: [{ footerText: "footer" }]});
+                * @remarks
+                * If the value is undefined the footer text will be determined automatically depending on the type of the datasource:
+                * DOM table - text in the footer cell.
+                */
+                this.footerText = undefined;
+                /** Gets or sets the header text.
+                * @example
+                * $("#element").wijgrid({ columns: [ { headerText: "column0" } ] });
+                * @remarks
+                * If the value is undefined the header text will be determined automatically depending on the type of the datasource:
+                * DOM table - text in the header cell.
+                * Array of objects - dataKey (name of the field associated with column).
+                * Two-dimensional array - dataKey (index of the field associated with column).
+                */
+                this.headerText = undefined;
+                /** Gets or sets the text alignment of data cells. Possible values are "left", "right", "center".
+                * @example
+                * $("#element").wijgrid({ columns: [{ textAligment: "right" }]});
+                */
+                this.textAlignment = undefined;
+                /** A value indicating whether column is visible.
+                * @example
+                * $("#element").wijgrid({ columns: [{ visible: true }]});
+                */
+                this.visible = true;
+                /** Determines the width of the column.
+                * @type {String|Number}
+                * @example
+                * $("#element").wijgrid({ columns: [ { width: 150 } ] });
+                * $("#element").wijgrid({ columns: [ { width: "10%" } ]});
+                * @remarks
+                * The option could either be a number of string.
+                * Use number to specify width in pixel, use string to specify width in percentage.
+                * By default, wijgrid emulates the table element behavior when using number as width. This means wijgrid may not have the exact width specified. If exact width is needed, please set ensureColumnsPxWidth option of wijgrid to true.
+                */
+                this.width = undefined;
+            }
+            return c1basefield_options;
+        })();
+        grid.c1basefield_options = c1basefield_options;
+        ;
+        //c1basefield.prototype.options = $.extend(true, {}, wijmoWidget.prototype.options, new c1basefield_options());
+        c1basefield.prototype.options = wijmo.grid.extendWidgetOptions(wijmo.wijmoWidget.prototype.options, new c1basefield_options());
+        $.wijmo.registerWidget("c1basefield", c1basefield.prototype);
+    })(wijmo.grid || (wijmo.grid = {}));
+    var grid = wijmo.grid;
 })(wijmo || (wijmo = {}));
 
 var __extends = this.__extends || function (d, b) {
@@ -4308,683 +4503,673 @@ var __extends = this.__extends || function (d, b) {
     __.prototype = b.prototype;
     d.prototype = new __();
 };
-/// <reference path="c1basefield.ts"/>
-/// <reference path="interfaces.ts"/>
-/// <reference path="../../../wijinput/jquery.wijmo.wijinputdate.ts"/>
-/// <reference path="../../../wijinput/jquery.wijmo.wijinputmask.ts"/>
-/// <reference path="../../../wijinput/jquery.wijmo.wijinputnumber.ts"/>
 var wijmo;
 (function (wijmo) {
-    "use strict";
-    var $ = jQuery;
-    var c1field = (function (_super) {
-        __extends(c1field, _super);
-        function c1field() {
-            _super.apply(this, arguments);
+    /// <reference path="c1basefield.ts"/>
+    /// <reference path="interfaces.ts"/>
+    /// <reference path="../../../wijinput/jquery.wijmo.wijinputdate.ts"/>
+    /// <reference path="../../../wijinput/jquery.wijmo.wijinputmask.ts"/>
+    /// <reference path="../../../wijinput/jquery.wijmo.wijinputnumber.ts"/>
+    (function (grid) {
+        "use strict";
+        var $ = jQuery;
+        /** @widget */
+        var c1field = (function (_super) {
+            __extends(c1field, _super);
+            function c1field() {
+                _super.apply(this, arguments);
 
-        }
-        c1field.prototype._create = function () {
-            _super.prototype._create.apply(this, arguments);
-            var wijgrid = this._owner();
-            this.element.addClass(wijgrid.options.wijCSS.widget + " wijmo-c1field");
-        };
-        c1field.prototype._destroy = function () {
-            if(this._isDestroyed()) {
-                return;
             }
-            var wijgrid = this._owner();
-            this.element.find("*").unbind("." + this.widgetName);
-            if(this.$filterEditor) {
-                this.$filterEditor.closest("td").find(// column filter cell
-                "*").unbind("." + this.widgetName);
-                switch(this._getInputEditorType(this.options)) {
-                    case "date":
-                        if(this.$filterEditor.data("wijmo-wijinputdate")) {
-                            this.$filterEditor.wijinputdate("destroy");
-                        }
-                        break;
-                    case "mask":
-                        if(this.$filterEditor.data("wijmo-wijinputmask")) {
-                            this.$filterEditor.wijinputmask("destroy");
-                        }
-                        break;
-                    case "numberCurrency":
-                    case "numberNumber":
-                    case "numberPercent":
-                        if(this.$filterEditor.data("wijmo-wijinputnumber")) {
-                            this.$filterEditor.wijinputnumber("destroy");
-                        }
-                        break;
-                }
-                this.$filterEditor = null;
-            }
-            this.element.removeClass(wijgrid.options.wijCSS.widget + " wijmo-c1field").find(".wijmo-wijgrid-headertext > span." + wijgrid.options.wijCSS.icon).remove()// remove ascending/ descending icon
-            ;
-            this._removeDropDownFilterList();
-            _super.prototype._destroy.apply(this, arguments);
-        };
-        c1field.prototype._init = function () {
-            _super.prototype._init.apply(this, arguments);
-            this.$filterEditor = null;
-            var wijgrid = this._owner();
-            this.filterRow = wijgrid._filterRow();
-            if(wijgrid.options.showFilter && this.options.showFilter && (this.options.dataIndex >= 0)) {
-                this._prepareFilterCell();
-            }
-        };
-        c1field.prototype._postset_aggregate = function (value, oldValue) {
-            this._owner().ensureControl(false);
-        };
-        c1field.prototype._postset_allowSort = function (value, oldValue) {
-            //this.element.find("#contentCell").empty();
-            //this._headerTextDOM(this.options.headerText);
-            this._refreshHeaderCell();
-        };
-        c1field.prototype._postset_dataType = function (value, oldValue) {
-            throw "read-only";
-        };
-        c1field.prototype._postset_dataParser = function (value, oldValue) {
-            this._owner().ensureControl(false);
-        };
-        c1field.prototype._postset_dataFormatString = function (value, oldValue) {
-            this._owner().ensureControl(false);
-        };
-        c1field.prototype._postset_filterOperator = function (value, oldValue) {
-            this._owner().ensureControl(true);
-        };
-        c1field.prototype._postset_filterValue = function (value, oldValue) {
-            this._owner().ensureControl(true);
-        };
-        c1field.prototype._postset_groupInfo = function (value, oldValue) {
-            this._owner().ensureControl(true);
-        };
-        c1field.prototype._postset_rowMerge = function (value, oldValue) {
-            this._owner().ensureControl(false);
-        };
-        c1field.prototype._postset_showFilter = function (value, oldValue) {
-            this._owner().ensureControl(false);
-        };
-        c1field.prototype._postset_sortDirection = function (value, oldValue) {
-            this.options.sortOrder = 0;
-            this._owner().ensureControl(true);
-        };
-        c1field.prototype._postset_width = function (value, oldValue) {
-            _super.prototype._postset_width.apply(this, arguments);
-        };
-        c1field.prototype._canDropTo = function (wijField) {
-            if(_super.prototype._canDropTo.apply(this, arguments)) {
-                //the grouped column can't be dropped into group area
-                if(this.options.groupedIndex !== undefined && (wijField instanceof $.wijmo.c1groupedfield)) {
-                    return false;
-                }
-                return true;
-            }
-            return false;
-        };
-        c1field.prototype._canSort = function () {
-            var grid = this._owner();
-            return (grid && grid.options.allowSorting && this.options.allowSort && (this.options.dataIndex >= 0));
-        };
-        c1field.prototype._decorateHeaderContent = function ($container) {
-            if(this._canSort()) {
-                var wijgrid = this._owner(), $anchor = $container.wrapInner("<a class=\"wijmo-wijgrid-headertext\" href=\"#\" role=\"button\" />").children("a");
-                $anchor.bind("click." + this.widgetName, this, $.proxy(this._onHrefClick, this));
-                switch(this.options.sortDirection) {
-                    case // sorting icon
-                    "ascending":
-                        $anchor.append($("<span class=\"" + wijgrid.options.wijCSS.icon + " " + wijgrid.options.wijCSS.iconArrowUp + "\">ascending</span>"));
-                        break;
-                    case "descending":
-                        $anchor.append($("<span class=\"" + wijgrid.options.wijCSS.icon + " " + wijgrid.options.wijCSS.iconArrowDown + "\">descending</span>"));
-                        break;
-                }
-            } else {
-                _super.prototype._decorateHeaderContent.apply(this, arguments);
-            }
-        };
-        c1field.prototype._prepareFilterCell = function () {
-            var filterCellIndex = this.options.visLeavesIdx, wijgrid = null, filterCell = null, dataValue, editorOptions, self = this, editorType;
-            if(filterCellIndex >= 0) {
-                wijgrid = this._owner();
-                if(this.filterRow) {
-                    filterCell = $(wijmo.grid.rowAccessor.getCell(this.filterRow, filterCellIndex));
-                } else {
-                    throw "exception";
-                }
-                this.$filterEditor = filterCell.find("input");
-                //the problem of inputing in the filter textbox
-                filterCell.bind((($.support).selectstart ? "selectstart" : "mousedown"), function (event) {
-                    event.stopPropagation();
-                });
-                dataValue = wijgrid._parse(this.options, wijmo.grid.filterHelper.getSingleValue(this.options.filterValue));
-                // set default value
-                if(dataValue === null || dataValue === "undefined") {
-                    switch(wijmo.grid.getDataType(this.options)) {
-                        case "boolean":
-                            dataValue = false;
-                            break;
-                        case "number":
-                        case "currency":
-                        case "datetime":
-                            dataValue = 0;
-                            break;
-                        default:
-                            dataValue = "";
-                    }
-                }
-                editorOptions = {
-                    culture: wijgrid.options.culture,
-                    disabled: wijgrid.options.disabled,
-                    decimalPlaces: (function (pattern) {
-                        // map decimal places specified within the dataFormatString option into the decimalPlaces option of the wijinputnumber.
-                        var test = /^(n|p|c){1}(\d*)$/.exec(pattern);
-                        if(test) {
-                            if(test[2]) {
-                                return parseInt(test[2], 10);
-                            }
-                        }
-                        return 2;
-                    })(this.options.dataFormatString)
-                };
-                // create editor
-                switch(editorType = this._getInputEditorType(this.options)) {
-                    case "date":
-                        this.$filterEditor.wijinputdate($.extend(editorOptions, {
-                            date: dataValue,
-                            dateFormat: this.options.dataFormatString || undefined
-                        }));
-                        break;
-                    case "mask":
-                        this.$filterEditor.wijinputmask({
-                            text: dataValue + ""
-                        });
-                        break;
-                    case "numberCurrency":
-                        this.$filterEditor.wijinputnumber($.extend(editorOptions, {
-                            type: "currency",
-                            value: dataValue
-                        }));
-                        break;
-                    case "numberNumber":
-                        this.$filterEditor.wijinputnumber($.extend(editorOptions, {
-                            value: dataValue
-                        }));
-                        break;
-                    case "numberPercent":
-                        this.$filterEditor.wijinputnumber($.extend(editorOptions, {
-                            type: "percent",
-                            value: dataValue * 100
-                        }));
-                        break;
-                    default:
-                        throw wijmo.grid.stringFormat("Unsupported editor type: \"{0}\"", editorType);
-                }
-                // create button
-                //var filterButton = filterCell.find(".filterBtn");
-                filterCell.find(".wijmo-wijgrid-filter-trigger").attr(// filter button
-                {
-                    "role": "button",
-                    "aria-haspopup": "true"
-                }).bind("mouseenter." + this.widgetName, function (e) {
-                    if(!self.options.disabled) {
-                        $(this).addClass(wijgrid.options.wijCSS.stateHover);
-                    }
-                }).bind("mouseleave." + this.widgetName, function (e) {
-                    if(!self.options.disabled) {
-                        $(this).removeClass(wijgrid.options.wijCSS.stateHover + " " + wijgrid.options.wijCSS.stateActive);
-                    }
-                }).bind("mouseup." + this.widgetName, this, function (e) {
-                    if(!self.options.disabled) {
-                        $(this).removeClass(wijgrid.options.wijCSS.stateActive);
-                    }
-                }).bind("mousedown." + this.widgetName, {
-                    column: this
-                }, this._onFilterBtnClick).bind("click." + this.widgetName, function (e) {
-                    e.preventDefault();
-                })// prevent # being added to url.
-                ;
-            }
-        };
-        c1field.prototype._onFilterBtnClick = function (e) {
-            var column = e.data.column, maxItemsCount = 8, wijgrid, filterOpLowerCase, applicableFilters, args, items, key, operator, width, eventUID, zIndex;
-            if(column.options.disabled) {
-                return false;
-            }
-            if(column.$dropDownFilterList) {
-                // close the dropdown list
-                column._removeDropDownFilterList();
-                return false;
-            }
-            e.target.focus()//TFS #24253: In IE9, wijgrid is distorted on opening filter drop-down in a scrollable grid
-            ;
-            wijgrid = column._owner();
-            filterOpLowerCase = wijmo.grid.filterHelper.getSingleOperatorName(column.options.filterOperator).toLowerCase();
-            applicableFilters = wijgrid.getFilterOperatorsByDataType(wijmo.grid.getDataType(column.options));
-            args = {
-                operators: applicableFilters,
-                column: column.options
+            c1field.prototype._create = function () {
+                _super.prototype._create.apply(this, arguments);
+                var wijgrid = this._owner();
+                this.element.addClass(wijgrid.options.wijCSS.widget + " wijmo-c1field");
             };
-            wijgrid._onFilterOperatorsListShowing($.extend(true, {
-            }, args));
-            items = [];
-            if(args.operators) {
-                $.each(args.operators, function (key, operator) {
-                    items.push({
-                        label: operator.displayName || operator.name,
-                        value: operator.name,
-                        selected: operator.name.toLowerCase() === filterOpLowerCase
-                    });
-                });
-            }
-            column.$dropDownFilterList = $("<div class=\"wijmo-wijgrid-filterlist\"></div").appendTo(document.body).wijlist({
-                autoSize: true,
-                maxItemsCount: maxItemsCount,
-                selected: function (data, arg) {
-                    var filterValue, editorType;
-                    switch(editorType = column._getInputEditorType(column.options)) {
+            c1field.prototype._destroy = function () {
+                if(this._isDestroyed()) {
+                    return;
+                }
+                var wijgrid = this._owner();
+                this.element.find("*").unbind("." + this.widgetName);
+                if(this.$filterEditor) {
+                    this.$filterEditor.closest("td").find(// column filter cell
+                    "*").unbind("." + this.widgetName);
+                    switch(this._getInputEditorType(this.options)) {
                         case "date":
-                            filterValue = column.$filterEditor.wijinputdate("option", "date") || new Date()// current date
-                            ;
+                            if(this.$filterEditor.data("wijmo-wijinputdate")) {
+                                this.$filterEditor.wijinputdate("destroy");
+                            }
                             break;
                         case "mask":
-                            filterValue = column.$filterEditor.wijinputmask("option", "text");
+                            if(this.$filterEditor.data("wijmo-wijinputmask")) {
+                                this.$filterEditor.wijinputmask("destroy");
+                            }
                             break;
                         case "numberCurrency":
                         case "numberNumber":
                         case "numberPercent":
-                            filterValue = column.$filterEditor.wijinputnumber("option", "value");
-                            if(editorType === "numberPercent") {
-                                filterValue /= 100;
+                            if(this.$filterEditor.data("wijmo-wijinputnumber")) {
+                                this.$filterEditor.wijinputnumber("destroy");
                             }
                             break;
                     }
-                    column._removeDropDownFilterList();
-                    wijgrid._handleFilter(column, arg.item.value, filterValue);
+                    this.$filterEditor = null;
                 }
-            });
-            // ** zIndex
-            if($.ui && $.fn.zIndex) {
-                zIndex = wijgrid.outerDiv.zIndex()// try to get zIndex of the first z-indexed element in order to display drop down list over it.
-                ;
-                if(zIndex) {
-                    zIndex++;
+                this.element.removeClass(wijgrid.options.wijCSS.widget + " wijmo-c1field");
+                this._removeDropDownFilterList();
+                _super.prototype._destroy.apply(this, arguments);
+            };
+            c1field.prototype._init = function () {
+                _super.prototype._init.apply(this, arguments);
+                this.$filterEditor = null;
+                var wijgrid = this._owner();
+                this.filterRow = wijgrid._filterRow();
+                if(wijgrid.options.showFilter && this.options.showFilter && (this.options.dataIndex >= 0)) {
+                    this._prepareFilterCell();
                 }
-            }
-            column.$dropDownFilterList.css("z-index", Math.max(zIndex || 0, 100))// 100 is the default value
-            ;
-            // zIndex **
-            column.$dropDownFilterList.wijlist("setItems", items).wijlist("renderList");
-            width = column.$dropDownFilterList.width() | 150;
-            column.$dropDownFilterList.width(items.length > maxItemsCount ? width + 20 : width).wijlist("refreshSuperPanel").position({
-                of: $(this),
-                my: "left top",
-                at: "left bottom"
-            });
-            (column.$dropDownFilterList).$button = $(this);
-            eventUID = (column.$dropDownFilterList).eventUID = wijmo.grid.getUID();
-            $(document).bind("mousedown." + column.widgetName + "." + eventUID, {
-                column: column
-            }, column._onDocMouseDown);
-        };
-        c1field.prototype._onDocMouseDown = function (e) {
-            var $target = $(e.target), $filterList = $target.parents(".wijmo-wijgrid-filterlist:first"), $filterButton = $target.is(".wijmo-wijgrid-filter-trigger") ? $target : $target.parents(".wijmo-wijgrid-filter-trigger:first");
-            if(($filterButton.length && ($filterButton[0] === e.data.column.$dropDownFilterList.$button[0])) || ($filterList.length && ($filterList[0] === e.data.column.$dropDownFilterList[0]))) {
-                // do nothing
-                            } else {
-                e.data.column._removeDropDownFilterList();
-            }
-        };
-        c1field.prototype._onHrefClick = function (args) {
-            if(args.data.options.disabled) {
+            };
+            c1field.prototype._postset_aggregate = function (value, oldValue) {
+                this._owner().ensureControl(false);
+            };
+            c1field.prototype._postset_allowSort = function (value, oldValue) {
+                //this.element.find("#contentCell").empty();
+                //this._headerTextDOM(this.options.headerText);
+                this._refreshHeaderCell();
+            };
+            c1field.prototype._postset_dataType = function (value, oldValue) {
+                throw "read-only";
+            };
+            c1field.prototype._postset_dataParser = function (value, oldValue) {
+                this._owner().ensureControl(false);
+            };
+            c1field.prototype._postset_dataFormatString = function (value, oldValue) {
+                this._owner().ensureControl(false);
+            };
+            c1field.prototype._postset_filterOperator = function (value, oldValue) {
+                this._owner().ensureControl(true);
+            };
+            c1field.prototype._postset_filterValue = function (value, oldValue) {
+                this._owner().ensureControl(true);
+            };
+            c1field.prototype._postset_groupInfo = function (value, oldValue) {
+                this._owner().ensureControl(true);
+            };
+            c1field.prototype._postset_rowMerge = function (value, oldValue) {
+                this._owner().ensureControl(false);
+            };
+            c1field.prototype._postset_showFilter = function (value, oldValue) {
+                this._owner().ensureControl(false);
+            };
+            c1field.prototype._postset_sortDirection = function (value, oldValue) {
+                this.options.sortOrder = 0;
+                this._owner().ensureControl(true);
+            };
+            c1field.prototype._postset_width = function (value, oldValue) {
+                _super.prototype._postset_width.apply(this, arguments);
+            };
+            c1field.prototype._canDropTo = function (wijField) {
+                if(_super.prototype._canDropTo.apply(this, arguments)) {
+                    //the grouped column can't be dropped into group area
+                    if(this.options.groupedIndex !== undefined && (wijField instanceof $.wijmo.c1groupedfield)) {
+                        return false;
+                    }
+                    return true;
+                }
                 return false;
+            };
+            c1field.prototype._canSort = function () {
+                var grid = this._owner();
+                return (grid && grid.options.allowSorting && this.options.allowSort && (this.options.dataIndex >= 0));
+            };
+            c1field.prototype._decorateHeaderContent = function ($container) {
+                if(this._canSort()) {
+                    var wijgrid = this._owner(), $anchor = $container.wrapInner("<a class=\"wijmo-wijgrid-headertext\" href=\"#\" role=\"button\" />").children("a");
+                    $anchor.bind("click." + this.widgetName, this, $.proxy(this._onHrefClick, this));
+                    switch(this.options.sortDirection) {
+                        case // sorting icon
+                        "ascending":
+                            $container.append($("<span class=\"wijmo-wijgrid-sort-icon " + wijgrid.options.wijCSS.icon + " " + wijgrid.options.wijCSS.iconArrowUp + "\">ascending</span>"));
+                            break;
+                        case "descending":
+                            $container.append($("<span class=\"wijmo-wijgrid-sort-icon " + wijgrid.options.wijCSS.icon + " " + wijgrid.options.wijCSS.iconArrowDown + "\">descending</span>"));
+                            break;
+                    }
+                } else {
+                    _super.prototype._decorateHeaderContent.apply(this, arguments);
+                }
+            };
+            c1field.prototype._prepareFilterCell = function () {
+                var filterCellIndex = this.options.visLeavesIdx, wijgrid = this._owner(), filterCell = null, dataValue, editorOptions, self = this, editorType, inputType = wijmo.grid.HTML5InputSupport.getDefaultInputType(wijgrid._isMobileEnv(), this.options);
+                if(filterCellIndex >= 0) {
+                    wijgrid = this._owner();
+                    if(this.filterRow) {
+                        filterCell = $(wijmo.grid.rowAccessor.getCell(this.filterRow, filterCellIndex));
+                    } else {
+                        throw "exception";
+                    }
+                    this.$filterEditor = filterCell.find("input");
+                    //the problem of inputing in the filter textbox
+                    filterCell.bind((($.support).selectstart ? "selectstart" : "mousedown"), function (event) {
+                        event.stopPropagation();
+                    });
+                    dataValue = wijgrid.parse(this.options, wijmo.grid.filterHelper.getSingleValue(this.options.filterValue));
+                    // set default value
+                    if(dataValue === null || dataValue === "undefined") {
+                        switch(wijmo.grid.getDataType(this.options)) {
+                            case "boolean":
+                                dataValue = false;
+                                break;
+                            case "number":
+                            case "currency":
+                            case "datetime":
+                                dataValue = 0;
+                                break;
+                            default:
+                                dataValue = "";
+                        }
+                    }
+                    editorOptions = {
+                        culture: wijgrid.options.culture,
+                        disabled: wijgrid.options.disabled,
+                        decimalPlaces: (function (pattern) {
+                            // map decimal places specified within the dataFormatString option into the decimalPlaces option of the wijinputnumber.
+                            var test = /^(n|p|c){1}(\d*)$/.exec(pattern);
+                            if(test && test[2]) {
+                                return parseInt(test[2], 10);
+                            }
+                            test = /^(d){1}(\d*)$/.exec(pattern);
+                            if(test) {
+                                return 0;// left padding is not supported by wijinputnumber
+
+                            }
+                            return 2;
+                        })(this.options.dataFormatString)
+                    };
+                    // create editor
+                    switch(editorType = this._getInputEditorType(this.options)) {
+                        case "date":
+                            if(inputType === "text") {
+                                this.$filterEditor.wijinputdate($.extend(editorOptions, {
+                                    date: dataValue,
+                                    dateFormat: this.options.dataFormatString || undefined,
+                                    showTrigger: true
+                                }));
+                            } else {
+                                // html5 editor
+                                this._createHtmlEditor(this.$filterEditor, inputType, wijmo.grid.HTML5InputSupport.toStr(dataValue || new Date(), inputType));
+                            }
+                            break;
+                        case "mask":
+                            this.$filterEditor.wijinputmask({
+                                text: dataValue + ""
+                            });
+                            break;
+                        case "numberCurrency":
+                            this.$filterEditor.wijinputnumber($.extend(editorOptions, {
+                                type: "currency",
+                                value: dataValue
+                            }));
+                            break;
+                        case "numberNumber":
+                            if(inputType === "text") {
+                                this.$filterEditor.wijinputnumber($.extend(editorOptions, {
+                                    value: dataValue
+                                }));
+                            } else {
+                                // html5 editor
+                                this._createHtmlEditor(this.$filterEditor, inputType, wijmo.grid.HTML5InputSupport.toStr(dataValue, inputType));
+                            }
+                            break;
+                        case "numberPercent":
+                            this.$filterEditor.wijinputnumber($.extend(editorOptions, {
+                                type: "percent",
+                                value: dataValue * 100
+                            }));
+                            break;
+                        default:
+                            throw wijmo.grid.stringFormat("Unsupported editor type: \"{0}\"", editorType);
+                    }
+                    // create button
+                    //var filterButton = filterCell.find(".filterBtn");
+                    filterCell.find(".wijmo-wijgrid-filter-trigger").attr(// filter button
+                    {
+                        "role": "button",
+                        "aria-haspopup": "true"
+                    }).bind("mouseenter." + this.widgetName, function (e) {
+                        if(!self.options.disabled) {
+                            $(this).addClass(wijgrid.options.wijCSS.stateHover);
+                        }
+                    }).bind("mouseleave." + this.widgetName, function (e) {
+                        if(!self.options.disabled) {
+                            $(this).removeClass(wijgrid.options.wijCSS.stateHover + " " + wijgrid.options.wijCSS.stateActive);
+                        }
+                    }).bind("mouseup." + this.widgetName, this, function (e) {
+                        if(!self.options.disabled) {
+                            $(this).removeClass(wijgrid.options.wijCSS.stateActive);
+                        }
+                    }).bind("mousedown." + this.widgetName, {
+                        column: this
+                    }, this._onFilterBtnClick).bind("click." + this.widgetName, function (e) {
+                        e.preventDefault();
+                    })// prevent # being added to url.
+                    ;
+                }
+            };
+            c1field.prototype._createHtmlEditor = function (input, inputType, value) {
+                return input.wrap("<span class=\"wijgrid-input-wrapper\"></span").attr("type", inputType).val(value);
+            };
+            c1field.prototype._onFilterBtnClick = function (e) {
+                var column = e.data.column, maxItemsCount = 8, wijgrid = column._owner(), filterOpLowerCase, applicableFilters, args, items, key, operator, width, eventUID, zIndex, inputType = wijmo.grid.HTML5InputSupport.getDefaultInputType(wijgrid._isMobileEnv(), column.options);
+                if(column.options.disabled) {
+                    return false;
+                }
+                if(column.$dropDownFilterList) {
+                    // close the dropdown list
+                    column._removeDropDownFilterList();
+                    return false;
+                }
+                e.target.focus()//TFS #24253: In IE9, wijgrid is distorted on opening filter drop-down in a scrollable grid
+                ;
+                filterOpLowerCase = wijmo.grid.filterHelper.getSingleOperatorName(column.options.filterOperator).toLowerCase();
+                applicableFilters = wijgrid.getFilterOperatorsByDataType(wijmo.grid.getDataType(column.options));
+                args = {
+                    operators: $.extend(true, [], applicableFilters),
+                    column: // make a copy, so user can localize operators without affecting other controls
+                    column.options
+                };
+                wijgrid._onFilterOperatorsListShowing(args);
+                items = [];
+                if(args.operators) {
+                    $.each(args.operators, function (key, operator) {
+                        items.push({
+                            label: operator.displayName || operator.name,
+                            value: operator.name,
+                            selected: operator.name.toLowerCase() === filterOpLowerCase
+                        });
+                    });
+                }
+                column.$dropDownFilterList = $("<div class=\"wijmo-wijgrid-filterlist\"></div").appendTo(document.body).wijlist({
+                    autoSize: true,
+                    maxItemsCount: maxItemsCount,
+                    selected: function (data, arg) {
+                        var filterValue, editorType;
+                        switch(editorType = column._getInputEditorType(column.options)) {
+                            case "date":
+                                if(inputType === "text") {
+                                    filterValue = column.$filterEditor.wijinputdate("option", "date") || new Date()// current date
+                                    ;
+                                } else {
+                                    filterValue = wijmo.grid.HTML5InputSupport.parse(column.$filterEditor.val(), inputType) || new Date();
+                                }
+                                break;
+                            case "mask":
+                                filterValue = column.$filterEditor.wijinputmask("option", "text");
+                                break;
+                            case "numberNumber":
+                                if(inputType !== "text") {
+                                    filterValue = wijmo.grid.HTML5InputSupport.parse(column.$filterEditor.val(), inputType) || 0;
+                                    break;
+                                }
+                                // fall through
+                                                            case "numberCurrency":
+                            case "numberPercent":
+                                filterValue = column.$filterEditor.wijinputnumber("option", "value");
+                                if(editorType === "numberPercent") {
+                                    filterValue /= 100;
+                                }
+                                break;
+                        }
+                        column._removeDropDownFilterList();
+                        wijgrid._handleFilter(column, arg.item.value, filterValue);
+                    }
+                });
+                // ** zIndex
+                if($.ui && $.fn.zIndex) {
+                    zIndex = wijgrid.outerDiv.zIndex()// try to get zIndex of the first z-indexed element in order to display drop down list over it.
+                    ;
+                    if(zIndex) {
+                        zIndex++;
+                    }
+                }
+                column.$dropDownFilterList.css("z-index", Math.max(zIndex || 0, 9999))// 9999 is the default value
+                ;
+                // zIndex **
+                column.$dropDownFilterList.wijlist("setItems", items).wijlist("renderList");
+                width = column.$dropDownFilterList.width() | 150;
+                column.$dropDownFilterList.width(items.length > maxItemsCount ? width + 20 : width).wijlist("refreshSuperPanel").position({
+                    of: $(this),
+                    my: "left top",
+                    at: "left bottom"
+                });
+                (column.$dropDownFilterList).$button = $(this);
+                eventUID = (column.$dropDownFilterList).eventUID = wijmo.grid.getUID();
+                $(document).bind("mousedown." + column.widgetName + "." + eventUID, {
+                    column: column
+                }, column._onDocMouseDown);
+            };
+            c1field.prototype._onDocMouseDown = function (e) {
+                var $target = $(e.target), $filterList = $target.parents(".wijmo-wijgrid-filterlist:first"), $filterButton = $target.is(".wijmo-wijgrid-filter-trigger") ? $target : $target.parents(".wijmo-wijgrid-filter-trigger:first");
+                if(($filterButton.length && ($filterButton[0] === e.data.column.$dropDownFilterList.$button[0])) || ($filterList.length && ($filterList[0] === e.data.column.$dropDownFilterList[0]))) {
+                    // do nothing
+                                    } else {
+                    e.data.column._removeDropDownFilterList();
+                }
+            };
+            c1field.prototype._onHrefClick = function (args) {
+                if(args.data.options.disabled) {
+                    return false;
+                }
+                if(args.data.options.allowSort) {
+                    var wijgrid = args.data._owner();
+                    wijgrid._handleSort(args.data.options, args.ctrlKey);
+                }
+                return false;
+            };
+            c1field.prototype._removeDropDownFilterList = function () {
+                if(this.$dropDownFilterList) {
+                    var eventUID = (this.$dropDownFilterList).eventUID;
+                    this.$dropDownFilterList.remove();
+                    this.$dropDownFilterList = null;
+                    $(document).unbind("mousedown." + this.widgetName + "." + eventUID, this._onDocMouseDown);
+                }
+            };
+            c1field.prototype._getInputEditorType = // "mask", "date", "numberNumber", "numberPercent", "numberCurrency"
+            function (column) {
+                switch(wijmo.grid.getDataType(column)) {
+                    case "number":
+                        return (column.dataFormatString && column.dataFormatString.indexOf("p") === 0) ? "numberPercent" : "numberNumber";
+                    case "currency":
+                        return "numberCurrency";
+                    case "datetime":
+                        return "date";
+                    default:
+                        return "mask";
+                }
+            };
+            return c1field;
+        })(grid.c1basefield);
+        grid.c1field = c1field;
+        var c1field_options = (function (_super) {
+            __extends(c1field_options, _super);
+            function c1field_options() {
+                _super.apply(this, arguments);
+
+                /** Causes the grid to calculate aggregate values on the column and place them in the column footer cell or group header and footer rows.
+                * Possible values are: "none", "count", "sum", "average", "min", "max", "std", "stdPop", "var", "varPop" and "custom".
+                * @example
+                * $("#element").wijgrid({ columns: [{ aggregate: "count" }]});
+                * @remarks
+                * Possible values are:
+                * "none": no aggregate is calculated or displayed.
+                * "count": count of non-empty values.
+                * "sum": sum of numerical values.
+                * "average": average of the numerical values.
+                * "min": minimum value (numerical, string, or date).
+                * "max": maximum value (numerical, string, or date).
+                * "std": standard deviation (using formula for Sample, n-1).
+                * "stdPop": standard deviation (using formula for Population, n).
+                * "var": variance (using formula for Sample, n-1).
+                * "varPop": variance (using formula for Population, n).
+                * "custom": custom value (causing grid to throw groupAggregate event).
+                *
+                * If the showFooter option is off or grid does not contain any groups, setting the "aggregate" option has no effect.
+                */
+                this.aggregate = "none";
+                /** A value indicating whether column can be sorted.
+                * @example
+                * $("#element").wijgrid({ columns: [{ allowSort: true }] });
+                */
+                this.allowSort = true;
+                /** Column data type. Used to determine the rules for sorting, grouping, aggregate calculation, and so on.
+                * Possible values are: "string", "number", "datetime", "currency" and "boolean".
+                * @example
+                * $("#element").wijgrid({ columns: [{ dataType: "string" }]});
+                * @remarks
+                * Possible values are:
+                * "string": if using built-in parser any values are acceptable; "&nbsp;" considered as an empty string, nullString as null.
+                * "number": if using built-in parser only numeric values are acceptable, also "&nbsp;", "" and nullString which are considered as null. Any other value throws an exception.
+                * "datetime": if using built-in parser only date-time values are acceptable, also "&nbsp;", "" and nullString which are considered as null. Any other value throws an exception.
+                * "currency": if using built-in parser only numeric and currency values are acceptable, also "&nbsp;", "" and nullString which are considered as null. Any other value throws an exception.
+                * "boolean": if using built-in parser only "true" and "false" (case-insensitive) values are acceptable, also "&nbsp;", "" and nullString which are considered as null. Any other value throws an exception.
+                */
+                this.dataType = undefined;
+                /**
+                * Determines the type of html editor for filter and cells.
+                * Possible values are: "number", "date", "datetime", "datetime-local", "month", "time", "text".
+                * @example
+                * $("#element").wijgrid({ columns: [{ inputType: "text" }]});
+                * @remarks
+                * If the value is set then input type element is used with "type" attribute set to the value. If the value is not set then:
+                *  - in desktop environment a "text" input element is used as the editor.
+                *  - in mobile environment a "number" input element is used for columns having "number" and "currency" dataType; for columns where dataType = "datetime" a "datetime" input element is used, otherwise a "text" input element is shown.
+                */
+                this.inputType = undefined;
+                /** Data converter that is able to translate values from a string representation to column data type and back.
+                * @example
+                * var myBoolParser = {
+                *		parseDOM: function (value, culture, format, nullString) {
+                *			return this.parse(value.innerHTML, culture, format, nullString);
+                *		},
+                *		parse: function (value, culture, format, nullString) {
+                *			if (typeof (value) === "boolean")  return value;
+                *
+                *			if (!value || (value === "&nbsp;") || (value === nullString)) {
+                *				return null;
+                *			}
+                *
+                *			switch (value.toLowerCase()) {
+                *				case "on": return true;
+                *				case "off": return false;
+                *			}
+                *
+                *			return NaN;
+                *		},
+                *		toStr: function (value, culture, format, nullString) {
+                *			if (value === null)  return nullString;
+                *				return (value) ? "on" : "off";
+                *			}
+                *		}
+                * }
+                *
+                * $("#element").wijgrid({ columns: [ { dataType: "boolean", dataParser: myBoolParser } ] });
+                * @remarks
+                * If undefined, than the built-in parser for supported datatypes will be used.
+                */
+                this.dataParser = undefined;
+                /** A pattern used for formatting and parsing column values.
+                * @example
+                * $("#element").wijgrid({
+                *		columns: [
+                *			{ dataType: "currency" },
+                *			{ dataType: "number" },
+                *			{ dataType: "number", dataFormatString: "p0" }
+                *		]
+                * });
+                * @remarks
+                * The default value is undefined ("n" pattern will be used for "number" dataType, "d" for "datetime", "c" for "currency").
+                * Please see the https://github.com/jquery/globalize for a full explanation and additional values.
+                */
+                this.dataFormatString = undefined;
+                /** An operations set for filtering. Must be either one of the embedded operators or custom filter operator.
+                * Operator names are case insensitive.
+                *
+                * @example
+                * $("#element").wijgrid({ columns: [{ dataType: "number", filterOperator: "Equals", filterValue: 0 }]});
+                * @remarks
+                * Embedded filter operators include:
+                * "NoFilter": no filter.
+                * "Contains": applicable to "string" data type.
+                * "NotContain": applicable to "string" data type.
+                * "BeginsWith": applicable to "string" data type.
+                * "EndsWith": applicable to "string" data type.
+                * "Equals": applicable to "string", "number", "datetime", "currency" and "boolean" data types.
+                * "NotEqual": applicable to "string", "number", "datetime", "currency" and "boolean" data types.
+                * "Greater": applicable to "string", "number", "datetime", "currency" and "boolean" data types.
+                * "Less": applicable to "string", "number", "datetime", "currency" and "boolean" data types.
+                * "GreaterOrEqual": applicable to "string", "number", "datetime", "currency" and "boolean" data types.
+                * "LessOrEqual": applicable to "string", "number", "datetime", "currency" and "boolean" data types.
+                * "IsEmpty": applicable to "string".
+                * "NotIsEmpty": applicable to "string".
+                * "IsNull": applicable to "string", "number", "datetime", "currency" and "boolean" data types.
+                * "NotIsNull": applicable to "string", "number", "datetime", "currency" and "boolean" data types.
+                *
+                * Full option value is:
+                *		[filterOperartor1, ..., filterOperatorN]
+                * where each filter item is an object of the following kind:
+                *		{ name: <operatorName>, condition: "or"|"and" }
+                * where:
+                *		name: filter operator name.
+                *		condition: logical condition to other operators, "or" is by default.
+                * Example:
+                *		filterOperator: [ { name: "Equals" }, { name: "NotEqual", condition: "and" } ]
+                * It is possible to use shorthand notation, the following statements are equivalent:
+                *		filterOperator: [ { name: "Equals" }, { name: "BeginsWith" } ]
+                *		filterOperator: [ "Equals", "BeginsWith" ]
+                * In the case of a single operator option name may contain only filter operator name, the following statements are equivalent:
+                *		filterOperator: [ { name: "Equals" } ]
+                *		filterOperator: [ "Equals" ]
+                *		filterOperator: "Equals"
+                *
+                * Note: wijgrid built-in filter editors do not support multiple filter operators.
+                *
+                */
+                this.filterOperator = "nofilter";
+                /** A value set for filtering.
+                * @example
+                * $("#element").wijgrid({ columns: [{ dataType: "number", filterOperator: "Equals", filterValue: 0 }]});
+                * @remarks
+                * Full option value is:
+                *		[filterValue1, ..., filterValueN]
+                * where each item is a filter value for the corresponding filter operator. Example:
+                *		filterValue: [0, "a", "b"]
+                *
+                * Built-in filter operators support array of values as an argument. Example:
+                *		filterOperator: ["Equals", "BeginsWith"]
+                *		filterValue: [[0, 1, 2], "a"]
+                * As a result of filtering all the records having 0, 1, 2, or starting with "a" will be fetched.
+                *
+                * Shorthand notation allows omitting square brackets, the following statements are equivalent:
+                *		filterValue: ["a"]
+                *		filterValue: [["a"]]
+                *		filterValue: "a"
+                *
+                * Note: wijgrid built-in filter editors do not support multiple filter values.
+                */
+                this.filterValue = undefined;
+                /** Used to customize the appearance and position of groups.
+                * @example
+                * $("#element").wijgrid({ columns: [{ groupInfo: { position: "header" }}]});
+                */
+                this.groupInfo = {
+                    expandInfo: /** @ignore */
+                    [],
+                    level: // infrastructure
+                    /** @ignore */
+                    undefined,
+                    groupSingleRow: // infrastructure
+                    true,
+                    collapsedImageClass: /** Determines the CSS used to show collapsed nodes on the grid.
+                    * @default "ui-icon-triangle-1-e".
+                    * @example
+                    * $("#element").wijgrid({ columns: [{ groupInfo: { collapsedImageClass: "myClass" }}] });
+                    */
+                    $.wijmo.wijCSS.iconArrowRight,
+                    expandedImageClass: /** Determines the CSS used to show expanded nodes on the grid.
+                    * @default "ui-icon-triangle-1-se".
+                    * @example
+                    * $("#element").wijgrid({ columns: [{ groupInfo: { expandedImageClass: "myClass" }}] });
+                    */
+                    $.wijmo.wijCSS.iconArrowRightDown,
+                    position: /** Determines whether the grid should insert group header and/or group footer rows for this column.  Possible values are: "none", "header", "footer", "headerAndFooter".
+                    * @example
+                    * $("#element").wijgrid({ columns: [{ groupInfo: { position: "header" }}] });
+                    * @remarks
+                    * Possible values are:
+                    * "none": disables grouping for the column.
+                    * "header": inserts header rows.
+                    * "footer": inserts footer rows.
+                    * "headerAndFooter": inserts header and footer rows.
+                    */
+                    "none",
+                    outlineMode: /** Determines whether the user will be able to collapse and expand the groups by clicking on the group headers, and also determines whether groups will be initially collapsed or expanded.
+                    * Possible values are: "none", "startCollapsed", "startExpanded".
+                    * @example
+                    * $("#element").wijgrid({ columns: [{ groupInfo: { outlineMode: "startExpanded" }}] });
+                    * @remarks
+                    * Possible values are:
+                    * "none": disables collapsing and expanding.
+                    * "startCollapsed": groups are initially collapsed.
+                    * "startExpanded": groups are initially expanded.
+                    */
+                    "startExpanded",
+                    headerText: /** Determines the text that is displayed in the group header rows.
+                    * @example
+                    * $("#element").wijgrid({ columns: [{ groupInfo: { headerText: "{1}: {0}" }}] });
+                    * @remarks
+                    * The text may include up to three placeholders:
+                    * "{0}" is replaced with the value being grouped on.
+                    * "{1}" is replaced with the group's column header.
+                    * "{2}" is replaced with the aggregate
+                    * The text may be set to "custom". Doing so causes the grid groupText event to be raised when processing a grouped header.
+                    */
+                    undefined,
+                    footerText: /** Determines the text that is displayed in the group footer rows.
+                    * @example
+                    * $("#element").wijgrid({ columns: [{ groupInfo: { footerText: "{1}: {0}" }}] });
+                    * @remarks
+                    * The text may include up to three placeholders:
+                    * "{0}" is replaced with the value being grouped on.
+                    * "{1}" is replaced with the group's column header.
+                    * "{2}" is replaced with the aggregate
+                    * The text may be set to "custom". Doing so causes the grid groupText event to be raised when processing a grouped footer.
+                    */
+                    undefined
+                };
+                /** A value indicating whether the cells in the column can be edited.
+                * @example
+                * $("#element").wijgrid({ columns: [ { readOnly: false } ] });
+                */
+                this.readOnly = false;
+                /** Determines whether rows are merged. Possible values are: "none", "free" and "restricted".
+                * @example
+                * $("#element").wijgrid({ columns: [{ rowMerge: "none" }]});
+                * @remarks
+                * Possible values are:
+                * "none": no row merging.
+                * "free": allows row with identical text to merge.
+                * "restricted": keeps rows with identical text from merging if rows in the previous column are merged.
+                */
+                this.rowMerge = "none";
+                /** A value indicating whether filter editor will be shown in the filter row.
+                * @example
+                * $("#element").wijgrid({ columns: [{ showFilter: true }]});
+                */
+                this.showFilter = true;
+                /** Determines the sort direction. Possible values are: "none", "ascending" and "descending".
+                * @example
+                * $("#element").wijgrid({ columns: [{ sortDirection: "none" }]});
+                * @remarks
+                * Possible values are:
+                * "none": no sorting.
+                * "ascending": sort from smallest to largest.
+                * "descending": sort from largest to smallest.
+                */
+                this.sortDirection = "none";
+                /** A value indicating whether null value is allowed during editing.
+                * @example
+                * $("#element").wijgrid({ columns: [{ valueRequired: false }]});
+                */
+                this.valueRequired = false;
             }
-            if(args.data.options.allowSort) {
-                args.data._owner()._handleSort(args.data.options, args.ctrlKey);
-            }
-            return false;
-        };
-        c1field.prototype._removeDropDownFilterList = function () {
-            if(this.$dropDownFilterList) {
-                var eventUID = (this.$dropDownFilterList).eventUID;
-                this.$dropDownFilterList.remove();
-                this.$dropDownFilterList = null;
-                $(document).unbind("mousedown." + this.widgetName + "." + eventUID, this._onDocMouseDown);
-            }
-        };
-        c1field.prototype._getInputEditorType = // "mask", "date", "numberNumber", "numberPercent", "numberCurrency"
-        function (column) {
-            switch(wijmo.grid.getDataType(column)) {
-                case "number":
-                    return (column.dataFormatString && column.dataFormatString.indexOf("p") === 0) ? "numberPercent" : "numberNumber";
-                case "currency":
-                    return "numberCurrency";
-                case "datetime":
-                    return "date";
-                default:
-                    return "mask";
-            }
-        };
-        return c1field;
-    })(wijmo.c1basefield);
-    wijmo.c1field = c1field;
-    c1field.prototype.options = $.extend(true, {
-    }, wijmo.c1basefield.prototype.options, {
-        aggregate: /// <summary>
-        /// Causes the grid to calculate aggregate values on the column and place them in the column footer cell or group header and footer rows.
-        /// If the <see cref="showFooter"/> option is disabled or grid does not contain any groups, setting the "aggregate" option has no effect.
-        ///
-        /// Possible values are: "none", "count", "sum", "average", "min", "max", "std", "stdPop", "var", "varPop" and "custom".
-        ///
-        /// "none": no aggregate is calculated or displayed.
-        /// "count": count of non-empty values.
-        /// "sum": sum of numerical values.
-        /// "average": average of the numerical values.
-        /// "min": minimum value (numerical, string, or date).
-        /// "max": maximum value (numerical, string, or date).
-        /// "std": standard deviation (using formula for Sample, n-1).
-        /// "stdPop": standard deviation (using formula for Population, n).
-        /// "var": variance (using formula for Sample, n-1).
-        /// "varPop": variance (using formula for Population, n).
-        /// "custom": custom value (causing grid to throw groupAggregate event).
-        ///
-        /// Default: "none".
-        /// Type: String.
-        /// Code example: $("#element").wijgrid({ columns: [{ aggregate: "none" }] });
-        /// </summary>
-        "none",
-        allowSort: /// <summary>
-        /// A value indicating whether column can be sorted.
-        /// Default: true.
-        /// Type: Boolean.
-        /// Code example: $("#element").wijgrid({ columns: [{ allowSort: true }] });
-        /// </summary>
-        true,
-        dataType: /// <summary>
-        /// Column data type. Used to determine the rules for sorting, grouping, aggregate calculation, and so on.
-        /// Possible values are: "string", "number", "datetime", "currency" and "boolean".
-        ///
-        /// "string": if using built-in parser any values are acceptable; "&nbsp;" considered as an empty string, nullString as null.
-        /// "number": if using built-in parser only numeric values are acceptable, also "&nbsp;", "" and nullString which are considered as null. Any other value throws an exception.
-        /// "datetime": if using built-in parser only date-time values are acceptable, also "&nbsp;", "" and nullString which are considered as null. Any other value throws an exception.
-        /// "currency": if using built-in parser only numeric and currency values are acceptable, also "&nbsp;", "" and nullString which are considered as null. Any other value throws an exception.
-        /// "boolean": if using built-in parser only "true" and "false" (case-insensitive) values are acceptable, also "&nbsp;", "" and nullString which are considered as null. Any other value throws an exception.
-        ///
-        /// Default: undefined.
-        /// Type: String.
-        /// Code example: $("#element").wijgrid({ columns: [{ dataType: "string" }] });
-        /// </summary>
-        undefined,
-        dataParser: /// <summary>
-        /// Data converter that is able to translate values from a string representation to column data type and back.
-        ///
-        /// The dataParser is an object which must contains the following methods:
-        ///   parseDOM(value, culture, format, nullString): converts given DOM element into the typed value.
-        ///   parse(value, culture, format, nullString): converts the value into typed value.
-        ///   toStr(value, culture, format, nullString): converts the value into its string representation.
-        ///
-        /// Default: undefined (widget built-in parser for supported datatypes will be used).
-        /// Type: Object.
-        ///
-        /// Code example:
-        ///   var myBoolParser = {
-        ///     parseDOM: function (value, culture, format, nullString) {
-        ///       return this.parse(value.innerHTML, culture, format, nullString);
-        ///     },
-        ///
-        ///     parse: function (value, culture, format, nullString) {
-        ///       if (typeof (value) === "boolean")  return value;
-        ///
-        ///       if (!value || (value === "&nbsp;") || (value === nullString)) {
-        ///         return null;
-        ///       }
-        ///
-        ///       switch (value.toLowerCase()) {
-        ///         case "on": return true;
-        ///         case "off": return false;
-        ///       }
-        ///
-        ///       return NaN;
-        ///     },
-        ///
-        ///     toStr: function (value, culture, format, nullString) {
-        ///       if (value === null)  return nullString;
-        ///       return (value) ? "on" : "off";
-        ///     }
-        ///   }
-        ///
-        ///   $("#element").wijgrid({ columns: [ { dataType: "boolean", dataParser: myBoolParser } ] });
-        /// </summary>
-        undefined,
-        dataFormatString: /// <summary>
-        /// A pattern used for formatting and parsing column values. See globalize.js for possible values.
-        /// The default value is undefined ("n" pattern will be used for "number" dataType, "d" for "datetime", "c" for "currency").
-        /// Default: undefined.
-        /// Type: String.
-        /// Code example: $("#element").wijgrid({ columns: [ { dataType: "number", dataFormatString: "n" } ] });
-        /// </summary>
-        undefined,
-        filterOperator: /// <summary>
-        /// An operations set for filtering. Must be either one of the embedded operators or custom filter operator.
-        /// Operator names are case insensitive.
-        ///
-        /// Embedded filter operators include:
-        ///   "NoFilter": no filter.
-        ///   "Contains": applicable to "string" data type.
-        ///   "NotContain": applicable to "string" data type.
-        ///   "BeginsWith": applicable to "string" data type.
-        ///   "EndsWith": applicable to "string" data type.
-        ///   "Equals": applicable to "string", "number", "datetime", "currency" and "boolean" data types.
-        ///   "NotEqual": applicable to "string", "number", "datetime", "currency" and "boolean" data types.
-        ///   "Greater": applicable to "string", "number", "datetime", "currency" and "boolean" data types.
-        ///   "Less": applicable to "string", "number", "datetime", "currency" and "boolean" data types.
-        ///   "GreaterOrEqual": applicable to "string", "number", "datetime", "currency" and "boolean" data types.
-        ///   "LessOrEqual": applicable to "string", "number", "datetime", "currency" and "boolean" data types.
-        ///   "IsEmpty": applicable to "string".
-        ///   "NotIsEmpty": applicable to "string".
-        ///   "IsNull": applicable to "string", "number", "datetime", "currency" and "boolean" data types.
-        ///   "NotIsNull": applicable to "string", "number", "datetime", "currency" and "boolean" data types.
-        ///
-        /// Full option value is:
-        ///   [filterOperartor1, ..., filterOperatorN]
-        ///
-        /// where each filter item is an object of the following kind:
-        ///   { name: <operatorName>, condition: "or"|"and" }
-        ///
-        /// where:
-        ///   name: filter operator name.
-        ///   condition: logical condition to other operators, "or" is by default.
-        ///
-        /// Example:
-        ///   filterOperator: [ { name: "Equals" }, { name: "NotEqual", condition: "and" } ]
-        ///
-        /// It is possible to use shorthand notation, the following statements are equivalent:
-        ///   filterOperator: [ { name: "Equals" }, { name: "BeginsWith" } ]
-        ///   filterOperator: [ "Equals", "BeginsWith" ]
-        ///
-        /// In the case of a single operator option name may contain only filter operator name, the following statements are equivalent:
-        ///   filterOperator: [ { name: "Equals" } ]
-        ///   filterOperator: [ "Equals" ]
-        ///   filterOperator: "Equals"
-        ///
-        /// Note: wijgrid built-in filter editors do not support multiple filter operators.
-        ///
-        /// Default: "nofilter".
-        /// Type: Object.
-        /// Code example: $("#element").wijgrid({ columns: [ { filterOperator: "nofilter" } ] });
-        /// </summary>
-        "nofilter",
-        filterValue: /// <summary>
-        /// A value set for filtering.
-        ///
-        /// Full option value is:
-        ///   [filterValue1, ..., filterValueN]
-        ///
-        /// where each item is a filter value for the corresponding filter operator.
-        ///
-        /// Example:
-        ///  filterValue: [0, "a", "b"]
-        ///
-        /// Built-in filter operators support array of values as an argument.
-        ///
-        /// Example:
-        ///   filterOperator: ["Equals", "BeginsWith"]
-        ///   filterValue: [[0, 1, 2], "a"]
-        ///
-        ///   As a result of filtering all the records having 0, 1, 2, or starting with "a" will be fetched.
-        ///
-        /// Shorthand notation allows omitting square brackets, the following statements are equivalent:
-        ///    filterValue: ["a"]
-        ///    filterValue: [["a"]]
-        ///    filterValue: "a"
-        ///
-        /// Note: wijgrid built-in filter editors do not support multiple filter values.
-        ///
-        /// Default: undefined.
-        /// Type: Depends on column data type.
-        /// Code example: $("#element").wijgrid({ columns: [ { filterValue: "abc" } ] });
-        /// </summary>
-        undefined,
-        groupInfo: /// <summary>
-        /// Using to customize the appearance and position of groups.
-        /// Default: {
-        ///   groupSingleRow: true,
-        ///   collapsedImageClass: "ui-icon-triangle-1-e",
-        ///   expandedImageClass: "ui-icon-triangle-1-se",
-        ///   position: "none",
-        ///   outlineMode: "startExpanded",
-        ///   headerText: undefined,
-        ///   footerText: undefined
-        /// }
-        /// Type: Object.
-        /// Code example: $("#element").wijgrid({ columns: [{ groupInfo: { position: "header" }}] });
-        /// </summary>
-        {
-            expandInfo: [],
-            groupSingleRow: // infrastructure
-            /// <summary>
-            /// A value indicating whether groupings containing a single row are grouped.
-            /// The default value is true.
-            /// Type: Boolean.
-            /// </summary>
-            true,
-            collapsedImageClass: /// <summary>
-            /// Determines the css used to show collapsed nodes on the grid.
-            /// The default value is "ui-icon-triangle-1-e".
-            /// Type: String.
-            /// </summary>
-            $.wijmo.wijCSS.iconArrowRight,
-            expandedImageClass: /// <summary>
-            /// Determines the css used to show expanded nodes on the grid.
-            /// The default value is "ui-icon-triangle-1-se".
-            /// Type: String.
-            /// </summary>
-            $.wijmo.wijCSS.iconArrowRightDown,
-            position: /// <summary>
-            /// Determines whether the grid should insert group header and/or group footer rows for this column.
-            ///
-            /// Possible values are: "none", "header", "footer", "headerAndFooter".
-            ///  "none" -  disables grouping for the column.
-            ///  "header" - inserts header rows.
-            ///  "footer" - inserts footer rows.
-            ///  "headerAndFooter" - inserts header and footer rows.
-            ///
-            /// The default value is "none".
-            /// Type: String.
-            /// </summary>
-            "none",
-            outlineMode: /// <summary>
-            /// Determines whether the user will be able to collapse and expand the groups by clicking on the group headers,
-            /// and also determines whether groups will be initially collapsed or expanded.
-            ///
-            /// Possible values are: "none", "startCollapsed", "startExpanded".
-            ///  "none" -  disables collapsing and expanding.
-            ///  "startCollapsed" - groups are initially collapsed.
-            ///  "startExpanded" - groups are initially expanded.
-            ///
-            /// The default value is "startExpanded".
-            /// Type: String.
-            /// </summary>
-            "startExpanded",
-            headerText: /// <summary>
-            /// Determines the text that is displayed in the group header rows.
-            ///
-            /// The text may include up to three placeholders:
-            /// "{0}" is replaced with the value being grouped on.
-            /// "{1}" is replaced with the group's column header.
-            /// "{2}" is replaced with the aggregate
-            ///
-            /// The text may be set to "custom". Doing so causes the grid groupText event to be raised when
-            /// processing a grouped header.
-            ///
-            /// The default value is undefined.
-            /// Type: String.
-            /// </summary>
-            undefined,
-            footerText: /// <summary>
-            /// Determines the text that is displayed in the group footer rows.
-            ///
-            /// The text may include up to three placeholders:
-            /// "{0}" is replaced with the value being grouped on.
-            /// "{1}" is replaced with the group's column header.
-            /// "{2}" is replaced with the aggregate
-            ///
-            /// The text may be set to "custom". Doing so causes the grid groupText event to be raised when
-            /// processing a grouped footer.
-            ///
-            /// The default value is undefined.
-            /// Type: String.
-            /// </summary>
-            undefined
-        },
-        readOnly: /// <summary>
-        /// A value indicating whether the cells in the column can be edited.
-        /// Default: false.
-        /// Type: Boolean.
-        /// Code example: $("#element").wijgrid({ columns: [ { readOnly: false } ] });
-        /// </summary>
-        false,
-        rowMerge: /// <summary>
-        /// Determines whether rows are merged.
-        /// Possible values are: "none", "free" and "restricted".
-        ///
-        /// "none": no row merging.
-        /// "free": allows row with identical text to merge.
-        /// "restricted": keeps rows with identical text from merging if rows in the previous column are merged.
-        ///
-        /// Default: "none".
-        /// Type: String.
-        /// Code example: $("#element").wijgrid({ columns: [{ rowMerge: "none" }] });
-        /// </summary>
-        "none",
-        showFilter: /// <summary>
-        /// A value indicating whether filter editor will be shown in the filter row.
-        /// Default: true.
-        /// Type: Boolean.
-        /// Code example: $("#element").wijgrid({ columns: [ { showFilter: true } ] });
-        /// </summary>
-        true,
-        sortDirection: /// <summary>
-        /// Determines the sort direction.
-        /// Possible values are: "none", "ascending" and "descending".
-        ///
-        /// "none": no sorting.
-        /// "ascending": sort from smallest to largest.
-        /// "descending": sort from largest to smallest.
-        ///
-        /// Default: "none".
-        /// Type: String.
-        /// Code example: $("#element").wijgrid({ columns: [{ sortDirection: "none" }] });
-        /// </summary>
-        "none",
-        valueRequired: /// <summary>
-        /// A value indicating whether null value is allowed during editing.
-        /// Default: false.
-        /// Type: Boolean.
-        /// Code example: $("#element").wijgrid({ columns: [ { valueRequired: false } ] });
-        /// </summary>
-        false
-    });
-    $.wijmo.registerWidget("c1field", $.wijmo.c1basefield, c1field.prototype);
+            return c1field_options;
+        })(grid.c1basefield_options);
+        grid.c1field_options = c1field_options;
+        ;
+        //c1field.prototype.options = $.extend(true, {}, c1basefield.prototype.options, new c1field_options());
+        c1field.prototype.options = wijmo.grid.extendWidgetOptions(grid.c1basefield.prototype.options, new c1field_options());
+        $.wijmo.registerWidget("c1field", $.wijmo.c1basefield, c1field.prototype);
+    })(wijmo.grid || (wijmo.grid = {}));
+    var grid = wijmo.grid;
 })(wijmo || (wijmo = {}));
 
 var __extends = this.__extends || function (d, b) {
@@ -4992,43 +5177,64 @@ var __extends = this.__extends || function (d, b) {
     __.prototype = b.prototype;
     d.prototype = new __();
 };
-/// <reference path="c1basefield.ts"/>
-/// <reference path="interfaces.ts"/>
 var wijmo;
 (function (wijmo) {
-    "use strict";
-    var $ = jQuery;
-    var c1band = (function (_super) {
-        __extends(c1band, _super);
-        function c1band() {
-            _super.apply(this, arguments);
+    /// <reference path="c1field.ts"/>
+    /// <reference path="c1basefield.ts"/>
+    /// <reference path="interfaces.ts"/>
+    (function (grid) {
+        "use strict";
+        var $ = jQuery;
+        /** @widget */
+        var c1band = (function (_super) {
+            __extends(c1band, _super);
+            function c1band() {
+                _super.apply(this, arguments);
 
-        }
-        c1band.prototype._create = function () {
-            _super.prototype._create.apply(this, arguments);
-            var wijgrid = this._owner();
-            this.element.addClass(wijgrid.options.wijCSS.widget + " wijmo-c1band");
-        };
-        c1band.prototype._canDropTo = function (wijField) {
-            if(_super.prototype._canDropTo.apply(this, arguments)) {
-                //band can't be dropped into group area
-                return !(wijField instanceof $.wijmo.c1groupedfield);
             }
-            return false;
-        };
-        return c1band;
-    })(wijmo.c1basefield);
-    wijmo.c1band = c1band;
-    c1band.prototype.options = $.extend(true, {
-    }, wijmo.c1basefield.prototype.options, {
-        columns: /// <summary>
-        /// Gets a array of objects representing the columns of the band.
-        /// The default value is an empty array.
-        /// Type: Array.
-        /// </summary>
-        []
-    });
-    $.wijmo.registerWidget("c1band", $.wijmo.c1basefield, c1band.prototype);
+            c1band.prototype._create = function () {
+                _super.prototype._create.apply(this, arguments);
+                var wijgrid = this._owner();
+                this.element.addClass(wijgrid.options.wijCSS.widget + " wijmo-c1band");
+            };
+            c1band.prototype._canDropTo = function (wijField) {
+                if(_super.prototype._canDropTo.apply(this, arguments)) {
+                    //band can't be dropped into group area
+                    return !(wijField instanceof $.wijmo.c1groupedfield);
+                }
+                return false;
+            };
+            return c1band;
+        })(grid.c1basefield);
+        grid.c1band = c1band;
+        var c1band_options = (function (_super) {
+            __extends(c1band_options, _super);
+            function c1band_options() {
+                _super.apply(this, arguments);
+
+                /**
+                * Gets a array of objects representing the band columns.
+                * @example
+                * $("#element").wijgrid({
+                *   columns: [{
+                *      headerText: "Band",
+                *      columns: [
+                *         { headerText: "ID" },
+                *         { headerText: "Name" }
+                *      ]
+                *   }]
+                * });
+                */
+                this.columns = [];
+            }
+            return c1band_options;
+        })(grid.c1field_options);
+        ;
+        //c1band.prototype.options = $.extend(true, {}, c1basefield.prototype.options, new c1band_options());
+        c1band.prototype.options = wijmo.grid.extendWidgetOptions(grid.c1basefield.prototype.options, new c1band_options());
+        $.wijmo.registerWidget("c1band", $.wijmo.c1basefield, c1band.prototype);
+    })(wijmo.grid || (wijmo.grid = {}));
+    var grid = wijmo.grid;
 })(wijmo || (wijmo = {}));
 
 var __extends = this.__extends || function (d, b) {
@@ -5036,210 +5242,214 @@ var __extends = this.__extends || function (d, b) {
     __.prototype = b.prototype;
     d.prototype = new __();
 };
-/// <reference path="c1basefield.ts"/>
-/// <reference path="interfaces.ts"/>
 var wijmo;
 (function (wijmo) {
-    "use strict";
-    var $ = jQuery;
-    var c1groupedfield = (function (_super) {
-        __extends(c1groupedfield, _super);
-        function c1groupedfield() {
-            _super.apply(this, arguments);
+    /// <reference path="c1basefield.ts"/>
+    /// <reference path="interfaces.ts"/>
+    (function (grid) {
+        "use strict";
+        var $ = jQuery;
+        /** @ignore */
+        var c1groupedfield = (function (_super) {
+            __extends(c1groupedfield, _super);
+            function c1groupedfield() {
+                _super.apply(this, arguments);
 
-        }
-        c1groupedfield.prototype._create = function () {
-            var wijgrid = $.data(this.element[0], "wijgridowner");
-            this._field("owner", wijgrid);
-            wijmo.grid.widgetName(this.element[0], this.widgetFullName);
-            this._destroyed = false;
-            this.element.addClass("wijmo-wijgrid-group-button " + wijgrid.options.wijCSS.stateDefault + " " + wijgrid.options.wijCSS.cornerAll);
-            if(this.options.disabled) {
-                this.disable();
             }
-            if(wijgrid.options.allowColMoving) {
-                wijgrid._dragndrop(true).attach(this);
-            }
-        };
-        c1groupedfield.prototype._init = function () {
-            this._refreshHeaderCell();
-        };
-        c1groupedfield.prototype.destroy = function () {
-            try  {
-                _super.prototype.destroy.apply(this, arguments);
-            }finally {
-                this._destroyed = true;
-            }
-        };
-        c1groupedfield.prototype._destroy = function () {
-            if(this._isDestroyed()) {
-                return;
-            }
-            this.element.find("*").unbind("." + this.widgetName);
-            var wijgrid = this._owner();
-            if(wijgrid && wijgrid._dragndrop(false)) {
-                wijgrid._dragndrop(false).detach(this);
-            }
-            wijmo.grid.remove$dataByPrefix(this.element, this._data$prefix);
-        };
-        c1groupedfield.prototype._field = function (name, value) {
-            return wijmo.grid.dataPrefix(this.element, this._data$prefix, name, value);
-        };
-        c1groupedfield.prototype._removeField = function (name) {
-            var internalDataName = this._data$prefix + name;
-            this.element.removeData(internalDataName);
-        };
-        c1groupedfield.prototype._setOption = function (key, value) {
-            var presetFunc = this["_preset_" + key], oldValue = this.options[key], optionChanged, postsetFunc;
-            if(presetFunc !== undefined) {
-                value = presetFunc.apply(this, [
-                    value,
-                    oldValue
-                ]);
-            }
-            optionChanged = (value !== oldValue);
-            //$.Widget.prototype._setOption.apply(this, arguments);  note: there is no dynamic linkage between the arguments and the formal parameter values when strict mode is used
-            _super.prototype._setOption.apply(this, [
-                key,
-                value
-            ]);
-            if(optionChanged) {
-                postsetFunc = this["_postset_" + key];
-                if(postsetFunc !== undefined) {
-                    postsetFunc.apply(this, [
+            c1groupedfield.prototype._create = function () {
+                var wijgrid = $.data(this.element[0], "wijgridowner");
+                this._field("owner", wijgrid);
+                wijmo.grid.widgetName(this.element[0], this.widgetFullName);
+                this._destroyed = false;
+                this.element.addClass("wijmo-wijgrid-group-button " + wijgrid.options.wijCSS.stateDefault + " " + wijgrid.options.wijCSS.cornerAll);
+                if(this.options.disabled) {
+                    this.disable();
+                }
+                if(wijgrid.options.allowColMoving) {
+                    wijgrid._dragndrop(true).attach(this);
+                }
+            };
+            c1groupedfield.prototype._init = function () {
+                this._refreshHeaderCell();
+            };
+            c1groupedfield.prototype.destroy = function () {
+                try  {
+                    _super.prototype.destroy.apply(this, arguments);
+                }finally {
+                    this._destroyed = true;
+                }
+            };
+            c1groupedfield.prototype._destroy = function () {
+                if(this._isDestroyed()) {
+                    return;
+                }
+                this.element.find("*").unbind("." + this.widgetName);
+                var wijgrid = this._owner();
+                if(wijgrid && wijgrid._dragndrop(false)) {
+                    wijgrid._dragndrop(false).detach(this);
+                }
+                wijmo.grid.remove$dataByPrefix(this.element, this._data$prefix);
+            };
+            c1groupedfield.prototype._field = function (name, value) {
+                return wijmo.grid.dataPrefix(this.element, this._data$prefix, name, value);
+            };
+            c1groupedfield.prototype._removeField = function (name) {
+                var internalDataName = this._data$prefix + name;
+                this.element.removeData(internalDataName);
+            };
+            c1groupedfield.prototype._setOption = function (key, value) {
+                var presetFunc = this["_preset_" + key], oldValue = this.options[key], optionChanged, postsetFunc;
+                if(presetFunc !== undefined) {
+                    value = presetFunc.apply(this, [
                         value,
                         oldValue
                     ]);
                 }
-            }
-        };
-        c1groupedfield.prototype._postset_headerText = function (value, oldValue, isInvokedOutside) {
-            this._refreshHeaderCell();
-        };
-        c1groupedfield.prototype._postset_allowSort = function (value, oldValue, isInvokedOutside) {
-            this._refreshHeaderCell();
-        };
-        c1groupedfield.prototype._owner = function () {
-            return this._field("owner");
-        };
-        c1groupedfield.prototype._canSize = function () {
-            return this.options.allowSizing && this._owner().options.allowColSizing;
-        };
-        c1groupedfield.prototype._canDrag = // drag-n-drop
-        function () {
-            return this.options.allowMoving === true;
-        };
-        c1groupedfield.prototype._canDropTo = function (wijField) {
-            //band can't be dropped into group area
-            if(!(wijField instanceof $.wijmo.c1groupedfield)) {
-                return false;
-            }
-            // parent can't be dropped into a child
-            if(wijmo.grid.isChildOf(this._owner().options.columns, wijField, this)) {
-                return false;
-            }
-            return true;
-        };
-        c1groupedfield.prototype._canSort = function () {
-            var grid = this._owner();
-            return (grid && grid.options.allowSorting && this.options.allowSort && (this.options.dataIndex >= 0));
-        };
-        c1groupedfield.prototype._refreshHeaderCell = function () {
-            var wijCSS = this._owner().options.wijCSS, $closeButton = $("<span class=\"wijmo-wijgrid-group-button-close " + wijCSS.stateDefault + " " + wijCSS.cornerAll + "\"><span class=\"" + wijCSS.icon + " " + wijCSS.iconClose + "\"></span></span>").bind("click." + this.widgetName, this, this._onCloseClick);
-            this.element.html(this.options.headerText || "").prepend(// html(value) returns "" if value is undefined
-            $closeButton).bind("click." + this.widgetName, this, $.proxy(this._onHrefClick, this));
-            if(this._canSort()) {
-                switch(this.options.sortDirection) {
-                    case // sorting icon
-                    "ascending":
-                        this.element.append($("<span class=\"wijmo-wijgrid-group-button-sort " + wijCSS.icon + " " + wijCSS.iconArrowUp + "\"></span>"));
-                        break;
-                    case "descending":
-                        this.element.append($("<span class=\"wijmo-wijgrid-group-button-sort " + wijCSS.icon + " " + wijCSS.iconArrowDown + "\"></span>"));
-                        break;
+                optionChanged = (value !== oldValue);
+                //$.Widget.prototype._setOption.apply(this, arguments);  note: there is no dynamic linkage between the arguments and the formal parameter values when strict mode is used
+                _super.prototype._setOption.apply(this, [
+                    key,
+                    value
+                ]);
+                if(optionChanged) {
+                    postsetFunc = this["_postset_" + key];
+                    if(postsetFunc !== undefined) {
+                        postsetFunc.apply(this, [
+                            value,
+                            oldValue
+                        ]);
+                    }
                 }
-            }
-        };
-        c1groupedfield.prototype._onCloseClick = function (args) {
-            var options = args.data.options;
-            if(!options.disabled) {
-                args.data._owner()._handleUngroup(args.data.options.travIdx);
-            }
-            return false;
-        };
-        c1groupedfield.prototype._onHrefClick = function (args) {
-            var wijgrid = args.data._owner(), options = args.data.options, column;
-            if(!options.disabled && options.allowSort) {
-                //find the column according to the c1groupedfield widget
-                column = wijmo.grid.search(wijgrid.columns(), function (test) {
-                    return test.options.travIdx === options.travIdx;
-                });
-                column = (!column.found) ? // grouped column is invisible?
-                wijmo.grid.getColumnByTravIdx(wijgrid.options.columns, options.travIdx).found : column.found.options;
-                if(column) {
-                    wijgrid._handleSort(column, args.ctrlKey);
+            };
+            c1groupedfield.prototype._postset_headerText = function (value, oldValue, isInvokedOutside) {
+                this._refreshHeaderCell();
+            };
+            c1groupedfield.prototype._postset_allowSort = function (value, oldValue, isInvokedOutside) {
+                this._refreshHeaderCell();
+            };
+            c1groupedfield.prototype._owner = function () {
+                return this._field("owner");
+            };
+            c1groupedfield.prototype._canSize = function () {
+                return this.options.allowSizing && this._owner().options.allowColSizing;
+            };
+            c1groupedfield.prototype._canDrag = // drag-n-drop
+            function () {
+                return this.options.allowMoving === true;
+            };
+            c1groupedfield.prototype._canDropTo = function (wijField) {
+                //band can't be dropped into group area
+                if(!(wijField instanceof $.wijmo.c1groupedfield)) {
+                    return false;
                 }
-            }
-            return false;
-        };
-        c1groupedfield.prototype._isDestroyed = function () {
-            return this._destroyed;
-        };
-        return c1groupedfield;
-    })(wijmo.wijmoWidget);
-    wijmo.c1groupedfield = c1groupedfield;
-    c1groupedfield.prototype._data$prefix = "c1groupedfield";
-    c1groupedfield.prototype.options = $.extend(true, {
-    }, wijmo.JQueryUIWidget.prototype.options, {
-        wijMobileCSS: {
-            header: "ui-header ui-bar-a",
-            content: "ui-body-c",
-            stateDefault: "ui-btn-up-c",
-            stateHover: "ui-btn-down-c",
-            stateActive: "ui-btn-down-c"
-        },
-        allowMoving: /// <summary>
-        /// A value indicating whether the column can be moved.
-        /// Default: true.
-        /// Type: Boolean.
-        /// Code example: $("#element").wijgrid({ columns: [ { allowMoving: true } ] });
-        /// </summary>
-        true,
-        allowSort: /// <summary>
-        /// A value indicating whether column can be sorted.
-        /// Default: true.
-        /// Type: Boolean.
-        /// Code example: $("#element").wijgrid({ columns: [{ allowSort: true }] });
-        /// </summary>
-        true,
-        headerText: /// <summary>
-        /// Gets or sets the header text.
-        /// Default: undefined.
-        /// Type: String.
-        /// Code example: $("#element").wijgrid({ columns: [ { headerText: "column0" } ] });
-        /// </summary>
-        /// <remarks>
-        /// If the value is undefined the header text will be determined automatically depending on the type of the datasource:
-        ///  DOM table - text in the header cell.
-        ///  Array of hashes - dataKey (name of the field associated with column).
-        ///  Two-dimensional array - dataKey (index of the field associated with column).
-        /// </remarks>
-        undefined,
-        sortDirection: /// <summary>
-        /// Determines the sort direction.
-        /// Possible values are: "none", "ascending" and "descending".
-        ///
-        /// "none": no sorting.
-        /// "ascending": sort from smallest to largest.
-        /// "descending": sort from largest to smallest.
-        ///
-        /// Default: "none".
-        /// Type: String.
-        /// Code example: $("#element").wijgrid({ columns: [{ sortDirection: "none" }] });
-        /// </summary>
-        "none"
-    });
-    $.wijmo.registerWidget("c1groupedfield", c1groupedfield.prototype);
+                // parent can't be dropped into a child
+                if(wijmo.grid.isChildOf(this._owner().options.columns, wijField, this)) {
+                    return false;
+                }
+                return true;
+            };
+            c1groupedfield.prototype._canSort = function () {
+                var grid = this._owner();
+                return (grid && grid.options.allowSorting && this.options.allowSort && (this.options.dataIndex >= 0));
+            };
+            c1groupedfield.prototype._refreshHeaderCell = function () {
+                var wijCSS = this._owner().options.wijCSS, $closeButton = $("<span class=\"wijmo-wijgrid-group-button-close " + wijCSS.stateDefault + " " + wijCSS.cornerAll + "\"><span class=\"" + wijCSS.icon + " " + wijCSS.iconClose + "\"></span></span>").bind("click." + this.widgetName, this, this._onCloseClick);
+                this.element.html(this.options.headerText || "").prepend(// html(value) returns "" if value is undefined
+                $closeButton).bind("click." + this.widgetName, this, $.proxy(this._onHrefClick, this));
+                if(this._canSort()) {
+                    switch(this.options.sortDirection) {
+                        case // sorting icon
+                        "ascending":
+                            this.element.append($("<span class=\"wijmo-wijgrid-group-button-sort " + wijCSS.icon + " " + wijCSS.iconArrowUp + "\"></span>"));
+                            break;
+                        case "descending":
+                            this.element.append($("<span class=\"wijmo-wijgrid-group-button-sort " + wijCSS.icon + " " + wijCSS.iconArrowDown + "\"></span>"));
+                            break;
+                    }
+                }
+            };
+            c1groupedfield.prototype._onCloseClick = function (args) {
+                var options = args.data.options;
+                if(!options.disabled) {
+                    (args.data._owner())._handleUngroup(args.data.options.travIdx);
+                }
+                return false;
+            };
+            c1groupedfield.prototype._onHrefClick = function (args) {
+                var wijgrid = args.data._owner(), options = args.data.options, column;
+                if(!(options).disabled && options.allowSort) {
+                    //find the column according to the c1groupedfield widget
+                    column = wijmo.grid.search(wijgrid.columns(), function (test) {
+                        return test.options.travIdx === options.travIdx;
+                    });
+                    column = (!column.found) ? // grouped column is invisible?
+                    wijmo.grid.getColumnByTravIdx(wijgrid.options.columns, options.travIdx).found : column.found.options;
+                    if(column) {
+                        wijgrid._handleSort(column, args.ctrlKey);
+                    }
+                }
+                return false;
+            };
+            c1groupedfield.prototype._isDestroyed = function () {
+                return this._destroyed;
+            };
+            return c1groupedfield;
+        })(wijmo.wijmoWidget);
+        grid.c1groupedfield = c1groupedfield;
+        c1groupedfield.prototype._data$prefix = "c1groupedfield";
+        c1groupedfield.prototype.options = $.extend(true, {
+        }, wijmo.wijmoWidget.prototype.options, {
+            wijMobileCSS: {
+                header: "ui-header ui-bar-a",
+                content: "ui-body-c",
+                stateDefault: "ui-btn-up-c",
+                stateHover: "ui-btn-down-c",
+                stateActive: "ui-btn-down-c"
+            },
+            allowMoving: /// <summary>
+            /// A value indicating whether the column can be moved.
+            /// Default: true.
+            /// Type: Boolean.
+            /// Code example: $("#element").wijgrid({ columns: [ { allowMoving: true } ] });
+            /// </summary>
+            true,
+            allowSort: /// <summary>
+            /// A value indicating whether column can be sorted.
+            /// Default: true.
+            /// Type: Boolean.
+            /// Code example: $("#element").wijgrid({ columns: [{ allowSort: true }] });
+            /// </summary>
+            true,
+            headerText: /// <summary>
+            /// Gets or sets the header text.
+            /// Default: undefined.
+            /// Type: String.
+            /// Code example: $("#element").wijgrid({ columns: [ { headerText: "column0" } ] });
+            /// </summary>
+            /// <remarks>
+            /// If the value is undefined the header text will be determined automatically depending on the type of the datasource:
+            ///  DOM table - text in the header cell.
+            ///  Array of hashes - dataKey (name of the field associated with column).
+            ///  Two-dimensional array - dataKey (index of the field associated with column).
+            /// </remarks>
+            undefined,
+            sortDirection: /// <summary>
+            /// Determines the sort direction.
+            /// Possible values are: "none", "ascending" and "descending".
+            ///
+            /// "none": no sorting.
+            /// "ascending": sort from smallest to largest.
+            /// "descending": sort from largest to smallest.
+            ///
+            /// Default: "none".
+            /// Type: String.
+            /// Code example: $("#element").wijgrid({ columns: [{ sortDirection: "none" }] });
+            /// </summary>
+            "none"
+        });
+        $.wijmo.registerWidget("c1groupedfield", c1groupedfield.prototype);
+    })(wijmo.grid || (wijmo.grid = {}));
+    var grid = wijmo.grid;
 })(wijmo || (wijmo = {}));
 
 var wijmo;
@@ -5248,6 +5458,7 @@ var wijmo;
     (function (grid) {
         "use strict";
         var $ = jQuery;
+        /** @ignore */
         var bandProcessor = (function () {
             function bandProcessor() { }
             bandProcessor.prototype.generateSpanTable = function (root, leaves) {
@@ -5568,11 +5779,13 @@ var wijmo;
 (function (wijmo) {
     /// <reference path="interfaces.ts"/>
     /// <reference path="filterOperators.ts"/>
+    /// <reference path="misc.ts"/>
     /// <reference path="../../../data/src/dataView.ts"/>
     /// <reference path="../../../data/src/filtering.ts"/>
     (function (grid) {
         "use strict";
         var $ = jQuery;
+        /** @ignore */
         var settingsManager = (function () {
             function settingsManager(wijgrid) {
                 this._dvFilteringSettings = undefined;
@@ -5627,7 +5840,8 @@ var wijmo;
                                 // single filter object - { property, operator, value }
                                 normalizedItem.filterValue.push(item.value);
                                 normalizedItem.filterOperator.push({
-                                    name: item.operator,
+                                    name: item.originalOperator || // unwrap proxy operator
+                                    item.operator,
                                     condition: condition
                                 });
                             }
@@ -5647,7 +5861,8 @@ var wijmo;
                                 traverse(item, normalizedItem);
                             } else if($.isPlainObject(item)) {
                                 normalizedItem.filterValue = item.value;
-                                normalizedItem.filterOperator = item.operator || "Equals";
+                                normalizedItem.filterOperator = item.originalOperator || // unwrap proxy operator
+                                item.operator || "Equals";
                             } else {
                                 normalizedItem.filterValue = item;
                                 normalizedItem.filterOperator = "Equals";
@@ -5708,6 +5923,7 @@ var wijmo;
                                 })).foo, verifiedFop = wijmo.grid.filterHelper.verify(fopToVerify, fvToVerify, leaf.dataType, self._filterCache);
                                 if(verifiedFop) {
                                     foo.push({
+                                        owner: leaf,
                                         dataKey: leaf.dataKey,
                                         filterValue: verifiedFop.filterValue,
                                         filterOperator: verifiedFop.filterOperator
@@ -5731,39 +5947,60 @@ var wijmo;
             };
             settingsManager.prototype.WGSortingSettings = function () {
                 if(this._wgSortingSettings === undefined) {
-                    var foo = [], leaves = this._wijgrid._field("leaves");
+                    var sortDictionary = {
+                    }, sortArray = [], groupedColumns = this._wijgrid._groupedColumns(true), leaves = // grouped columns ordered by the groupedIndex
+                    this._wijgrid._field("leaves") || [], canSort = function (column) {
+                        return (!column.isBand && column.allowSort && wijmo.grid.validDataKey(column.dataKey));
+                    }, sortOrder = 0;
                     if(this._wijgrid.options.allowSorting) {
-                        if(leaves) {
-                            $.each(leaves, function (key, leaf) {
-                                if(!leaf.isBand && leaf.allowSort && wijmo.grid.validDataKey(leaf.dataKey)) {
-                                    if(leaf.groupInfo && (leaf.groupInfo.position !== "none") && (leaf.sortDirection === "none")) {
-                                        leaf.sortDirection = "ascending"// use "ascending" for grouped columns by default
-                                        ;
-                                    }
-                                    if(leaf.sortDirection === "ascending" || leaf.sortDirection === "descending") {
-                                        foo.push({
+                        // fill the sortedDictionary with the grouped columns first
+                        $.each(groupedColumns, function (i, leaf) {
+                            if(canSort(leaf)) {
+                                if(leaf.sortDirection === "none") {
+                                    leaf.sortDirection = "ascending"// use "ascending" for grouped columns by default
+                                    ;
+                                }
+                                sortDictionary[leaf.dataKey] = {
+                                    dataKey: leaf.dataKey,
+                                    sortDirection: leaf.sortDirection,
+                                    sortOrder: sortOrder++
+                                };
+                            }
+                        });
+                        sortOrder++;
+                        // add other columns
+                        $.each(leaves, function (i, leaf) {
+                            if(canSort(leaf)) {
+                                if(leaf.sortDirection === "ascending" || leaf.sortDirection === "descending") {
+                                    if(!sortDictionary[leaf.dataKey]) {
+                                        // skip grouped columns or columns with the same dataKey
+                                        sortDictionary[leaf.dataKey] = {
                                             dataKey: leaf.dataKey,
                                             sortDirection: leaf.sortDirection,
-                                            sortOrder: leaf.sortOrder || 0
-                                        });
+                                            sortOrder: (leaf.sortOrder || 0) + sortOrder
+                                        };
                                     }
                                 }
-                            });
-                        }
-                        if(foo.length) {
-                            foo.sort(function (a, b) {
-                                return a.sortOrder - b.sortOrder;
-                            });
-                            $.each(foo, function (idx, item) {
-                                delete item.sortOrder;
-                            });
-                        }
+                            }
+                        });
+                        // convert {} to []
+                        $.each(sortDictionary, function (key, value) {
+                            sortArray.push(value);
+                        });
+                        // sort by sortOrder
+                        sortArray.sort(function (a, b) {
+                            return a.sortOrder - b.sortOrder;
+                        });
+                        $.each(sortArray, function (i, item) {
+                            delete item.sortOrder;
+                        });
                     }
-                    this._wgSortingSettings = (foo.length) ? foo : null;
+                    this._wgSortingSettings = (sortArray.length) ? sortArray : null;
                 }
                 return this._wgSortingSettings;
             };
             settingsManager.prototype.MapWGToDV = function () {
+                var _this = this;
                 var result = {
                 }, foo, newDVFilterOption;
                 // * paging *
@@ -5789,8 +6026,19 @@ var wijmo;
                     }
                 }
                 // sorting **
+                this._wijgrid.deficientFilters = {
+                };
                 // ** filtering
                 if(this._mapFilteringParams()) {
+                    // fill the deficientFilters
+                    $.each(this._wijgrid._field("leaves"), function (key, leaf) {
+                        if(wijmo.grid.validDataKey(leaf.dataKey) && ((leaf.filterOperator === undefined) ^ (leaf.filterValue === undefined))) {
+                            _this._wijgrid.deficientFilters[leaf.dataKey] = {
+                                filterOperator: leaf.filterOperator,
+                                filterValue: leaf.filterValue
+                            };
+                        }
+                    });
                     result.filter = {
                     };
                     // set filtering
@@ -5807,7 +6055,7 @@ var wijmo;
             };
             settingsManager.prototype.MapDVToWG = function () {
                 var foo, leavesByDataKey = {
-                }, mapSortingParams = this._mapSortingParams(), mapPagingParams = this._mapPagingParams(), mapFilteringParams = this._mapFilteringParams(), pagedDataView = wijmo.grid.asPagedDataView(this._dataView);
+                }, mapSortingParams = this._mapSortingParams(), mapPagingParams = this._mapPagingParams(), mapFilteringParams = this._mapFilteringParams(), pagedDataView = wijmo.grid.asPagedDataView(this._dataView), self = this;
                 $.each(this._wijgrid._field("leaves"), function (key, leaf) {
                     // clear sorting
                     if(mapSortingParams) {
@@ -5835,17 +6083,25 @@ var wijmo;
                         }
                     });
                 }
-                if(mapFilteringParams && (foo = this.DVFilteringSettings())) {
-                    $.each(foo, function (key, o) {
-                        var leaf;
-                        if((leaf = leavesByDataKey[o.dataKey])) {
-                            leaf.filterValue = o.filterValue;
-                            leaf.filterOperator = o.filterOperator;
-                            if($.isPlainObject(leaf.filterOperator)) {
-                                // custom operator, convert operator object to operator name.
-                                leaf.filterOperator = leaf.filterOperator.name;
+                if(mapFilteringParams) {
+                    if(foo = this.DVFilteringSettings()) {
+                        $.each(foo, function (key, o) {
+                            var leaf;
+                            if((leaf = leavesByDataKey[o.dataKey])) {
+                                leaf.filterValue = o.filterValue;
+                                leaf.filterOperator = o.filterOperator;
+                                if($.isPlainObject(leaf.filterOperator)) {
+                                    // custom operator, convert operator object to operator name.
+                                    leaf.filterOperator = leaf.filterOperator.name;
+                                }
+                                delete self._wijgrid.deficientFilters[leaf.dataKey]// unary operator?
+                                ;
                             }
-                        }
+                        });
+                    }
+                    $.each(this._wijgrid.deficientFilters, function (dataKey, defFilter) {
+                        leavesByDataKey[dataKey].filterOperator = defFilter.filterOperator;
+                        leavesByDataKey[dataKey].filterValue = defFilter.filterValue;
                     });
                 }
             };
@@ -5861,70 +6117,97 @@ var wijmo;
                 return !this._wijgrid._serverShaping();// used by c1gridview. Disable client filtering because source data are filtered already.
 
             };
+            settingsManager.prototype.makeProxyFilter = function (owner, prop, name, value) {
+                name = name.toLowerCase();
+                var self = this, isDateColumn = (owner.dataType === "datetime"), result = {
+                    originalOperator: undefined,
+                    property: prop,
+                    operator: name,
+                    value: // name or filter object
+                    value
+                };
+                var internalOp = this._filterCache.getByNameInt(name);
+                var builtinOp = wijmo.data.filtering.ops[name];
+                if((name !== "nofilter") && (internalOp.isCustom || isDateColumn)) {
+                    // need to create a proxy filter
+                    result.originalOperator = result.operator;
+                    if(internalOp.isCustom) {
+                        result.operator = $.extend(true, {
+                        }, internalOp.op);
+                        result.operator.apply = result.operator.operator// wijdata requires apply() function instead of operator().
+                        ;
+                    } else {
+                        // date column
+                        result.operator = $.extend(true, {
+                        }, builtinOp);
+                        var filterRequirements = owner.inputType ? wijmo.grid.TimeUnitConverter.convertInputType(owner.inputType) : // inputType takes precedence
+                        wijmo.grid.TimeUnitConverter.convertFormatString(owner.dataFormatString || "d");
+                        result.operator.apply = function (a, b) {
+                            if(!(a instanceof Date)) {
+                                a = self._wijgrid.parse(owner, a);
+                            }
+                            if(!(b instanceof Date)) {
+                                b = self._wijgrid.parse(owner, b);
+                            }
+                            wijmo.grid.TimeUnitConverter.cutDate(a, filterRequirements);
+                            wijmo.grid.TimeUnitConverter.cutDate(b, filterRequirements);
+                            // compare formatted values
+                            //a = self._wijgrid.toStr(owner, a);
+                            //b = self._wijgrid.toStr(owner, b);
+                            return builtinOp.apply(a, b);
+                        };
+                    }
+                }
+                return result;
+            };
             settingsManager.prototype._convertFilterToDV = // conversion from wijgrid format
             function (normalizedFilter) {
                 var result = {
                 }, manager = this;
                 $.each(normalizedFilter, function (i, group) {
-                    var prop = group.dataKey, currConds = [], currConn = "and", conn, fos, fvs, fv, conds;
+                    var prop = group.dataKey, currConds = [], currConn = "and", conn, operators, values, conds;
                     if(!$.isPlainObject(group)) {
                         return;
                     }
-                    fos = group.filterOperator;
-                    fvs = group.filterValue;
-                    if(fos == null) {
+                    operators = group.filterOperator;
+                    values = group.filterValue;
+                    if(operators == null) {
                         return;
                     }
-                    if(!$.isArray(fos)) {
-                        fos = [
-                            fos
+                    if(!$.isArray(operators)) {
+                        operators = [
+                            operators
                         ];
                     }
-                    if(!$.isArray(fvs)) {
-                        fvs = [
-                            fvs
+                    if(!$.isArray(values)) {
+                        values = [
+                            values
                         ];
                     }
-                    if(fos.length != fvs.length) {
+                    if(operators.length != values.length) {
                         throw "The number of filter operators must match the number of filter values";
                     }
-                    if(fos.length == 0) {
+                    if(operators.length == 0) {
                         return;
                     }
-                    $.each(fos, function (i, fo) {
-                        if(typeof (fo) === "string") {
-                            fo = {
-                                name: fo
+                    $.each(operators, function (i, operator) {
+                        var value;
+                        if(typeof operator === "string") {
+                            operator = {
+                                name: operator
                             };
                         }
-                        if(!$.isPlainObject(fo) || !fo.name) {
+                        if(!$.isPlainObject(operator) || !operator.name) {
                             throw "Invalid filter operator";
                         }
-                        fv = fvs[i];
-                        if(!$.isArray(fv)) {
-                            fv = [
-                                fv
+                        value = values[i];
+                        if(!$.isArray(value)) {
+                            value = [
+                                value
                             ];
                         }
-                        conds = $.map(fv, function (operand) {
-                            var cond = {
-                                property: prop,
-                                operator: fo.name,
-                                value: operand
-                            };
-                            var internalFop = manager._filterCache.getByNameInt(fo.name);
-                            if(internalFop.isCustom) {
-                                // replace operator name with the operator object
-                                var customOp = $.extend(true, {
-                                }, internalFop.op);
-                                if($.isFunction(customOp.operator)) {
-                                    (customOp).apply = customOp.operator// wijmo.data requires "apply" function instead of "operator"// wijmo.data requires "apply" function instead of "operator"
-                                    ;
-                                }
-                                cond.operator = customOp;
-                            }
-                            //normalizePerPropCondition(prop, cond);
-                            return cond;
+                        conds = $.map(value, function (operand) {
+                            return manager.makeProxyFilter(group.owner, prop, operator.name, operand);
                         });
                         function adjustConds() {
                             if(conds.length > 1) {
@@ -5940,7 +6223,7 @@ var wijmo;
                             }
                         }
                         currConn = null;
-                        conn = fo.condition || "or";
+                        conn = operator.condition || "or";
                         if(currConds.length <= 1 || currConn == conn) {
                             if(conds.length == 1 || currConds.length <= 1 || currConn == "or") {
                                 currConds = currConds.concat(conds);
@@ -5996,16 +6279,16 @@ var wijmo;
     (function (grid) {
         "use strict";
         var $ = jQuery;
+        /** @ignore */
         var dataViewWrapper = (function () {
             function dataViewWrapper(wijgrid) {
                 this._domSource = null;
                 this._ignoreAllEvents = false;
                 this._ignoreChangeEvent = false;
                 this._ignoreCurrentChangedEvent = false;
-                this._sharedDataItems = [];
+                this._sharedDataItems = null;
                 this._userData = null;
-                this._totals = {
-                };
+                this._totals = null;
                 this._changeTimer = 0;
                 this._toDispose = [];
                 this._isOwnDataView = false;
@@ -6018,10 +6301,10 @@ var wijmo;
             dataViewWrapper.prototype.data = function () {
                 var dataView = this._getDataViewInst(), pagedDataView = wijmo.grid.asPagedDataView(dataView);
                 return {
-                    data: this._sharedDataItems,
+                    data: this._getSharedDataItems(),
                     totalRows: // totalRows: dataView().length,
                     pagedDataView != null ? pagedDataView.totalItemCount() : (dataView.getSource() || []).length,
-                    totals: this._totals,
+                    totals: this._getTotals(),
                     emptyData: this.isBoundedToDOM() ? this._domSource.emptyData : null
                 };
             };
@@ -6061,16 +6344,24 @@ var wijmo;
                 return this._isOwnDataView;
             };
             dataViewWrapper.prototype.getFieldsInfo = function () {
-                var dataView = this._getDataViewInst(), props = dataView.getProperties(), result = {
+                var dataView = this._getDataViewInst();
+                return this._propDescriptorsToFieldsInfo(dataView.getProperties());
+            };
+            dataViewWrapper.prototype._propDescriptorsToFieldsInfo = function (propDescriptors) {
+                var result = {
                 };
-                $.each(props, function (_, prop) {
-                    result[prop.name] = {
-                        name: prop.name,
-                        type: //readonly: "readOnly" in prop ? col.readOnly : false,
-                        prop.type || "string"
-                    };
-                    //format: col && col.format || ""
-                                    });
+                if(propDescriptors) {
+                    $.each(propDescriptors, function (_, prop) {
+                        if(prop.name === "$$hash") {
+                            // exclude $$hash property (Angular).
+                            return;
+                        }
+                        result[prop.name] = {
+                            name: prop.name,
+                            type: prop.type || "string"
+                        };
+                    });
+                }
                 return result;
             };
             dataViewWrapper.prototype.isBoundedToDOM = function () {
@@ -6090,6 +6381,8 @@ var wijmo;
                     if(this._isWijdatasource && !this._isDynamicWijdatasource && dataView.isLoaded()) {
                         local = true;
                     }
+                    this.ignoreCurrentChangedEvent(true)// The currentPositionChanged event fires before the change event, stop listening. Listening will  be restored in the _onDataViewReset method.
+                    ;
                     dataView.refresh(loadParams, local);
                 } else {
                     if(this.isDataLoaded()) {
@@ -6130,6 +6423,12 @@ var wijmo;
                     this.ignoreChangeEvent(false);
                 }
             };
+            dataViewWrapper.prototype.makeDirty = function () {
+                this._propChangeListener.removeAll()// remove old subscriptions
+                ;
+                this._totals = null;
+                this._sharedDataItems = null;
+            };
             dataViewWrapper.prototype._createDataViewWrapper = function () {
                 var dataItemToGetProperties, data = this._wijgrid.options.data, dataView = this._getDataViewInst(), isWijdatasource = false;
                 if(dataView) {
@@ -6149,7 +6448,8 @@ var wijmo;
                     if(!this._domSource && this._wijgrid.options.readAttributesFromData) {
                         this._moveAttributesToExpando(data);
                     }
-                    dataView = wijmo.grid.GridDataView.create(wijmo.data.asDataView(data));
+                    var tBody = this.isBoundedToDOM() && wijmo.grid.getTableSection(this._wijgrid.element, wijmo.grid.rowScope.body);
+                    dataView = wijmo.grid.GridDataView.create(wijmo.data.asDataView(this._parseOwnData(data, tBody)));
                 } else {
                     dataView = data;
                 }
@@ -6160,6 +6460,41 @@ var wijmo;
                 this._toDispose.push(dataView.currentPosition.subscribe($.proxy(this._onDataViewCurrentChangedInternal, this)));
                 this._propChangeListener = new wijmo.grid.propChangeListener($.proxy(this._onPropertyChanged, this));
             };
+            dataViewWrapper.prototype._parseOwnData = function (data, tbody) {
+                var self = this;
+                if(data && data.length) {
+                    var columns = $.extend(true, [], this._wijgrid.options.columns), props = wijmo.data.ArrayDataViewBase._getProps(data[0]) || [], fieldsInfo = this._propDescriptorsToFieldsInfo(props), dataLeaves = [];
+                    this._wijgrid._prepareColumnOptions(columns, "merge", fieldsInfo, true, true);
+                    wijmo.grid.traverse(columns, function (column) {
+                        if(wijmo.grid.validDataKey(column.dataKey)) {
+                            dataLeaves.push(column);
+                        }
+                    });
+                    if(columns.length/*dataLen*/ ) {
+                        $.each(data, function (i, dataItem) {
+                            wijmo.grid.dataViewWrapper._parseDataItem(self._wijgrid, dataItem, (tbody && tbody.rows[i]), dataLeaves);
+                        });
+                    }
+                }
+                return data;
+            };
+            dataViewWrapper._parseDataItem = function _parseDataItem(parseHandler, dataItem, domRow, leaves) {
+                $.each(leaves, function (i, leaf) {
+                    if((wijmo.grid.getDataType(leaf) !== "string") && wijmo.grid.validDataKey(leaf.dataKey)) {
+                        var value = dataItem[leaf.dataKey], newValue = parseHandler.parse(leaf, value);
+                        if(isNaN(newValue)) {
+                            // failed
+                            var domCell = null;
+                            if(domRow) {
+                                domCell = domRow.cells[leaf.dataKey];
+                            }
+                            newValue = parseHandler.parseFailed(leaf, value, dataItem, domCell);
+                        }
+                        dataItem[leaf.dataKey] = newValue;
+                    }
+                });
+                return dataItem;
+            };
             dataViewWrapper.prototype._getDataViewInst = function () {
                 return this._wijgrid._wijDataView;
             };
@@ -6168,11 +6503,15 @@ var wijmo;
                 if(this._isDynamicWijdatasource || (this._isWijdatasource && !dataView.isLoaded())) {
                     return true;
                 }
+                if(this._isOwnDataView && !this._isWijdatasource && this.isDataLoaded()) {
+                    // TFS Issue #36277
+                    return true;
+                }
                 if(this.isDataLoaded() || dataView.isLoading()) {
                     // data is loaded already or loading, check reshaping settings
                     return !settingsManager.compareSettings();
                 }
-                return false;// data is not loaded yet or user want to load them manually
+                return true;// data is not loaded yet or user want to load them manually
 
             };
             dataViewWrapper.prototype._validateSettings = function (settingsManager) {
@@ -6235,19 +6574,11 @@ var wijmo;
             dataViewWrapper.prototype._onDataViewReset = // dataView events handlers **
             // ** event handlers
             function () {
-                this._sharedDataItems = [];
-                this._totals = {
-                };
-                var i, dataView = this._getDataViewInst(), len = dataView.count(), dataItem;
                 try  {
-                    this._propChangeListener.removeAll()// remove old subscriptions
+                    this.ignoreCurrentChangedEvent(false)// restore listening (see the load() method).
                     ;
-                    for(i = 0; i < len; i++) {
-                        dataItem = dataView.item(i);
-                        this._propChangeListener.insert(i, dataItem);
-                        this._sharedDataItems.push(this._wrapDataItem(dataItem, i));
-                    }
-                    this._totals = this._getTotals(dataView, this._wijgrid._prepareTotalsRequest(true));
+                    this.makeDirty()// force to recreate  the _totals and _sharedDataItems fields when the this.data() method will be called.
+                    ;
                     this._wijgrid._onDataViewReset(this._userData);
                 }finally {
                     this._userData = null;
@@ -6283,8 +6614,34 @@ var wijmo;
             dataViewWrapper.prototype._onDataViewLoaded = function () {
                 this._wijgrid._onDataViewLoaded();
             };
-            dataViewWrapper.prototype._getTotals = // event handlers **
-            function (dataView, request) {
+            dataViewWrapper.prototype._getSharedDataItems = // event handlers **
+            function () {
+                if(!this._sharedDataItems) {
+                    var dataView = this._getDataViewInst(), len = dataView.count();
+                    this._sharedDataItems = [];
+                    for(var i = 0; i < len; i++) {
+                        var dataItem = dataView.item(i);
+                        this._propChangeListener.insert(i, dataItem);
+                        this._sharedDataItems.push(this._wrapDataItem(dataItem, i));
+                    }
+                }
+                if(!this._sharedDataItems) {
+                    this._sharedDataItems = [];
+                }
+                return this._sharedDataItems;
+            };
+            dataViewWrapper.prototype._getTotals = function () {
+                if(!this._totals) {
+                    var dataView = this._getDataViewInst();
+                    this._totals = this._prepareTotals(dataView, this._wijgrid._prepareTotalsRequest(true));
+                }
+                if(!this._totals) {
+                    this._totals = {
+                    };
+                }
+                return this._totals;
+            };
+            dataViewWrapper.prototype._prepareTotals = function (dataView, request) {
                 if(!request || request.length === 0) {
                     return {
                     };
@@ -6296,7 +6653,7 @@ var wijmo;
                 }
                 for(i = 0 , len = dataView.count(); i < len; i++) {
                     for(j = 0 , len2 = tallies.length; j < len2; j++) {
-                        tallies[j].add(this._wijgrid._parse(request[j].column, this.getValue(i, request[j].column.dataKey)));
+                        tallies[j].add(this._wijgrid.parse(request[j].column, this.getValue(i, request[j].column.dataKey)));
                     }
                 }
                 for(i = 0 , len = tallies.length; i < len; i++) {
@@ -6392,14 +6749,17 @@ var wijmo;
         })();
         grid.dataViewWrapper = dataViewWrapper;
         // used by c1gridview to refresh underlying data during callbacks **
+        /** @ignore */
         function asPagedDataView(dataView) {
             return dataView && ("pageCount" in dataView) ? dataView : null;
         }
         grid.asPagedDataView = asPagedDataView;
+        /** @ignore */
         function asEditableDataView(dataView) {
             return dataView && ("commitEdit" in dataView) ? dataView : null;
         }
         grid.asEditableDataView = asEditableDataView;
+        /** @ignore */
         var propChangeListener = (function () {
             function propChangeListener(callback) {
                 this._subscriptions = [];
@@ -6457,6 +6817,7 @@ var wijmo;
     (function (grid) {
         "use strict";
         var $ = jQuery;
+        /** @ignore */
         var groupRange = (function () {
             function groupRange(expanded, range, sum, position, hasHeaderOrFooter) {
                 this.cr = new wijmo.grid.cellRange(-1, -1);
@@ -6490,7 +6851,7 @@ var wijmo;
             groupRange.prototype.getHeaderImageClass = function (expanded) {
                 var groupInfo = this.owner;
                 if(groupInfo) {
-                    return expanded ? groupInfo.expandedImageClass || wijmo.c1field.prototype.options.groupInfo.expandedImageClass : groupInfo.collapsedImageClass || wijmo.c1field.prototype.options.groupInfo.collapsedImageClass;
+                    return expanded ? groupInfo.expandedImageClass || grid.c1field.prototype.options.groupInfo.expandedImageClass : groupInfo.collapsedImageClass || grid.c1field.prototype.options.groupInfo.collapsedImageClass;
                 }
                 return null;
             };
@@ -6629,77 +6990,49 @@ var wijmo;
             };
             groupRange.prototype._updateHeaderIcon = function (rowAccessor, groupRange, virtualOffset) {
                 if(groupRange.owner.position !== "footer") {
-                    var imageDiv, rowObj = rowAccessor.item(groupRange.cr.r1 - virtualOffset);
+                    var rowObj = rowAccessor.item(groupRange.cr.r1 - virtualOffset);
                     if(rowObj) {
-                        if(rowObj[0]) {
-                            imageDiv = $(rowObj[0]).find("div.wijmo-wijgrid-grouptogglebtn:first-child");
-                        }
-                    }
-                    if(imageDiv && imageDiv.length) {
-                        imageDiv.toggleClass(groupRange.getHeaderImageClass(!groupRange.isExpanded), false);
-                        imageDiv.toggleClass(groupRange.getHeaderImageClass(groupRange.isExpanded), true);
+                        $.each(rowObj, function (i, row) {
+                            if(row) {
+                                var imageDiv = $(row).find("div.wijmo-wijgrid-grouptogglebtn:first-child");
+                                if(imageDiv && imageDiv.length) {
+                                    imageDiv.toggleClass(groupRange.getHeaderImageClass(!groupRange.isExpanded), false);
+                                    imageDiv.toggleClass(groupRange.getHeaderImageClass(groupRange.isExpanded), true);
+                                }
+                            }
+                        });
                     }
                 }
             };
             return groupRange;
         })();
         grid.groupRange = groupRange;
+        /** @ignore */
         var grouper = (function () {
             function grouper() {
                 this._groupRowIdx = 0;
             }
             grouper.prototype.group = function (grid, data, leaves) {
+                var _this = this;
                 this._grid = grid;
                 this._data = data;
                 this._leaves = leaves;
                 this._groupRowIdx = 0;
-                var level = 1, i, len, leaf, groupCollection = [], needReset = false, groupLength = 0;
-                //get the grouped columns
-                for(i = 0 , len = leaves.length; i < len; i++) {
-                    leaf = leaves[i];
-                    if(leaf.groupInfo) {
-                        delete leaf.groupInfo.level;
-                        delete leaf.groupInfo.expandInfo;
+                $.each(leaves, function (i, column) {
+                    if(column.groupInfo) {
+                        delete column.groupInfo.level;
+                        delete column.groupInfo.expandInfo;
                     }
-                    if(/*(leaf.dynamic !== true) && */ leaf.groupInfo && (leaf.groupInfo.position && (leaf.groupInfo.position !== "none")) && (leaf.dataIndex >= 0)) {
-                        if(leaf.groupedIndex === undefined) {
-                            needReset = true;
-                        }
-                    } else {
-                        if(leaf.groupedIndex !== undefined) {
-                            delete leaf.groupedIndex;
-                        }
+                });
+                var groupedColumns = this._grid._groupedColumns(true), level = 1;
+                $.each(groupedColumns, function (i, column) {
+                    _this._groupRowIdx = 0;
+                    if(/*(leaf.dynamic !== true) && */ column.groupInfo && (column.groupInfo.position && (column.groupInfo.position !== "none")) && (column.dataIndex >= 0)) {
+                        column.groupInfo.level = level;
+                        column.groupInfo.expandInfo = [];
+                        _this._processRowGroup(column, level++);
                     }
-                }
-                if(needReset) {
-                    for(i = 0 , len = leaves.length; i < len; i++) {
-                        leaf = leaves[i];
-                        if(/*(leaf.dynamic !== true) && */ leaf.groupInfo && (leaf.groupInfo.position && (leaf.groupInfo.position !== "none")) && (leaf.dataIndex >= 0)) {
-                            leaf.groupedIndex = groupLength++;
-                            groupCollection.push(leaf);
-                        }
-                    }
-                } else {
-                    groupCollection = $.map(leaves, function (element) {
-                        return element.groupedIndex !== undefined ? element : null;
-                    });
-                    groupCollection.sort(function (a, b) {
-                        return a.groupedIndex - b.groupedIndex;
-                    });
-                    $.each(groupCollection, function (index, item) {
-                        item.groupedIndex = index;
-                    });
-                }
-                grid._field("groupedColumns", groupCollection);
-                for(i = 0 , len = groupCollection.length; i < len; i++) {
-                    leaf = groupCollection[i];
-                    this._groupRowIdx = 0;
-                    if(/*(leaf.dynamic !== true) && */ leaf.groupInfo && (leaf.groupInfo.position && (leaf.groupInfo.position !== "none")) && (leaf.dataIndex >= 0)) {
-                        leaf.groupInfo.level = level;
-                        leaf.groupInfo.expandInfo = [];
-                        this._processRowGroup(leaf, level++);
-                    }
-                }
+                });
                 delete this._grid;
                 delete this._data;
                 delete this._leaves;
@@ -6713,7 +7046,6 @@ var wijmo;
                     }
                 });
                 for(row = 0; row < this._data.length; row++) {
-                    // if (this._data[row].rowType !== "data") {
                     if(!(this._data[row].rowType & wijmo.grid.rowType.data)) {
                         continue;
                     }
@@ -6827,9 +7159,9 @@ var wijmo;
                 ;
                 //if (cellRange.c1 > -1 && ((tmp = this._data[cellRange.r1][cellRange.c1].value) !== null)) {
                 if((leaf.dataIndex >= 0) && ((tmp = this._data[cellRange.r1][leaf.dataIndex].value) !== null)) {
-                    groupByText = gridView._toStr(leaf, tmp);
+                    groupByText = gridView.toStr(leaf, tmp);
                 }
-                if(this._grid.options.showRowHeader) {
+                if(this._grid._showRowHeader()) {
                     row.push({
                         html: "&nbsp;"
                     });
@@ -6906,7 +7238,7 @@ var wijmo;
                 // summary cells span until the end of the row or the first aggregate
                 //span = headerOffset;
                 span = 1;
-                col = (this._grid.options.showRowHeader) ? 1 : 0;
+                col = (this._grid._showRowHeader()) ? 1 : 0;
                 //for (; col < cellRange.c1; col++) { // c1 is an index of the leaf inside the this._leaves
                 //	if (this._leaves[col].parentVis) {
                 //		span++;
@@ -6991,8 +7323,7 @@ var wijmo;
                 return aggregate;
             };
             grouper.prototype._getGroupCellRange = function (row, leaf, level) {
-                //var range = new $.wijmo.wijgrid.cellRange(row, leaf.dataIndex);
-                                var idx = leaf.leavesIdx, range = // $.inArray(leaf, this._leaves);
+                var idx = leaf.leavesIdx, range = // $.inArray(leaf, this._leaves);
                 new wijmo.grid.cellRange(row, idx), parentRange = wijmo.grid.groupHelper.getParentGroupRange(this._leaves, range, level), value, nextValue, count;
                 //if (this._data[row].rowType === "data") {
                 if(this._data[row].rowType & wijmo.grid.rowType.data) {
@@ -7081,6 +7412,7 @@ var wijmo;
     (function (grid) {
         "use strict";
         var $ = jQuery;
+        /** @ignore */
         var groupHelper = (function () {
             function groupHelper() { }
             groupHelper._getGroupInfoRegExp = new RegExp(".*G([HF]){1}(\\d+)-(\\d+)$");
@@ -7229,6 +7561,7 @@ var wijmo;
     (function (grid) {
         "use strict";
         var $ = jQuery;
+        /** @ignore */
         var cellRange = (function () {
             function cellRange(row1, col1, row2, col2) {
                 switch(arguments.length) {
@@ -7255,6 +7588,7 @@ var wijmo;
             return cellRange;
         })();
         grid.cellRange = cellRange;
+        /** @ignore */
         var merger = (function () {
             function merger() {
             }
@@ -7326,79 +7660,50 @@ var wijmo;
         "use strict";
         var $ = jQuery;
         grid.EXPANDO = "__wijgrid";
-        /// <summary>
-        /// Row type.
-        /// </summary>
+        /**
+        * Specifies the type of a row in the grid.
+        */
         (function (rowType) {
             rowType._map = [];
-            /// <summary>
-            /// Header row.
-            /// </summary>
+            /** The header row. */
             rowType.header = 1;
-            /// <summary>
-            /// Data row.
-            /// </summary>
+            /** Data row. */
             rowType.data = 2;
-            /// <summary>
-            /// Data alternating row (used only as modifier of the rowType.data, not as independent value).
-            /// </summary>
+            /** Alternating data row (used only as modifier of the rowType.data, not as an independent value). */
             rowType.dataAlt = 4;
-            /// <summary>
-            /// Filter row.
-            /// </summary>
+            /** Filter row. */
             rowType.filter = 8;
-            /// <summary>
-            /// Group header row.
-            /// </summary>
+            /** Group header row. */
             rowType.groupHeader = 16;
-            /// <summary>
-            /// Group footer row.
-            /// </summary>
+            /** Group footer row. */
             rowType.groupFooter = 32;
-            /// <summary>
-            /// Footer row.
-            /// </summary>
+            /** Footer row. */
             rowType.footer = 64;
-            /// <summary>
-            /// Empty data row
-            /// </summary>
+            /** Infrastructure. */
             rowType.emptyDataRow = 128;
-            /// <summary>
-            /// Infrastructure
-            /// </summary>
-            rowType.fooRow = 65536;
         })(grid.rowType || (grid.rowType = {}));
         var rowType = grid.rowType;
-        /// <summary>
-        /// Determines an object render state.
-        /// </summary>
+        /**
+        * Determines an object render state. This enumeration can be used with the cellStyleFormatter and rowStyleFormatter options to get a formatted object state.
+        */
         (function (renderState) {
             renderState._map = [];
-            /// <summary>
-            /// Normal state.
-            /// </summary>
+            /** This is the normal state. The object is rendered and not hovered, selected, or one of the elements determining the current position of the wijgrid. */
             renderState.none = 0;
-            /// <summary>
-            /// Object is being rendered.
-            /// </summary>
+            /** The object is being rendered. In the cellStyleFormatter, the rendered object is a table cell. In the rowStyleFormatter, the object is a table row. */
             renderState.rendering = 1;
-            /// <summary>
-            /// Object is one of the elements determining the current position of the wijgrid.
-            /// </summary>
+            /** The object is one of the elements determining the current position of the wijgrid. */
             renderState.current = 2;
-            /// <summary>
-            /// Object is hovered.
-            /// </summary>
+            /** The object is hovered over. */
             renderState.hovered = 4;
-            /// <summary>
-            /// Object is selected.
-            /// </summary>
+            /** The object is selected. */
             renderState.selected = 8;
         })(grid.renderState || (grid.renderState = {}));
         var renderState = grid.renderState;
-        /// <summary>
-        /// Infrastructure.
-        /// </summary>
+        /**
+        * Infrastructure.
+        * @ignore
+        */
         (function (rowScope) {
             rowScope._map = [];
             rowScope.table = 0;
@@ -7407,9 +7712,10 @@ var wijmo;
             rowScope.foot = 3;
         })(grid.rowScope || (grid.rowScope = {}));
         var rowScope = grid.rowScope;
-        /// <summary>
-        /// Infrastructure.
-        /// </summary>
+        /**
+        * Infrastructure.
+        * @ignore
+        */
         (function (cellRangeExtendMode) {
             cellRangeExtendMode._map = [];
             cellRangeExtendMode.none = 0;
@@ -7417,6 +7723,10 @@ var wijmo;
             cellRangeExtendMode.toRow = 2;
         })(grid.cellRangeExtendMode || (grid.cellRangeExtendMode = {}));
         var cellRangeExtendMode = grid.cellRangeExtendMode;
+        /**
+        * Infrastructure.
+        * @ignore
+        */
         (function (objectMode) {
             objectMode._map = [];
             objectMode.createIfNull = 0;
@@ -7424,15 +7734,17 @@ var wijmo;
             objectMode.dispose = 2;
         })(grid.objectMode || (grid.objectMode = {}));
         var objectMode = grid.objectMode;
-        /// <summary>
-        /// Determines purpose of the group row cells.
-        /// </summary>
+        /**
+        * Determines purpose of the group row cells.
+        * @ignore
+        */
         (function (groupRowCellPurpose) {
             groupRowCellPurpose._map = [];
             groupRowCellPurpose.groupCell = 0;
             groupRowCellPurpose.aggregateCell = 1;
         })(grid.groupRowCellPurpose || (grid.groupRowCellPurpose = {}));
         var groupRowCellPurpose = grid.groupRowCellPurpose;
+        /** @ignore */
         function compareObj(a, b) {
             var i, len, flag;
             if($.isArray(a) && $.isArray(b)) {
@@ -7472,6 +7784,7 @@ var wijmo;
             return a === b;
         }
         grid.compareObj = compareObj;
+        /** @ignore */
         function stringFormat(pattern) {
             var params = [];
             for (var _i = 0; _i < (arguments.length - 1); _i++) {
@@ -7487,14 +7800,25 @@ var wijmo;
             return pattern;
         }
         grid.stringFormat = stringFormat;
+        /** @ignore */
         function validDataKey(dataKey) {
             return (dataKey && !(dataKey < 0)) || (dataKey === 0);
         }
         grid.validDataKey = validDataKey;
+        /** @ignore */
+        function validDate(date) {
+            if(date && (date instanceof Date)) {
+                return !isNaN(date.getTime());
+            }
+            return false;
+        }
+        grid.validDate = validDate;
+        /** @ignore */
         function getDataType(column) {
             return column.dataType || column._underlyingDataType || "string";
         }
         grid.getDataType = getDataType;
+        /** @ignore */
         function iterateChildrenWidgets(item, callback) {
             if(item && callback) {
                 item.find(".ui-widget").each(function (index, dom) {
@@ -7508,6 +7832,7 @@ var wijmo;
             }
         }
         grid.iterateChildrenWidgets = iterateChildrenWidgets;
+        /** @ignore */
         function remove$dataByPrefix(element, prefix) {
             var data$keys = [];
             $.each(element.data(), function (key) {
@@ -7520,6 +7845,7 @@ var wijmo;
             });
         }
         grid.remove$dataByPrefix = remove$dataByPrefix;
+        /** @ignore */
         var domSelection = (function () {
             function domSelection(dom) {
                 this._dom = dom;
@@ -7589,9 +7915,10 @@ var wijmo;
             return domSelection;
         })();
         grid.domSelection = domSelection;
+        /** @ignore */
         function createDynamicField(options) {
             return $.extend(true, {
-            }, wijmo.c1basefield.prototype.options, wijmo.c1field.prototype.options, {
+            }, grid.c1basefield.prototype.options, grid.c1field.prototype.options, {
                 dynamic: true,
                 isLeaf: true,
                 isBand: false,
@@ -7599,6 +7926,7 @@ var wijmo;
             }, options);
         }
         grid.createDynamicField = createDynamicField;
+        /** @ignore */
         function bounds(element, client) {
             if(element) {
                 var $dom = element.nodeType ? $(element) : element, offset = $dom.offset();
@@ -7624,6 +7952,7 @@ var wijmo;
         grid.bounds = bounds;
         // maxDepth = -1 --  iterate through all child elements
         // default value = 3
+        /** @ignore */
         function _getDOMText(dom, maxDepth, ignoreTextNodes) {
             if(maxDepth === undefined) {
                 maxDepth = 3// default value
@@ -7657,6 +7986,7 @@ var wijmo;
         }
         grid._getDOMText = _getDOMText;
         // obj, prefix, name (opt), value (opt)
+        /** @ignore */
         function dataPrefix(obj, prefix, name, value) {
             var treatAsArray = (obj.jquery || $.isArray(obj)), i, len, tmp, internalName = // arrays of jQuery objects is not supported
             prefix + name;
@@ -7679,6 +8009,7 @@ var wijmo;
             }
         }
         grid.dataPrefix = dataPrefix;
+        /** @ignore */
         function shallowMerge(target, src) {
             if(src && target) {
                 var name, value, typeOf;
@@ -7694,10 +8025,12 @@ var wijmo;
             }
         }
         grid.shallowMerge = shallowMerge;
+        /** @ignore */
         function isCustomObject(value) {
             return (value && (typeof (value) === "object") && !(value instanceof Date));
         }
         grid.isCustomObject = isCustomObject;
+        /** @ignore */
         function search(value, test) {
             var key, foo, isFunc = $.isFunction(test);
             for(key in value) {
@@ -7717,6 +8050,7 @@ var wijmo;
             };
         }
         grid.search = search;
+        /** @ignore */
         function getAttributes(dom, prevent) {
             if(dom) {
                 var i, len, cnt = 0, result = {
@@ -7745,6 +8079,7 @@ var wijmo;
         }
         grid.getAttributes = getAttributes;
         // unlike the jQuery.extend(true) function the deepExtend() function doesn't skips undefined values.
+        /** @ignore */
         function deepExtend(source, target) {
             var key, src, dst, isArray, clone;
             if(source) {
@@ -7775,6 +8110,7 @@ var wijmo;
             return target;
         }
         grid.deepExtend = deepExtend;
+        /** @ignore */
         function getKeyCodeEnum() {
             if($.ui && $.ui.keyCode) {
                 return $.ui.keyCode;
@@ -7785,7 +8121,8 @@ var wijmo;
             throw "keyCode object is not found";
         }
         grid.getKeyCodeEnum = getKeyCodeEnum;
-                        function widgetName(element, name) {
+                        /** @ignore */
+        function widgetName(element, name) {
             if(element && element.jquery) {
                 element = element[0];
             }
@@ -7795,20 +8132,144 @@ var wijmo;
             return undefined;
         }
         grid.widgetName = widgetName;
-        // ** taken from jQuery UI
+        /** @ignore */
+        var HTML5InputSupport = (function () {
+            function HTML5InputSupport() { }
+            HTML5InputSupport._requiresExtendedSupport = {
+                "date": "",
+                "datetime": "",
+                "datetime-local": "",
+                "month": "",
+                "time": ""
+            };
+            HTML5InputSupport.isExtendSupportRequired = function isExtendSupportRequired(inputType) {
+                inputType = (inputType || "").toLowerCase();
+                return (inputType in wijmo.grid.HTML5InputSupport._requiresExtendedSupport);
+            };
+            HTML5InputSupport.getDefaultInputType = function getDefaultInputType(mobileEnvironment, column) {
+                var inputType = column.inputType;
+                if(!inputType) {
+                    // determine the editor's type automatically
+                    inputType = "text"// default
+                    ;
+                    if(mobileEnvironment) {
+                        switch(wijmo.grid.getDataType(column)) {
+                            case "number":
+                            case "currency":
+                                inputType = "number";
+                                break;
+                            case "datetime":
+                                inputType = "datetime";
+                                break;
+                        }
+                    }
+                }
+                return inputType;
+            };
+            HTML5InputSupport.toStr = function toStr(value, inputType) {
+                var result = value;
+                inputType = (inputType || "").toLowerCase();
+                if(wijmo.grid.HTML5InputSupport.isExtendSupportRequired(inputType)) {
+                    switch(inputType) {
+                        case "datetime":
+                            result = (value) ? result = Globalize.format(value, "yyyy-MM-ddTHH:mm:ssZ") : "";
+                            break;
+                        case "datetime-local":
+                            result = (value) ? result = Globalize.format(value, "yyyy-MM-ddTHH:mm:ss") : "";
+                            break;
+                        case "date":
+                            result = (value) ? result = Globalize.format(value, "yyyy-MM-dd") : "";
+                            break;
+                        case "month":
+                            result = (value) ? result = Globalize.format(value, "yyyy-MM") : "";
+                            break;
+                        case "time":
+                            result = (value) ? result = Globalize.format(value, "HH:mm:ss") : "";
+                            break;
+                    }
+                } else {
+                    result = value + "";
+                }
+                return result;
+            };
+            HTML5InputSupport.parse = function parse(value, inputType) {
+                var result, fallback = function (date) {
+                    date = new Date(date);
+                    if(!wijmo.grid.validDate(date)) {
+                        date = null;
+                    }
+                    return date;
+                };
+                inputType = (inputType || "").toLowerCase();
+                if(wijmo.grid.HTML5InputSupport.isExtendSupportRequired(inputType)) {
+                    switch(inputType) {
+                        case "datetime":
+                            result = Globalize.parseDate(value, "yyyy-MM-ddTHH:mm:ssZ") || Globalize.parseDate(value, "yyyy-MM-ddTHH:mmZ") || fallback(value);
+                            break;
+                        case "datetime-local":
+                            result = Globalize.parseDate(value, "yyyy-MM-ddTHH:mm:ss") || Globalize.parseDate(value, "yyyy-MM-ddTHH:mm") || fallback(value);
+                            break;
+                        case "date":
+                            result = Globalize.parseDate(value, "yyyy-MM-dd") || fallback(value);
+                            break;
+                        case "month":
+                            result = Globalize.parseDate(value, "yyyy-MM");
+                            break;
+                        case "time":
+                            result = Globalize.parseDate(value, "HH:mm:ss") || Globalize.parseDate(value, "HH:mm");
+                            ;
+                            break;
+                        case "number":
+                            result = parseFloat(value);
+                    }
+                } else {
+                    result = value;
+                }
+                return result;
+            };
+            HTML5InputSupport.extend = function extend(value, extendWith, inputType) {
+                if(!value) {
+                    value = extendWith;
+                } else {
+                    inputType = (inputType || "").toLowerCase();
+                    switch(inputType) {
+                        case "date":
+                            value.setFullYear(extendWith.getFullYear(), extendWith.getMonth(), extendWith.getDate());
+                            break;
+                        case "month":
+                            value.setFullYear(extendWith.getFullYear(), extendWith.getMonth());
+                            break;
+                        case "time":
+                            value.setHours(extendWith.getHours());
+                            value.setMinutes(extendWith.getMinutes());
+                            value.setSeconds(extendWith.getSeconds());
+                            break;
+                        default:
+                            value = extendWith;
+                    }
+                }
+                return value;
+            };
+            return HTML5InputSupport;
+        })();
+        grid.HTML5InputSupport = HTML5InputSupport;
+        // * taken from jQuery UI
+        /** @ignore */
         function isOverAxis(x, reference, size) {
             // Determines when x coordinate is over "b" element axis
             return (x > reference) && (x < (reference + size));
         }
         grid.isOverAxis = isOverAxis;
+        /** @ignore */
         function isOver(y, x, top, left, height, width) {
             // Determines when x, y coordinates is over "b" element
             return wijmo.grid.isOverAxis(y, top, height) && wijmo.grid.isOverAxis(x, left, width);
         }
         grid.isOver = isOver;
-        // taken from jQuery UI **
+        // taken from jQuery UI *
         // ** uid
         var __uid = 0;
+        /** @ignore */
         function getUID() {
             return "uid" + __uid++;
         }
@@ -7824,6 +8285,161 @@ var wijmo;
             })(wijmo.grid || (wijmo.grid = {}));
     var grid = wijmo.grid;
 })(wijmo || (wijmo = {}));
+var wijmo;
+(function (wijmo) {
+    (function (grid) {
+        /** @ignore */
+        (function (TimeUnit) {
+            TimeUnit._map = [];
+            TimeUnit.Millisecond = 1;
+            TimeUnit.Second = 2;
+            TimeUnit.Minute = 4;
+            TimeUnit.Hour = 8;
+            TimeUnit.Day = 16;
+            TimeUnit.Month = 32;
+            TimeUnit.Year = 64;
+            TimeUnit.DATE = TimeUnit.Year | TimeUnit.Month | TimeUnit.Day;
+            TimeUnit.TIME = TimeUnit.Hour | TimeUnit.Minute | TimeUnit.Second | TimeUnit.Millisecond;
+            TimeUnit.ALL = TimeUnit.DATE | TimeUnit.TIME;
+        })(grid.TimeUnit || (grid.TimeUnit = {}));
+        var TimeUnit = grid.TimeUnit;
+        ;
+        /** @ignore */
+        var TimeUnitConverter = (function () {
+            function TimeUnitConverter() { }
+            TimeUnitConverter.convertInputType = /**
+            * @param inputType One of the HTML input type values (date-time).
+            */
+            function convertInputType(inputType) {
+                var formatString = wijmo.grid.TimeUnitConverter.convertInputTypeToFormatString(inputType), result = wijmo.grid.TimeUnitConverter.convertFormatString(formatString);
+                return result;
+            };
+            TimeUnitConverter.convertInputTypeToFormatString = function convertInputTypeToFormatString(inputType) {
+                // specific format values are not important here.
+                switch((inputType || "").toLowerCase()) {
+                    case "datetime":
+                    case "datetime-local":
+                        return "f";// long date, short time
+
+                    case "date":
+                        return "d";// short date
+
+                    case "month":
+                        return "Y";// year-and-month
+
+                    case "time":
+                        return "t";// short time
+
+                }
+                return "";
+            };
+            TimeUnitConverter.convertFormatString = /**
+            * @param dateFormatString
+            */
+            function convertFormatString(dateFormatString) {
+                var result = 0;
+                if(dateFormatString) {
+                    // ** check one-char standard formats **
+                    if(dateFormatString.length === 1) {
+                        switch(dateFormatString[0]) {
+                            case "t":
+                                // short Time
+                                return TimeUnit.Hour | TimeUnit.Minute;
+                            case "T":
+                                // long Time
+                                return TimeUnit.TIME;
+                            case "d":
+                                // short Date
+                                                            case "D":
+                                // long Date
+                                return TimeUnit.DATE;
+                            case "Y":
+                                // month/year
+                                return TimeUnit.Month | TimeUnit.Year;
+                            case "M":
+                                // month/day
+                                return TimeUnit.Month | TimeUnit.Day;
+                            case "f" , "F" , "S":
+                                return TimeUnit.ALL;
+                        }
+                    }
+                    // ** check custom tokens **
+                                        var quoteFirst, quoteLast;
+                    // remove quoted text
+                    if(((quoteFirst = dateFormatString.indexOf("'")) >= 0) && ((quoteLast = dateFormatString.lastIndexOf("'")) >= 0) && (quoteFirst !== quoteLast)) {
+                        dateFormatString = dateFormatString.substr(0, quoteFirst) + dateFormatString.substring(quoteLast + 1, dateFormatString.length - 1);
+                    }
+                    // the validness of the string is not a subject to check
+                    for(var i = 0, len = dateFormatString.length; i < len; i++) {
+                        switch(dateFormatString[i]) {
+                            case "d":
+                                // day: d, dd, ddd, dddd
+                                result |= TimeUnit.Day;
+                                break;
+                            case "M":
+                                // month: M, MM, MMM, MMMM
+                                result |= TimeUnit.Month;
+                                break;
+                            case "y":
+                                // year: yy, yyyy
+                                result |= TimeUnit.Year;
+                                break;
+                            case "m":
+                                // minute: m, mm
+                                result |= TimeUnit.Minute;
+                                break;
+                            case "h":
+                                // hour: h, hh
+                                                            case "H":
+                                // hour: H, HH
+                                result |= TimeUnit.Hour;
+                                break;
+                            case "s":
+                                // second: s, ss
+                                result |= TimeUnit.Second;
+                                break;
+                            case "f":
+                                // milliseconds: f, ff, fff
+                                result |= TimeUnit.Millisecond;
+                                break;
+                        }
+                    }
+                }
+                return result || TimeUnit.ALL;
+            };
+            TimeUnitConverter.cutDate = function cutDate(date, timeUnit) {
+                if(date) {
+                    timeUnit = ~timeUnit;
+                    if(timeUnit & TimeUnit.Millisecond) {
+                        date.setMilliseconds(0);
+                    }
+                    if(timeUnit & TimeUnit.Second) {
+                        date.setSeconds(0);
+                    }
+                    if(timeUnit & TimeUnit.Minute) {
+                        date.setMinutes(0);
+                    }
+                    if(timeUnit & TimeUnit.Hour) {
+                        date.setHours(0);
+                    }
+                    if(timeUnit & TimeUnit.Day) {
+                        date.setDate(1);
+                    }
+                    if(timeUnit & TimeUnit.Month) {
+                        date.setMonth(0);
+                    }
+                    if(timeUnit & TimeUnit.Year) {
+                        date.setFullYear(0);
+                    }
+                }
+                return date;
+            };
+            return TimeUnitConverter;
+        })();
+        grid.TimeUnitConverter = TimeUnitConverter;
+    })(wijmo.grid || (wijmo.grid = {}));
+    var grid = wijmo.grid;
+})(wijmo || (wijmo = {}));
 
 var wijmo;
 (function (wijmo) {
@@ -7834,21 +8450,28 @@ var wijmo;
     (function (grid) {
         "use strict";
         var $ = jQuery;
+        /** @ignore */
+        var builtInFilterOperators = (function () {
+            function builtInFilterOperators() { }
+            builtInFilterOperators.NoFilterOp = {
+                applicableTo: null,
+                name: // any type
+                "NoFilter",
+                arity: 1,
+                operator: function () {
+                    return true;
+                }
+            };
+            return builtInFilterOperators;
+        })();
+        /** @ignore */
         var filterOperatorsCache = (function () {
             function filterOperatorsCache(wijgrid) {
                 this._cache = {
                 };
                 var self = this;
                 this._wijgrid = wijgrid;
-                this._addOperator(null, {
-                    applicableTo: null,
-                    name: // any type
-                    "NoFilter",
-                    arity: 1,
-                    operator: function () {
-                        return true;
-                    }
-                });
+                this._addOperator(null, builtInFilterOperators.NoFilterOp);
                 $.each(wijmo.data.filtering.ops, function (name, op) {
                     self._addOperator(name, op);
                 });
@@ -7969,6 +8592,7 @@ var wijmo;
             return filterOperatorsCache;
         })();
         grid.filterOperatorsCache = filterOperatorsCache;
+        /** @ignore */
         var filterHelper = (function () {
             function filterHelper() { }
             filterHelper.marker = "_wijgrid";
@@ -8059,7 +8683,8 @@ var wijmo;
     (function (grid) {
         "use strict";
         var $ = jQuery;
-                        function getTableSection(table, scope) {
+                        /** @ignore */
+        function getTableSection(table, scope) {
             if(table && !table.nodeType) {
                 table = table[0];
             }
@@ -8081,7 +8706,8 @@ var wijmo;
             return null;
         }
         grid.getTableSection = getTableSection;
-                        function getTableSectionLength(table, scope) {
+                        /** @ignore */
+        function getTableSectionLength(table, scope) {
             var section;
             if(table && !table.nodeType) {
                 table = table[0]// jQuery
@@ -8090,7 +8716,8 @@ var wijmo;
             return (table && (section = this.getTableSection(table, scope))) ? section.rows.length : 0;
         }
         grid.getTableSectionLength = getTableSectionLength;
-                        function getTableSectionRow(table, scope, rowIndex) {
+                        /** @ignore */
+        function getTableSectionRow(table, scope, rowIndex) {
             var section;
             if(table && !table.nodeType) {
                 table = table[0]// jQuery
@@ -8099,7 +8726,8 @@ var wijmo;
             return (table && (section = this.getTableSection(table, scope))) ? (section.rows[rowIndex] || null) : null;
         }
         grid.getTableSectionRow = getTableSectionRow;
-                        function readTableSection(table, scope, readAttributes) {
+                        /** @ignore */
+        function readTableSection(table, scope, readAttributes) {
             var ri, rowLen, ci, celLen, domRow, row, expando, rowAttributes, result = [], prevent = function (attrName) {
                 attrName = attrName.toLowerCase();
                 return attrName === "rowspan" || attrName === "colspan";
@@ -8134,6 +8762,7 @@ var wijmo;
             return result;
         }
         grid.readTableSection = readTableSection;
+        /** @ignore */
         var htmlTableAccessor = (function () {
             function htmlTableAccessor(domTable, skipOffsets, ensureTBody, ensureColgroup) {
                 this._width = 0;
@@ -8352,22 +8981,20 @@ var wijmo;
     (function (grid) {
         "use strict";
         var $ = jQuery;
-        /// <summary>
-        /// An object that represents a single cell.
-        /// </summary>
+        /** An object that represents a single cell. */
         var cellInfo = (function () {
+            /** Creates an object that represents a single cell. Normally you do not need to use this method.
+            * @example
+            * var cell = new wijmo.grid.cellInfo(0, 0, $("#demo").data("wijmo-wijgrid"));
+            * @param {Number} cellIndex The zero-based index of the required cell inside the corresponding row.
+            * @param {Number} rowIndex The zero-based index of the row that contains required cell.
+            * @param {Object} wijgrid The wijgrid instance.
+            * @returns {wijmo.grid.cellInfo} Object that represents a single cell.
+            */
             function cellInfo(cellIndex, rowIndex, wijgrid, absolute) {
                 if (typeof wijgrid === "undefined") { wijgrid = null; }
                 if (typeof absolute === "undefined") { absolute = false; }
                 this.__isEdit = false;
-                /// <summary>
-                /// Creates an object that represents a single cell.
-                /// Code example: var cell = new $.wijmo.wijgrid.cellInfo(0, 0, $("#demo").data("wijmo-wijgrid"));
-                /// </summary>
-                /// <param name="cellIndex">Zero-based index of the required cell inside the corresponding row.</param>
-                /// <param name="rowIndex">Zero-based index of the row that contains required cell.</param>
-                /// <param name="wijgrid">The wijgrid instance.</param>
-                /// <returns type="$.wijmo.wijgrid.cellInfo">Object that represents a single cell.</returns>
                 this._wijgrid = wijgrid;
                 if(absolute) {
                     this._cia = cellIndex;
@@ -8379,6 +9006,7 @@ var wijmo;
             }
             cellInfo.outsideValue = new cellInfo(-1, -1, null, true);
             cellInfo.prototype.cellIndexAbs = // public
+            /** @ignore */
             function (value) {
                 if(arguments.length === 0) {
                     this._ensureCia();
@@ -8387,7 +9015,8 @@ var wijmo;
                 this._ci = undefined;
                 this._cia = value;
             };
-            cellInfo.prototype.rowIndexAbs = function (value) {
+            cellInfo.prototype.rowIndexAbs = /** @ignore */
+            function (value) {
                 if(arguments.length === 0) {
                     this._ensureRia();
                     return this._ria;
@@ -8395,12 +9024,8 @@ var wijmo;
                 this._ri = undefined;
                 this._ria = value;
             };
-            cellInfo.prototype.cellIndex = function (value) {
-                /// <summary>
-                /// Gets the zero-based index of the cell in the row which it corresponds to.
-                /// Code example: var index = cellInfoObj.cellIndex();
-                /// </summary>
-                /// <returns type="Number" integer="true"></returns>
+            cellInfo.prototype.cellIndex = /** @ignore */
+            function (value) {
                 if(arguments.length === 0) {
                     this._ensureCi();
                     return this._ci;
@@ -8408,24 +9033,24 @@ var wijmo;
                 this._cia = undefined;
                 this._ci = value;
             };
-            cellInfo.prototype.column = function () {
-                /// <summary>
-                /// Gets the associated column object.
-                /// Code example: var column = cellInfoObj.column();
-                /// </summary>
-                /// <returns type="Object"></returns>
+            cellInfo.prototype.column = /** Gets the associated column object.
+            * @example
+            * var column = cellInfoObj.column();
+            * @returns {wijmo.grid.IColumn} The associated column object.
+            */
+            function () {
                 if(this._wijgrid && this._isValid()) {
                     return this._wijgrid._field("visibleLeaves")[this.cellIndexAbs()];
                 }
                 return null;
             };
-            cellInfo.prototype.container = function () {
-                /// <summary>
-                /// Returns the jQuery object containing a cell content.
-                /// Code example: var $container = cellInfoObj.container();
-                /// </summary>
-                /// <returns type="jQuery" />
-                                var tableCell = this.tableCell(), $innerDiv;
+            cellInfo.prototype.container = /** Returns the jQuery object containing a cell content.
+            * @example
+            * var $container = cellInfoObj.container();
+            * @returns {Object} The jQuery object containing a cell content.
+            */
+            function () {
+                var tableCell = this.tableCell(), $innerDiv;
                 if(tableCell) {
                     $innerDiv = $(tableCell).children("div.wijmo-wijgrid-innercell");
                     if($innerDiv) {
@@ -8434,32 +9059,22 @@ var wijmo;
                 }
                 return null;
             };
-            cellInfo.prototype.isEqual = function (value) {
-                /// <summary>
-                /// Compares the current object with a specified one and indicates whether they are identical.
-                /// Code example: var isEqual = cellInfoObj1.isEqual(cellInfoObj2);
-                /// </summary
-                /// <param name="value" type="$.wijmo.wijgrid.cellInfo">The object to compare</param>
-                /// <returns type="Boolean">True if the objects are identical, otherwise false.</returns>
+            cellInfo.prototype.isEqual = /** Compares the current object with an object you have specified and indicates whether they are identical
+            * @example
+            * var isEqual = cellInfoObj1.isEqual(cellInfoObj2);
+            * @param {wijmo.grid.cellInfo} value The object to compare
+            * @returns {Boolean} True if the objects are identical, otherwise false.
+            */
+            function (value) {
                 return (value && (value.rowIndex() === this.rowIndex()) && (value.cellIndex() === this.cellIndex()));
             };
-            cellInfo.prototype.row = function () {
-                /// <summary>
-                /// Gets the accociated row's information.
-                /// Code example: var row = cellInfoObj.row();
-                /// </summary>
-                /// <returns type="object">
-                /// Information about associated row.
-                ///
-                /// The return value has the following properties:
-                /// $rows: jQuery object that represents associated rows.
-                /// data: associated data.
-                /// dataRowIndex: data row index.
-                /// dataItemIndex: data item index.
-                /// virtualDataItemIndex: virtual data item index.
-                /// type: type of the row, one of the $.wijmo.wijgrid.rowType values.
-                /// </returns>
-                                var rowObj = null, result = null;
+            cellInfo.prototype.row = /** Gets the accociated row's information.
+            * @example
+            * var row = cellInfoObj.row();
+            * @returns {wijmo.grid.IRowInfo} Information about associated row.
+            */
+            function () {
+                var rowObj = null, result = null;
                 if(this._wijgrid) {
                     rowObj = this._wijgrid._view().rows().item(this.rowIndexAbs());
                     if(rowObj && rowObj.length) {
@@ -8468,12 +9083,8 @@ var wijmo;
                 }
                 return result;
             };
-            cellInfo.prototype.rowIndex = function (value) {
-                /// <summary>
-                /// Gets the zero-based index of the row containing the cell.
-                /// Code example: var index = cellInfoObj.rowIndex();
-                /// </summary>
-                /// <returns type="Number" integer="true"></returns>
+            cellInfo.prototype.rowIndex = /** @ignore */
+            function (value) {
                 if(arguments.length === 0) {
                     this._ensureRi();
                     return this._ri;
@@ -8481,32 +9092,20 @@ var wijmo;
                 this._ria = undefined;
                 this._ri = value;
             };
-            cellInfo.prototype.tableCell = function () {
-                /// <summary>
-                /// Returns the table cell element corresponding to this object.
-                /// Code example: var domCell = cellInfoObj.tableCell();
-                /// </summary>
-                /// <returns type="Object" domElement="true" />
+            cellInfo.prototype.tableCell = /** Returns the table cell element corresponding to this object.
+            * @example
+            * var domCell = cellInfoObj.tableCell();
+            * @returns {HTMLTableCellElement} The table cell element corresponding to this object.
+            */
+            function () {
                 if(this._wijgrid && this._isValid()) {
                     return this._wijgrid._view().getCell(this.cellIndexAbs(), this.rowIndexAbs());
                 }
                 return null;
             };
-            cellInfo.prototype.value = function (value/*opt*/ ) {
-                /// <summary>
-                /// Gets or sets underlying cell data.
-                /// Code example:
-                /// -) Getter:
-                ///   var value = cellInfoObj.value();
-                /// -) Setter:
-                ///   cellInfoObj.value("value");
-                /// </summary>
-                /// <param name="value" type="Object">Value to set.</param>
-                /// <returns type="Object" />
-                /// <remarks>
-                /// "invalid value" exception will be thrown by the setter if the value does not correspond to associated column.
-                /// </remarks>
-                                var column, rowInfo, colVal;
+            cellInfo.prototype.value = /** @ignore */
+            function (value/*opt*/ ) {
+                var column, rowInfo, colVal;
                 if(this._wijgrid && this._isValid()) {
                     rowInfo = this._wijgrid._view()._getRowInfo(this._wijgrid._rows().item(this.rowIndex()));
                     if(rowInfo.type & wijmo.grid.rowType.data) {
@@ -8514,11 +9113,11 @@ var wijmo;
                         if(arguments.length === 0) {
                             // getter
                             colVal = this._wijgrid._dataViewWrapper.getValue(rowInfo.data, column.dataKey);
-                            return this._wijgrid._parse(column, colVal);
+                            return this._wijgrid.parse(column, colVal);
                         } else {
                             // setter
                             // validation
-                            value = this._wijgrid._parse(column, value);
+                            value = this._wijgrid.parse(column, value);
                             if((value === null && column.valueRequired) || ((wijmo.grid.getDataType(column) !== "string") && isNaN(value))) {
                                 throw "invalid value";
                             }
@@ -8527,7 +9126,8 @@ var wijmo;
                     }
                 }
             };
-            cellInfo.prototype.toString = function () {
+            cellInfo.prototype.toString = /** @ignore */
+            function () {
                 return this.cellIndex() + ":" + this.rowIndex();
             };
             cellInfo.prototype._clip = // internal
@@ -8672,7 +9272,15 @@ var wijmo;
         })();
         grid.cellInfo = cellInfo;
         // private *
+        /** An object that specifies a range of cells determined by two cells. */
         var cellInfoRange = (function () {
+            /** Creates an object that specifies a range of cells determined by two cells. Normally you do not need to use this method.
+            * @example
+            * var range = wijmo.grid.cellInfoRange(new wijmo.grid.cellInfo(0, 0), new wijmo.grid.cellInfo(0, 0));
+            * @param {wijmo.grid.cellInfo} topLeft Object that represents the top left cell of the range.
+            * @param {wijmo.grid.cellInfo} bottomRight Object that represents the bottom right cell of the range.
+            * @returns {wijmo.grid.cellInfoRange} Object that specifies a range of cells determined by two cells.
+            */
             function cellInfoRange(topLeft, bottomRight) {
                 if(!topLeft || !bottomRight) {
                     throw "invalid arguments";
@@ -8680,32 +9288,33 @@ var wijmo;
                 this._topLeft = topLeft._clone();
                 this._bottomRight = bottomRight._clone();
             }
-            cellInfoRange.prototype.bottomRight = function () {
-                /// <summary>
-                /// Gets the object that represents the bottom right cell of the range.
-                /// Code example: var cellInfoObj = range.bottomRight();
-                /// </summary>
-                /// <returns type="$.wijmo.wijgrid.cellInfo" />
+            cellInfoRange.prototype.bottomRight = /** Gets the object that represents the bottom right cell of the range.
+            * @example
+            * var cellInfoObj = range.bottomRight();
+            * @returns {wijmo.grid.cellInfo} The object that represents the bottom right cell of the range.
+            */
+            function () {
                 return this._bottomRight;
             };
-            cellInfoRange.prototype.isEqual = function (range) {
-                /// <summary>
-                /// Compares the current range with a specified range and indicates whether they are identical.
-                /// Code example: var isEqual = range1.isEqual(range2);
-                /// </summary>
-                /// <param name="range" type="$.wijmo.wijgrid.cellInfoRange">Range to compare.</param>
-                /// <returns type="Boolean">True if the ranges are identical, otherwise false.</returns>
+            cellInfoRange.prototype.isEqual = /** Compares the current range with a specified range and indicates whether they are identical.
+            * @example
+            * var isEqual = range1.isEqual(range2);
+            * @param {wijmo.grid.cellInfoRange} range Range to compare.
+            * @returns True if the ranges are identical, otherwise false.
+            */
+            function (range) {
                 return (range && this._topLeft.isEqual(range.topLeft()) && this._bottomRight.isEqual(range.bottomRight()));
             };
-            cellInfoRange.prototype.topLeft = function () {
-                /// <summary>
-                /// Gets the object that represents the top left cell of the range.
-                /// Code example: var cellInfoObj = range.topLeft();
-                /// </summary>
-                /// <returns type="$.wijmo.wijgrid.cellInfo" />
+            cellInfoRange.prototype.topLeft = /** Gets the object that represents the top left cell of the range.
+            * @example
+            * var cellInfoObj = range.topLeft();
+            * @returns {wijmo.grid.cellInfo} The object that represents the top left cell of the range.
+            */
+            function () {
                 return this._topLeft;
             };
-            cellInfoRange.prototype.toString = function () {
+            cellInfoRange.prototype.toString = /** @ignore */
+            function () {
                 return this._topLeft.toString() + " - " + this._bottomRight.toString();
             };
             cellInfoRange.prototype._isIntersect = // public *
@@ -8728,7 +9337,9 @@ var wijmo;
             };
             cellInfoRange.prototype._clip = function (clipBy, absolute) {
                 if (typeof absolute === "undefined") { absolute = false; }
-                return this._topLeft._clip(clipBy, absolute) || this._bottomRight._clip(clipBy, absolute);
+                var a = this._topLeft._clip(clipBy, absolute);
+                var b = this._bottomRight._clip(clipBy, absolute);
+                return a || b;
             };
             cellInfoRange.prototype._clone = function () {
                 return new cellInfoRange(this._topLeft._clone(), this._bottomRight._clone());
@@ -8781,9 +9392,15 @@ var wijmo;
     (function (grid) {
         "use strict";
         var $ = jQuery;
+        /** @ignore */
         var baseView = (function () {
             function baseView(wijgrid, renderBounds) {
                 this._rowHeaderSize = 22;
+                this._sizesAdjCache = {
+                    th: 0,
+                    col: 0,
+                    subTable: 0
+                };
                 if(!wijgrid) {
                     throw "'wijgrid' must be specified";
                 }
@@ -8827,7 +9444,11 @@ var wijmo;
             baseView.prototype.render = function () {
                 this._ensureRenderBounds();
                 this._preRender();
+                var display = this._wijgrid.outerDiv.css("display");// hide outer element to improve performance.
+
+                this._wijgrid.outerDiv.css("display", "none");
                 this._renderContent();
+                this._wijgrid.outerDiv.css("display", display);
                 this._postRender();
             };
             baseView.prototype.toggleDOMSelection = function (enable) {
@@ -8940,6 +9561,25 @@ var wijmo;
                 this.toggleDOMSelection(this._wijgrid.options.selectionMode === "none");
 
                 this.ensureDisabledState();
+                // ** cache some values to speedup sizes manipulation (using IE especially) **
+                // reset
+                this._sizesAdjCache.col = 0;
+                this._sizesAdjCache.th = 0;
+                this._sizesAdjCache.subTable = 0;
+                // set a new values
+                var leaves = this._wijgrid._field("visibleLeaves");
+                if(leaves.length > 0) {
+                    // note: we assume that the margins, paddings and borders are common to all of the th\ col elements.
+                                        var th = this.getHeaderCell(0), cols = this.getJoinedCols(0);
+                    if(th) {
+                        this._sizesAdjCache.th = $(th).leftBorderWidth() + $(th).rightBorderWidth();
+                    }
+                    if(cols && cols.length) {
+                        this._sizesAdjCache.col = $(cols[0]).leftBorderWidth() + $(cols[0]).rightBorderWidth();
+                    }
+                }
+                var subTable = this.subTables()[0];
+                this._sizesAdjCache.subTable = $(subTable.element()).leftBorderWidth() + $(subTable.element()).rightBorderWidth();
             };
             baseView.prototype._preRender = function () {
                 throw "not implemented";
@@ -9100,7 +9740,7 @@ var wijmo;
                         continue;// spanned cell?
 
                     }
-                    cellValue = (dataIndex >= 0) ? this._wijgrid._toStr(leaf, sketchRow[dataIndex].value) : null// unbounded column
+                    cellValue = (dataIndex >= 0) ? this._wijgrid.toStr(leaf, sketchRow[dataIndex].value) : null// unbounded column
                     ;
                     cellAttr = (dataIndex >= 0) ? sketchRow[dataIndex].__attr : null;
                     cellStyle = (dataIndex >= 0) ? sketchRow[dataIndex].__style : null;
@@ -9182,7 +9822,7 @@ var wijmo;
             };
             baseView.prototype._adjustWidthArray = // rendering **
             // ** sizing
-            function (maxWidthArray, minWidthArray, expectedWidth, ensureColumnsPxWidth, autoExpandColumnIndex) {
+            function (maxWidthArray, minWidthArray, expectedWidth, ensureColumnsPxWidth) {
                 var maxWidth = this._sumWidthArray(maxWidthArray), minWidth = this._sumWidthArray(minWidthArray), widthArray = [], adjustWidth, expandCount = 0, expandWidth, remainingWidth, bFirst = true;
                 if(maxWidth <= expectedWidth) {
                     $.extend(true, widthArray, maxWidthArray);
@@ -9205,10 +9845,6 @@ var wijmo;
                     }
                 });
                 if(expandCount !== 0) {
-                    if(autoExpandColumnIndex !== undefined && (autoExpandColumnIndex > -1 && autoExpandColumnIndex < widthArray.length) && !widthArray[autoExpandColumnIndex].real) {
-                        widthArray[autoExpandColumnIndex].width += adjustWidth;
-                        return widthArray;
-                    }
                     expandWidth = Math.floor(adjustWidth / expandCount);
                     remainingWidth = adjustWidth - expandWidth * expandCount;
                     $.each(widthArray, function (index, colWidth) {
@@ -9223,80 +9859,95 @@ var wijmo;
                 }
                 return widthArray;
             };
-            baseView.prototype._getColumnWidth = function (index, widthArray) {
-                var leaf, colWidth, maxW, joinedTables, relIdx, i, table, rows, cell, row, j, len;
-                if(widthArray) {
-                    leaf = this._wijgrid._field("visibleLeaves")[index];
-                    if(leaf._realWidth !== undefined) {
-                        colWidth = {
-                            width: leaf._realWidth,
-                            real: true
-                        };
-                    } else if(leaf.isRowHeader) {
-                        colWidth = {
-                            width: this._rowHeaderSize,
-                            real: true
-                        };
-                    } else {
-                        maxW = 0;
-                        joinedTables = this.getJoinedTables(true, index);
-                        relIdx = joinedTables[2];
-                        for(i = 0; i < 2; i++) {
-                            table = joinedTables[i];
-                            if(table !== null) {
-                                rows = table.element().rows;
-                                if(len = rows.length) {
-                                    // try to find row which doesn't contains a spanned cells
-                                    for(j = len - 1 , row = null; j >= 0; j--) {
-                                        if(rows[j].cells.length === table.width()) {
-                                            row = rows[j];
-                                            break;
-                                        }
+            baseView.prototype._getColumnWidth = function (index) {
+                var result, leaf, joinedTables, relIdx, i, table, rows, cell, row, j, len;
+                leaf = this._wijgrid._field("visibleLeaves")[index];
+                if(leaf._realWidth !== undefined) {
+                    result = {
+                        width: leaf._realWidth,
+                        real: true
+                    };
+                } else if(leaf.isRowHeader) {
+                    result = {
+                        width: this._rowHeaderSize,
+                        real: true
+                    };
+                } else {
+                    var maxW = 0;
+                    joinedTables = this.getJoinedTables(true, index);
+                    relIdx = joinedTables[2];
+                    for(i = 0; i < 2; i++) {
+                        table = joinedTables[i];
+                        if(table !== null) {
+                            rows = table.element().rows;
+                            if(len = rows.length) {
+                                // try to find a row which doesn't contains a spanned cells
+                                for(j = len - 1 , row = null; j >= 0; j--) {
+                                    if(rows[j].cells.length === table.width()) {
+                                        row = rows[j];
+                                        break;
                                     }
-                                    if(row) {
-                                        cell = row.cells[relIdx];
-                                        maxW = Math.max(maxW, $(cell).outerWidth());
-                                    }
+                                }
+                                if(row) {
+                                    cell = row.cells[relIdx];
+                                    maxW = Math.max(maxW, $(cell).outerWidth());
                                 }
                             }
                         }
-                        colWidth = {
-                            width: maxW,
-                            real: false
-                        };
                     }
-                    widthArray.push(colWidth);
+                    result = {
+                        width: maxW,
+                        real: false
+                    };
                 }
+                return result;
             };
             baseView.prototype._setColumnWidth = function (index, px) {
-                var th = this.getHeaderCell(index), cols = this.getJoinedCols(index);
+                var th = this.getHeaderCell(index), cols = this.getJoinedCols(index), value;
                 if(px) {
-                    $(th).setOutWidth(px);
-                    $.each(cols, function (idx, col) {
-                        $(col).setOutWidth(px);
+                    var self = this;
+                    // $(th).setOutWidth(px); // very slow in IE9
+                    if(th) {
+                        value = px - this._sizesAdjCache.th;
+                        if(value < 0) {
+                            value = 0;
+                        }
+                        th.style.width = value + "px";
+                    }
+                    $.each(cols, function (i, col) {
+                        if(col) {
+                            // $(col).setOutWidth(px); // very slow in IE9
+                            value = px - self._sizesAdjCache.col;
+                            if(value < 0) {
+                                value = 0;
+                            }
+                            col.style.width = value + "px";
+                        }
                     });
                 }
             };
-            baseView.prototype._setTableWidth = function (tableArray, expectedWidth, expandColumnWidth, expandIndex) {
-                var after, diff;
-                $.each(tableArray, function (index, table) {
-                    table.css("table-layout", "fixed").setOutWidth(expectedWidth);
+            baseView.prototype._setTableWidth = function (subTables, expectedWidth, expandColumnWidth, expandIndex) {
+                var after, diff, self = this;
+                $.each(subTables, function (index, table) {
+                    //table.css("table-layout", "fixed").setOutWidth(expectedWidth); // very slow in IE9
+                    table[0].style.tableLayout = "fixed";
+                    table[0].style.width = (expectedWidth - self._sizesAdjCache.subTable) + "px";
                 });
-                after = tableArray[0].outerWidth();
+                after = subTables[0].outerWidth();
                 diff = after - expectedWidth;
                 if(diff !== 0) {
                     this._setColumnWidth(expandIndex, expandColumnWidth - diff);
                 }
             };
             baseView.prototype._sumWidthArray = function (widthArray, startIndex, endIndex) {
-                var minWidth = 0;
+                var result = 0;
                 $.each(widthArray, function (index, colWidth) {
                     if(startIndex !== undefined && endIndex !== undefined && (index < startIndex || index > endIndex)) {
                         return true;
                     }
-                    minWidth += colWidth.width;
+                    result += colWidth.width;
                 });
-                return minWidth;
+                return result;
             };
             baseView.prototype._clearBody = // sizing **
             // private abstract **
@@ -9337,7 +9988,7 @@ var wijmo;
                     }// if (affectMetadata)
 
                     // remove DOMRows
-                    rowInfo = this._getRowInfo(rows.item(sectionRowIndex));
+                    rowInfo = this._getRowInfo(rows.item(sectionRowIndex), false);
                     absRowIdx = this.getAbsoluteRowIndex(rowInfo.$rows[0]);
                     rowInfo.$rows.remove();
                     // ** update offsets
@@ -9402,12 +10053,13 @@ var wijmo;
                     rowInfo.data = tmpData;
                 }
             };
-            baseView.prototype._getRowInfo = function (rowObj) {
+            baseView.prototype._getRowInfo = function (rowObj, retrieveDataItem) {
+                if (typeof retrieveDataItem === "undefined") { retrieveDataItem = true; }
                 var wijgrid = this._wijgrid, $rows = rowObj[1] ? $(rowObj) : $(rowObj[0]), rowInfo = wijmo.grid.dataPrefix($rows, wijgrid._data$prefix, "rowInfo"), tmp;
                 // add $rows property
                 rowInfo.$rows = $rows;
                 // set data property
-                if((rowInfo.dataItemIndex >= 0) && (rowInfo.type & wijmo.grid.rowType.data)) {
+                if(retrieveDataItem && (rowInfo.dataItemIndex >= 0) && (rowInfo.type & wijmo.grid.rowType.data)) {
                     rowInfo.data = wijgrid._getDataItem(rowInfo.dataItemIndex);
                 }
                 return rowInfo;
@@ -9450,6 +10102,7 @@ var wijmo;
     (function (grid) {
         "use strict";
         var $ = jQuery;
+        /** @ignore */
         var flatView = (function (_super) {
             __extends(flatView, _super);
             function flatView(wijgrid, renderBounds) {
@@ -9506,16 +10159,15 @@ var wijmo;
                 });
                 // read column widths.
                 $.each(visibleLeaves, function (index, leaf) {
-                    self._getColumnWidth(index, maxWidthArray);
+                    maxWidthArray.push(self._getColumnWidth(index));
                 });
                 gridElement.css("width", "1px");
                 $.each(visibleLeaves, function (index, leaf) {
-                    self._getColumnWidth(index, minWidthArray);
+                    minWidthArray.push(self._getColumnWidth(index));
                 });
-                // headerWidth = outerDiv.innerWidth();
                 headerWidth = outerDiv.width()// using width() instead of innerWidth() to exclude padding.
                 ;
-                resultWidthArray = this._adjustWidthArray(maxWidthArray, minWidthArray, headerWidth, o.ensureColumnsPxWidth, o.autoExpandColumnIndex);
+                resultWidthArray = this._adjustWidthArray(maxWidthArray, minWidthArray, headerWidth, o.ensureColumnsPxWidth);
                 $.each(resultWidthArray, function (index, colWidth) {
                     var leaf = visibleLeaves[index];
                     if(leaf._realWidth !== undefined) {
@@ -9709,6 +10361,7 @@ var wijmo;
     (function (grid) {
         "use strict";
         var $ = jQuery;
+        /** @ignore */
         var fixedView = (function (_super) {
             __extends(fixedView, _super);
             function fixedView(wijgrid, renderBounds) {
@@ -9816,7 +10469,8 @@ var wijmo;
                 }
                 if(nwBounds.width) {
                     verBounds = {
-                        left: bounds.left,
+                        left: //left: bounds.left,
+                        nwBounds.left,
                         top: bounds.top,
                         width: Math.min(nwBounds.width, bounds.width),
                         height: bounds.height
@@ -9828,9 +10482,19 @@ var wijmo;
                 ];
             };
             fixedView.prototype.refreshPanel = function (scrollValue) {
-                var self = this, wijgrid = this._wijgrid, options = wijgrid.options, gridWidth = this._getGridWidth(options.scrollMode), panelModes = this._getMappedScrollMode(), needVBar = this._testNeedVBar(wijgrid.outerDiv, wijgrid.element, $(this._viewTables.ne.element()), options.scrollMode, wijgrid._autoHeight), hScrollValue = scrollValue ? scrollValue.x : null, vScrollValue = scrollValue ? scrollValue.y : null;
+                var self = this, wijgrid = this._wijgrid, options = wijgrid.options, gridWidth = this._getGridWidth(options.scrollMode), panelModes = this._getMappedScrollMode(), needVBar = this._testNeedVBar(wijgrid.outerDiv, wijgrid.element, $(this._viewTables.ne.element()), options.scrollMode, wijgrid._autoHeight), excludeVBarWidth = needVBar && !isTouchEnabled, hScrollValue = scrollValue ? scrollValue.x : null, vScrollValue = scrollValue ? scrollValue.y : null, isTouchEnabled = ($.support.isTouchEnabled && $.support.isTouchEnabled());
                 this._scroller.width(gridWidth);
-                this._splitAreas.ne.width(gridWidth - options.splitDistanceX - (needVBar ? this._verScrollBarSize : 0));
+                this._splitAreas.ne.width(gridWidth - options.splitDistanceX - (excludeVBarWidth ? this._verScrollBarSize : 0));
+                if(options.staticColumnsAlignment === "right") {
+                    this._splitAreas.nw.css({
+                        "left": "",
+                        "right": excludeVBarWidth ? this._verScrollBarSize : 0
+                    });
+                    this._splitAreas.sw.css({
+                        "left": "",
+                        "right": excludeVBarWidth ? this._verScrollBarSize : 0
+                    });
+                }
                 if(!this._scroller.data("wijmo-wijsuperpanel")) {
                     if(this._allowVirtualScrolling) {
                         this.vsUI = new wijmo.grid.uiVirtualScroller(wijgrid, this._splitAreas.se, // content to scroll
@@ -9864,16 +10528,17 @@ var wijmo;
                             self._splitAreas.sw.height(data.contentLength - options.splitDistanceY);
                         }
                     });
-                    this._scroller.find(".wijmo-wijsuperpanel-contentwrapper:first").scroll(function (e) {
-                        // * prevent native scrolling to avoid disalignment of the fixed and unfixed areas in IE\ Chrome when partially visible cell gets focus *
-                        if((e.target).scrollLeft) {
-                            (e.target).scrollLeft = 0;
-                        }
-                        if((e.target).scrollTop) {
-                            (e.target).scrollTop = 0;
-                        }
-                        e.preventDefault();
-                    });
+                    // issue #39166 - commented out.
+                    //this._scroller.find(".wijmo-wijsuperpanel-contentwrapper:first").scroll(function (e) {
+                    //	// * prevent native scrolling to avoid disalignment of the fixed and unfixed areas in IE\ Chrome when partially visible cell gets focus *
+                    //	if ((<Element>e.target).scrollLeft) {
+                    //		(<Element>e.target).scrollLeft = 0;
+                    //	}
+                    //	if ((<Element>e.target).scrollTop) {
+                    //		(<Element>e.target).scrollTop = 0;
+                    //	}
+                    //	e.preventDefault();
+                    //});
                     if(this._allowVirtualScrolling) {
                         this.vsUI.attach(this._scroller);
                     }
@@ -9886,23 +10551,9 @@ var wijmo;
                 if(!currentCell.tableCell()) {
                     return;
                 }
-                var wijgrid = this._wijgrid, o = wijgrid.options, superPanelObj = this._getSuperPanel(), element = currentCell.tableCell(), $dom = element.nodeType ? $(element) : element, contentElement, wrapperElement, visibleLeft, visibleTop, visibleWidth, visibleHeight, elementPosition, elementLeft, elementTop, elementWidth, elementHeight, resultLeft = null, resultTop = null, staticRowIndex, staticColumnIndex, currentRowIndex, currentCellIndex;
-                if(superPanelObj && $dom.is(":visible")) {
-                    contentElement = (superPanelObj).getContentElement();
-                    wrapperElement = contentElement.parent();
-                    visibleLeft = parseInt((contentElement.css("left") + "").replace("px", ""), 10) * -1;
-                    visibleTop = parseInt((contentElement.css("top") + "").replace("px", ""), 10) * -1;
-                    visibleWidth = wrapperElement.outerWidth() - o.splitDistanceX;
-                    visibleHeight = wrapperElement.outerHeight() - o.splitDistanceY;
-                    elementPosition = $dom.position();
-                    elementLeft = elementPosition.left;
-                    elementTop = elementPosition.top;
-                    elementWidth = $dom.outerWidth();
-                    elementHeight = $dom.outerHeight();
-                    staticRowIndex = wijgrid._getStaticIndex(true);
-                    staticColumnIndex = wijgrid._getStaticIndex(false);
-                    currentRowIndex = currentCell.rowIndex();
-                    currentCellIndex = currentCell.cellIndex();
+                var wijgrid = this._wijgrid, o = wijgrid.options, superPanelObj = this._getSuperPanel(), tableCell = currentCell.tableCell(), $tableCell = tableCell.nodeType ? $(tableCell) : tableCell, resultLeft = null, resultTop = null;
+                if(superPanelObj && $tableCell.is(":visible")) {
+                    var contentElement = (superPanelObj).getContentElement(), wrapperElement = contentElement.parent(), visibleLeft = parseInt((contentElement.css("left") + "").replace("px", ""), 10) * -1, visibleTop = parseInt((contentElement.css("top") + "").replace("px", ""), 10) * -1, visibleWidth = wrapperElement.outerWidth() - o.splitDistanceX, visibleHeight = wrapperElement.outerHeight() - o.splitDistanceY, elementPosition = $tableCell.position(), elementLeft = elementPosition.left, elementTop = elementPosition.top, elementWidth = $tableCell.outerWidth(), elementHeight = $tableCell.outerHeight(), staticRowIndex = wijgrid._getStaticIndex(true), staticColumnIndex = wijgrid._getStaticIndex(false), currentRowIndex = currentCell.rowIndex(), currentCellIndex = currentCell.cellIndex();
                     if(currentRowIndex <= staticRowIndex) {
                         if(currentCellIndex <= staticColumnIndex) {
                             resultLeft = 0;
@@ -9919,7 +10570,8 @@ var wijmo;
                         }
                     } else {
                         if(currentCellIndex <= staticColumnIndex) {
-                            elementTop += visibleTop;
+                            // elementTop += visibleTop;
+                            elementTop += this._splitAreas.sw.scrollTop();
                             if(elementTop + elementHeight > visibleTop + visibleHeight) {
                                 visibleTop = resultTop = elementTop + elementHeight - visibleHeight;
                             }
@@ -9963,7 +10615,7 @@ var wijmo;
                 /*if (!$tableSE.find("tbody .wijmo-wijgrid-row:not(.wijmo-wijgrid-groupheaderrow):first").length) {
                 wijgrid.element.css("width", "100%");
                 }*/
-                // * if there is no data in table, we must enlarge the table to prevent the width from being 0
+                // * if there is no data in a table, we must enlarge the table to prevent the width from being 0
                 if((tmp = self._viewTables.se.element().tBodies) && (tmp = tmp[0])) {
                     // tmp = tBodies[0]
                     hasDataRows = false;
@@ -10006,7 +10658,7 @@ var wijmo;
                     }
                 });
                 $.each(visibleLeaves, function (index, leaf) {
-                    self._getColumnWidth(index, maxWidthArray);
+                    maxWidthArray.push(self._getColumnWidth(index));
                 });
                 $.each([
                     $tableNW,
@@ -10019,12 +10671,11 @@ var wijmo;
                     });
                 });
                 $.each(visibleLeaves, function (index, leaf) {
-                    self._getColumnWidth(index, minWidthArray);
+                    minWidthArray.push(self._getColumnWidth(index));
                 });
-                //headerWidth = outerDiv.innerWidth();
                 headerWidth = outerDiv.width()// using width() instead of innerWidth() to exclude padding.
                 ;
-                resultWidthArray = this._adjustWidthArray(maxWidthArray, minWidthArray, headerWidth, o.ensureColumnsPxWidth, o.autoExpandColumnIndex);
+                resultWidthArray = this._adjustWidthArray(maxWidthArray, minWidthArray, headerWidth, o.ensureColumnsPxWidth);
                 $.each(resultWidthArray, function (index, colWidth) {
                     var leaf = visibleLeaves[index];
                     if(leaf._realWidth !== undefined) {
@@ -10077,7 +10728,7 @@ var wijmo;
                 if(!o.ensureColumnsPxWidth) {
                     if(this._testNeedVBar(wijgrid.outerDiv, $tableSE, $tableNE, mode, wijgrid._autoHeight)) {
                         headerWidth -= this._verScrollBarSize;
-                        resultWidthArray = this._adjustWidthArray(maxWidthArray, minWidthArray, headerWidth, o.ensureColumnsPxWidth, o.autoExpandColumnIndex);
+                        resultWidthArray = this._adjustWidthArray(maxWidthArray, minWidthArray, headerWidth, o.ensureColumnsPxWidth);
                         $.each(resultWidthArray, function (index, colWidth) {
                             if(!colWidth.real) {
                                 self._setColumnWidth(index, colWidth.width);
@@ -10561,13 +11212,7 @@ var wijmo;
                 }
             };
             fixedView.prototype._adjustRowHeight = function () {
-                /// <summary>
-                /// Set row height.
-                /// </summary>
-                /// <param name="index" type="Number">
-                /// The index of the column. Start with 0.
-                /// </param>
-                                var wijgrid = this._wijgrid, fixedColIdx = this._staticColumnIndex, lastColIdx = wijgrid._field("visibleLeaves").length - 1, fixedRowIdx, lastRowIdx, tables, tableNE, tableNEParent, tableNW, tableNWParent, tableSE, tableSEParent, tableSW, tableSWParent, rowCount, i, j, leftRows, rightRows, heightArray = [];
+                var wijgrid = this._wijgrid, fixedColIdx = this._staticColumnIndex, lastColIdx = wijgrid._field("visibleLeaves").length - 1, fixedRowIdx, lastRowIdx, tables, tableNE, tableNEParent, tableNW, tableNWParent, tableSE, tableSEParent, tableSW, tableSWParent, rowCount, i, j, leftRows, rightRows, heightArray = [];
                 // setting row height only if grid is divided into leftern and rightern parts
                 if(fixedColIdx > -1 && fixedColIdx < lastColIdx) {
                     fixedRowIdx = this._staticRowIndex;
@@ -10686,7 +11331,7 @@ var wijmo;
                 // force superpanel to do scrolling when cursor is placed over then non-scrollable (fixed) areas of the wijgrid.
                                 var bounds, dir = (delta > 0) ? "top" : "bottom", isOverFixedArea = false, vPos;
                 if(this._wijgrid._canInteract()) {
-                    bounds = this.getFixedAreaVisibleBounds()// an array
+                    bounds = this.getFixedAreaVisibleBounds()// an array (horizonta area, verticalw area)
                     ;
                     $.each(bounds, function (i, o) {
                         if(o && wijmo.grid.isOver(e.pageY, e.pageX, o.top, o.left, o.height, o.width)) {
@@ -10756,8 +11401,13 @@ var wijmo;
                 if(bSet === 0 || bSet === 2) {
                     this._splitAreas.nw.width(o.splitDistanceX);
                     this._splitAreas.sw.width(o.splitDistanceX);
-                    this._splitAreas.se.css("marginLeft", o.splitDistanceX);
-                    this._splitAreas.ne.css("marginLeft", o.splitDistanceX);
+                    if(wijgrid.options.staticColumnsAlignment === "right") {
+                        this._splitAreas.se.css("marginRight", o.splitDistanceX);
+                        this._splitAreas.ne.css("marginRight", o.splitDistanceX);
+                    } else {
+                        this._splitAreas.se.css("marginLeft", o.splitDistanceX);
+                        this._splitAreas.ne.css("marginLeft", o.splitDistanceX);
+                    }
                 }
                 if(bSet === 1 || bSet === 2) {
                     this._scroller.css("height", "");
@@ -10808,13 +11458,14 @@ var wijmo;
     (function (grid) {
         "use strict";
         var $ = jQuery;
-        /// <summary>
-        /// Object that represents selection in the grid.
-        /// Code example: var selection = new $.wijmo.wijgrid.selection(gridView);
-        /// </summary>
-        /// <param name="gridview" type="$.wijmo.wijgrid" mayBeNull="false">gridView</param>
-        /// <returns type="$.wijmo.wijgrid.selection">Object that represents selection in the grid</returns>
+        /** An object that represents selection in the grid. You do not need to create instances of this class. */
         var selection = (function () {
+            /** Creates an object that represents selection in the grid. Normally you do not need to use this method.
+            * @example
+            * var selection = new wijmo.grid.selection(wijgrid);
+            * @param {wijmo.wijgrid} wijgrid wijgrid
+            * @returns {wijmo.grid.selection} Object that represents selection in the grid
+            */
             function selection(wijgrid) {
                 this._updates = 0;
                 this._selectedColumns = null;
@@ -10879,52 +11530,37 @@ var wijmo;
                 this._selectedCells = new cellInfoOrderedCollection(wijgrid);
                 this._addedDuringCurTransactionCells = new cellInfoOrderedCollection(wijgrid);
             }
-            selection.prototype.selectedCells = function () {
-                /// <summary>
-                /// Gets a read-only collection of the selected cells.
-                /// Code example: var selectedCells = selectionObj.selectedCells();
-                /// </summary>
-                /// <returns type="$.wijmo.wijgrid.cellInfoOrderedCollection"/>
+            selection.prototype.selectedCells = /** Gets a read-only collection of the selected cells.
+            * @example
+            * var selectedCells = selectionObj.selectedCells();
+            * for (var i = 0, len = selectedCells.length(); i < len; i++) {
+            *	alert(selectedCells.item(i).value().toString());
+            * }
+            * @returns {wijmo.grid.cellInfoOrderedCollection} A read-only collection of the selected cells.
+            */
+            function () {
                 return this._selectedCells;
             };
-            selection.prototype.addColumns = function (start, end/* opt */ ) {
-                /// <summary>
-                /// Adds a column range to the current selection.
-                ///
-                /// Usage:
-                /// 1. addColumns(0)
-                /// 2. addColumns(0, 2)
-                ///
-                /// The result depends upon the chosen selection mode in the grid. For example, if current selection mode
-                /// does not allow multiple selection the previous selection will be removed.
-                ///
-                /// Code example: selectionObj.addColumns(0);
-                /// </summary>
-                /// <param name="start" type="Number" integer="true">The index of the first column to select.</param>
-                /// <param name="end" type="Number" integer="true">The index of the last column to select. Optional.</param>
+            selection.prototype.addColumns = /** Adds a column range to the current selection.
+            * Usage:
+            * 1. addColumns(0)
+            * 2. addColumns(0, 2)
+            * @example
+            * // Add the first column to the current selection.
+            * selectionObj.addColumns(0);
+            * @remarks
+            * The result depends upon the chosen selection mode in the grid. For example, if current selection mode does not allow multiple selection the previous selection will be removed.
+            * @param {Number} start The index of the first column to select.
+            * @param {Number} end The index of the last column to select.
+            */
+            function (start, end/* opt */ ) {
                 if(!end && end !== 0) {
                     end = start;
                 }
                 this.addRange(start, 0, end, 0xFFFFFF);
             };
-            selection.prototype.addRange = function (cellRange/* x0 */ , y0/* opt */ , x1/* opt */ , y1/* opt */ ) {
-                /// <summary>
-                /// Adds a cell range to the current selection.
-                ///
-                /// Usage:
-                /// 1. addRange(cellRange)
-                /// 2. addRange(x0, y0, x1, y1)
-                ///
-                /// The result depends upon the chosen selection mode in the grid. For example, if current selection mode
-                /// does not allow multiple selection the previous selection will be removed.
-                ///
-                /// Code example: selectionObj.addRange(0, 0, 1, 1);
-                /// </summary>
-                /// <param name="cellRange" type="$.wijmo.wijgrid.cellInfoRange">Cell range to select.</param>
-                /// <param name="x0" type="Number" integer="true">The x-coordinate that represents the top left cell of the range.</number>
-                /// <param name="y0" type="Number" integer="true">The y-coordinate that represents the top left cell of the range.</number>
-                /// <param name="x1" type="Number" integer="true">The x-coordinate that represents the bottom right cell of the range.</number>
-                /// <param name="y1" type="Number" integer="true">The y-coordinate that represents the bottom right cell of the range.</number>
+            selection.prototype.addRange = /** @ignore */
+            function (cellRange/* x0 */ , y0/* opt */ , x1/* opt */ , y1/* opt */ ) {
                 if(!cellRange && (arguments.length === 1)) {
                     throw "invalid argument";
                 }
@@ -10938,43 +11574,26 @@ var wijmo;
                 this._selectRange(range, false, true, 0/* none*/ , null);
                 this.endUpdate();
             };
-            selection.prototype.addRows = function (start, end/* opt */ ) {
-                /// <summary>
-                /// Adds a row range to the current selection.
-                ///
-                /// Usage:
-                /// 1. addRows(0)
-                /// 2. addRows(0, 2)
-                ///
-                /// The result depends upon the chosen selection mode in the grid. For example, if current selection mode
-                /// does not allow multiple selection the previous selection will be removed.
-                ///
-                /// Code example: selectionObj.addRows(0);
-                /// </summary>
-                /// <param name="start" type="Number" integer="true">The index of the first row to select.</param>
-                /// <param name="end" type="Number" integer="true">The index of the last row to select. Optional.</param>
+            selection.prototype.addRows = /** Adds a row range to the current selection.
+            * Usage:
+            * 1. addRows(0)
+            * 2. addRows(0, 2)
+            * @example
+            * // Add the first row to the selection.
+            * selectionObj.addRows(0);
+            * @remarks
+            * The result depends upon the chosen selection mode in the grid. For example, if current selection mode does not allow multiple selection the previous selection will be removed.
+            * @param {Number} start The index of the first row to select.
+            * @param {Number} end The index of the last row to select.
+            */
+            function (start, end/* opt */ ) {
                 if(!end && end !== 0) {
                     end = start;
                 }
                 this.addRange(0, start, 0xFFFFFF, end);
             };
-            selection.prototype.removeRange = function (cellRange/* x0 */ , y0/* opt */ , x1/* opt */ , y1/* opt */ ) {
-                /// <summary>
-                /// Removes a cell range from the current selection.
-                ///
-                /// Usage:
-                /// 1. removeRange(cellRange)
-                /// 2. removeRange(x0, y0, x1, y1)
-                ///
-                /// The result depends upon the chosen selection mode in the grid.
-                ///
-                /// Code example: selectionObj.removeRange(0, 0, 1, 1);
-                /// </summary>
-                /// <param name="cellRange" type="$.wijmo.wijgrid.cellInfoRange">Cell range to remove.</param>
-                /// <param name="x0" type="Number" integer="true">The x-coordinate that represents the top left cell of the range.</number>
-                /// <param name="y0" type="Number" integer="true">The y-coordinate that represents the top left cell of the range.</number>
-                /// <param name="x1" type="Number" integer="true">The x-coordinate that represents the bottom right cell of the range.</number>
-                /// <param name="y1" type="Number" integer="true">The y-coordinate that represents the bottom right cell of the range.</number>
+            selection.prototype.removeRange = /** @ignore */
+            function (cellRange/* x0 */ , y0/* opt */ , x1/* opt */ , y1/* opt */ ) {
                 if(!cellRange && (arguments.length === 1)) {
                     throw "invalid argument";
                 }
@@ -10988,81 +11607,81 @@ var wijmo;
                 this._clearRange(range, 0/* none */ );
                 this.endUpdate();
             };
-            selection.prototype.removeColumns = function (start, end/* opt */ ) {
-                /// <summary>
-                /// Removes a column range from the current selection.
-                ///
-                /// Usage:
-                /// 1. removeColumns(0)
-                /// 2. removeColumns(0, 2)
-                ///
-                /// The result depends upon the chosen selection mode in the grid.
-                ///
-                /// Code example: selectionObj.removeColumns(0);
-                /// </summary>
-                /// <param name="start" type="Number" integer="true">The index of the first column to remove.</param>
-                /// <param name="end" type="Number" integer="true">The index of the last column to remove. Optional.</param>
+            selection.prototype.removeColumns = /**
+            * Removes a range of columns from the current selection.
+            * Usage:
+            * 1. removeColumns(0)
+            * 2. removeColumns(0, 2)
+            * @example
+            * // Remove the first columm from the selection.
+            * selectionObj.removeColumns(0);
+            * @remarks
+            * The result depends upon the chosen selection mode in the grid.
+            * @param {Number} start The index of the first column to remove.
+            * @param {Number} end The index of the last column to remove.
+            */
+            function (start, end/* opt */ ) {
                 if(!end && end !== 0) {
                     end = start;
                 }
                 this.removeRange(start, 0, end, 0xFFFFFF);
             };
-            selection.prototype.removeRows = function (start, end/* opt */ ) {
-                /// <summary>
-                /// Removes a row range from the current selection.
-                ///
-                /// Usage:
-                /// 1. removeRows(0)
-                /// 2. removeRows(0, 2)
-                ///
-                /// The result depends upon the chosen selection mode in the grid.
-                ///
-                /// Code example: selectionObj.removeRows(0);
-                /// </summary>
-                /// <param name="start" type="Number" integer="true">The index of the first row to remove.</param>
-                /// <param name="end" type="Number" integer="true">The index of the last row to remove. Optional.</param>
+            selection.prototype.removeRows = /** Removes a range of rows from the current selection.
+            * Usage:
+            * 1. removeRows(0)
+            * 2. removeRows(0, 2)
+            * @example
+            * // Remove the first row from the selection.
+            * selectionObj.removeRows(0);
+            * @remarks
+            * The result depends upon the chosen selection mode in the grid.
+            * @param {Number} start The index of the first row to remove.
+            * @param {Number} end The index of the last row to remove.
+            */
+            function (start, end/* opt */ ) {
                 if(!end && end !== 0) {
                     end = start;
                 }
                 this.removeRange(0, start, 0xFFFFFF, end);
             };
-            selection.prototype.clear = function () {
-                /// <summary>
-                /// Clears the selection.
-                /// Code example: selectionObj.clear();
-                /// </summary>
+            selection.prototype.clear = /**
+            * Clears the selection.
+            * @example
+            * // Clear the selection.
+            * selectionObj.clear();
+            */
+            function () {
                 this.beginUpdate();
                 this._removedCells._clear();
                 this._removedCells._addFrom(this._selectedCells);
                 this.endUpdate();
             };
-            selection.prototype.selectAll = function () {
-                /// <summary>
-                /// Selects all the cells in a grid.
-                ///
-                /// The result depends upon the chosen selection mode in the grid.
-                /// For example, if the selection mode is "singleCell", only the top left cell will be selected.
-                ///
-                /// Code example: selectionObj.selectAll();
-                /// </summary>
+            selection.prototype.selectAll = /**
+            * Selects all the cells in a grid.
+            * @example
+            * selectionObj.selectAll();
+            * @remarks
+            * The result depends upon the chosen selection mode in the grid. For example, if the selection mode is set to "singleCell", then only the top left cell will be selected.
+            */
+            function () {
                 this.beginUpdate();
                 this._selectRange(this._wijgrid._getDataCellsRange(), false, false, 0/* none */ , null);
                 this.endUpdate();
             };
-            selection.prototype.beginUpdate = function () {
-                /// <summary>
-                /// Begins the update.
-                /// The changes won't have effect until endUpdate() is called.
-                /// Code example: selectionObj.beginUpdate();
-                /// </summary>
+            selection.prototype.beginUpdate = /**
+            * Begins the update. Any changes won't take effect until endUpdate() is called.
+            * @example
+            * selectionObj.beginUpdate();
+            */
+            function () {
                 this._updates++;
             };
-            selection.prototype.endUpdate = function () {
-                /// <summary>
-                /// Ends the update.
-                /// The pending changes are executed and the corresponding events are raised.
-                /// Code example: selectionObj.endUpdate();
-                /// </summary>
+            selection.prototype.endUpdate = /**
+            * Ends the update. The pending changes are executed and the selectionChanged event is raised.
+            * @example
+            * selectionObj.endUpdate();
+            */
+            function () {
                 if(this._updates > 0) {
                     this._updates--;
                     if(this._updates === 0) {
@@ -11246,13 +11865,15 @@ var wijmo;
         })();
         grid.selection = selection;
         // * private
-        /// <summary>
-        /// Creates an ordered read-only collection of $.wijmo.wijgrid.cellInfo objects.
-        /// Code example: var collection = new $.wijmo.wijgrid.cellInfoOrderedCollection(gridView);
-        /// </summary>
-        /// <param name="gridView" type="$.wijmo.wijgrid" mayBeNull="false">gridView</param>
-        /// <returns type="$.wijmo.wijgrid.cellInfoOrderedCollection" />
+        /** An ordered read-only collection of wijmo.grid.cellInfo objects */
         var cellInfoOrderedCollection = (function () {
+            /**
+            * Creates an ordered read-only collection of wijmo.grid.cellInfo objects. Normally you do not need to use this method.
+            * @example
+            * var collection = new wijmo.grid.cellInfoOrderedCollection(wijgrid);
+            * @param {wijmo.wijgrid} wijgrid wijgrid
+            * @returns {wijmo.grid.cellInfoOrderedCollection}  An ordered read-only collection of wijmo.grid.cellInfo objects
+            */
             function cellInfoOrderedCollection(wijgrid) {
                 this._clear = function () {
                     this._list.length = 0;
@@ -11264,40 +11885,25 @@ var wijmo;
                 this._list = [];
             }
             cellInfoOrderedCollection.prototype.item = // public
+            /** Gets an item at the specified index.
+            * @example
+            * var cellInfoObj = collection.item(0);
+            * @param {Number} index The zero-based index of the item to get.
+            * @returns {wijmo.grid.cellInfo} The wijmo.grid.cellInfo object at the specified index.
+            */
             function (index) {
-                /// <summary>
-                /// Gets an item at the specified index.
-                /// Code example: var cellInfoObj = collection.item(0);
-                /// </summary>
-                /// <param name="index" type="Number" integer="true">The zero-based index of the item to get.</param>
-                /// <returns type="$.wijmo.wijgrid.cellInfo">The $.wijmo.wijgrid.cellInfo object at the specified index.</returns>
                 return this._list[index];
             };
-            cellInfoOrderedCollection.prototype.length = function () {
-                /// <summary>
-                /// Gets the total number of the items in the collection.
-                /// Code example: var len = collection.length();
-                /// </summary>
-                /// <returns type="Number" integet="true">The total number of the items in the collection.</returns>
+            cellInfoOrderedCollection.prototype.length = /** Gets the total number of the items in the collection.
+            * @example
+            * var len = collection.length();
+            * @returns {Number} The total number of the items in the collection.
+            */
+            function () {
                 return this._list.length;
             };
-            cellInfoOrderedCollection.prototype.indexOf = // (cellInfo)
-            // (cellIndex, rowIndex)
+            cellInfoOrderedCollection.prototype.indexOf = /** @ignore */
             function (cellIndex, rowIndex) {
-                /// <summary>
-                /// Returns the zero-based index of specified collection item.
-                ///
-                /// Usage:
-                /// 1. indexOf(cellInfo) (note: search is done by value, not by reference).
-                /// 2. indexOf(cellIndex, rowIndex)
-                ///
-                /// Code example: var index = collection.indexOf(0, 0);
-                /// </summary>
-                ///
-                /// <param name="cellInfo" type="$.wijmo.wijgrid.cellInfo">A cellInfo object to return the index of.</param>
-                /// <param name="cellIndex" type="Number" integer="true">A zero-based cellIndex component of the cellInfo object to return the index of.</param>
-                /// <param name="rowIndex" type="Number" integer="true">A zero-based rowIndex component of the cellInfo object to return the index of.</param>
-                /// <returns type="Number" integer="true">The zero-based index of the specified object, or -1 if the specified object is not a member of the collection.</returns>
                 if(arguments.length === 1) {
                     rowIndex = cellIndex.rowIndex();
                     cellIndex = cellIndex.cellIndex();
@@ -11322,7 +11928,8 @@ var wijmo;
                 }
                 return ~lo;
             };
-            cellInfoOrderedCollection.prototype.toString = function () {
+            cellInfoOrderedCollection.prototype.toString = /** @ignore */
+            function () {
                 var val = "", i, len;
                 for(i = 0 , len = this._list.length; i < len; i++) {
                     val += this._list[i].toString() + "\n";
@@ -11439,6 +12046,7 @@ var wijmo;
     (function (grid) {
         "use strict";
         var $ = jQuery;
+        /** @ignore */
         var uiSelection = (function () {
             function uiSelection(wijgrid) {
                 this._gap_to_start = 10;
@@ -11685,6 +12293,10 @@ var wijmo;
     (function (grid) {
         "use strict";
         var $ = jQuery;
+        /**
+        * Class for convenient access to rows of a wijgrid.
+        * @ignore
+        */
         var rowAccessor = (function () {
             function rowAccessor(view, scope, offsetTop, offsetBottom) {
                 this._view = view;
@@ -11692,25 +12304,22 @@ var wijmo;
                 this._offsetBottom = offsetBottom;
                 this._offsetTop = offsetTop;
             }
-            rowAccessor.prototype.item = function (index) {
-                /// <summary>
-                /// Gets an array of the table row elements that represents a wijgrid widget row at the specified index.
-                /// remark: size of returning array is always two.
-                /// </summary>
-                /// <param name="index" type="Number" integer="true">
-                /// The zero-based index of the row to retrieve.
-                /// </param>
-                /// <returns type="Array" elementType="object" elementDomElement="true">
-                /// The array of the table row elements at the specified index.
-                /// </returns>
+            rowAccessor.prototype.item = /** Gets an array of the table row elements that represents a wijgrid widget row at the specified index.
+            * size of returning array is always two.
+            * @param {Number} index The zero-based index of the row to retrieve.
+            * @returns {Object[]} The array of the table row elements at the specified index.
+            * @remarks
+            */
+            function (index) {
                 var len = this.length();
                 return (index < len) ? this._view.getJoinedRows(index + this._offsetTop, this._scope) : null;
             };
-            rowAccessor.prototype.length = function () {
-                /// <summary>
-                /// Gets the total number of elements.
-                /// </summary>
-                                var joinedTables = this._view.getJoinedTables(true, 0), len = 0, htmlAccessor;
+            rowAccessor.prototype.length = /**
+            * Gets the total number of elements.
+            * @returns {Number} The total number of elements.
+            */
+            function () {
+                var joinedTables = this._view.getJoinedTables(true, 0), len = 0, htmlAccessor;
                 if(htmlAccessor = joinedTables[0]) {
                     len = htmlAccessor.getSectionLength(this._scope);
                 }
@@ -11723,20 +12332,12 @@ var wijmo;
                 }
                 return len;
             };
-            rowAccessor.iterateCells = function iterateCells(rowObj, callback, param) {
-                /// <summary>
-                /// Sequentially iterates the cells in a <paramref name="rows"/> array.
-                ///
-                /// example:
-                /// Suppose rows is an array containing the following data:
-                /// [ ["a", "b"], ["c", "d", "e"] ]
-                ///
-                /// When it is iterated it will sequentially return:
-                /// "a", "b", "c", "d", "e"
-                /// </summary>
-                /// <param name="rowObj" type="Array" elementType="Object" elementDomElement="true">Array of rows to be iterated.</param>
-                /// <param name="callback" type="Function">Function that will be called each time a new cell is reached.</param>
-                /// <param name="param" type="Object" optional="true">Parameter that can be handled within the callback function.</param>
+            rowAccessor.iterateCells = /** Sequentially iterates the cells in a rowObj argument.
+            * @param {Array} rowObj Array of rows to be iterated.
+            * @param {Function} callback Function that will be called each time a new cell is reached.
+            * @param {Object} param Parameter that can be handled within the callback function.
+            */
+            function iterateCells(rowObj, callback, param) {
                 if(rowObj && callback) {
                     var globCellIdx = 0, i, len, domRow, j, cellLen, result;
                     for(i = 0 , len = rowObj.length; i < len; i++) {
@@ -11752,23 +12353,17 @@ var wijmo;
                     }
                 }
             };
-            rowAccessor.getCell = function getCell(rowObj, globCellIndex) {
-                /// <summary>
-                /// Gets a cell by its global index in a row's array passed in rowObj.
-                ///
-                /// example:
-                /// Suppose rows is an array containing the following data:
-                /// [ ["a", "b"], ["c", "d", "e"] ]
-                ///
-                /// "a" symbol has a global index 0.
-                /// "c" symbol has a global index 2.
-                /// </summary>
-                /// <param name="rowObj" type="Array" elementType="Object" elementDomElement="true">Array of table row elements.</param>
-                /// <param name="index" type="Number" integer="true">Zero-based global index of a cell.</param>
-                /// <returns type="Object" domElement="true" elementMayBeNull="true">
-                /// A cell or null if a cell with provided index is not found.
-                /// </returns>
-                                var domRow, cellLen;
+            rowAccessor.getCell = /** Gets a cell by its global index in a row's array passed in rowObj.
+            * @example:
+            * Suppose rows is an array containing the following data: [ ["a", "b"], ["c", "d", "e"] ]
+            * "a" symbol has a global index 0.
+            * "c" symbol has a global index 2.
+            * @param {Array} rowObj Array of table row elements.
+            * @param {Number} index Zero-based global index of a cell.
+            * @returns {HTMLTableCellElement} A cell or null if a cell with provided index is not found.
+            */
+            function getCell(rowObj, globCellIndex) {
+                var domRow, cellLen;
                 if(rowObj && (domRow = rowObj[0])) {
                     cellLen = domRow.cells.length;
                     if(globCellIndex < cellLen) {
@@ -11784,13 +12379,12 @@ var wijmo;
                 }
                 return null;
             };
-            rowAccessor.cellsCount = function cellsCount(rowObj) {
-                /// <summary>
-                /// Gets the number of cells in a array of table row elements.
-                /// </summary>
-                /// <param name="rowObj" type="Array" elementType="Object" elementDomElement="true">Array of table row elements.</param>
-                /// <returns type="Number" integer="true">The number of cells in a array of table row elements.</returns>
-                                var res = 0, domRow;
+            rowAccessor.cellsCount = /** Gets the number of cells in a array of table row elements.
+            * @param {Array} rowObj Array of table row elements.
+            * @returns {Number} The number of cells in a array of table row elements.
+            */
+            function cellsCount(rowObj) {
+                var res = 0, domRow;
                 if(rowObj && (domRow = rowObj[0])) {
                     res = domRow.cells.length;
                     if(domRow = rowObj[1]) {
@@ -11814,6 +12408,7 @@ var wijmo;
     (function (grid) {
         "use strict";
         var $ = jQuery;
+        /** @ignore */
         var cellEditorHelper = (function () {
             function cellEditorHelper() {
                 this._timeout = 25;
@@ -11838,7 +12433,7 @@ var wijmo;
                             }
                             if(result) {
                                 currentCell._isEdit(true);
-                                if(grid.options.showRowHeader) {
+                                if(grid._showRowHeader()) {
                                     $innerDiv = $((rowInfo.$rows[0]).cells[0]).children("div.wijmo-wijgrid-innercell");
                                     if($innerDiv.length) {
                                         $innerDiv.empty();
@@ -11852,7 +12447,7 @@ var wijmo;
                 return result;
             };
             cellEditorHelper.prototype.currentCellEditEnd = function (grid, e) {
-                var currentCell = grid.currentCell(), result = false, view = grid._view(), rowInfo, rowType, escPressed, a, b, domCell, keyCodeEnum = wijmo.grid.getKeyCodeEnum();
+                var currentCell = grid.currentCell(), column = currentCell.column(), result = false, view = grid._view(), rowInfo, rowType, escPressed, a, b, domCell, keyCodeEnum = wijmo.grid.getKeyCodeEnum(), inputType;
                 if(!currentCell._isValid() || !currentCell._isEdit()) {
                     return;
                 }
@@ -11875,17 +12470,25 @@ var wijmo;
                             }
                             a = bcuArgs.value// new value
                             ;
+                            b = currentCell.value()// old value
+                            ;
                             try  {
-                                bcuArgs.value = grid._parse(currentCell.column(), bcuArgs.value)// try to parse raw value
-                                ;
+                                inputType = this._getHTMLInputElementType(currentCell);
+                                // xxx
+                                if(wijmo.grid.HTML5InputSupport.isExtendSupportRequired(inputType)) {
+                                    bcuArgs.value = wijmo.grid.HTML5InputSupport.parse(bcuArgs.value, inputType);
+                                    bcuArgs.value = wijmo.grid.HTML5InputSupport.extend(b, bcuArgs.value, inputType);
+                                } else {
+                                    // xxx
+                                    bcuArgs.value = grid.parse(currentCell.column(), bcuArgs.value)// try to parse raw value
+                                    ;
+                                }
                                 a = bcuArgs.value;
                             } catch (ex) {
                                 bcuArgs.value = a// restore raw value
                                 ;
                             }
-                            b = currentCell.value()// old value
-                            ;
-                            if(wijmo.grid.getDataType(bcuArgs.cell.column()) === "datetime") {
+                            if(wijmo.grid.getDataType(column) === "datetime") {
                                 if(a instanceof Date) {
                                     a = a.getTime();
                                 }
@@ -11931,7 +12534,7 @@ var wijmo;
                         if(result) {
                             currentCell._isEdit(false);
                         }
-                        if(grid.options.showRowHeader) {
+                        if(grid._showRowHeader()) {
                             $((rowInfo.$rows[0]).cells[0]).children("div.wijmo-wijgrid-innercell").html("&nbsp;")// remove ui-icon-pencil
                             ;
                         }
@@ -11954,13 +12557,15 @@ var wijmo;
             };
             cellEditorHelper.prototype._defaultBeforeCellEdit = // private
             function (grid, args) {
-                var leafOpt = args.cell.column(), result = false, value, $container, $input, len, kbEvent, keyCodeEnum = wijmo.grid.getKeyCodeEnum();
-                if(leafOpt.dataIndex >= 0) {
+                var column = args.cell.column(), result = false, value, strValue, $container, $input, len, kbEvent, keyCodeEnum = wijmo.grid.getKeyCodeEnum(), inputType = // xxx
+                wijmo.grid.HTML5InputSupport.getDefaultInputType(grid._isMobileEnv(), column);
+                // xxx
+                if(column.dataIndex >= 0) {
                     value = args.cell.value();
                     result = true;
                     try  {
                         $container = args.cell.container();
-                        if(wijmo.grid.getDataType(leafOpt) === "boolean") {
+                        if(wijmo.grid.getDataType(column) === "boolean") {
                             $input = $container.children("input");
                             $input.focus();
                             if(args.event && args.event.type === "keypress") {
@@ -11972,7 +12577,10 @@ var wijmo;
                                 });
                             }
                         } else {
-                            $input = $("<input />").attr("type", "text").addClass("wijgridinput wijmo-wijinput " + grid.options.wijCSS.stateFocus).bind("keydown", grid, $.proxy(this._checkBoxOrInputKeyDown, this));
+                            $input = $("<input />").attr(// xxx
+                            "type", inputType).addClass(// xxx
+                            //.attr("type", "text")
+                            "wijgridinput wijmo-wijinput " + grid.options.wijCSS.stateFocus).bind("keydown", grid, $.proxy(this._checkBoxOrInputKeyDown, this));
                             //the problem of inputing
                             $input.bind((($.support).selectstart ? "selectstart" : "mousedown"), function (event) {
                                 event.stopPropagation();
@@ -11980,7 +12588,7 @@ var wijmo;
                             if(args.event && args.event.type === "keypress" && args.event.which) {
                                 $input.val(String.fromCharCode(args.event.which));
                             } else {
-                                switch(wijmo.grid.getDataType(args.cell.column())) {
+                                switch(wijmo.grid.getDataType(column)) {
                                     case "currency":
                                     case "number":
                                         if(value !== null) {
@@ -11988,19 +12596,28 @@ var wijmo;
                                             ;
                                             break;
                                         }
+                                    case "datetime":
+                                        // xxx
+                                        if(wijmo.grid.HTML5InputSupport.isExtendSupportRequired(inputType)) {
+                                            $input.val(wijmo.grid.HTML5InputSupport.toStr(value, inputType));
+                                            break;
+                                        }
+                                        // xxx
                                         // fall through
                                                                             default:
-                                        $input.val(grid._toStr(args.cell.column(), value));
+                                        $input.val(grid.toStr(column, value));
                                         break;
                                 }
                             }
                             $container.empty().append($input);
-                            // move caret to the end of the text
                             len = $input.val().length;
-                            new wijmo.grid.domSelection($input[0]).setSelection({
-                                start: len,
-                                end: len
-                            });
+                            if(inputType === "text") {
+                                // move caret to the end of the text
+                                new wijmo.grid.domSelection($input[0]).setSelection({
+                                    start: len,
+                                    end: len
+                                });
+                            }
                             $input.focus();
                             setTimeout(function () {
                                 // IE fix
@@ -12031,7 +12648,7 @@ var wijmo;
                     view = grid._view();
                     try  {
                         $container = args.cell.container();
-                        cellValue = grid._toStr(leafOpt, args.cell.value());
+                        cellValue = grid.toStr(leafOpt, args.cell.value());
                         rowInfo = view._getRowInfo(grid._rows().item(args.cell.rowIndex()));
                         if(wijmo.grid.getDataType(leafOpt) === "boolean") {
                             $input = $container.children("input");
@@ -12069,6 +12686,9 @@ var wijmo;
                 }
                 return result;
             };
+            cellEditorHelper.prototype._getHTMLInputElementType = function (currentCell) {
+                return currentCell.container().find(":input:first").attr("type");
+            };
             return cellEditorHelper;
         })();
         grid.cellEditorHelper = cellEditorHelper;
@@ -12085,6 +12705,7 @@ var wijmo;
     (function (grid) {
         "use strict";
         var $ = jQuery;
+        /** @ignore */
         var cellFormatterHelper = (function () {
             function cellFormatterHelper() { }
             cellFormatterHelper._div = document.createElement("div");
@@ -12155,7 +12776,7 @@ var wijmo;
                         if(allowEditing) {
                             disableStr = "";
                         }
-                        if(grid._parse(args.column, grid._dataViewWrapper.getValue(args.row.data, args.column.dataKey)) === true) {
+                        if(grid.parse(args.column, grid._dataViewWrapper.getValue(args.row.data, args.column.dataKey)) === true) {
                             args.$container.html("<input class='wijgridinput' type='checkbox' checked='checked' " + disableStr + " />");
                         } else {
                             args.$container.html("<input class='wijgridinput' type='checkbox' " + disableStr + " />");
@@ -12188,7 +12809,8 @@ var wijmo;
                 var grid = args.column.owner, wijCSS = grid.options.wijCSS;
                 args.$container.addClass(wijCSS.widget + " " + wijCSS.stateDefault);
                 if((args.column.dataIndex >= 0) && !args.column.isBand && args.column.showFilter) {
-                    args.$container.html("<div class=\"wijmo-wijgrid-filter " + wijCSS.cornerAll + "\"><input type=\"text\" class=\"wijmo-wijgrid-filter-input\" style=\"width:100%\" /><a class=\"wijmo-wijgrid-filter-trigger " + wijCSS.cornerRight + " " + wijCSS.stateDefault + "\" href=\"#\"><span class=\"" + wijCSS.icon + " " + wijCSS.iconArrowDown + "\"></span></a></div>");
+                    // args.$container.html("<div class=\"wijmo-wijgrid-filter " + wijCSS.cornerAll + "\"><input type=\"text\" class=\"wijmo-wijgrid-filter-input\" style=\"width:100%\" /><a class=\"wijmo-wijgrid-filter-trigger " + wijCSS.cornerRight + " " + wijCSS.stateDefault + "\" href=\"#\"><span class=\"" + wijCSS.icon + " " + wijCSS.iconArrowDown + "\"></span></a></div>");
+                    args.$container.html("<table cellPadding=\"0\" cellSpacing=\"0\" class=\"wijmo-wijgrid-filter " + wijCSS.cornerAll + "\"><tr><td style=\"width:100%\"><input type=\"text\" class=\"wijmo-wijgrid-filter-input\" style=\"width:100%\" /></td><td class=\"wijmo-wijgrid-filter-trigger " + wijCSS.cornerRight + " " + wijCSS.stateDefault + "\"><span class=\"" + wijCSS.icon + " " + wijCSS.iconArrowDown + "\"></span></td></tr></table>");
                 } else {
                     args.$container.html("&nbsp;");
                 }
@@ -12208,8 +12830,10 @@ var wijmo;
     (function (grid) {
         "use strict";
         var $ = jQuery;
+        /** @ignore */
         var uiResizer = (function () {
             function uiResizer(wijgrid) {
+                this.MIN_WIDTH = 5;
                 this._elements = [];
                 this._gap = 10;
                 this._step = 1;
@@ -12307,7 +12931,7 @@ var wijmo;
                     // destroy proxy object
                     this._proxy.remove();
                     if(this._startLocation !== this._lastLocation) {
-                        this._wijgrid._fieldResized(this._hoveredField, this._startLocation.width, this._lastLocation.left - this._startLocation.left);
+                        this._wijgrid._fieldResized(this._hoveredField, this._startLocation.width, Math.max(this._lastLocation.left - this._startLocation.left, this.MIN_WIDTH));
                     }
                 }finally {
                     this._hoveredField = null;
@@ -12373,6 +12997,7 @@ var wijmo;
     (function (grid) {
         "use strict";
         var $ = jQuery;
+        /** @ignore */
         var uiDragndrop = (function () {
             function uiDragndrop(wijgrid) {
                 this._scope_guid = "scope_" + wijmo.grid.getUID();
@@ -12396,7 +13021,7 @@ var wijmo;
                             draggedWijField = self._getWijFieldInstance(draggable);
                             if(draggedWijField) {
                                 // The rightmost column header in the the group area can't be dragged to the end of the group area again.
-                                if((draggedWijField instanceof $.wijmo.c1groupedfield) && (draggedWijField.options.groupedIndex === self._wijgrid._field("groupedColumns").length - 1)) {
+                                if((draggedWijField instanceof $.wijmo.c1groupedfield) && (draggedWijField.options.groupedIndex === self._wijgrid._groupedColumns().length - 1)) {
                                     return false;
                                 }
                                 return !draggedWijField.options.isBand && (draggedWijField.options.groupedIndex === undefined || (draggedWijField instanceof $.wijmo.c1groupedfield));
@@ -12665,6 +13290,7 @@ var wijmo;
     (function (grid) {
         "use strict";
         var $ = jQuery;
+        /** @ignore */
         var cellStyleFormatterHelper = (function () {
             function cellStyleFormatterHelper(wijgrid) {
                 if(!wijgrid) {
@@ -12674,7 +13300,7 @@ var wijmo;
             }
             cellStyleFormatterHelper.prototype.format = function ($cell, cellIndex, column, rowInfo, state, cellAttr, cellStyle) {
                 var $rs = wijmo.grid.renderState, $rt = wijmo.grid.rowType, rowType = rowInfo.type, args, groupRowCellInfo = null;
-                if(cellIndex === 0 && this._wijgrid.options.showRowHeader) {
+                if(cellIndex === 0 && this._wijgrid._showRowHeader()) {
                     column = null;
                 }
                 if(rowType === $rt.groupHeader || rowType === $rt.groupFooter) {
@@ -12757,7 +13383,7 @@ var wijmo;
                         }
                     }
                 }
-                if(args._cellIndex === 0 && this._wijgrid.options.showRowHeader) {
+                if(args._cellIndex === 0 && this._wijgrid._showRowHeader()) {
                     args.$cell.attr({
                         "role": "rowheader",
                         "scope": "row"
@@ -12845,6 +13471,7 @@ var wijmo;
     (function (grid) {
         "use strict";
         var $ = jQuery;
+        /** @ignore */
         var rowStyleFormatterHelper = (function () {
             function rowStyleFormatterHelper(wijgrid) {
                 if(!wijgrid) {
@@ -12927,7 +13554,7 @@ var wijmo;
                 args.$rows.addClass(className);
             };
             rowStyleFormatterHelper.prototype._currentStateFormatter = function (args, flag) {
-                if(this._wijgrid.options.showRowHeader) {
+                if(this._wijgrid._showRowHeader()) {
                     // make deal with the row header cell
                     if(flag) {
                         // add formatting
@@ -12968,6 +13595,7 @@ var wijmo;
     (function (grid) {
         "use strict";
         var $ = jQuery;
+        /** @ignore */
         var tally = (function () {
             function tally() {
                 this._sum = 0;
@@ -13030,16 +13658,16 @@ var wijmo;
                 var wijgrid = column.owner;
                 if(this._cntNumbers && (column.dataType === "number" || column.dataType === "currency")) {
                     var value = this._getValue(column.aggregate);
-                    return wijgrid._toStr(column, value);
+                    return wijgrid.toStr(column, value);
                 }
                 // we only support max/min and count for dates
                 if(this._cntDates && (column.dataType === "datetime")) {
                     // we only support max/min and count for dates
                     switch(column.aggregate) {
                         case "max":
-                            return wijgrid._toStr(column, new Date(this._maxDate));
+                            return wijgrid.toStr(column, new Date(this._maxDate));
                         case "min":
-                            return wijgrid._toStr(column, new Date(this._minDate));
+                            return wijgrid.toStr(column, new Date(this._minDate));
                         case "count":
                             return this._cntStrings + "";
                     }
@@ -13107,6 +13735,7 @@ var wijmo;
     (function (grid) {
         "use strict";
         var $ = jQuery;
+        /** @ignore */
         var uiFrozener = (function () {
             function uiFrozener(wijgrid) {
                 this._docEventsUID = "wijgridfrozener" + wijmo.grid.getUID();
@@ -13134,8 +13763,13 @@ var wijmo;
                 this._staticRowIndex = this._wijgrid._getStaticIndex(true);
                 this._visibleBounds = this._wijgrid._view().getVisibleAreaBounds();
                 var allFixedAreaBounds = wijmo.grid.bounds(this._$outerDiv.find(".wijmo-wijgrid-split-area-nw")), containerBounds = wijmo.grid.bounds(this._$outerDiv);
-                this._createVBar(this._visibleBounds, allFixedAreaBounds, containerBounds);
-                this._createHBar(this._visibleBounds, allFixedAreaBounds, containerBounds);
+                // if staticColumnsAlignment is "right" then create vbar only when staticColumnIndex is set (vbar dragging ability is disabled in this case)
+                if(this._wijgrid.options.staticColumnsAlignment !== "right" || this._staticColumnIndex >= 0) {
+                    this._createVBar(this._visibleBounds, allFixedAreaBounds, containerBounds);
+                }
+                if(!this._wijgrid._serverSideVirtualScrolling()) {
+                    this._createHBar(this._visibleBounds, allFixedAreaBounds, containerBounds);
+                }
             };
             uiFrozener.prototype.dispose = function () {
                 if(this._$hBar) {
@@ -13155,9 +13789,10 @@ var wijmo;
                 this._detachDocEvents();
             };
             uiFrozener.prototype._createVBar = function (visibleBounds, allFixedAreaBounds, containerBounds) {
-                var leftPos = allFixedAreaBounds.width + allFixedAreaBounds.left, self = this;
+                var lAlign = (this._wijgrid.options.staticColumnsAlignment !== "right"), leftPos = lAlign ? allFixedAreaBounds.width + allFixedAreaBounds.left : allFixedAreaBounds.left - 2, self = this;
                 if(leftPos <= visibleBounds.left + visibleBounds.width) {
-                    this._$vBar = $("<div><div></div></div>").addClass("wijmo-wijgrid-frozener-v").css({
+                    this._$vBar = $("<div><div></div></div>").addClass("wijmo-wijgrid-frozener-v").addClass(lAlign ? "" : "not-allowed").css(// remove "pointer" cursor (vbar dragging ability is disabled when staticColumnsAlignment == "right" is used)
+                    {
                         left: leftPos - containerBounds.left,
                         top: allFixedAreaBounds.top - containerBounds.top,
                         height: visibleBounds.height + visibleBounds.top - allFixedAreaBounds.top
@@ -13174,12 +13809,14 @@ var wijmo;
                 }
             };
             uiFrozener.prototype._createHBar = function (visibleBounds, allFixedAreaBounds, containerBounds) {
-                var topPos = allFixedAreaBounds.top + allFixedAreaBounds.height, self = this;
+                var topPos = allFixedAreaBounds.top + allFixedAreaBounds.height, lAlign = (this._wijgrid.options.staticColumnsAlignment !== "right"), self = this;
                 if(topPos <= visibleBounds.top + visibleBounds.height) {
                     this._$hBar = $("<div><div></div></div>").addClass("wijmo-wijgrid-frozener-h").css({
-                        left: allFixedAreaBounds.left - containerBounds.left,
+                        left: lAlign ? allFixedAreaBounds.left - containerBounds.left : // 0?
+                        0,
                         top: topPos - containerBounds.top,
-                        width: visibleBounds.width + visibleBounds.left - allFixedAreaBounds.left
+                        width: lAlign ? visibleBounds.width + visibleBounds.left - allFixedAreaBounds.left : // visibleBounds.width?
+                        visibleBounds.width
                     }).bind("mousedown", function (e) {
                         e.data = false// horizontal bar
                         ;
@@ -13192,8 +13829,11 @@ var wijmo;
                     });
                 }
             };
-            uiFrozener.prototype._onBarMouseDown = // e.data.vertical
+            uiFrozener.prototype._onBarMouseDown = // e.data: true = vertical, false = horizontal
             function (e) {
+                if(this._wijgrid.options.disabled || (this._wijgrid.options.staticColumnsAlignment === "right" && e.data)) {
+                    return false;
+                }
                 this._visibleBounds = this._wijgrid._view().getVisibleAreaBounds();
                 this._newStaticIndex = e.data ? this._staticColumnIndex : this._staticRowIndex;
                 this._$proxy = $("<div class=\"wijmo-wijgrid-resizehandle " + this._wijgrid.options.wijCSS.header + "\"></div>").appendTo(document.body);
@@ -13262,7 +13902,7 @@ var wijmo;
                 return wijmo.grid.stringFormat("{0}.{1}", eventName, this._docEventsUID);
             };
             uiFrozener.prototype._showPosition = function (e) {
-                var element, elementBounds, centerXOrY, currentIdx, prevIdx, leftOrTop, position, barBounds;
+                var element, elementBounds, centerXOrY, currentIdx, prevIdx, leftOrTop, position, barBounds, lAlign = (this._wijgrid.options.staticColumnsAlignment !== "right");
                 if(e.data) {
                     // vertical
                     barBounds = wijmo.grid.bounds(this._$vBar);
@@ -13314,9 +13954,11 @@ var wijmo;
                         }
                         this._newStaticIndex = leftOrTop ? prevIdx : currentIdx;
                         this._$proxy.show().css({
-                            left: elementBounds.left,
+                            left: lAlign ? elementBounds.left : // this._visibleBounds.left?
+                            this._visibleBounds.left,
                             top: position,
-                            width: this._visibleBounds.width + this._visibleBounds.left - elementBounds.left,
+                            width: lAlign ? this._visibleBounds.width + this._visibleBounds.left - elementBounds.left : // this._visibleBounds.width?
+                            this._visibleBounds.width,
                             height: 3
                         });
                     }
@@ -13362,6 +14004,7 @@ var wijmo;
     (function (grid) {
         "use strict";
         var $ = jQuery;
+        /** @ignore */
         var columnsGenerator = (function () {
             function columnsGenerator() { }
             columnsGenerator.generate = function generate(mode, fieldsInfo, columns) {
@@ -13443,6 +14086,7 @@ var wijmo;
     (function (grid) {
         "use strict";
         var $ = jQuery;
+        /** @ignore */
         var uiVirtualScroller = (function () {
             function uiVirtualScroller(wijgrid, $content, fixedAreaHeight) {
                 this._timer = 0;
@@ -13633,7 +14277,7 @@ var wijmo;
                     if(value === null && convertEmptyStringToNull) {
                         return nullString;
                     }
-                    return glob.format(value, format ? format : "n", culture.name);
+                    return glob.format(value, format || "n", culture.name);
                 }
             },
             currency: {
@@ -13656,7 +14300,7 @@ var wijmo;
                     if(value === null && convertEmptyStringToNull) {
                         return nullString;
                     }
-                    return glob.format(value, format ? format : "c", culture.name);
+                    return glob.format(value, format || "c", culture.name);
                 }
             },
             datetime: {
@@ -13685,7 +14329,7 @@ var wijmo;
                     if(value === null && convertEmptyStringToNull) {
                         return nullString;
                     }
-                    return glob.format(value, format ? format : "d", culture.name);
+                    return glob.format(value, format || "d", culture.name);
                 }
             },
             "boolean": { // Novius OS : Add "" under boolean for yui-compresor

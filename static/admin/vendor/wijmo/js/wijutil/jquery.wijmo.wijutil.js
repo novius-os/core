@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20131.4
+ * Wijmo Library 3.20132.15
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -12,6 +12,7 @@
  */
 /// <reference path="../External/declarations/jquery.d.ts"/>
 /// <reference path="../External/declarations/jquery.ui.d.ts"/>
+/// <reference path="../External/declarations/jquerymobile.d.ts"/>
 /// <reference path="../Base/wijmo.d.ts"/>
 /*
 *
@@ -22,6 +23,83 @@
 var wijmo;
 (function (wijmo) {
     $.fn.extend({
+        wijtextselection: function () {
+            /// <summary>jQuery plugins to get/set text selection for input element</summary>
+                        var start, end, t = this[0];
+            var val = this.val();
+            if(arguments.length === 0) {
+                var range, stored_range, s, e;
+                if($.browser.msie && parseInt($.browser.version) < 9) {
+                    try  {
+                        var selection = document.selection;
+                        if(t.tagName.toLowerCase() != "textarea") {
+                            //$(this).focus();
+                            range = selection.createRange().duplicate();
+                            range.moveEnd("character", val.length);
+                            s = (range.text === "" ? val.length : val.lastIndexOf(range.text));
+                            range = selection.createRange().duplicate();
+                            range.moveStart("character", -val.length);
+                            e = range.text.length;
+                        } else {
+                            range = selection.createRange();
+                            stored_range = range.duplicate();
+                            stored_range.moveToElementText(t);
+                            stored_range.setEndPoint('EndToEnd', range);
+                            s = stored_range.text.length - range.text.length;
+                            e = s + range.text.length;
+                        }
+                    } catch (e) {
+                    }//fixed bug 26153
+                    
+                } else {
+                    s = t.selectionStart;
+                    e = t.selectionEnd;
+                }
+                var te = val.substring(s, e);
+                return {
+                    start: s,
+                    end: e,
+                    text: te,
+                    replace: function (st) {
+                        return val.substring(0, s) + st + val.substring(e, val.length);
+                    }
+                };
+            } else if(arguments.length === 1) {
+                if(typeof arguments[0] === "object" && typeof arguments[0].start === "number" && typeof arguments[0].end === "number") {
+                    start = arguments[0].start;
+                    end = arguments[0].end;
+                } else if(typeof arguments[0] === "string") {
+                    if((start = val.indexOf(arguments[0])) > -1) {
+                        end = start + arguments[0].length;
+                    }
+                } else if(Object.prototype.toString.call(arguments[0]) === "[object RegExp]") {
+                    var re = arguments[0].exec(val);
+                    if(re != null) {
+                        start = re.index;
+                        end = start + re[0].length;
+                    }
+                }
+            } else if(arguments.length === 2) {
+                if(typeof arguments[0] === "number" && typeof arguments[1] === "number") {
+                    start = arguments[0];
+                    end = arguments[1];
+                }
+            }
+            if(typeof start === "undefined") {
+                start = 0;
+                end = val.length;
+            }
+            if($.browser.msie) {
+                var selRange = t.createTextRange();
+                selRange.collapse(true);
+                selRange.moveStart('character', start);
+                selRange.moveEnd('character', end - start);
+                selRange.select();
+            } else {
+                t.selectionStart = start;
+                t.selectionEnd = end;
+            }
+        },
         wijContent: function (url) {
             return this.each(function () {
                 this.innerHTML = '<iframe frameborder="0" style="width: 100%; height: 100%;" src="' + url + '">"';
@@ -30,8 +108,14 @@ var wijmo;
         wijAddVisibilityObserver: /* Visibility observer */
         function (h, namespace) {
             return this.each(function () {
+                var _this = this;
                 $(this).addClass("wijmo-wijobserver-visibility");
-                $(this).bind("wijmovisibilitychanged" + (namespace ? ("." + namespace) : ""), h);
+                $(this).bind("wijmovisibilitychanged" + (namespace ? ("." + namespace) : ""), function (e) {
+                    //fixed an issue that if an visiblity Objerver element inside another visiblity Objerver element,
+                    // when trigger inside the element's event, it will propagate. It's not we wanted, So stop the propagation.
+                    h.apply(_this, arguments);
+                    e.stopPropagation();
+                });
             });
         },
         wijRemoveVisibilityObserver: function (h) {
@@ -163,7 +247,7 @@ var wijmo;
                 //rather than directly on $.effects.
                 if($.effects) {
                     if($.effects[animated] || ($.effects.effect && $.effects.effect[animated])) {
-                        this.hide(animated, $.extend(option, {
+                        this.stop().hide(animated, $.extend(option, {
                             easing: easing
                         }), duration, hidden);
                         return;
@@ -278,6 +362,40 @@ var wijmo;
         }
         return element;
     };
+    //Add the hasAllClasses method for supporting multiple classes selector
+    $.fn.hasAllClasses = function (classesString) {
+        var i, classes = (classesString || '').match(/\S+/g) || [];
+        //if classesString is "" or null or undefined, return false
+        if(classes.length === 0) {
+            return false;
+        }
+        for(i = 0; i < classes.length; i++) {
+            if(!this.hasClass(classes[i])) {
+                return false;
+            }
+        }
+        ;
+        return true;
+    };
+    /**TODO: Override the hasClass method for supporting multiple classes selector
+    $.fn.hasClass = function (selector) {
+    var className = " " + selector + " ",
+    i = 0, j = 0,
+    eleClassName = "",
+    classes = (className || '').match(/\S+/g) || [],
+    l = this.length;
+    for (; i < l; i++) {
+    if (this[i].nodeType === 1) {
+    eleClassName = (" " + this[i].className + " ").replace(/[\t\r\n]/g, " ");
+    for (j = 0; j < classes.length; j++) {
+    if (eleClassName.indexOf(classes[j]) <= 0) {
+    return false;
+    }
+    }
+    }
+    }
+    return true;
+    };*/
     $.setMode = function (el, mode) {
         if($.effects) {
             return $.effects.setMode(el, mode);
@@ -349,6 +467,35 @@ var wijmo;
             return '' || input.substr(0, pos) + ch + input.substr(pos + 1);
         }
     });
+    // add the zIndex method to util if using in mobile.
+    if(!$.fn.zIndex) {
+        $.fn.zIndex = function (zIndex) {
+            if(zIndex !== undefined) {
+                return this.css("zIndex", zIndex);
+            }
+            if(this.length) {
+                var elem = $(this[0]), position, value;
+                while(elem.length && elem[0] !== document) {
+                    // Ignore z-index if position is set to a value where z-index is ignored by the browser
+                    // This makes behavior of this function consistent across browsers
+                    // WebKit always returns auto if the element is positioned
+                    position = elem.css("position");
+                    if(position === "absolute" || position === "relative" || position === "fixed") {
+                        // IE returns 0 when zIndex is not specified
+                        // other browsers return a string
+                        // we ignore the case of nested elements with an explicit value of 0
+                        // <div style="z-index: -10;"><div style="z-index: 0;"></div></div>
+                        value = parseInt(elem.css("zIndex"), 10);
+                        if(!isNaN(value) && value !== 0) {
+                            return value;
+                        }
+                    }
+                    elem = elem.parent();
+                }
+            }
+            return 0;
+        };
+    }
     var c__escapeArr1 = [
         '\n', 
         '\r', 
@@ -392,7 +539,8 @@ var wijmo;
                 charValidator: new wijCharValidator(),
                 encodeString: function (s) {
                     for(var i = 0; i < c__escapeArr1.length; i++) {
-                        var r = /c__escapeArr3[i]/g;
+                        //var r = /c__escapeArr3[i]/g;
+                        var r = new RegExp(c__escapeArr3[i], "g");
                         s = s.replace(r, c__escapeArr2[i]);
                     }
                     return s;
@@ -402,7 +550,8 @@ var wijmo;
                         return;
                     }
                     for(var i = 0; i < c__escapeArr2.length; i++) {
-                        var r = /c__escapeArr2[i]/g;
+                        //var r = /c__escapeArr2[i]/g;
+                        var r = new RegExp(c__escapeArr2[i], "g");
                         s = s.replace(r, c__escapeArr1[i]);
                     }
                     return s;
@@ -445,46 +594,66 @@ var wijmo;
         }
         jQuery.browser = browser;
     }
-    //Fix an known jQuery issue #8710,
+    //Fix a known jQuery issue #8710, fix tfs issue #34746
     //http://bugs.jqueryui.com/ticket/8710
-    //if ($.ui && $.ui.position && $.ui.position.flipfit) {
-    //    $.ui.position.flip.top =function (position:any, data:any) {
-    //        var within = data.within,
-    //            withinOffset = within.offset.top + within.scrollTop,
-    //            outerHeight = within.height,
-    //            offsetTop = within.isWindow ? within.scrollTop : within.offset.top,
-    //            collisionPosTop = position.top - data.collisionPosition.marginTop,
-    //            overTop = collisionPosTop - offsetTop,
-    //            overBottom = collisionPosTop + data.collisionHeight - outerHeight - within.offset.top,
-    //            top = data.my[1] === "top",
-    //            myOffset = top ?
-    //                -data.elemHeight :
-    //                data.my[1] === "bottom" ?
-    //                    data.elemHeight :
-    //                    0,
-    //            atOffset = data.at[1] === "top" ?
-    //                data.targetHeight :
-    //                data.at[1] === "bottom" ?
-    //                    -data.targetHeight :
-    //                    0,
-    //            offset = -2 * data.offset[1],
-    //            newOverTop,
-    //            newOverBottom;
-    //        if (overTop < 0) {
-    //            newOverBottom = position.top + myOffset + atOffset + offset + data.collisionHeight - outerHeight - withinOffset;
-    //            if (newOverBottom < 0 || newOverBottom < Math.abs(overTop)) {
-    //                position.top += myOffset + atOffset + offset;
-    //            }
-    //        }
-    //        else if (overBottom > 0) {
-    //            newOverTop = position.top - data.collisionPosition.marginTop + myOffset + atOffset + offset - offsetTop;
-    //            if (newOverTop > 0 || Math.abs(newOverTop) < overBottom) {
-    //                position.top += myOffset + atOffset + offset;
-    //            }
-    //        }
-    //    };
-    //}
-    })(wijmo || (wijmo = {}));
+    if($.ui && $.ui.position && $.ui.position.flipfit) {
+        $.ui.position.flip.top = function (position, data) {
+            var within = data.within, withinOffset = within.offset.top + within.scrollTop, outerHeight = within.height, offsetTop = within.isWindow ? within.scrollTop : within.offset.top, collisionPosTop = position.top - data.collisionPosition.marginTop, overTop = collisionPosTop - offsetTop, overBottom = collisionPosTop + data.collisionHeight - outerHeight - offsetTop, top = data.my[1] === "top", myOffset = top ? -data.elemHeight : data.my[1] === "bottom" ? data.elemHeight : 0, atOffset = data.at[1] === "top" ? data.targetHeight : data.at[1] === "bottom" ? -data.targetHeight : 0, offset = -2 * data.offset[1], newOverTop, newOverBottom;
+            if(overTop < 0) {
+                newOverBottom = position.top + myOffset + atOffset + offset + data.collisionHeight - outerHeight - withinOffset;
+                if((position.top + myOffset + atOffset + offset) > overTop && (newOverBottom < 0 || newOverBottom < Math.abs(overTop))) {
+                    position.top += myOffset + atOffset + offset;
+                }
+            } else if(overBottom > 0) {
+                newOverTop = position.top - data.collisionPosition.marginTop + myOffset + atOffset + offset - offsetTop;
+                if((position.top + myOffset + atOffset + offset + data.collisionHeight - outerHeight - offsetTop) < overBottom && (newOverTop > 0 || Math.abs(newOverTop) < overBottom)) {
+                    //if ( ( position.top + myOffset + atOffset + offset) > overBottom && ( newOverTop > 0 || abs( newOverTop ) < overBottom ) ) {
+                    position.top += myOffset + atOffset + offset;
+                }
+            }
+        };
+    }
+    // for upgrade jQuery UI 1.10, it remove the offset option from option arguments.
+    var $position = $.fn.position;
+    $.fn.position = function (options) {
+        //$position.call(this, options);
+        if(options && $.isPlainObject(options) && options.offset) {
+            var my = (options.my || "").split(" "), rhorizontal = /left|center|right/, rvertical = /top|center|bottom/, offset = (options.offset || "").split(" ");
+            if(my.length === 1) {
+                rhorizontal.test(my[0]) ? my.concat([
+                    "center"
+                ]) : rvertical.test(my[0]) ? [
+                    "center"
+                ].concat(my) : [
+                    "center", 
+                    "center"
+                ];
+            }
+            if(offset.length === 1) {
+                offset.concat(offset[0]);
+            }
+            $.each(my, function (i, m) {
+                if(/\+|-/.test(offset[i])) {
+                    my[i] = my[i] + offset[i];
+                } else {
+                    my[i] = my[i] + "+" + offset[i];
+                }
+            });
+            options.my = my.join(" ");
+        }
+        return $position.apply(this, arguments);
+    };
+    function getKeyCodeEnum() {
+        if($.ui && $.ui.keyCode) {
+            return $.ui.keyCode;
+        }
+        if($.mobile && $.mobile.keyCode) {
+            return $.mobile.keyCode;
+        }
+        throw "keyCode object is not found";
+    }
+    wijmo.getKeyCodeEnum = getKeyCodeEnum;
+})(wijmo || (wijmo = {}));
 function __wijReadOptionEvents(eventsArr, widgetInstance) {
     // handle option events
     for(var k = 0; k < eventsArr.length; k++) {
