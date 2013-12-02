@@ -1,0 +1,19 @@
+.mceSplitButton a.nosActionLabel {
+    width:auto !important;
+}
+.mceSplitButtonLabeled span.mceAction {
+    float:left !important;
+}
+span.mceSplitButtonLabel {
+    display:block;
+    font-size:10px;
+    padding:4px 6px 0 22px;
+    font-family:Tahoma,Verdana,Arial,Helvetica;
+}
+.mceSplitButtonDisabled .mceSplitButtonLabel {
+    color:#888;
+}
+
+span.mce_noslink {
+    background : url(../img/link.png) no-repeat 1px 1px !important;
+}

@@ -1,0 +1,6 @@
+span.mceIcon.mce_toolbar_toggle_open {
+    background : url(../img/toolbar_toggle_open.png) no-repeat 1px 1px;
+}
+span.mceIcon.mce_toolbar_toggle_close {
+    background : url(../img/toolbar_toggle_close.png) no-repeat 1px 1px;
+}
