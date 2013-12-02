@@ -60,25 +60,31 @@ return array(
         'deleting item title' => __('Deleting the page ‘{{title}}’'),
 
         # Delete action's labels
-        'deleting button 1 item' => __('Yes, delete this page'),
-        'deleting button N items' => __('Yes, delete these {{count}} pages'),
+        'deleting button N items' => n__(
+            'Yes, delete this page',
+            'Yes, delete these {{count}} pages'
+        ),
 
-        '1 item' => __('1 page'),
-        'N items' => __('{{count}} pages'),
+        'N items' => n__(
+            '1 page',
+            '{{count}} pages'
+        ),
 
         # Keep only if the model has the behaviour Contextable
-        'deleting with N contexts' => __('This page exists in <strong>{{context_count}} contexts</strong>.'),
-        'deleting with N languages' => __('This page exists in <strong>{{language_count}} languages</strong>.'),
-
-        # Keep only if the model has the behaviours Contextable + Tree
-        'deleting with N contexts and N children' => __('This page exists in <strong>{{context_count}} contexts</strong> and has <strong>{{children_count}} sub-pages</strong>.'),
-        'deleting with N contexts and 1 child' => __('This page exists in <strong>{{context_count}} contexts</strong> and has <strong>one sub-page</strong>.'),
-        'deleting with N languages and N children' => __('This page exists in <strong>{{language_count}} languages</strong> and has <strong>{{children_count}} sub-pages</strong>.'),
-        'deleting with N languages and 1 child' => __('This page exists in <strong>{{language_count}} languages</strong> and has <strong>one sub-page</strong>.'),
+        'deleting with N contexts' => n__(
+            'This page exists in <strong>one context</strong>.',
+            'This page exists in <strong>{{context_count}} contexts</strong>.'
+        ),
+        'deleting with N languages' => n__(
+            'This page exists in <strong>one language</strong>.',
+            'This page exists in <strong>{{language_count}} languages</strong>.'
+        ),
 
         # Keep only if the model has the behaviour Tree
-        'deleting with 1 child' => __('This page has <strong>1 sub-page</strong>.'),
-        'deleting with N children' => __('This page has <strong>{{children_count}} sub-pages</strong>.'),
+        'deleting with N children' => n__(
+            'This page has <strong>one sub-page</strong>.',
+            'This page has <strong>{{children_count}} sub-pages</strong>.'
+        ),
     ),
     'actions' => array(
         'list' => array(

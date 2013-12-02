@@ -27,7 +27,10 @@ return array(
         'deleting item title' => __('Deleting the role ‘{{title}}’'),
 
         // Delete action's labels
-        'deleting button 1 item' => __('Yes, delete this role'),
+        'deleting button N items' => n__(
+            'Yes, delete this role',
+            'Yes, delete these {{count}} roles'
+        ),
     ),
     'actions' => array(
         'add' => array(

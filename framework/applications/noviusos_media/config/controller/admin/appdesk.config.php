@@ -97,8 +97,14 @@ return array(
     'i18n' => array(
         'item' => __('media file'),
         'items' => __('media files'),
-        'showNbItems' => __('Showing {{x}} media files out of {{y}}'),
-        'showOneItem' => __('Showing 1 media file'),
+        'NItems' => n__(
+            '1 media file',
+            '{{count}} media files'
+        ),
+        'showNbItems' => n__(
+            'Showing 1 media file out of {{y}}',
+            'Showing {{x}} media files out of {{y}}'
+        ),
         'showNoItem' => __('No media files'),
         // Note to translator: This is the action that clears the 'Search' field
         'showAll' => __('Show all media files'),

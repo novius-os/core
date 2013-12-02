@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-\Nos\I18n::current_dictionary('nos::common');
+\Nos\I18n::current_dictionary('nos::application');
 
 if (empty($saveField) && !empty($fieldset)) {
     $saveField = $fieldset->field('save');

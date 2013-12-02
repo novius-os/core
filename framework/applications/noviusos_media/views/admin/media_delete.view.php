@@ -23,12 +23,16 @@ if ($usage_count == 0) {
     <?php
 } else {
     ?>
-    <p><?= strtr(__(
-            $usage_count == 1 ? __('The media is used <strong>once</strong> by an application.')
-                              : __('The media is used <strong>{{count}} times</strong> by your applications.')
-    ), array(
-        '{{count}}' => $usage_count,
-    )) ?></p>
+    <p><?= strtr(
+            n__(
+                'The media is used <strong>once</strong> by an application.',
+                'The media is used <strong>{{count}} times</strong> by your applications.',
+                $usage_count
+            ),
+            array(
+                '{{count}}' => $usage_count,
+            )
+        ) ?></p>
     <p><?= $crud['config']['i18n']['deleting confirmation number'] ?></p>
     <p><?= strtr(__('Yes, I want to delete this media file even though it is used {{count}} times.'), array(
         '{{count}}' => '<input class="verification" data-verification="'.$usage_count.'" size="'.(mb_strlen($usage_count) + 1).'" />',

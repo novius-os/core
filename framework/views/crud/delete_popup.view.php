@@ -45,18 +45,28 @@ $context_or_language = count(Nos\Tools_Context::sites()) == 1 ? 'language' : 'co
 if ($children_count > 0 || $context_count > 1) {
     $deletion_summary = array();
     if ($context_count > 1) {
-        $deletion_summary[] = 'N '.$context_or_language.'s';
+        if (is_array($crud['config']['i18n']['deleting with N '.$context_or_language.'s'])) {
+            $msg = $crud['config']['i18n']['deleting with N '.$context_or_language.'s'][\Nos\I18n::pluralKey($context_count)];
+        } else {
+            \Log::deprecated('The "deleting with N '.$context_or_language.'s" key '.
+                'of CRUD '.$crud['config']['model'].' config\'s i18n array must contain an array of different plurals'.
+                ' translation, and not the translated text.', 'Chiba.3');
+            $msg = $crud['config']['i18n']['deleting with N '.$context_or_language.'s'];
+        }
+        $deletion_summary[] = strtr($msg, array('{{'.$context_or_language.'_count}}' =>  $context_count));
     }
     if ($children_count > 0) {
-        $deletion_summary[] = $children_count == 1 ? '1 child' : 'N children';
+        if (is_array($crud['config']['i18n']['deleting with N children'])) {
+            $msg = $crud['config']['i18n']['deleting with N children'][\Nos\I18n::pluralKey($children_count)];
+        } else {
+            \Log::deprecated('The "deleting with N children" key '.
+                'of CRUD '.$crud['config']['model'].' config\'s i18n array must contain an array of different plurals '.
+                'translation, and not the translated text. In this case, the key "1 child" is unnecessary.', 'Chiba.3');
+            $msg = $crud['config']['i18n']['deleting with '.($children_count == 1 ? '1 child' : 'N children')];
+        }
+        $deletion_summary[] = strtr($msg, array('{{children_count}}' =>  $children_count));
     }
-    $deletion_summary = $crud['config']['i18n']['deleting with '.implode(' and ', $deletion_summary)];
-
-    $deletion_summary = strtr($deletion_summary, array(
-        '{{'.$context_or_language.'_count}}' =>  $context_count,
-        '{{children_count}}' =>  $children_count,
-        '{{title}}' => $item->title_item(),
-    ));
+    $deletion_summary = implode('<br />', $deletion_summary);
     ?>
     <p><?= $deletion_summary ?></p>
     <?php
@@ -74,10 +84,19 @@ if ($context_count > 1) {
         ));
         $context = $item_context->get_context();
         $count = isset($children_context[$context]) ? $children_context[$context] : 1;
+
+        if (is_array($crud['config']['i18n']['N items'])) {
+            $msg = $crud['config']['i18n']['N items'][\Nos\I18n::pluralKey($count)];
+        } else {
+            \Log::deprecated('The "N items" key '.
+                'of CRUD '.$crud['config']['model'].' config\'s i18n array must contain an array of different plurals '.
+                'translation, and not the translated text. In this case, the key "1 item" is unnecessary.', 'Chiba.3');
+            $msg = $crud['config']['i18n'][$count == 1 ? '1 item' : 'N items'];
+        }
         ?>
         <tr>
             <td><?= Nos\Tools_Context::contextLabel($item_context->get_context()) ?></td>
-            <td><?= strtr($crud['config']['i18n'][$count == 1 ? '1 item' : 'N items'], array('{{count}}' => $count)) ?></td>
+            <td><?= strtr($msg, array('{{count}}' => $count)) ?></td>
             <td><input type="checkbox" name="contexts[]" class="count" data-count="<?= $count ?>" value="<?= $context ?>" <?= $is_disabled ? 'disabled' : 'checked' ?> /></td>
         </tr>
         <?php

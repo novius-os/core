@@ -25,8 +25,14 @@ return array(
     'i18n' => array(
         'item' => __('user'),
         'items' => __('users'),
-        'showNbItems' => __('Showing {{x}} users out of {{y}}'),
-        'showOneItem' => __('Showing 1 user'),
+        'NItems' => n__(
+            '1 user',
+            '{{count}} users'
+        ),
+        'showNbItems' => n__(
+            'Showing 1 user out of {{y}}',
+            'Showing {{x}} users out of {{y}}'
+        ),
         'showNoItem' => __('No users'),
         // Note to translator: This is the action that clears the 'Search' field
         'showAll' => __('Show all users'),

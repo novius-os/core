@@ -39,7 +39,10 @@ return array(
         'deleting item title' => __('Deleting the media ‘{{title}}’'),
 
         # Delete action's labels
-        'deleting button 1 item' => __('Yes, delete this media file'),
+        'deleting button N items' => n__(
+            'Yes, delete this media file',
+            'Yes, delete these {{count}} media files'
+        ),
     ),
     'data_mapping' => array(
         'title' => array(

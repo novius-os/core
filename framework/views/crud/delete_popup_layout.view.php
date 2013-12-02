@@ -9,6 +9,17 @@
  */
 $id = $uniqid = uniqid('form_');
 
+
+if (!is_array($crud['config']['i18n']['deleting button N items'])) {
+    \Log::deprecated('The "deleting button N items" key '.
+        'of CRUD '.$crud['config']['model'].' config\'s i18n array must contain an array of different plurals '.
+        'translation, and not the translated text. '.
+        'In this case, the key "deleting button 1 item" and "deleting button 0 items" is unnecessary.', 'Chiba.3');
+    $crud['config']['i18n']['deleting button N items'] = array(
+        0 => $crud['config']['i18n']['deleting button 1 item'],
+        1 => $crud['config']['i18n']['deleting button N items'],
+    );
+}
 ?>
 <form class="fieldset standalone" id="<?= $id ?>">
 <?= \View::forge($crud['config']['views']['delete'], $view_params, false) ?>
@@ -16,11 +27,9 @@ $id = $uniqid = uniqid('form_');
 <p>
     <?= strtr($crud['config']['i18n']['deleting confirmation button'], array(
         '{{Button}}' => '
-                <button type="submit" class="ui-priority-primary ui-state-error" data-texts="'.htmlspecialchars(\Format::forge()->to_json(array(
-                    '0' => $crud['config']['i18n']['deleting button 0 items'],
-                    '1' => $crud['config']['i18n']['deleting button 1 item'],
-                    '+' => $crud['config']['i18n']['deleting button N items'],
-                ))).'">'.$crud['config']['i18n']['deleting confirmation item'].'</button>',
+                <button type="submit" class="ui-priority-primary ui-state-error" data-texts="'.
+                    htmlspecialchars(\Format::forge()->to_json($crud['config']['i18n']['deleting button N items'])).
+                    '">'.$crud['config']['i18n']['deleting confirmation item'].'</button>',
         '<a>' => '<a href="#">',
     )) ?>
 </p>
@@ -67,9 +76,10 @@ $id = $uniqid = uniqid('form_');
                         });
                         $confirmButton[sum == 0 ? 'addClass' : 'removeClass']('ui-state-disabled');
                         $confirmButton.find('.ui-button-text').text(
-                            $.nosDataReplace($confirmButton.data('texts')[(sum > 1 ? '+' : sum).toString()], {
-                                'count': sum.toString()
-                            })
+                            $.nosDataReplace(
+                                $.nosI18nPlural($confirmButton.data('texts'), sum),
+                                {'count': sum.toString()}
+                            )
                         );
                         $(this).removeClass('ui-state-focus');
                     })

@@ -1,9 +1,9 @@
 <?php
 
-// Generated on 19/08/2013 18:12:14
+// Generated on 07/11/2013 15:24:52
 
-// 56 out of 56 messages are translated (100%).
-// 246 out of 246 words are translated (100%).
+// 55 out of 56 messages are translated (98%).
+// 243 out of 245 words are translated (98%).
 
 return array(
     #: classes/controller/admin/user.ctrl.php:70
@@ -33,15 +33,30 @@ return array(
     #: classes/controller/admin/role.ctrl.php:29
     'OK, permissions saved.' => 'OK, droits enregistrés.',
 
-    #: views/admin/user_details_edit.view.php:29
+    #: views/admin/user_details_edit.view.php:27
     'Details' => 'Propriétés',
 
-    #: views/admin/user_details_edit.view.php:38
-    #: views/admin/user_add.view.php:46
+    #: views/admin/user_details_edit.view.php:36
+    #: views/admin/user_add.view.php:45
     'Roles' => 'Rôles',
 
-    #: views/admin/user_details_edit.view.php:46
+    #: views/admin/user_details_edit.view.php:44
     'Set a new password' => 'Changer le mot de passe',
+
+    #: views/admin/password_strength.view.php:14
+    'Insufficient' => 'Insuffisant',
+
+    #: views/admin/password_strength.view.php:15
+    'Weak' => 'Faible',
+
+    #: views/admin/password_strength.view.php:16
+    'Average' => 'Dans la moyenne',
+
+    #: views/admin/password_strength.view.php:17
+    'Strong' => 'Fort',
+
+    #: views/admin/password_strength.view.php:18
+    'Outstanding' => 'Excellent',
 
     #: views/admin/user_edit.view.php:38
     'User details' => 'Propriétés',
@@ -49,46 +64,23 @@ return array(
     #: views/admin/user_edit.view.php:39
     'Permissions' => 'Droits d’accès',
 
-    #. Password strength
-    #: views/admin/user_edit.view.php:91
-    #: views/admin/account.view.php:95
-    #: views/admin/user_add.view.php:75
-    'Insufficient' => 'Insuffisant',
-
-    #: views/admin/user_edit.view.php:92
-    #: views/admin/account.view.php:96
-    #: views/admin/user_add.view.php:76
-    'Weak' => 'Faible',
-
-    #: views/admin/user_edit.view.php:93
-    #: views/admin/account.view.php:97
-    #: views/admin/user_add.view.php:77
-    'Average' => 'Dans la moyenne',
-
-    #: views/admin/user_edit.view.php:94
-    #: views/admin/account.view.php:98
-    #: views/admin/user_add.view.php:78
-    'Strong' => 'Fort',
-
-    #: views/admin/user_edit.view.php:95
-    #: views/admin/account.view.php:99
-    #: views/admin/user_add.view.php:79
-    'Outstanding' => 'Excellent',
-
     #: views/admin/user_roles_edit.view.php:35
     'View and edit permissions' => 'Voir et modifier les permissions',
 
-    #: views/admin/account.view.php:30
+    #: views/admin/account.view.php:14
+    'Save' => '',
+
+    #: views/admin/account.view.php:32
     'Sign out (see you!)' => 'Se déconnecter (à bientôt&nbsp;!)',
 
-    #: views/admin/account.view.php:42
+    #: views/admin/account.view.php:44
     'My account' => 'Mon compte',
 
-    #: views/admin/account.view.php:43
+    #: views/admin/account.view.php:45
     'Theme' => 'Thème',
 
     #: config/controller/admin/user.config.php:19
-    #: config/common/user.config.php:47
+    #: config/common/user.config.php:50
     'Add a user' => 'Ajouter un utilisateur',
 
     #: config/controller/admin/user.config.php:35
@@ -113,7 +105,7 @@ return array(
     #: config/controller/admin/user.config.php:97
     'Password:' => 'Mot de passe&nbsp;:',
 
-    #: config/controller/admin/user.config.php:115
+    #: config/controller/admin/user.config.php:114
     'Password (confirmation):' => 'Mot de passe (confirmation)&nbsp;:',
 
     #: config/controller/admin/inspector/role.config.php:22
@@ -121,10 +113,10 @@ return array(
     'Role' => 'Rôle',
 
     #: config/controller/admin/role.config.php:19
-    #: config/common/role.config.php:34
+    #: config/common/role.config.php:37
     'Add a role' => 'Ajouter un rôle',
 
-    #: config/controller/admin/role.config.php:41
+    #: config/controller/admin/role.config.php:40
     'Title' => 'Titre',
 
     #: config/controller/admin/appdesk.config.php:26
@@ -133,17 +125,23 @@ return array(
     #: config/controller/admin/appdesk.config.php:27
     'users' => 'utilisateurs',
 
-    #: config/controller/admin/appdesk.config.php:28
-    'Showing {{x}} users out of {{y}}' => '{{x}} utilisateurs sur {{y}} affichés',
-
     #: config/controller/admin/appdesk.config.php:29
-    'Showing 1 user' => '1 utilisateur affiché',
+    '1 user' => array(
+        0 => '',
+        1 => '',
+    ),
 
-    #: config/controller/admin/appdesk.config.php:30
+    #: config/controller/admin/appdesk.config.php:33
+    'Showing 1 user out of {{y}}' => array(
+        0 => '1 utilisateur sur {{y}} affiché',
+        1 => '{{x}} utilisateurs sur {{y}} affichés',
+    ),
+
+    #: config/controller/admin/appdesk.config.php:36
     'No users' => 'Pas d’utilisateur',
 
     #. Note to translator: This is the action that clears the 'Search' field
-    #: config/controller/admin/appdesk.config.php:32
+    #: config/controller/admin/appdesk.config.php:38
     'Show all users' => 'Afficher tous les utilisateurs',
 
     #: config/common/user.config.php:8
@@ -170,9 +168,11 @@ return array(
     #: config/common/user.config.php:40
     'Deleting the user ‘{{title}}’' => 'Supprimer l’utilisateur «&nbsp;{{title}}&nbsp;»',
 
-    #. Delete action's labels
-    #: config/common/user.config.php:43
-    'Yes, delete this user' => 'Oui, supprimer cet utilisateur',
+    #: config/common/user.config.php:44
+    'Yes, delete this user' => array(
+        0 => 'Oui, supprimer cet utilisateur',
+        1 => 'Oui, supprimer ces {{count}} utilisateurs',
+    ),
 
     #. Crud
     #: config/common/role.config.php:19
@@ -192,8 +192,10 @@ return array(
     #: config/common/role.config.php:27
     'Deleting the role ‘{{title}}’' => 'Supprimer le rôle «&nbsp;{{title}}&nbsp;»',
 
-    #. Delete action's labels
-    #: config/common/role.config.php:30
-    'Yes, delete this role' => 'Oui, supprimer ce rôle',
+    #: config/common/role.config.php:31
+    'Yes, delete this role' => array(
+        0 => 'Oui, supprimer ce rôle',
+        1 => 'Oui, supprimer ces {{count}} rôles',
+    ),
 
 );

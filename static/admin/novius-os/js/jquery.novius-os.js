@@ -103,10 +103,21 @@ define('jquery-nos',
 
 
         $.extend({
+            nosLangPluralRule: '$n != 1 ? 1 : 0',
             nosTexts: {
                 chooseMediaFile : 'Choose a media file',
                 chooseMediaImage : 'Choose a image',
                 errorImageNotfind : 'We’re afraid we cannot find this image.'
+            },
+
+            nosI18nPlural: function(msgs, $n) {
+                var plural_indice;
+                if (!$.isArray(msgs)) {
+                    return msgs;
+                } else {
+                    plural_indice = eval($.nosLangPluralRule);
+                    return msgs[plural_indice] ? msgs[plural_indice] : msgs[0];
+                }
             },
 
             nosContext : function(contexts) {

@@ -31,9 +31,16 @@ define('jquery-nos-appdesk',
                     item : 'item',
                     items : 'items',
                     //gridTitle: 'Items', // Don't set it here, will use texts.items as default value
-                    showNbItems : 'Showing {{x}} items out of {{y}}',
-                    showOneItem : 'Showing 1 item',
+                    showNbItems : [
+                        'Showing 1 item out of {{y}}',
+                        'Showing {{x}} items out of {{y}}'
+                    ],
                     showNoItem : 'No items',
+                    showNbTotal : '({{nb}} in total)',
+                    NItems : [
+                        '1 item',
+                        '{{count}} items'
+                    ],
                     showAll : 'Show all items',
                     viewGrid : 'List',
                     viewTreeGrid : 'Tree',
@@ -1045,12 +1052,16 @@ define('jquery-nos-appdesk',
                                 if (dataSource.data.totalRows === 0) {
                                     self.uiPaginationLabel.html(o.texts.showNoItem);
                                     self.uiNbResult.html(o.texts.showNoItem);
-                                } else if (dataSource.data.totalRows === 1) {
-                                    self.uiPaginationLabel.html(o.texts.showOneItem);
-                                    self.uiNbResult.html('1 ' + o.texts.item);
                                 } else {
-                                    self.uiPaginationLabel.html(o.texts.showNbItems.replace('{{x}}', dataSource.data.length).replace('{{y}}', dataSource.data.totalRows));
-                                    self.uiNbResult.html(dataSource.data.totalRows + ' ' + o.texts.items);
+                                    self.uiPaginationLabel.html(
+                                        $.nosI18nPlural(o.texts.showNbItems, dataSource.data.length)
+                                            .replace('{{x}}', dataSource.data.length)
+                                            .replace('{{y}}', dataSource.data.totalRows)
+                                    );
+                                    self.uiNbResult.html(
+                                        $.nosI18nPlural(o.texts.NItems, dataSource.data.totalRows)
+                                            .replace('{{count}}', dataSource.data.totalRows)
+                                    );
                                 }
                                 self.uiNbResult.show();
 
@@ -1247,12 +1258,16 @@ define('jquery-nos-appdesk',
                             if (dataSource.data.totalRows === 0) {
                                 self.uiPaginationLabel.html(o.texts.showNoItem);
                                 self.uiNbResult.html(o.texts.showNoItem);
-                            } else if (dataSource.data.totalRows === 1) {
-                                self.uiPaginationLabel.html(o.texts.showOneItem);
-                                self.uiNbResult.html('1 ' + o.texts.item);
                             } else {
-                                self.uiPaginationLabel.html(o.texts.showNbItems.replace('{{x}}', dataSource.data.length).replace('{{y}}', dataSource.data.totalRows));
-                                self.uiNbResult.html(dataSource.data.totalRows + ' ' + o.texts.items);
+                                self.uiPaginationLabel.html(
+                                    $.nosI18nPlural(o.texts.showNbItems, dataSource.data.length)
+                                        .replace('{{x}}', dataSource.data.length)
+                                        .replace('{{y}}', dataSource.data.totalRows)
+                                );
+                                self.uiNbResult.html(
+                                    $.nosI18nPlural(o.texts.NItems, dataSource.data.totalRows)
+                                        .replace('{{count}}', dataSource.data.totalRows)
+                                );
                             }
                             self.uiNbResult.show();
 

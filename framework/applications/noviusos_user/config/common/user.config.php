@@ -40,7 +40,10 @@ return array(
         'deleting item title' => __('Deleting the user ‘{{title}}’'),
 
         // Delete action's labels
-        'deleting button 1 item' => __('Yes, delete this user'),
+        'deleting button N items' => n__(
+            'Yes, delete this user',
+            'Yes, delete these {{count}} users'
+        ),
     ),
     'actions' => array(
         'add' => array(

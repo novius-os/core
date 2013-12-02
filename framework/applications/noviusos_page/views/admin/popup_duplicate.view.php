@@ -32,18 +32,30 @@ $context_or_language = count(Nos\Tools_Context::sites()) == 1 ? 'language' : 'co
 if ($children_count > 0 || $context_count > 1) {
     $deletion_summary = array();
     if ($context_count > 1) {
-        $deletion_summary[] = 'N '.$context_or_language.'s';
+        if (is_array($crud['i18n']['deleting with N '.$context_or_language.'s'])) {
+            $msg = $crud['i18n']['deleting with N '.$context_or_language.'s'][\Nos\I18n::pluralKey($context_count)];
+        } else {
+            $model = get_class($item);
+            \Log::deprecated('The "deleting with N '.$context_or_language.'s" key '.
+                'of CRUD '.$model.' config\'s i18n array must contain an array of different plurals'.
+                ' translation, and not the translated text.', 'Chiba.3');
+            $msg = $crud['i18n']['deleting with N '.$context_or_language.'s'];
+        }
+        $deletion_summary[] = strtr($msg, array('{{'.$context_or_language.'_count}}' =>  $context_count));
     }
     if ($children_count > 0) {
-        $deletion_summary[] = $children_count == 1 ? '1 child' : 'N children';
+        if (is_array($crud['i18n']['deleting with N children'])) {
+            $msg = $crud['i18n']['deleting with N children'][\Nos\I18n::pluralKey($children_count)];
+        } else {
+            $model = get_class($item);
+            \Log::deprecated('The "deleting with N children" key '.
+                'of CRUD '.$model.' config\'s i18n array must contain an array of different plurals '.
+                'translation, and not the translated text. In this case, the key "1 child" is unnecessary.', 'Chiba.3');
+            $msg = $crud['i18n']['deleting with '.($children_count == 1 ? '1 child' : 'N children')];
+        }
+        $deletion_summary[] = strtr($msg, array('{{children_count}}' =>  $children_count));
     }
-    $deletion_summary = $crud['i18n']['deleting with '.implode(' and ', $deletion_summary)];
-
-    $deletion_summary = strtr($deletion_summary, array(
-        '{{'.$context_or_language.'_count}}' =>  $context_count,
-        '{{children_count}}' =>  $children_count,
-        '{{title}}' => $item->title_item(),
-    ));
+    $deletion_summary = implode('<br />', $deletion_summary);
     ?>
     <p style="margin: 1em 0;"><?= $deletion_summary ?></p>
     <?php
@@ -61,11 +73,20 @@ if ($context_count > 1 || $children_count > 0) {
     <?php
     foreach ($item_contexts as $item_context) {
         $context = $item_context->get_context();
-        $count = $children_context[$context];
+
+        if (is_array($crud['i18n']['N items'])) {
+            $msg = $crud['i18n']['N items'][\Nos\I18n::pluralKey(1)];
+        } else {
+            $model = get_class($item);
+            \Log::deprecated('The "N items" key '.
+                'of CRUD '.$model.' config\'s i18n array must contain an array of different plurals '.
+                'translation, and not the translated text. In this case, the key "1 item" is unnecessary.', 'Chiba.3');
+            $msg = $crud['i18n']['1 item'];
+        }
         ?>
         <tr>
             <td><?= Nos\Tools_Context::contextLabel($item_context->get_context()) ?></td>
-            <td><?= strtr($crud['i18n']['1 item'], array('{{count}}' => $count)) ?></td>
+            <td><?= strtr($msg, array('{{count}}' => 1)) ?></td>
             <td><input type="checkbox" name="contexts_single[]" data-count="<?= 1 ?>" value="<?= $context ?>" checked /></td>
         </tr>
         <?php
@@ -79,10 +100,17 @@ if ($context_count > 1 || $children_count > 0) {
     foreach ($item_contexts as $item_context) {
         $context = $item_context->get_context();
         $count = $children_context[$context];
+
+        if (is_array($crud['i18n']['N items'])) {
+            $msg = $crud['i18n']['N items'][\Nos\I18n::pluralKey($count)];
+        } else {
+            // Not log a deprecated, already logged above
+            $msg = $crud['i18n'][$count == 1 ? '1 item' : 'N items'];
+        }
         ?>
         <tr>
             <td><?= Nos\Tools_Context::contextLabel($item_context->get_context()) ?></td>
-            <td><?= strtr($crud['i18n'][$count == 1 ? '1 item' : 'N items'], array('{{count}}' => $count)) ?></td>
+            <td><?= strtr($msg, array('{{count}}' => $count)) ?></td>
             <td><input type="checkbox" name="contexts_multi[]" data-count="<?= $children_context[$context] ?>" value="<?= $context ?>" checked /></td>
         </tr>
         <?php
@@ -95,11 +123,11 @@ if ($context_count > 1 || $children_count > 0) {
 ?>
 
     <p style="margin: 1em 0;">
-    <button type="submit" class="ui-priority-primary ui-state-default" data-texts="<?= htmlspecialchars(\Format::forge()->to_json(array(
-                    '0' => __('Nothing to duplicate'),
-                    '1' => __('Duplicate this page'),
-                    '+' => __('Duplicate these {{count}} pages'),
-                ))) ?>"><?= __('Duplicate') ?></button>
+    <button type="submit" class="ui-priority-primary ui-state-default"
+            data-texts="<?= htmlspecialchars(\Format::forge()->to_json(n__(
+                'Duplicate this page',
+                'Duplicate these {{count}} pages'
+            ))) ?>"><?= __('Duplicate') ?></button>
     <span><?= __('or') ?></span>
     <a href="#"><?= __('Cancel') ?></a>
 </p>
@@ -113,7 +141,6 @@ if ($context_count > 1 || $children_count > 0) {
                         $checkboxes,
                         $confirmButton = $form.find(':submit'),
                         $cancelButton = $form.find('a:last');
-
 
                     $tables.wijgrid({
                         selectionMode: 'none',
@@ -145,9 +172,10 @@ if ($context_count > 1 || $children_count > 0) {
                         });
                         $confirmButton[sum == 0 ? 'addClass' : 'removeClass']('ui-state-disabled');
                         $confirmButton.find('.ui-button-text').text(
-                                $.nosDataReplace($confirmButton.data('texts')[(sum > 1 ? '+' : sum).toString()], {
-                                    'count': sum.toString()
-                                })
+                            $.nosDataReplace(
+                                $.nosI18nPlural($confirmButton.data('texts'), sum),
+                                {'count': sum.toString()}
+                            )
                         );
                         $(this).removeClass('ui-state-focus');
                     });
