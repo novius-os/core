@@ -36,9 +36,12 @@ if ($children_count > 0 || $context_count > 1) {
             $msg = $crud['i18n']['deleting with N '.$context_or_language.'s'][\Nos\I18n::pluralKey($context_count)];
         } else {
             $model = get_class($item);
-            \Log::deprecated('The "deleting with N '.$context_or_language.'s" key '.
+            \Log::deprecated(
+                'The "deleting with N '.$context_or_language.'s" key '.
                 'of CRUD '.$model.' config\'s i18n array must contain an array of different plurals'.
-                ' translation, and not the translated text.', 'Chiba.3');
+                ' translation, and not the translated text.',
+                'Version D'
+            );
             $msg = $crud['i18n']['deleting with N '.$context_or_language.'s'];
         }
         $deletion_summary[] = strtr($msg, array('{{'.$context_or_language.'_count}}' =>  $context_count));
@@ -48,9 +51,12 @@ if ($children_count > 0 || $context_count > 1) {
             $msg = $crud['i18n']['deleting with N children'][\Nos\I18n::pluralKey($children_count)];
         } else {
             $model = get_class($item);
-            \Log::deprecated('The "deleting with N children" key '.
+            \Log::deprecated(
+                'The "deleting with N children" key '.
                 'of CRUD '.$model.' config\'s i18n array must contain an array of different plurals '.
-                'translation, and not the translated text. In this case, the key "1 child" is unnecessary.', 'Chiba.3');
+                'translation, and not the translated text. In this case, the key "1 child" is unnecessary.',
+                'Version D'
+            );
             $msg = $crud['i18n']['deleting with '.($children_count == 1 ? '1 child' : 'N children')];
         }
         $deletion_summary[] = strtr($msg, array('{{children_count}}' =>  $children_count));
@@ -78,9 +84,11 @@ if ($context_count > 1 || $children_count > 0) {
             $msg = $crud['i18n']['N items'][\Nos\I18n::pluralKey(1)];
         } else {
             $model = get_class($item);
-            \Log::deprecated('The "N items" key '.
-                'of CRUD '.$model.' config\'s i18n array must contain an array of different plurals '.
-                'translation, and not the translated text. In this case, the key "1 item" is unnecessary.', 'Chiba.3');
+            \Log::deprecated(
+                'The "N items" key of CRUD '.$model.' config\'s i18n array must contain an array of different plurals '.
+                'translation, and not the translated text. In this case, the key "1 item" is unnecessary.',
+                'Version D'
+            );
             $msg = $crud['i18n']['1 item'];
         }
         ?>

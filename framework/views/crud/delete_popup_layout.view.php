@@ -11,10 +11,13 @@ $id = $uniqid = uniqid('form_');
 
 
 if (!is_array($crud['config']['i18n']['deleting button N items'])) {
-    \Log::deprecated('The "deleting button N items" key '.
+    \Log::deprecated(
+        'The "deleting button N items" key '.
         'of CRUD '.$crud['config']['model'].' config\'s i18n array must contain an array of different plurals '.
         'translation, and not the translated text. '.
-        'In this case, the key "deleting button 1 item" and "deleting button 0 items" is unnecessary.', 'Chiba.3');
+        'In this case, the key "deleting button 1 item" and "deleting button 0 items" is unnecessary.',
+        'Version D'
+    );
     $crud['config']['i18n']['deleting button N items'] = array(
         0 => $crud['config']['i18n']['deleting button 1 item'],
         1 => $crud['config']['i18n']['deleting button N items'],

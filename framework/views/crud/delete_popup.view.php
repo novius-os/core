@@ -48,9 +48,12 @@ if ($children_count > 0 || $context_count > 1) {
         if (is_array($crud['config']['i18n']['deleting with N '.$context_or_language.'s'])) {
             $msg = $crud['config']['i18n']['deleting with N '.$context_or_language.'s'][\Nos\I18n::pluralKey($context_count)];
         } else {
-            \Log::deprecated('The "deleting with N '.$context_or_language.'s" key '.
+            \Log::deprecated(
+                'The "deleting with N '.$context_or_language.'s" key '.
                 'of CRUD '.$crud['config']['model'].' config\'s i18n array must contain an array of different plurals'.
-                ' translation, and not the translated text.', 'Chiba.3');
+                ' translation, and not the translated text.',
+                'Version D'
+            );
             $msg = $crud['config']['i18n']['deleting with N '.$context_or_language.'s'];
         }
         $deletion_summary[] = strtr($msg, array('{{'.$context_or_language.'_count}}' =>  $context_count));
@@ -59,9 +62,12 @@ if ($children_count > 0 || $context_count > 1) {
         if (is_array($crud['config']['i18n']['deleting with N children'])) {
             $msg = $crud['config']['i18n']['deleting with N children'][\Nos\I18n::pluralKey($children_count)];
         } else {
-            \Log::deprecated('The "deleting with N children" key '.
+            \Log::deprecated(
+                'The "deleting with N children" key '.
                 'of CRUD '.$crud['config']['model'].' config\'s i18n array must contain an array of different plurals '.
-                'translation, and not the translated text. In this case, the key "1 child" is unnecessary.', 'Chiba.3');
+                'translation, and not the translated text. In this case, the key "1 child" is unnecessary.',
+                'Version D'
+            );
             $msg = $crud['config']['i18n']['deleting with '.($children_count == 1 ? '1 child' : 'N children')];
         }
         $deletion_summary[] = strtr($msg, array('{{children_count}}' =>  $children_count));
@@ -88,9 +94,12 @@ if ($context_count > 1) {
         if (is_array($crud['config']['i18n']['N items'])) {
             $msg = $crud['config']['i18n']['N items'][\Nos\I18n::pluralKey($count)];
         } else {
-            \Log::deprecated('The "N items" key '.
+            \Log::deprecated(
+                'The "N items" key '.
                 'of CRUD '.$crud['config']['model'].' config\'s i18n array must contain an array of different plurals '.
-                'translation, and not the translated text. In this case, the key "1 item" is unnecessary.', 'Chiba.3');
+                'translation, and not the translated text. In this case, the key "1 item" is unnecessary.',
+                'Version D'
+            );
             $msg = $crud['config']['i18n'][$count == 1 ? '1 item' : 'N items'];
         }
         ?>

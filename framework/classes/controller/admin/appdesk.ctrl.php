@@ -468,10 +468,13 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
         $config['i18n'] = array_merge($i18n_default, \Arr::get($config, 'i18n', array()));
 
         if (isset($config['i18n']['showNbItems']) && !is_array($config['i18n']['showNbItems'])) {
-            \Log::deprecated('The "showNbItems" key of appdesk '.
+            \Log::deprecated(
+                'The "showNbItems" key of appdesk '.
                 (isset($config['model']) ? $config['model'] : $application).
                 ' config\'s i18n array must contain an array of different plurals'.
-                ' translation, and not the translated text.', 'Chiba.3');
+                ' translation, and not the translated text.',
+                'Version D'
+            );
         }
 
         foreach ($config as $key => $idc) {
