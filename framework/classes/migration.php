@@ -52,19 +52,6 @@ class Migration
 
     }
 
-    public static function canUpdateMetadata()
-    {
-        if (\Config::get('migrations.enabled_types.metadata', true)) {
-            if (is_writeable(APPPATH.'metadata')) {
-                return true;
-            } else {
-                throw new \Exception('Metadata folder is not writeable.');
-            }
-        } else {
-            return false;
-        }
-    }
-
     public static function getCompleteSql()
     {
         return implode("\n", static::$complete_sql);

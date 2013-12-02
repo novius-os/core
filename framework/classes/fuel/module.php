@@ -64,9 +64,11 @@ class Module extends Fuel\Core\Module
             $application = \Nos\Application::forge($module);
             // But metadata exists, so the folder was deleted
             if ($application->is_installed()) {
-                // Cleanup the cached metadata
-                if (\Nos\Migration::canUpdateMetadata()) {
+                // Try to cleanup the cached metadata
+                try {
                     $application->uninstall();
+                } catch (\FileAccessException $e) {
+                    \Log::exception($e, 'Unable to automatically the '.$module.' application - ');
                 }
             }
         }
