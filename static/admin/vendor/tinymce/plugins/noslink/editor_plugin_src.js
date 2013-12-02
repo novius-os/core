@@ -114,7 +114,7 @@
             var dialog = null;
             dialog = $nos(ed.getElement()).nosDialog({
                 contentUrl: 'admin/nos/wysiwyg/link' + (e ? '/edit' : ''),
-                title: e ? ed.getLang('nos.link_edit') : ed.getLang('nos.link_insert'),
+                title: e ? ed.getLang('noslink.edit') : ed.getLang('noslink.insert'),
                 ajax: true,
                 open : function(event) {
                     $(event.target).data('tinymce', ed);

@@ -68,7 +68,7 @@
             var dialog = null;
             dialog = $nos(ed.getElement()).nosDialog({
                 contentUrl: 'admin/nos/wysiwyg/image' + (editCurrentImage ? '/edit' : ''),
-                title: editCurrentImage ? ed.getLang('nos.image_edit') : ed.getLang('nos.image_insert'),
+                title: editCurrentImage ? ed.getLang('nosimage.edit') : ed.getLang('nosimage.insert'),
                 ajax: true,
                 open : function(e) {
                     $(e.target).data('tinymce', ed);
