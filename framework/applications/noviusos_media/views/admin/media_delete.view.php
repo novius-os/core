@@ -23,7 +23,8 @@ if ($usage_count == 0) {
     <?php
 } else {
     ?>
-    <p><?= strtr(
+    <p><?=
+        strtr(
             n__(
                 'The media is used <strong>once</strong> by an application.',
                 'The media is used <strong>{{count}} times</strong> by your applications.',
