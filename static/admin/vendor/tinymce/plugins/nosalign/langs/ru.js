@@ -1,0 +1,7 @@
+tinyMCE.addI18n('ru.nosalign',{
+    "select":"Alignement",
+    "full_desc": "\u041f\u043e \u0448\u0438\u0440\u0438\u043d\u0435",
+    "right_desc": "\u041f\u043e \u043f\u0440\u0430\u0432\u043e\u043c\u0443 \u043a\u0440\u0430\u044e",
+    "center_desc": "\u041f\u043e \u0446\u0435\u043d\u0442\u0440\u0443",
+    "left_desc": "\u041f\u043e \u043b\u0435\u0432\u043e\u043c\u0443 \u043a\u0440\u0430\u044e"
+});
