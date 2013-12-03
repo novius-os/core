@@ -1,6 +1,6 @@
 <?php
 
-// Generated on 03/12/2013 16:06:58
+// Generated on 03/12/2013 16:22:23
 
 // 54 out of 56 messages are translated (96%).
 // 237 out of 245 words are translated (96%).
@@ -130,7 +130,6 @@ return array(
         0 => '',
         1 => '',
         2 => '',
-        3 => '',
     ),
 
     #: config/controller/admin/appdesk.config.php:33
@@ -138,7 +137,6 @@ return array(
         0 => '',
         1 => '',
         2 => 'Показано {{x}} пользователей из {{y}}',
-        3 => '',
     ),
 
     #: config/controller/admin/appdesk.config.php:36
@@ -177,7 +175,6 @@ return array(
         0 => 'Да, я хочу удалить эту учетную запись',
         1 => '',
         2 => '',
-        3 => '',
     ),
 
     #. Crud
@@ -203,7 +200,6 @@ return array(
         0 => 'Да, я хочу удалить эту роль',
         1 => '',
         2 => '',
-        3 => '',
     ),
 
 );

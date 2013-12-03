@@ -1,6 +1,6 @@
 <?php
 
-// Generated on 03/12/2013 16:06:58
+// Generated on 03/12/2013 16:22:23
 
 // 152 out of 155 messages are translated (98%).
 // 796 out of 813 words are translated (98%).
@@ -408,7 +408,6 @@ return array(
         0 => 'Да, удалить это элемент',
         1 => 'Да, удалить {{count}} элементов',
         2 => '',
-        3 => '',
     ),
 
     #: config/i18n_common.config.php:32
@@ -422,7 +421,6 @@ return array(
         0 => '1 элемент',
         1 => '{{count}} элементов',
         2 => '',
-        3 => '',
     ),
 
     #: config/i18n_common.config.php:42
@@ -430,7 +428,6 @@ return array(
         0 => '',
         1 => '',
         2 => 'Элемент присутствует в <strong>{{context_count}} контекстах</strong>.',
-        3 => '',
     ),
 
     #: config/i18n_common.config.php:46
@@ -438,7 +435,6 @@ return array(
         0 => '',
         1 => '',
         2 => 'Элемент присутствует в <strong>{{context_count}} языках</strong>.',
-        3 => '',
     ),
 
     #. Keep only if the model has the behaviour Twinnable
@@ -456,7 +452,6 @@ return array(
         0 => '',
         1 => '',
         2 => 'Элемент имеет <strong>{{children_count}} вложенных элементов</strong>.',
-        3 => '',
     ),
 
     #. Visualise action's labels

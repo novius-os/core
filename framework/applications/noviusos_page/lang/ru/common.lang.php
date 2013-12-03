@@ -1,6 +1,6 @@
 <?php
 
-// Generated on 03/12/2013 16:06:58
+// Generated on 03/12/2013 16:22:23
 
 // 96 out of 100 messages are translated (96%).
 // 533 out of 556 words are translated (96%).
@@ -53,7 +53,6 @@ return array(
         0 => 'Продублировать эту страницу',
         1 => 'Продублировать эти {{count}} страниц',
         2 => '',
-        3 => '',
     ),
 
     #: views/admin/popup_duplicate.view.php:139
@@ -252,7 +251,6 @@ return array(
         0 => '1 страница',
         1 => '{{count}} страниц',
         2 => '',
-        3 => '',
     ),
 
     #: config/controller/admin/appdesk.config.php:37
@@ -260,7 +258,6 @@ return array(
         0 => '',
         1 => '',
         2 => 'Показано страниц: {{x}} из {{y}}',
-        3 => '',
     ),
 
     #: config/controller/admin/appdesk.config.php:40
@@ -302,7 +299,6 @@ return array(
         0 => 'Да, я хочу удалить эту страницу',
         1 => 'Да, я хочу удалить эти {{count}} страниц',
         2 => '',
-        3 => '',
     ),
 
     #: config/common/page.config.php:75
@@ -310,7 +306,6 @@ return array(
         0 => '',
         1 => '',
         2 => 'Страница присутствует в <strong>{{context_count}} контекстах</strong>.',
-        3 => '',
     ),
 
     #: config/common/page.config.php:79
@@ -318,7 +313,6 @@ return array(
         0 => '',
         1 => '',
         2 => 'Страница переведена на <strong>{{language_count}} языков</strong>.',
-        3 => '',
     ),
 
     #: config/common/page.config.php:85
@@ -326,7 +320,6 @@ return array(
         0 => '',
         1 => '',
         2 => '',
-        3 => 'Эта страница имеет <strong>{{children_count}} подчиненных страниц</strong>.',
     ),
 
     #: config/common/page.config.php:95

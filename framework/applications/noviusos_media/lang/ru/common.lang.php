@@ -1,6 +1,6 @@
 <?php
 
-// Generated on 03/12/2013 16:06:59
+// Generated on 03/12/2013 16:22:23
 
 // 118 out of 120 messages are translated (98%).
 // 647 out of 657 words are translated (98%).
@@ -88,7 +88,6 @@ return array(
         0 => 'Этот файл медиа использован <strong>один раз</strong> в приложении.',
         1 => 'Этот файл медиа использован <strong>{{count}} раз</strong> в приложениях.',
         2 => '',
-        3 => '',
     ),
 
     #: views/admin/media_delete.view.php:37
@@ -235,7 +234,6 @@ return array(
         0 => '<strong>Один файл медиа</strong> в этой папке.',
         1 => '<strong>{{count}} файлов медиа</strong> в этой папке.',
         2 => '',
-        3 => '',
     ),
 
     #: views/admin/folder_delete.view.php:37
@@ -339,7 +337,6 @@ return array(
         0 => '',
         1 => '',
         2 => '',
-        3 => '',
     ),
 
     #: config/controller/admin/appdesk.config.php:105
@@ -347,7 +344,6 @@ return array(
         0 => '',
         1 => '',
         2 => 'Показано {{x}} файлов медиа из {{y}}',
-        3 => '',
     ),
 
     #: config/controller/admin/appdesk.config.php:108
@@ -389,7 +385,6 @@ return array(
         0 => 'Да, я хочу удалить эту папку',
         1 => '',
         2 => '',
-        3 => '',
     ),
 
     #: config/common/folder.config.php:56
@@ -427,7 +422,6 @@ return array(
         0 => 'Да, я хочу удалить этот файл медиа',
         1 => '',
         2 => '',
-        3 => '',
     ),
 
     #: config/common/media.config.php:62
