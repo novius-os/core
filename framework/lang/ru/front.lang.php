@@ -8,9 +8,9 @@
 return array(
     #. Pagination
     #: classes/pagination.php:150
-    'Previous' => 'Précédent',
+    'Previous' => 'Предыдущий',
 
     #: classes/pagination.php:152
-    'Next' => 'Suivant',
+    'Next' => 'Следующий',
 
 );

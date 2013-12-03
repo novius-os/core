@@ -1,9 +1,9 @@
 <?php
 
-// Generated on 07/11/2013 15:24:52
+// Generated on 02/12/2013 17:53:33
 
-// 55 out of 56 messages are translated (98%).
-// 243 out of 245 words are translated (98%).
+// 56 out of 56 messages are translated (100%).
+// 246 out of 246 words are translated (100%).
 
 return array(
     #: classes/controller/admin/user.ctrl.php:70
@@ -27,7 +27,7 @@ return array(
     #: classes/controller/admin/account.ctrl.php:134
     'Your wallpaper is now the default one.' => 'あなたの壁紙をデフォルトにしました。',
 
-    #: classes/controller/admin/account.ctrl.php:140
+    #: classes/controller/admin/account.ctrl.php:141
     'Something went wrong. Please refresh your browser window and try again. Contact your developer or Novius OS if the problem persists. We apologise for the inconvenience caused.' => 'おかしな事態が発生しました。ブラウザを更新して、再度試してください。問題が解決しない場合は、開発者または Novius OS にご相談ください。ご迷惑をかけたことをお詫びします。',
 
     #: classes/controller/admin/role.ctrl.php:29
@@ -80,7 +80,7 @@ return array(
     'Theme' => 'テーマ',
 
     #: config/controller/admin/user.config.php:19
-    #: config/common/user.config.php:50
+    #: config/common/user.config.php:47
     'Add a user' => 'ユーザーを追加',
 
     #: config/controller/admin/user.config.php:35
@@ -113,7 +113,7 @@ return array(
     'Role' => 'ロール（権限グループ）',
 
     #: config/controller/admin/role.config.php:19
-    #: config/common/role.config.php:37
+    #: config/common/role.config.php:34
     'Add a role' => 'ロールを追加',
 
     #: config/controller/admin/role.config.php:40
@@ -125,21 +125,17 @@ return array(
     #: config/controller/admin/appdesk.config.php:27
     'users' => 'ユーザー',
 
+    #: config/controller/admin/appdesk.config.php:28
+    'Showing {{x}} users out of {{y}}' => '{{y}}人のユーザーのうち{{x}}人を表示しています',
+
     #: config/controller/admin/appdesk.config.php:29
-    '1 user' => array(
-        0 => '',
-    ),
+    'Showing 1 user' => '1人のユーザーを表示しています',
 
-    #: config/controller/admin/appdesk.config.php:33
-    'Showing 1 user out of {{y}}' => array(
-        0 => '{{y}}人のユーザーのうち{{x}}人を表示しています',
-    ),
-
-    #: config/controller/admin/appdesk.config.php:36
+    #: config/controller/admin/appdesk.config.php:30
     'No users' => 'ユーザー無し',
 
     #. Note to translator: This is the action that clears the 'Search' field
-    #: config/controller/admin/appdesk.config.php:38
+    #: config/controller/admin/appdesk.config.php:32
     'Show all users' => '全てのユーザーを表示する',
 
     #: config/common/user.config.php:8
@@ -166,10 +162,9 @@ return array(
     #: config/common/user.config.php:40
     'Deleting the user ‘{{title}}’' => 'ユーザー‘{{title}}’を削除します',
 
-    #: config/common/user.config.php:44
-    'Yes, delete this user' => array(
-        0 => 'はい、このユーザーを削除します',
-    ),
+    #. Delete action's labels
+    #: config/common/user.config.php:43
+    'Yes, delete this user' => 'はい、このユーザーを削除します',
 
     #. Crud
     #: config/common/role.config.php:19
@@ -189,9 +184,8 @@ return array(
     #: config/common/role.config.php:27
     'Deleting the role ‘{{title}}’' => 'ロール{{title}}を削除します',
 
-    #: config/common/role.config.php:31
-    'Yes, delete this role' => array(
-        0 => 'はい、このロールを削除します',
-    ),
+    #. Delete action's labels
+    #: config/common/role.config.php:30
+    'Yes, delete this role' => 'はい、このロールを削除します',
 
 );

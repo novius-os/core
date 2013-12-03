@@ -6,6 +6,6 @@
 // 2 out of 2 words are translated (100%).
 
 return array(
-    'Applications manager' => 'Gestion des applications',
+    'Media Centre' => 'Mediateca',
 
 );

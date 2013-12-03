@@ -1,9 +1,9 @@
 <?php
 
-// Generated on 07/11/2013 15:24:52
+// Generated on 02/12/2013 17:53:33
 
-// 107 out of 108 messages are translated (99%).
-// 638 out of 641 words are translated (99%).
+// 122 out of 122 messages are translated (100%).
+// 675 out of 675 words are translated (100%).
 
 return array(
     #: classes/controller/admin/attachment.ctrl.php:38
@@ -49,7 +49,7 @@ return array(
     #: classes/controller/admin/appdesk.ctrl.php:76
     'The cache has been renewed. All ready for you to enjoy!' => '',
 
-    #: classes/model/folder.model.php:245
+    #: classes/model/folder.model.php:246
     'This is strange: This folder should be empty but isn’t. Please contact your developer or Novius OS to fix this. We apologise for the inconvenience caused.' => 'おかしなことが起きました。このフォルダは空のはずですが、空ではありません。開発者または Novius OS に相談して、修復してください。ご迷惑をかけたことをお詫びします。',
 
     #: classes/renderer/media.php:34
@@ -83,12 +83,13 @@ return array(
     #: views/admin/media_delete.view.php:21
     'The media is not used anywhere and can be safely deleted.' => 'このメディアは使用されていません。削除しても構いません。',
 
-    #: views/admin/media_delete.view.php:27
-    'The media is used <strong>once</strong> by an application.' => array(
-        0 => 'このメディアはアプリケーションで<strong>{{count}}回</strong>使用しています。',
-    ),
+    #: views/admin/media_delete.view.php:26
+    'The media is used <strong>once</strong> by an application.' => 'このメディアはアプリケーションで<strong>1回</strong>使用しています。',
 
-    #: views/admin/media_delete.view.php:36
+    #: views/admin/media_delete.view.php:27
+    'The media is used <strong>{{count}} times</strong> by your applications.' => 'このメディアはアプリケーションで<strong>{{count}}回</strong>使用しています。',
+
+    #: views/admin/media_delete.view.php:32
     'Yes, I want to delete this media file even though it is used {{count}} times.' => 'はい、このメディアファイルは{{count}}回使用していますが、それでも削除します。',
 
     #: views/admin/wysiwyg_image.view.php:29
@@ -125,21 +126,57 @@ return array(
     'Height:' => '高さ:',
 
     #: views/admin/wysiwyg_image.view.php:55
+    'Alignment:' => '配置:',
+
+    #: views/admin/wysiwyg_image.view.php:58
+    'Baseline' => 'ベースライン揃え',
+
+    #: views/admin/wysiwyg_image.view.php:59
+    'Top' => '上揃え',
+
+    #: views/admin/wysiwyg_image.view.php:60
+    'Middle' => '中央揃え',
+
+    #: views/admin/wysiwyg_image.view.php:61
+    'Bottom' => '下揃え',
+
+    #: views/admin/wysiwyg_image.view.php:62
+    'Text Top' => 'テキストの上端揃え',
+
+    #: views/admin/wysiwyg_image.view.php:63
+    'Text Bottom' => 'テキストの下端揃え',
+
+    #: views/admin/wysiwyg_image.view.php:64
+    'Left' => '左揃え',
+
+    #: views/admin/wysiwyg_image.view.php:65
+    'Right' => '右揃え',
+
+    #: views/admin/wysiwyg_image.view.php:69
+    'Border:' => '枠線:',
+
+    #: views/admin/wysiwyg_image.view.php:73
+    'Vertical space:' => '上下の余白:',
+
+    #: views/admin/wysiwyg_image.view.php:77
+    'Horizontal space:' => '左右の余白:',
+
+    #: views/admin/wysiwyg_image.view.php:81
     'Style:' => 'スタイル:',
 
-    #: views/admin/wysiwyg_image.view.php:60
+    #: views/admin/wysiwyg_image.view.php:86
     'Update this image' => 'この画像を更新する',
 
-    #: views/admin/wysiwyg_image.view.php:60
+    #: views/admin/wysiwyg_image.view.php:86
     'Insert this image' => 'この画像を挿入',
 
-    #: views/admin/wysiwyg_image.view.php:60
+    #: views/admin/wysiwyg_image.view.php:86
     'or' => 'または',
 
-    #: views/admin/wysiwyg_image.view.php:60
+    #: views/admin/wysiwyg_image.view.php:86
     'Cancel' => 'キャンセル',
 
-    #: views/admin/wysiwyg_image.view.php:76
+    #: views/admin/wysiwyg_image.view.php:102
     'This is unusual: It seems that no image has been selected. Please try again. Contact your developer or Novius OS if the problem persists. We apologise for the inconvenience caused.' => 'おかしなことが起きました。画像が選択されていません。もう一度お試しください。問題が解決しない場合は、開発者または Novius OS にご相談ください。ご迷惑をかけたことをお詫びします。',
 
     #: views/admin/upload.view.php:24
@@ -181,22 +218,23 @@ return array(
     'The file size must not exceed {{size}}.' => '',
 
     #: views/admin/media_edit.view.php:62
-    #: config/controller/admin/appdesk.config.php:50
+    #: config/controller/admin/appdesk.config.php:51
     'File size:' => '',
 
     #: views/admin/media_edit.view.php:69
-    #: config/controller/admin/appdesk.config.php:53
+    #: config/controller/admin/appdesk.config.php:54
     'Dimensions:' => '',
 
     #: views/admin/folder_delete.view.php:21
     'The folder is empty and can be safely deleted.' => 'このフォルダは空です。削除しても構いません。',
 
     #: views/admin/folder_delete.view.php:26
-    'There is <strong>one media file</strong> in this folder.' => array(
-        0 => 'このフォルダには<strong>メディアファイルが{{count}}個</strong>あります。',
-    ),
+    'There is <strong>one media file</strong> in this folder.' => 'このフォルダには<strong>メディアファイルが1個</strong>あります。',
 
-    #: views/admin/folder_delete.view.php:33
+    #: views/admin/folder_delete.view.php:27
+    'There are <strong>{{count}} media files</strong> in this folder.' => 'このフォルダには<strong>メディアファイルが{{count}}個</strong>あります。',
+
+    #: views/admin/folder_delete.view.php:32
     'Yes, I want to delete this folder and the {{count}} media files it contains.' => 'はい、このフォルダには{{count}}個のメディアファイルがありますが、このフォルダを削除します。',
 
     #: views/admin/folder.view.php:51
@@ -249,7 +287,7 @@ return array(
     'SEO, Media URL:' => 'SEO, メディア URL:',
 
     #: config/controller/admin/folder.config.php:20
-    #: config/common/folder.config.php:45
+    #: config/common/folder.config.php:42
     'Add a folder' => 'フォルダを追加',
 
     #: config/controller/admin/folder.config.php:42
@@ -257,65 +295,61 @@ return array(
 
     #. Note to translator: This is a placeholder, i.e. a field’s label shown within the field
     #: config/controller/admin/folder.config.php:48
-    #: config/common/media.config.php:50
+    #: config/common/media.config.php:47
     'Title' => 'タイトル',
 
     #: config/controller/admin/folder.config.php:60
     'SEO, folder URL:' => 'SEO、フォルダURL:',
 
     #: config/controller/admin/media.config.php:20
-    #: config/common/media.config.php:121
+    #: config/common/media.config.php:118
     'Add a media file' => 'メディアファイルを追加',
 
     #: config/controller/admin/media.config.php:53
     'File from your hard drive:' => '手元の端末のファイル:',
 
-    #: config/controller/admin/appdesk.config.php:47
+    #: config/controller/admin/appdesk.config.php:48
     'File name:' => 'ファイル名:',
 
     #. Note to translator: 'Preview' here is a label, not an action
-    #: config/controller/admin/appdesk.config.php:60
+    #: config/controller/admin/appdesk.config.php:61
     'Preview' => 'プレビュー',
 
-    #: config/controller/admin/appdesk.config.php:61
+    #: config/controller/admin/appdesk.config.php:62
     'Click on a media file to preview it.' => 'メディアファイルをクリックすると、プレビューします。',
 
-    #: config/controller/admin/appdesk.config.php:69
+    #: config/controller/admin/appdesk.config.php:70
     'Default view' => 'デフォルト表示',
 
-    #: config/controller/admin/appdesk.config.php:75
+    #: config/controller/admin/appdesk.config.php:76
     'Flick through view' => 'サイドバー無し',
 
-    #: config/controller/admin/appdesk.config.php:97
+    #: config/controller/admin/appdesk.config.php:98
     'media file' => 'メディアファイル',
 
-    #: config/controller/admin/appdesk.config.php:98
+    #: config/controller/admin/appdesk.config.php:99
     'media files' => 'メディアファイル',
 
     #: config/controller/admin/appdesk.config.php:100
-    '1 media file' => array(
-        0 => '',
-    ),
+    'Showing {{x}} media files out of {{y}}' => '{{y}} 個のメディアファイルのうち {{x}} 個を表示しています',
 
-    #: config/controller/admin/appdesk.config.php:104
-    'Showing 1 media file out of {{y}}' => array(
-        0 => '{{y}} 個のメディアファイルのうち {{x}} 個を表示しています',
-    ),
+    #: config/controller/admin/appdesk.config.php:101
+    'Showing 1 media file' => '1 個のメディアファイルを表示しています',
 
-    #: config/controller/admin/appdesk.config.php:107
+    #: config/controller/admin/appdesk.config.php:102
     'No media files' => 'メディアファイルがありません',
 
     #. Note to translator: This is the action that clears the 'Search' field
-    #: config/controller/admin/appdesk.config.php:109
+    #: config/controller/admin/appdesk.config.php:104
     'Show all media files' => '全てのメディアファイルを表示する',
 
-    #: config/controller/admin/appdesk.config.php:111
+    #: config/controller/admin/appdesk.config.php:106
     'Pick' => '選択する',
 
-    #: config/controller/admin/appdesk.config.php:129
+    #: config/controller/admin/appdesk.config.php:124
     'Add many files at once' => '',
 
-    #: config/controller/admin/appdesk.config.php:142
+    #: config/controller/admin/appdesk.config.php:137
     'Renew media cache' => '',
 
     #. Crud
@@ -336,21 +370,20 @@ return array(
     #: config/common/folder.config.php:35
     'Deleting the folder ‘{{title}}’' => 'フォルダ ‘{{title}}’ を削除します',
 
-    #: config/common/folder.config.php:39
-    'Yes, delete this folder' => array(
-        0 => 'はい、このフォルダを削除します',
-    ),
+    #. Delete action's labels
+    #: config/common/folder.config.php:38
+    'Yes, delete this folder' => 'はい、このフォルダを削除します',
 
-    #: config/common/folder.config.php:56
+    #: config/common/folder.config.php:53
     'You can’t edit the root folder.' => 'ルートフォルダは編集できません。',
 
-    #: config/common/folder.config.php:65
+    #: config/common/folder.config.php:62
     'You can’t delete the root folder.' => 'ルートフォルダは削除できません。',
 
-    #: config/common/folder.config.php:72
+    #: config/common/folder.config.php:69
     'Add a media file in this folder' => 'このフォルダにメディアファイルを追加',
 
-    #: config/common/folder.config.php:91
+    #: config/common/folder.config.php:88
     'Add a sub-folder to this folder' => 'このフォルダにサブフォルダを追加',
 
     #. Crud
@@ -371,27 +404,14 @@ return array(
     #: config/common/media.config.php:39
     'Deleting the media ‘{{title}}’' => 'メディア ‘{{title}}’ を削除します',
 
-    #: config/common/media.config.php:43
-    'Yes, delete this media file' => array(
-        0 => 'はい、このメディアファイルを削除します',
-    ),
+    #. Delete action's labels
+    #: config/common/media.config.php:42
+    'Yes, delete this media file' => 'はい、このメディアファイルを削除します',
 
-    #: config/common/media.config.php:62
+    #: config/common/media.config.php:59
     'Extension' => '拡張子',
 
-    #: config/common/media.config.php:137
+    #: config/common/media.config.php:134
     'Visualise' => '閲覧',
 
-    'Alignment:' => '配置:',
-    'Baseline' => 'ベースライン揃え',
-    'Top' => '上揃え',
-    'Middle' => '中央揃え',
-    'Bottom' => '下揃え',
-    'Text Top' => 'テキストの上端揃え',
-    'Text Bottom' => 'テキストの下端揃え',
-    'Left' => '左揃え',
-    'Right' => '右揃え',
-    'Border:' => '枠線:',
-    'Vertical space:' => '上下の余白:',
-    'Horizontal space:' => '左右の余白:',
 );

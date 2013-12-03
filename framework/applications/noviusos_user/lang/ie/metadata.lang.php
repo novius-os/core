@@ -6,8 +6,8 @@
 // 3 out of 3 words are translated (100%).
 
 return array(
-    'Users' => 'Utilisateurs',
+    'Users' => 'Usators',
 
-    'My account' => 'Mon compte',
+    'My account' => 'Mi conto',
 
 );
