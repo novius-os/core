@@ -1,6 +1,6 @@
 <?php
 
-// Generated on 02/12/2013 17:53:33
+// Generated on 03/12/2013 16:06:58
 
 // 24 out of 24 messages are translated (100%).
 // 90 out of 90 words are translated (100%).
@@ -25,12 +25,12 @@ return array(
     'Native applications' => 'Нативные приложения',
 
     #: views/admin/app_manager.view.php:45
-    #: views/admin/app_manager.view.php:171
+    #: views/admin/app_manager.view.php:173
     'It appears you’ve made some recent changes.' => 'Похоже, вы сделали несколько новых изменений.',
 
     #: views/admin/app_manager.view.php:45
     #: views/admin/app_manager.view.php:68
-    #: views/admin/app_manager.view.php:171
+    #: views/admin/app_manager.view.php:173
     'Apply changes' => 'Применить изменения',
 
     #: views/admin/app_manager.view.php:47
@@ -51,38 +51,38 @@ return array(
     #: views/admin/app_manager.view.php:88
     'Cannot be uninstalled. Uninstall ‘{{application}}’ first.' => 'Невозможно удалить. Сперва удалите ‘{{application}}’.',
 
-    #: views/admin/app_manager.view.php:92
+    #: views/admin/app_manager.view.php:93
     'Cannot be uninstalled. Uninstall <a>these applications</a> first.' => 'Невозможно удалить. Сперва удалите <a>эти приложения</a>.',
 
-    #: views/admin/app_manager.view.php:108
-    #: views/admin/app_manager.view.php:159
+    #: views/admin/app_manager.view.php:109
+    #: views/admin/app_manager.view.php:161
     'No applications found.' => 'Приложения не обнаружены.',
 
-    #: views/admin/app_manager.view.php:115
+    #: views/admin/app_manager.view.php:116
     'Available applications' => 'Доступные приложения',
 
-    #: views/admin/app_manager.view.php:129
+    #: views/admin/app_manager.view.php:130
     'No metadata found' => 'Метаданные не обнаружены',
 
-    #: views/admin/app_manager.view.php:133
+    #: views/admin/app_manager.view.php:134
     'Install' => 'Установить',
 
-    #: views/admin/app_manager.view.php:139
+    #: views/admin/app_manager.view.php:140
     'Cannot be installed. Install ‘{{application}}’ first.' => 'Невозможно установить. Установите сперва ‘{{application}}’.',
 
-    #: views/admin/app_manager.view.php:143
+    #: views/admin/app_manager.view.php:145
     'Cannot be installed. Install <a>these applications</a> first.' => 'Невозможно установить. Установите сперва <a>эти приложения</a>.',
 
-    #: views/admin/app_manager.view.php:167
+    #: views/admin/app_manager.view.php:169
     'Website configuration' => 'Настройки сайта',
 
-    #: views/admin/app_manager.view.php:173
+    #: views/admin/app_manager.view.php:175
     'The website’s configuration is up-to-date.' => 'Настройки сайта в актуальном состоянии.',
 
-    #: views/admin/app_manager.view.php:190
+    #: views/admin/app_manager.view.php:192
     'Applications manager' => 'Менеджер приложений',
 
-    #: views/admin/app_manager.view.php:202
+    #: views/admin/app_manager.view.php:204
     'Refresh all metadata' => 'Обновить все метаданные',
 
 );

@@ -1,9 +1,9 @@
 <?php
 
-// Generated on 02/12/2013 17:53:33
+// Generated on 03/12/2013 16:06:58
 
 // 56 out of 56 messages are translated (100%).
-// 246 out of 246 words are translated (100%).
+// 245 out of 245 words are translated (100%).
 
 return array(
     #: classes/controller/admin/user.ctrl.php:70
@@ -68,7 +68,7 @@ return array(
     'View and edit permissions' => 'Voir et modifier les permissions',
 
     #: views/admin/account.view.php:14
-    'Save' => '',
+    'Save' => 'Enregistrer',
 
     #: views/admin/account.view.php:32
     'Sign out (see you!)' => 'Se déconnecter (à bientôt&nbsp;!)',
@@ -80,7 +80,7 @@ return array(
     'Theme' => 'Thème',
 
     #: config/controller/admin/user.config.php:19
-    #: config/common/user.config.php:47
+    #: config/common/user.config.php:50
     'Add a user' => 'Ajouter un utilisateur',
 
     #: config/controller/admin/user.config.php:35
@@ -113,7 +113,7 @@ return array(
     'Role' => 'Rôle',
 
     #: config/controller/admin/role.config.php:19
-    #: config/common/role.config.php:34
+    #: config/common/role.config.php:37
     'Add a role' => 'Ajouter un rôle',
 
     #: config/controller/admin/role.config.php:40
@@ -125,17 +125,23 @@ return array(
     #: config/controller/admin/appdesk.config.php:27
     'users' => 'utilisateurs',
 
-    #: config/controller/admin/appdesk.config.php:28
-    'Showing {{x}} users out of {{y}}' => '{{x}} utilisateurs sur {{y}} affichés',
-
     #: config/controller/admin/appdesk.config.php:29
-    'Showing 1 user' => '1 utilisateur affiché',
+    '1 user' => array(
+        0 => '1 utilisateur',
+        1 => '{{count}} utilisateurs',
+    ),
 
-    #: config/controller/admin/appdesk.config.php:30
+    #: config/controller/admin/appdesk.config.php:33
+    'Showing 1 user out of {{y}}' => array(
+        0 => '1 utilisateur sur {{y}} affiché',
+        1 => '{{x}} utilisateurs sur {{y}} affichés',
+    ),
+
+    #: config/controller/admin/appdesk.config.php:36
     'No users' => 'Pas d’utilisateur',
 
     #. Note to translator: This is the action that clears the 'Search' field
-    #: config/controller/admin/appdesk.config.php:32
+    #: config/controller/admin/appdesk.config.php:38
     'Show all users' => 'Afficher tous les utilisateurs',
 
     #: config/common/user.config.php:8
@@ -162,9 +168,11 @@ return array(
     #: config/common/user.config.php:40
     'Deleting the user ‘{{title}}’' => 'Supprimer l’utilisateur «&nbsp;{{title}}&nbsp;»',
 
-    #. Delete action's labels
-    #: config/common/user.config.php:43
-    'Yes, delete this user' => 'Oui, supprimer cet utilisateur',
+    #: config/common/user.config.php:44
+    'Yes, delete this user' => array(
+        0 => 'Oui, supprimer cet utilisateur',
+        1 => '',
+    ),
 
     #. Crud
     #: config/common/role.config.php:19
@@ -184,8 +192,10 @@ return array(
     #: config/common/role.config.php:27
     'Deleting the role ‘{{title}}’' => 'Supprimer le rôle «&nbsp;{{title}}&nbsp;»',
 
-    #. Delete action's labels
-    #: config/common/role.config.php:30
-    'Yes, delete this role' => 'Oui, supprimer ce rôle',
+    #: config/common/role.config.php:31
+    'Yes, delete this role' => array(
+        0 => 'Oui, supprimer ce rôle',
+        1 => '',
+    ),
 
 );

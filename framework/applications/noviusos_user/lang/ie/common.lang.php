@@ -1,9 +1,9 @@
 <?php
 
-// Generated on 02/12/2013 17:53:33
+// Generated on 03/12/2013 16:06:58
 
 // 56 out of 56 messages are translated (100%).
-// 246 out of 246 words are translated (100%).
+// 245 out of 245 words are translated (100%).
 
 return array(
     #: classes/controller/admin/user.ctrl.php:70
@@ -27,7 +27,7 @@ return array(
     #: classes/controller/admin/account.ctrl.php:134
     'Your wallpaper is now the default one.' => 'Tu scren-image es nu li defect.',
 
-    #: classes/controller/admin/account.ctrl.php:140
+    #: classes/controller/admin/account.ctrl.php:141
     'Something went wrong. Please refresh your browser window and try again. Contact your developer or Novius OS if the problem persists. We apologise for the inconvenience caused.' => 'Un problema occuret. Ples regenerar tu browser e essayar ancor. Contacte tu developator o Novius si li problema persiste. Ples pardonar nos por ti problema.',
 
     #: classes/controller/admin/role.ctrl.php:29
@@ -80,7 +80,7 @@ return array(
     'Theme' => 'Thema',
 
     #: config/controller/admin/user.config.php:19
-    #: config/common/user.config.php:47
+    #: config/common/user.config.php:50
     'Add a user' => 'Addir un usator',
 
     #: config/controller/admin/user.config.php:35
@@ -105,7 +105,7 @@ return array(
     #: config/controller/admin/user.config.php:97
     'Password:' => 'Passa-parol:',
 
-    #: config/controller/admin/user.config.php:115
+    #: config/controller/admin/user.config.php:114
     'Password (confirmation):' => 'Passa-parol (confirmation):',
 
     #: config/controller/admin/inspector/role.config.php:22
@@ -113,7 +113,7 @@ return array(
     'Role' => 'Rol',
 
     #: config/controller/admin/role.config.php:19
-    #: config/common/role.config.php:34
+    #: config/common/role.config.php:37
     'Add a role' => 'Addir un rol',
 
     #: config/controller/admin/role.config.php:40
@@ -125,17 +125,23 @@ return array(
     #: config/controller/admin/appdesk.config.php:27
     'users' => 'usators',
 
-    #: config/controller/admin/appdesk.config.php:28
-    'Showing {{x}} users out of {{y}}' => 'Exhibir {{x}} usators ex {{y}}',
-
     #: config/controller/admin/appdesk.config.php:29
-    'Showing 1 user' => 'Exhibir 1 usator',
+    '1 user' => array(
+        0 => '1 usator',
+        1 => '{{count}} usators',
+    ),
 
-    #: config/controller/admin/appdesk.config.php:30
+    #: config/controller/admin/appdesk.config.php:33
+    'Showing 1 user out of {{y}}' => array(
+        0 => 'Exhibir 1 usator ex {{y}}',
+        1 => 'Exhibir {{x}} usators ex {{y}}',
+    ),
+
+    #: config/controller/admin/appdesk.config.php:36
     'No users' => 'Null usator',
 
     #. Note to translator: This is the action that clears the 'Search' field
-    #: config/controller/admin/appdesk.config.php:32
+    #: config/controller/admin/appdesk.config.php:38
     'Show all users' => 'Exhibir omni usators',
 
     #: config/common/user.config.php:8
@@ -162,9 +168,11 @@ return array(
     #: config/common/user.config.php:40
     'Deleting the user ‘{{title}}’' => 'Deleter li usator ‘{{title}}’',
 
-    #. Delete action's labels
-    #: config/common/user.config.php:43
-    'Yes, delete this user' => 'Yes, delete ti usator',
+    #: config/common/user.config.php:44
+    'Yes, delete this user' => array(
+        0 => 'Yes, delete ti usator',
+        1 => '',
+    ),
 
     #. Crud
     #: config/common/role.config.php:19
@@ -184,8 +192,10 @@ return array(
     #: config/common/role.config.php:27
     'Deleting the role ‘{{title}}’' => 'Deleter li rol ‘{{title}}’',
 
-    #. Delete action's labels
-    #: config/common/role.config.php:30
-    'Yes, delete this role' => 'Yes, delete ti rol',
+    #: config/common/role.config.php:31
+    'Yes, delete this role' => array(
+        0 => 'Yes, delete ti rol',
+        1 => '',
+    ),
 
 );

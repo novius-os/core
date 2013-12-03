@@ -1,9 +1,9 @@
 <?php
 
-// Generated on 02/12/2013 17:53:33
+// Generated on 03/12/2013 16:06:58
 
-// 162 out of 162 messages are translated (100%).
-// 865 out of 865 words are translated (100%).
+// 155 out of 155 messages are translated (100%).
+// 813 out of 813 words are translated (100%).
 
 return array(
     #. Date syntax is the one from PHP strftime() function: http://php.net/strftime
@@ -122,7 +122,7 @@ return array(
     #: classes/controller/admin/noviusos.ctrl.php:123
     #: views/inspector/modeltree_checkbox.view.php:15
     #: views/inspector/modeltree_radio.view.php:15
-    #: config/i18n_common.config.php:66
+    #: config/i18n_common.config.php:72
     'Loading...' => '読み込み中...',
 
     #: classes/controller/admin/enhancer.ctrl.php:122
@@ -239,13 +239,13 @@ return array(
     #: views/admin/login.view.php:45
     'Let’s get started' => 'では始めましょう',
 
-    #: views/admin/html.view.php:475
+    #: views/admin/html.view.php:479
     'Select a media file' => 'メディアファイルを選択',
 
-    #: views/admin/html.view.php:476
+    #: views/admin/html.view.php:480
     'Pick an image' => '画像を選択',
 
-    #: views/admin/html.view.php:477
+    #: views/admin/html.view.php:481
     'We’re afraid we cannot find this image.' => 'この画像は見つかりませんでした。',
 
     #: views/admin/orm/publishable_label.view.php:21
@@ -279,7 +279,7 @@ return array(
     'About Novius OS' => 'Novius OS について',
 
     #: views/admin/appstab.view.php:19
-    #: config/i18n_common.config.php:68
+    #: config/i18n_common.config.php:74
     'Search' => '検索',
 
     #: views/admin/data_catcher/applications.view.php:59
@@ -403,116 +403,102 @@ return array(
     #: config/i18n_common.config.php:26
     'Nothing to delete' => '削除するものがありません',
 
-    #: config/i18n_common.config.php:27
-    'Yes, delete this item' => 'はい、このアイテムを削除します',
-
     #: config/i18n_common.config.php:28
-    'Yes, delete these {{count}} items' => 'はい、これら{{count}}個のアイテムを削除します',
+    'Yes, delete this item' => array(
+        0 => 'はい、このアイテムを削除します',
+    ),
 
-    #: config/i18n_common.config.php:30
+    #: config/i18n_common.config.php:32
     'To confirm the deletion, you need to enter this number in the field below:' => '削除の意思を確認するため、この数字を下の欄に入力してください。',
 
-    #: config/i18n_common.config.php:31
+    #: config/i18n_common.config.php:33
     'We cannot delete this item as the number of sub-items you’ve entered is wrong. Please amend it.' => '入力した数字が間違っているため、このアイテムを削除できません。修正してください。',
 
-    #: config/i18n_common.config.php:33
-    '1 item' => '1個のアイテム',
-
-    #: config/i18n_common.config.php:34
-    '{{count}} items' => '{{count}}個のアイテム',
-
-    #. Keep only if the model has the behaviour Contextable
-    #: config/i18n_common.config.php:37
-    'This item exists in <strong>{{context_count}} contexts</strong>.' => 'このアイテムは<strong>{{context_count}}つのコンテキスト</strong>にあります。',
-
-    #: config/i18n_common.config.php:38
-    'This item exists in <strong>{{language_count}} languages</strong>.' => 'このアイテムは<strong>{{language_count}}つの言語</strong>に翻訳されています。',
-
-    #. Keep only if the model has the behaviours Contextable + Tree
-    #: config/i18n_common.config.php:41
-    'This item exists in <strong>{{context_count}} contexts</strong> and has <strong>{{children_count}} sub-items</strong>.' => 'この項目は<strong>{{context_count}}つのコンテキスト</strong>にあり、<strong>{{children_count}}つの子項目</strong>があります。',
+    #: config/i18n_common.config.php:36
+    '1 item' => array(
+        0 => '1個のアイテム',
+    ),
 
     #: config/i18n_common.config.php:42
-    'This item exists in <strong>{{context_count}} contexts</strong> and has <strong>one sub-item</strong>.' => 'この項目は<strong>{{context_count}}つのコンテキスト</strong>にあり、<strong>1つの子項目</strong>があります。',
+    'This item exists in <strong>one context</strong>.' => array(
+        0 => 'このアイテムは<strong>{{context_count}}つのコンテキスト</strong>にあります。',
+    ),
 
-    #: config/i18n_common.config.php:43
-    'This item exists in <strong>{{language_count}} languages</strong> and has <strong>{{children_count}} sub-items</strong>.' => 'この項目は<strong>{{language_count}}つの言語</strong>に翻訳され、<strong>{{children_count}}つの子項目</strong>があります。',
-
-    #: config/i18n_common.config.php:44
-    'This item exists in <strong>{{language_count}} languages</strong> and has <strong>one sub-item</strong>.' => 'この項目は<strong>{{language_count}}つの言語</strong>に翻訳され、<strong>1つの子項目</strong>があります。',
+    #: config/i18n_common.config.php:46
+    'This item exists in <strong>one language</strong>.' => array(
+        0 => 'このアイテムは<strong>{{language_count}}つの言語</strong>に翻訳されています。',
+    ),
 
     #. Keep only if the model has the behaviour Twinnable
-    #: config/i18n_common.config.php:47
+    #: config/i18n_common.config.php:51
     'We’re afraid this item cannot be added to {{context}} because its <a>parent</a> is not available in this context yet.' => '申し訳ないですが、このアイテムは{{context}}に追加できません。 このアイテム<a>親</a>がこのコンテキストで利用可能になっていないからです。',
 
-    #: config/i18n_common.config.php:48
+    #: config/i18n_common.config.php:52
     'We’re afraid this item cannot be translated into {{language}} because its <a>parent</a> is not available in this language yet.' => '申し訳ないですが、このアイテムは{{language}}に翻訳できません。 このアイテム<a>親</a>がこのコンテキストで利用可能になっていないからです。',
 
-    #: config/i18n_common.config.php:49
+    #: config/i18n_common.config.php:53
     'This item cannot be added in {{context}}. (How come you get this error message? You’ve hacked your way into here, haven’t you?)' => 'このアイテムは、{{context}}に追加できません。(どうやってこのエラーメッセージを表示しているのでしょう？ハッキングしてきたのでしょうか？)',
 
-    #. Keep only if the model has the behaviour Tree
-    #: config/i18n_common.config.php:52
-    'This item has <strong>1 sub-item</strong>.' => 'この項目には<strong>1つの子項目</strong>があります。',
-
-    #: config/i18n_common.config.php:53
-    'This item has <strong>{{children_count}} sub-items</strong>.' => 'この項目には<strong>{{children_count}}つの子項目</strong>があります。',
+    #: config/i18n_common.config.php:57
+    'This item has <strong>one sub-item</strong>.' => array(
+        0 => 'この項目には<strong>{{children_count}}つの子項目</strong>があります。',
+    ),
 
     #. Visualise action's labels
-    #: config/i18n_common.config.php:56
+    #: config/i18n_common.config.php:62
     'This application hasn’t yet been added to a page. Visualising is therefore impossible.' => 'このアプリケーションは、ページに追加されていません。そのため閲覧できません。',
 
     #. Appdesk: allLanguages
-    #: config/i18n_common.config.php:59
+    #: config/i18n_common.config.php:65
     'All languages' => '全ての言語',
 
-    #: config/i18n_common.config.php:60
+    #: config/i18n_common.config.php:66
     'All sites' => '全てのサイト',
 
-    #: config/i18n_common.config.php:61
+    #: config/i18n_common.config.php:67
     'All contexts' => '全てのコンテキスト',
 
-    #: config/i18n_common.config.php:62
+    #: config/i18n_common.config.php:68
     'List' => '一覧',
 
-    #: config/i18n_common.config.php:63
+    #: config/i18n_common.config.php:69
     'Tree' => '木',
 
-    #: config/i18n_common.config.php:64
+    #: config/i18n_common.config.php:70
     'Thumbnails' => 'サムネイル',
 
-    #: config/i18n_common.config.php:65
+    #: config/i18n_common.config.php:71
     'Preview' => 'プレビュー',
 
-    #: config/i18n_common.config.php:67
-    #: config/i18n_common.config.php:78
+    #: config/i18n_common.config.php:73
+    #: config/i18n_common.config.php:84
     'Languages' => '言語',
 
-    #: config/i18n_common.config.php:69
+    #: config/i18n_common.config.php:75
     'Select the site(s) to show' => '表示するサイトを選択する',
 
-    #: config/i18n_common.config.php:70
+    #: config/i18n_common.config.php:76
     'Select the language(s) to show' => '表示する言語を選択する',
 
-    #: config/i18n_common.config.php:71
+    #: config/i18n_common.config.php:77
     'Select the context(s) to show' => '表示するコンテキストを選択する',
 
-    #: config/i18n_common.config.php:72
+    #: config/i18n_common.config.php:78
     'Show {{context}}' => '{{context}}を表示する',
 
-    #: config/i18n_common.config.php:73
+    #: config/i18n_common.config.php:79
     'Other sites' => '他のサイト',
 
-    #: config/i18n_common.config.php:74
+    #: config/i18n_common.config.php:80
     'Other languages' => '他の言語',
 
-    #: config/i18n_common.config.php:75
+    #: config/i18n_common.config.php:81
     'Other contexts' => '他のコンテキスト',
 
-    #: config/i18n_common.config.php:76
+    #: config/i18n_common.config.php:82
     'Contexts' => 'コンテキスト',
 
-    #: config/i18n_common.config.php:77
+    #: config/i18n_common.config.php:83
     'Sites' => 'サイト',
 
     #: config/validation.config.php:15

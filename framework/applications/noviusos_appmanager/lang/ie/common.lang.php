@@ -1,6 +1,6 @@
 <?php
 
-// Generated on 02/12/2013 17:53:33
+// Generated on 03/12/2013 16:06:58
 
 // 24 out of 24 messages are translated (100%).
 // 90 out of 90 words are translated (100%).
@@ -25,12 +25,12 @@ return array(
     'Native applications' => 'Applications natal',
 
     #: views/admin/app_manager.view.php:45
-    #: views/admin/app_manager.view.php:171
+    #: views/admin/app_manager.view.php:173
     'It appears you’ve made some recent changes.' => 'Apparentli tu ha fat changeaments recentli.',
 
     #: views/admin/app_manager.view.php:45
     #: views/admin/app_manager.view.php:68
-    #: views/admin/app_manager.view.php:171
+    #: views/admin/app_manager.view.php:173
     'Apply changes' => 'Applicar li changeaments',
 
     #: views/admin/app_manager.view.php:47
@@ -51,38 +51,38 @@ return array(
     #: views/admin/app_manager.view.php:88
     'Cannot be uninstalled. Uninstall ‘{{application}}’ first.' => 'Ne posse esser desinstallat. Desinstalla ‘{{application}}’ in prim.',
 
-    #: views/admin/app_manager.view.php:92
+    #: views/admin/app_manager.view.php:93
     'Cannot be uninstalled. Uninstall <a>these applications</a> first.' => 'Ne posse esser desinstallat. Desinstalla <a>ti applications</a> in prim.',
 
-    #: views/admin/app_manager.view.php:108
-    #: views/admin/app_manager.view.php:159
+    #: views/admin/app_manager.view.php:109
+    #: views/admin/app_manager.view.php:161
     'No applications found.' => 'Null application trovat.',
 
-    #: views/admin/app_manager.view.php:115
+    #: views/admin/app_manager.view.php:116
     'Available applications' => 'Applications disponibil',
 
-    #: views/admin/app_manager.view.php:129
+    #: views/admin/app_manager.view.php:130
     'No metadata found' => 'Null metadata trovat',
 
-    #: views/admin/app_manager.view.php:133
+    #: views/admin/app_manager.view.php:134
     'Install' => 'Installar',
 
-    #: views/admin/app_manager.view.php:139
+    #: views/admin/app_manager.view.php:140
     'Cannot be installed. Install ‘{{application}}’ first.' => 'Ne posse esser installat. Installa ‘{{application}}’ in prim.',
 
-    #: views/admin/app_manager.view.php:143
+    #: views/admin/app_manager.view.php:145
     'Cannot be installed. Install <a>these applications</a> first.' => 'Ne posse esser desinstallat. Installa <a>ti applications</a> in prim.',
 
-    #: views/admin/app_manager.view.php:167
+    #: views/admin/app_manager.view.php:169
     'Website configuration' => 'Configuration del web site',
 
-    #: views/admin/app_manager.view.php:173
+    #: views/admin/app_manager.view.php:175
     'The website’s configuration is up-to-date.' => 'Li configuration del website es hodial.',
 
-    #: views/admin/app_manager.view.php:190
+    #: views/admin/app_manager.view.php:192
     'Applications manager' => 'Administration del applications',
 
-    #: views/admin/app_manager.view.php:202
+    #: views/admin/app_manager.view.php:204
     'Refresh all metadata' => 'Regenerar omni metadatas.',
 
 );

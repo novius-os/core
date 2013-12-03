@@ -1,9 +1,9 @@
 <?php
 
-// Generated on 02/12/2013 17:53:33
+// Generated on 03/12/2013 16:06:58
 
-// 56 out of 56 messages are translated (100%).
-// 246 out of 246 words are translated (100%).
+// 55 out of 56 messages are translated (98%).
+// 243 out of 245 words are translated (98%).
 
 return array(
     #: classes/controller/admin/user.ctrl.php:70
@@ -68,7 +68,7 @@ return array(
     'View and edit permissions' => 'パーミッションを閲覧／編集',
 
     #: views/admin/account.view.php:14
-    'Save' => '',
+    'Save' => '保存',
 
     #: views/admin/account.view.php:32
     'Sign out (see you!)' => 'ログアウトします。それではまた。',
@@ -80,7 +80,7 @@ return array(
     'Theme' => 'テーマ',
 
     #: config/controller/admin/user.config.php:19
-    #: config/common/user.config.php:47
+    #: config/common/user.config.php:50
     'Add a user' => 'ユーザーを追加',
 
     #: config/controller/admin/user.config.php:35
@@ -113,7 +113,7 @@ return array(
     'Role' => 'ロール（権限グループ）',
 
     #: config/controller/admin/role.config.php:19
-    #: config/common/role.config.php:34
+    #: config/common/role.config.php:37
     'Add a role' => 'ロールを追加',
 
     #: config/controller/admin/role.config.php:40
@@ -125,17 +125,21 @@ return array(
     #: config/controller/admin/appdesk.config.php:27
     'users' => 'ユーザー',
 
-    #: config/controller/admin/appdesk.config.php:28
-    'Showing {{x}} users out of {{y}}' => '{{y}}人のユーザーのうち{{x}}人を表示しています',
-
     #: config/controller/admin/appdesk.config.php:29
-    'Showing 1 user' => '1人のユーザーを表示しています',
+    '1 user' => array(
+        0 => '',
+    ),
 
-    #: config/controller/admin/appdesk.config.php:30
+    #: config/controller/admin/appdesk.config.php:33
+    'Showing 1 user out of {{y}}' => array(
+        0 => '{{y}}人のユーザーのうち{{x}}人を表示しています',
+    ),
+
+    #: config/controller/admin/appdesk.config.php:36
     'No users' => 'ユーザー無し',
 
     #. Note to translator: This is the action that clears the 'Search' field
-    #: config/controller/admin/appdesk.config.php:32
+    #: config/controller/admin/appdesk.config.php:38
     'Show all users' => '全てのユーザーを表示する',
 
     #: config/common/user.config.php:8
@@ -162,9 +166,10 @@ return array(
     #: config/common/user.config.php:40
     'Deleting the user ‘{{title}}’' => 'ユーザー‘{{title}}’を削除します',
 
-    #. Delete action's labels
-    #: config/common/user.config.php:43
-    'Yes, delete this user' => 'はい、このユーザーを削除します',
+    #: config/common/user.config.php:44
+    'Yes, delete this user' => array(
+        0 => 'はい、このユーザーを削除します',
+    ),
 
     #. Crud
     #: config/common/role.config.php:19
@@ -184,8 +189,9 @@ return array(
     #: config/common/role.config.php:27
     'Deleting the role ‘{{title}}’' => 'ロール{{title}}を削除します',
 
-    #. Delete action's labels
-    #: config/common/role.config.php:30
-    'Yes, delete this role' => 'はい、このロールを削除します',
+    #: config/common/role.config.php:31
+    'Yes, delete this role' => array(
+        0 => 'はい、このロールを削除します',
+    ),
 
 );

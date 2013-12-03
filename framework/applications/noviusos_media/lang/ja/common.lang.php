@@ -1,9 +1,9 @@
 <?php
 
-// Generated on 02/12/2013 17:53:33
+// Generated on 03/12/2013 16:06:58
 
-// 122 out of 122 messages are translated (100%).
-// 675 out of 675 words are translated (100%).
+// 119 out of 120 messages are translated (99%).
+// 654 out of 657 words are translated (99%).
 
 return array(
     #: classes/controller/admin/attachment.ctrl.php:38
@@ -83,13 +83,12 @@ return array(
     #: views/admin/media_delete.view.php:21
     'The media is not used anywhere and can be safely deleted.' => 'このメディアは使用されていません。削除しても構いません。',
 
-    #: views/admin/media_delete.view.php:26
-    'The media is used <strong>once</strong> by an application.' => 'このメディアはアプリケーションで<strong>1回</strong>使用しています。',
+    #: views/admin/media_delete.view.php:28
+    'The media is used <strong>once</strong> by an application.' => array(
+        0 => 'このメディアはアプリケーションで<strong>1回</strong>使用しています。',
+    ),
 
-    #: views/admin/media_delete.view.php:27
-    'The media is used <strong>{{count}} times</strong> by your applications.' => 'このメディアはアプリケーションで<strong>{{count}}回</strong>使用しています。',
-
-    #: views/admin/media_delete.view.php:32
+    #: views/admin/media_delete.view.php:37
     'Yes, I want to delete this media file even though it is used {{count}} times.' => 'はい、このメディアファイルは{{count}}回使用していますが、それでも削除します。',
 
     #: views/admin/wysiwyg_image.view.php:29
@@ -228,13 +227,12 @@ return array(
     #: views/admin/folder_delete.view.php:21
     'The folder is empty and can be safely deleted.' => 'このフォルダは空です。削除しても構いません。',
 
-    #: views/admin/folder_delete.view.php:26
-    'There is <strong>one media file</strong> in this folder.' => 'このフォルダには<strong>メディアファイルが1個</strong>あります。',
+    #: views/admin/folder_delete.view.php:28
+    'There is <strong>one media file</strong> in this folder.' => array(
+        0 => 'このフォルダには<strong>メディアファイルが1個</strong>あります。',
+    ),
 
-    #: views/admin/folder_delete.view.php:27
-    'There are <strong>{{count}} media files</strong> in this folder.' => 'このフォルダには<strong>メディアファイルが{{count}}個</strong>あります。',
-
-    #: views/admin/folder_delete.view.php:32
+    #: views/admin/folder_delete.view.php:37
     'Yes, I want to delete this folder and the {{count}} media files it contains.' => 'はい、このフォルダには{{count}}個のメディアファイルがありますが、このフォルダを削除します。',
 
     #: views/admin/folder.view.php:51
@@ -287,7 +285,7 @@ return array(
     'SEO, Media URL:' => 'SEO, メディア URL:',
 
     #: config/controller/admin/folder.config.php:20
-    #: config/common/folder.config.php:42
+    #: config/common/folder.config.php:45
     'Add a folder' => 'フォルダを追加',
 
     #: config/controller/admin/folder.config.php:42
@@ -295,14 +293,14 @@ return array(
 
     #. Note to translator: This is a placeholder, i.e. a field’s label shown within the field
     #: config/controller/admin/folder.config.php:48
-    #: config/common/media.config.php:47
+    #: config/common/media.config.php:50
     'Title' => 'タイトル',
 
     #: config/controller/admin/folder.config.php:60
     'SEO, folder URL:' => 'SEO、フォルダURL:',
 
     #: config/controller/admin/media.config.php:20
-    #: config/common/media.config.php:118
+    #: config/common/media.config.php:121
     'Add a media file' => 'メディアファイルを追加',
 
     #: config/controller/admin/media.config.php:53
@@ -330,26 +328,30 @@ return array(
     #: config/controller/admin/appdesk.config.php:99
     'media files' => 'メディアファイル',
 
-    #: config/controller/admin/appdesk.config.php:100
-    'Showing {{x}} media files out of {{y}}' => '{{y}} 個のメディアファイルのうち {{x}} 個を表示しています',
-
     #: config/controller/admin/appdesk.config.php:101
-    'Showing 1 media file' => '1 個のメディアファイルを表示しています',
+    '1 media file' => array(
+        0 => '',
+    ),
 
-    #: config/controller/admin/appdesk.config.php:102
+    #: config/controller/admin/appdesk.config.php:105
+    'Showing 1 media file out of {{y}}' => array(
+        0 => '{{y}} 個のメディアファイルのうち {{x}} 個を表示しています',
+    ),
+
+    #: config/controller/admin/appdesk.config.php:108
     'No media files' => 'メディアファイルがありません',
 
     #. Note to translator: This is the action that clears the 'Search' field
-    #: config/controller/admin/appdesk.config.php:104
+    #: config/controller/admin/appdesk.config.php:110
     'Show all media files' => '全てのメディアファイルを表示する',
 
-    #: config/controller/admin/appdesk.config.php:106
+    #: config/controller/admin/appdesk.config.php:112
     'Pick' => '選択する',
 
-    #: config/controller/admin/appdesk.config.php:124
+    #: config/controller/admin/appdesk.config.php:130
     'Add many files at once' => '',
 
-    #: config/controller/admin/appdesk.config.php:137
+    #: config/controller/admin/appdesk.config.php:143
     'Renew media cache' => '',
 
     #. Crud
@@ -370,20 +372,21 @@ return array(
     #: config/common/folder.config.php:35
     'Deleting the folder ‘{{title}}’' => 'フォルダ ‘{{title}}’ を削除します',
 
-    #. Delete action's labels
-    #: config/common/folder.config.php:38
-    'Yes, delete this folder' => 'はい、このフォルダを削除します',
+    #: config/common/folder.config.php:39
+    'Yes, delete this folder' => array(
+        0 => 'はい、このフォルダを削除します',
+    ),
 
-    #: config/common/folder.config.php:53
+    #: config/common/folder.config.php:56
     'You can’t edit the root folder.' => 'ルートフォルダは編集できません。',
 
-    #: config/common/folder.config.php:62
+    #: config/common/folder.config.php:65
     'You can’t delete the root folder.' => 'ルートフォルダは削除できません。',
 
-    #: config/common/folder.config.php:69
+    #: config/common/folder.config.php:72
     'Add a media file in this folder' => 'このフォルダにメディアファイルを追加',
 
-    #: config/common/folder.config.php:88
+    #: config/common/folder.config.php:91
     'Add a sub-folder to this folder' => 'このフォルダにサブフォルダを追加',
 
     #. Crud
@@ -404,14 +407,15 @@ return array(
     #: config/common/media.config.php:39
     'Deleting the media ‘{{title}}’' => 'メディア ‘{{title}}’ を削除します',
 
-    #. Delete action's labels
-    #: config/common/media.config.php:42
-    'Yes, delete this media file' => 'はい、このメディアファイルを削除します',
+    #: config/common/media.config.php:43
+    'Yes, delete this media file' => array(
+        0 => 'はい、このメディアファイルを削除します',
+    ),
 
-    #: config/common/media.config.php:59
+    #: config/common/media.config.php:62
     'Extension' => '拡張子',
 
-    #: config/common/media.config.php:134
+    #: config/common/media.config.php:137
     'Visualise' => '閲覧',
 
 );

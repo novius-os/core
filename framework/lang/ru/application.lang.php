@@ -1,12 +1,12 @@
 <?php
 
-// Generated on 02/12/2013 17:53:33
+// Generated on 03/12/2013 16:06:58
 
 // 18 out of 18 messages are translated (100%).
 // 99 out of 99 words are translated (100%).
 
 return array(
-    #: classes/controller/admin/crud.ctrl.php:351
+    #: classes/controller/admin/crud.ctrl.php:350
     'This item already exists in {{context}}. Therefore your item cannot be added.' => 'Элемент уже существует в {{context}}. Поэтому ваш элемент не может быть добавлен.',
 
     #: classes/controller/admin/appdesk.ctrl.php:167
@@ -61,8 +61,6 @@ return array(
 
     #. Note to translator: This is a submit button
     #: views/crud/toolbar.view.php:21
-    #: views/admin/enhancer/popup.view.php:50
-    #: views/admin/data_catcher/form.view.php:166
     'Save' => 'Сохранить',
 
 );

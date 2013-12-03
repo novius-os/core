@@ -1,9 +1,9 @@
 <?php
 
-// Generated on 02/12/2013 17:53:33
+// Generated on 03/12/2013 16:06:58
 
-// 110 out of 110 messages are translated (100%).
-// 659 out of 659 words are translated (100%).
+// 120 out of 120 messages are translated (100%).
+// 657 out of 657 words are translated (100%).
 
 return array(
     #: classes/controller/admin/attachment.ctrl.php:38
@@ -49,7 +49,7 @@ return array(
     #: classes/controller/admin/appdesk.ctrl.php:76
     'The cache has been renewed. All ready for you to enjoy!' => 'Li cache ha esset regenerat.',
 
-    #: classes/controller/admin/folder.ctrl.php:56
+    #: classes/model/folder.model.php:246
     'This is strange: This folder should be empty but isn’t. Please contact your developer or Novius OS to fix this. We apologise for the inconvenience caused.' => 'To es bizarri: ti dossier vell dever esser vacui ma ne es. Ples contactar tu developator o Novius por fixar it. Ples pardonar nos por ti problema.',
 
     #: classes/renderer/media.php:34
@@ -83,13 +83,13 @@ return array(
     #: views/admin/media_delete.view.php:21
     'The media is not used anywhere and can be safely deleted.' => 'Li media necu es usat e posse esser deletet sin problema.',
 
-    #: views/admin/media_delete.view.php:26
-    'The media is used <strong>once</strong> by an application.' => 'Li media es usat <strong>un vez</strong> per un application.',
+    #: views/admin/media_delete.view.php:28
+    'The media is used <strong>once</strong> by an application.' => array(
+        0 => 'Li media es usat <strong>un vez</strong> per un application.',
+        1 => 'Li media es usat <strong>{{count}} vezes</strong> per tu applications.',
+    ),
 
-    #: views/admin/media_delete.view.php:27
-    'The media is used <strong>{{count}} times</strong> by your applications.' => 'Li media es usat <strong>{{count}} vezes</strong> per tu applications.',
-
-    #: views/admin/media_delete.view.php:32
+    #: views/admin/media_delete.view.php:37
     'Yes, I want to delete this media file even though it is used {{count}} times.' => 'Yes, yo desire deleter ti document media benque it es usat {{count}} vezes.',
 
     #: views/admin/wysiwyg_image.view.php:29
@@ -126,21 +126,57 @@ return array(
     'Height:' => 'Altore',
 
     #: views/admin/wysiwyg_image.view.php:55
+    'Alignment:' => '',
+
+    #: views/admin/wysiwyg_image.view.php:58
+    'Baseline' => '',
+
+    #: views/admin/wysiwyg_image.view.php:59
+    'Top' => '',
+
+    #: views/admin/wysiwyg_image.view.php:60
+    'Middle' => '',
+
+    #: views/admin/wysiwyg_image.view.php:61
+    'Bottom' => '',
+
+    #: views/admin/wysiwyg_image.view.php:62
+    'Text Top' => '',
+
+    #: views/admin/wysiwyg_image.view.php:63
+    'Text Bottom' => '',
+
+    #: views/admin/wysiwyg_image.view.php:64
+    'Left' => '',
+
+    #: views/admin/wysiwyg_image.view.php:65
+    'Right' => '',
+
+    #: views/admin/wysiwyg_image.view.php:69
+    'Border:' => '',
+
+    #: views/admin/wysiwyg_image.view.php:73
+    'Vertical space:' => '',
+
+    #: views/admin/wysiwyg_image.view.php:77
+    'Horizontal space:' => '',
+
+    #: views/admin/wysiwyg_image.view.php:81
     'Style:' => 'Stil:',
 
-    #: views/admin/wysiwyg_image.view.php:60
+    #: views/admin/wysiwyg_image.view.php:86
     'Update this image' => 'Updatar ti image',
 
-    #: views/admin/wysiwyg_image.view.php:60
+    #: views/admin/wysiwyg_image.view.php:86
     'Insert this image' => 'Inserter ti image',
 
-    #: views/admin/wysiwyg_image.view.php:60
+    #: views/admin/wysiwyg_image.view.php:86
     'or' => 'o',
 
-    #: views/admin/wysiwyg_image.view.php:60
+    #: views/admin/wysiwyg_image.view.php:86
     'Cancel' => 'Anullar',
 
-    #: views/admin/wysiwyg_image.view.php:76
+    #: views/admin/wysiwyg_image.view.php:102
     'This is unusual: It seems that no image has been selected. Please try again. Contact your developer or Novius OS if the problem persists. We apologise for the inconvenience caused.' => 'It es bizarri. It apare que null image ha esset selectet. Ples essayar ancor. Contacte tu developator o Novius OS si li problema persiste. Noi excusa por ti problema.',
 
     #: views/admin/upload.view.php:24
@@ -158,6 +194,7 @@ return array(
     #: views/admin/upload.view.php:41
     'Select a folder where to put your media files:' => 'Selecte un dossier u posir tu documents media',
 
+    #. Note to translator: This is a submit button
     #: views/admin/upload.view.php:48
     #: views/admin/attachment.view.php:19
     'Add' => 'Li dimension totale del documents excesse li limite de carga {{size}}',
@@ -181,23 +218,23 @@ return array(
     'The file size must not exceed {{size}}.' => 'La dimension del document ne deve exceder {{size}}.',
 
     #: views/admin/media_edit.view.php:62
-    #: config/controller/admin/appdesk.config.php:50
+    #: config/controller/admin/appdesk.config.php:51
     'File size:' => 'Dimension del document:',
 
     #: views/admin/media_edit.view.php:69
-    #: config/controller/admin/appdesk.config.php:53
+    #: config/controller/admin/appdesk.config.php:54
     'Dimensions:' => 'Dimensions:',
 
     #: views/admin/folder_delete.view.php:21
     'The folder is empty and can be safely deleted.' => 'Li dossier es vacui e posse esser deletet sin problema.',
 
-    #: views/admin/folder_delete.view.php:26
-    'There is <strong>one media file</strong> in this folder.' => 'Hay <strong>un media document</strong> in ti dossier.',
+    #: views/admin/folder_delete.view.php:28
+    'There is <strong>one media file</strong> in this folder.' => array(
+        0 => 'Hay <strong>un media document</strong> in ti dossier.',
+        1 => 'Hay <strong>{{count}} media documents</strong> in ti dossiers.',
+    ),
 
-    #: views/admin/folder_delete.view.php:27
-    'There are <strong>{{count}} media files</strong> in this folder.' => 'Hay <strong>{{count}} media documents</strong> in ti dossiers.',
-
-    #: views/admin/folder_delete.view.php:32
+    #: views/admin/folder_delete.view.php:37
     'Yes, I want to delete this folder and the {{count}} media files it contains.' => 'Yes, yo desire deleter ti dossier e li {{count}} documents media it contene.',
 
     #: views/admin/folder.view.php:51
@@ -237,8 +274,8 @@ return array(
     #: config/controller/admin/inspector/extension.config.php:47
     'Others' => 'Altri',
 
-    #: config/controller/admin/inspector/extension.config.php:87
-    #: config/controller/admin/inspector/extension.config.php:92
+    #: config/controller/admin/inspector/extension.config.php:86
+    #: config/controller/admin/inspector/extension.config.php:91
     'Types' => 'Tipes',
 
     #: config/controller/admin/attachment.config.php:25
@@ -250,7 +287,7 @@ return array(
     'SEO, Media URL:' => 'Referentiation, URL del media:',
 
     #: config/controller/admin/folder.config.php:20
-    #: config/common/folder.config.php:42
+    #: config/common/folder.config.php:45
     'Add a folder' => 'Addir un dossier',
 
     #: config/controller/admin/folder.config.php:42
@@ -258,61 +295,67 @@ return array(
 
     #. Note to translator: This is a placeholder, i.e. a field’s label shown within the field
     #: config/controller/admin/folder.config.php:48
-    #: config/common/media.config.php:47
+    #: config/common/media.config.php:50
     'Title' => 'Titul',
 
     #: config/controller/admin/folder.config.php:60
     'SEO, folder URL:' => 'SEO, URL del dossier:',
 
     #: config/controller/admin/media.config.php:20
-    #: config/common/media.config.php:118
+    #: config/common/media.config.php:121
     'Add a media file' => 'Addir un document media',
 
     #: config/controller/admin/media.config.php:53
     'File from your hard drive:' => 'Document ex tu disco-dure',
 
-    #: config/controller/admin/appdesk.config.php:47
+    #: config/controller/admin/appdesk.config.php:48
     'File name:' => 'Nomine del document:',
 
     #. Note to translator: 'Preview' here is a label, not an action
-    #: config/controller/admin/appdesk.config.php:60
+    #: config/controller/admin/appdesk.config.php:61
     'Preview' => 'Previsualisar',
 
-    #: config/controller/admin/appdesk.config.php:61
+    #: config/controller/admin/appdesk.config.php:62
     'Click on a media file to preview it.' => 'Clica sur un document por previsualisar it.',
 
-    #: config/controller/admin/appdesk.config.php:69
+    #: config/controller/admin/appdesk.config.php:70
     'Default view' => 'Defective exposition',
 
-    #: config/controller/admin/appdesk.config.php:75
+    #: config/controller/admin/appdesk.config.php:76
     'Flick through view' => 'Navigar in li exposition',
 
-    #: config/controller/admin/appdesk.config.php:97
+    #: config/controller/admin/appdesk.config.php:98
     'media file' => 'Document media',
 
-    #: config/controller/admin/appdesk.config.php:98
+    #: config/controller/admin/appdesk.config.php:99
     'media files' => 'Documents media',
 
-    #: config/controller/admin/appdesk.config.php:99
-    'Showing {{x}} media files out of {{y}}' => 'Exhibir {{x}} media documents ex {{y}}',
-
-    #: config/controller/admin/appdesk.config.php:100
-    'Showing 1 media file' => 'Exhibir 1 document media',
-
     #: config/controller/admin/appdesk.config.php:101
+    '1 media file' => array(
+        0 => '1 media document',
+        1 => '{{count}} media documents',
+    ),
+
+    #: config/controller/admin/appdesk.config.php:105
+    'Showing 1 media file out of {{y}}' => array(
+        0 => 'Exhibir 1 media document ex {{y}}',
+        1 => 'Exhibir {{x}} media documents ex {{y}}',
+    ),
+
+    #: config/controller/admin/appdesk.config.php:108
     'No media files' => 'Null document media',
 
     #. Note to translator: This is the action that clears the 'Search' field
-    #: config/controller/admin/appdesk.config.php:103
+    #: config/controller/admin/appdesk.config.php:110
     'Show all media files' => 'Exhibir omni media documents',
 
-    #: config/controller/admin/appdesk.config.php:105
+    #: config/controller/admin/appdesk.config.php:112
     'Pick' => 'Selecter',
 
-    #: config/controller/admin/appdesk.config.php:123
+    #: config/controller/admin/appdesk.config.php:130
     'Add many files at once' => 'Addir mult documentes simultanli',
 
-    #: config/controller/admin/appdesk.config.php:136
+    #: config/controller/admin/appdesk.config.php:143
     'Renew media cache' => 'Regenerar li cache del medias',
 
     #. Crud
@@ -333,20 +376,22 @@ return array(
     #: config/common/folder.config.php:35
     'Deleting the folder ‘{{title}}’' => 'Deleter li dossier ‘{{title}}’',
 
-    #. Delete action's labels
-    #: config/common/folder.config.php:38
-    'Yes, delete this folder' => 'Yes, deleter ti dossier',
+    #: config/common/folder.config.php:39
+    'Yes, delete this folder' => array(
+        0 => 'Yes, deleter ti dossier',
+        1 => '',
+    ),
 
-    #: config/common/folder.config.php:53
+    #: config/common/folder.config.php:56
     'You can’t edit the root folder.' => 'Tu ne posse modificar li dossier radica.',
 
-    #: config/common/folder.config.php:62
+    #: config/common/folder.config.php:65
     'You can’t delete the root folder.' => 'Tu ne posse deleter ti dossier.',
 
-    #: config/common/folder.config.php:69
+    #: config/common/folder.config.php:72
     'Add a media file in this folder' => 'Addir un document media in ti dossier.',
 
-    #: config/common/folder.config.php:88
+    #: config/common/folder.config.php:91
     'Add a sub-folder to this folder' => 'Addir un sub-dossier a ti dossier',
 
     #. Crud
@@ -367,14 +412,16 @@ return array(
     #: config/common/media.config.php:39
     'Deleting the media ‘{{title}}’' => 'Deleter li media ‘{{title}}’',
 
-    #. Delete action's labels
-    #: config/common/media.config.php:42
-    'Yes, delete this media file' => 'Yes, delete ti document media',
+    #: config/common/media.config.php:43
+    'Yes, delete this media file' => array(
+        0 => 'Yes, delete ti document media',
+        1 => '',
+    ),
 
-    #: config/common/media.config.php:59
+    #: config/common/media.config.php:62
     'Extension' => 'Extension',
 
-    #: config/common/media.config.php:134
+    #: config/common/media.config.php:137
     'Visualise' => 'Visualisar',
 
 );

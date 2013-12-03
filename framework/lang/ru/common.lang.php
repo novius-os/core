@@ -1,9 +1,9 @@
 <?php
 
-// Generated on 02/12/2013 17:53:33
+// Generated on 03/12/2013 16:06:58
 
-// 162 out of 162 messages are translated (100%).
-// 865 out of 865 words are translated (100%).
+// 152 out of 155 messages are translated (98%).
+// 796 out of 813 words are translated (98%).
 
 return array(
     #. Date syntax is the one from PHP strftime() function: http://php.net/strftime
@@ -91,10 +91,10 @@ return array(
     #: classes/controller/admin/datacatcher.ctrl.php:80
     'We cannot find ‘{{item}}’. It must have been deleted while you tried to share it. Bad luck.' => 'Не удается найти «{{item}}». Наверное, кто-то его удалил, пока вы пытались поделиться. Не повезло.',
 
-    #: classes/controller/admin/datacatcher.ctrl.php:87
+    #: classes/controller/admin/datacatcher.ctrl.php:85
     'Surprisingly it appears ‘{{item}}’ cannot be shared with ‘{{catcher}}’. Contact your developer for further details.' => 'Удивительно, но похоже, что «{{item}}» нельзя поделиться с помощью «{{catcher}}». Свяжитесь с вашим разработчиком, чтобы он разъяснил вам подробности.',
 
-    #: classes/controller/admin/datacatcher.ctrl.php:94
+    #: classes/controller/admin/datacatcher.ctrl.php:92
     'Something went wrong. Please ask your developer or Novius OS to have a look into this. You could call your mother too but we doubt she would be much help. Unless your mum is a software engineer, which would be awesome. We forgot to say: We apologise for the inconvenience caused.' => 'Что-то пошло не так. Пожалуйста, попросите посмотреть вашего разработчика или команду Novius OS. Можете, конечно, позвать вашу мамочку, но мы сомневаемся, что она сможет помочь. Конечно, если только она не инженер-программист, что было бы чудесно. Да, чуть не забыли: Мы ужасно сожалеем о том, что доставили вам неудобства.',
 
     #: classes/controller/admin/noviusos.ctrl.php:116
@@ -122,7 +122,7 @@ return array(
     #: classes/controller/admin/noviusos.ctrl.php:123
     #: views/inspector/modeltree_checkbox.view.php:15
     #: views/inspector/modeltree_radio.view.php:15
-    #: config/i18n_common.config.php:66
+    #: config/i18n_common.config.php:72
     'Loading...' => 'Загружается...',
 
     #: classes/controller/admin/enhancer.ctrl.php:122
@@ -138,7 +138,7 @@ return array(
 
     #: views/form/action_or_cancel.view.php:15
     #: views/admin/enhancer/popup.view.php:50
-    #: views/admin/data_catcher/form.view.php:166
+    #: views/admin/data_catcher/form.view.php:168
     'Save' => 'Сохранить',
 
     #: views/form/layout_standard.view.php:82
@@ -239,13 +239,13 @@ return array(
     #: views/admin/login.view.php:45
     'Let’s get started' => 'Приступим!',
 
-    #: views/admin/html.view.php:475
+    #: views/admin/html.view.php:479
     'Select a media file' => 'Выберите файл медиа',
 
-    #: views/admin/html.view.php:476
+    #: views/admin/html.view.php:480
     'Pick an image' => 'Выберите изображение',
 
-    #: views/admin/html.view.php:477
+    #: views/admin/html.view.php:481
     'We’re afraid we cannot find this image.' => 'Похоже, мы не можем найти это изображение.',
 
     #: views/admin/orm/publishable_label.view.php:21
@@ -279,7 +279,7 @@ return array(
     'About Novius OS' => 'О Novius OS',
 
     #: views/admin/appstab.view.php:19
-    #: config/i18n_common.config.php:68
+    #: config/i18n_common.config.php:74
     'Search' => 'Поиск',
 
     #: views/admin/data_catcher/applications.view.php:59
@@ -312,10 +312,10 @@ return array(
     #: views/admin/data_catcher/form.view.php:64
     'Description:' => 'Описание:',
 
-    #: views/admin/data_catcher/form.view.php:110
+    #: views/admin/data_catcher/form.view.php:112
     'Use default' => 'Использовать заголовок по умолчанию',
 
-    #: views/admin/data_catcher/form.view.php:142
+    #: views/admin/data_catcher/form.view.php:144
     'Pick a custom image' => 'Выбор своего изображения',
 
     #: views/admin/data_catcher/panel.view.php:29
@@ -338,6 +338,7 @@ return array(
     #: config/common.config.php:38
     'Edit' => 'Редактировать',
 
+    #. Deletion popup
     #: config/common.config.php:61
     #: config/i18n_common.config.php:20
     'Deleting the item ‘{{title}}’' => 'Удаление элемента «{{title}}»',
@@ -402,116 +403,117 @@ return array(
     #: config/i18n_common.config.php:26
     'Nothing to delete' => 'Нечего удалять',
 
-    #: config/i18n_common.config.php:27
-    'Yes, delete this item' => 'Да, удалить это элемент',
-
     #: config/i18n_common.config.php:28
-    'Yes, delete these {{count}} items' => 'Да, удалить {{count}} элементов',
+    'Yes, delete this item' => array(
+        0 => 'Да, удалить это элемент',
+        1 => 'Да, удалить {{count}} элементов',
+        2 => '',
+        3 => '',
+    ),
 
-    #: config/i18n_common.config.php:30
+    #: config/i18n_common.config.php:32
     'To confirm the deletion, you need to enter this number in the field below:' => 'Введите это число в поле ниже, чтобы подтвердить удаление',
 
-    #: config/i18n_common.config.php:31
+    #: config/i18n_common.config.php:33
     'We cannot delete this item as the number of sub-items you’ve entered is wrong. Please amend it.' => 'Мы не смогли удалить этот элемент, так как вы ввели неверное количество вложенных элементов. Исправьте, пожалуйста.',
 
-    #: config/i18n_common.config.php:33
-    '1 item' => '1 элемент',
-
-    #: config/i18n_common.config.php:34
-    '{{count}} items' => '{{count}} элементов',
-
-    #. Keep only if the model has the behaviour Contextable
-    #: config/i18n_common.config.php:37
-    'This item exists in <strong>{{context_count}} contexts</strong>.' => 'Элемент присутствует в <strong>{{context_count}} контекстах</strong>.',
-
-    #: config/i18n_common.config.php:38
-    'This item exists in <strong>{{language_count}} languages</strong>.' => 'Элемент присутствует в <strong>{{context_count}} языках</strong>.',
-
-    #. Keep only if the model has the behaviours Contextable + Tree
-    #: config/i18n_common.config.php:41
-    'This item exists in <strong>{{context_count}} contexts</strong> and has <strong>{{children_count}} sub-items</strong>.' => 'Элемент присутствует в <strong>{{context_count}} контекстах</strong> и имеет <strong>{{children_count}} вложенных элементов</strong>.',
+    #: config/i18n_common.config.php:36
+    '1 item' => array(
+        0 => '1 элемент',
+        1 => '{{count}} элементов',
+        2 => '',
+        3 => '',
+    ),
 
     #: config/i18n_common.config.php:42
-    'This item exists in <strong>{{context_count}} contexts</strong> and has <strong>one sub-item</strong>.' => 'Элемент присутствует в <strong>{{context_count}} контекстах</strong> и имеет <strong>один вложенный элемент</strong>.',
+    'This item exists in <strong>one context</strong>.' => array(
+        0 => '',
+        1 => '',
+        2 => 'Элемент присутствует в <strong>{{context_count}} контекстах</strong>.',
+        3 => '',
+    ),
 
-    #: config/i18n_common.config.php:43
-    'This item exists in <strong>{{language_count}} languages</strong> and has <strong>{{children_count}} sub-items</strong>.' => 'Элемент присутствует в <strong>{{language_count}} языках</strong> и имеет <strong>{{children_count}} вложенных элементов</strong>.',
-
-    #: config/i18n_common.config.php:44
-    'This item exists in <strong>{{language_count}} languages</strong> and has <strong>one sub-item</strong>.' => 'Элемент присутствует в <strong>{{language_count}} языках</strong> и имеет <strong>один вложенный элемент</strong>.',
+    #: config/i18n_common.config.php:46
+    'This item exists in <strong>one language</strong>.' => array(
+        0 => '',
+        1 => '',
+        2 => 'Элемент присутствует в <strong>{{context_count}} языках</strong>.',
+        3 => '',
+    ),
 
     #. Keep only if the model has the behaviour Twinnable
-    #: config/i18n_common.config.php:47
+    #: config/i18n_common.config.php:51
     'We’re afraid this item cannot be added to {{context}} because its <a>parent</a> is not available in this context yet.' => 'К сожалению, этот элемент нельзя добавить в {{context}}, так как его <a>родитель</a> еще недоступен в этом контексте.',
 
-    #: config/i18n_common.config.php:48
+    #: config/i18n_common.config.php:52
     'We’re afraid this item cannot be translated into {{language}} because its <a>parent</a> is not available in this language yet.' => 'К сожалению, этот элемент перевести на {{language}}, так как его <a>родитель</a> еще недоступен на этом языке.',
 
-    #: config/i18n_common.config.php:49
+    #: config/i18n_common.config.php:53
     'This item cannot be added in {{context}}. (How come you get this error message? You’ve hacked your way into here, haven’t you?)' => 'Этот элемент нельзя добавить в {{context}}. (Как вы смогли получить это сообщение? Вы хакер, что ли?)',
 
-    #. Keep only if the model has the behaviour Tree
-    #: config/i18n_common.config.php:52
-    'This item has <strong>1 sub-item</strong>.' => 'Элемент имеет <strong>1 вложенный элемент</strong>.',
-
-    #: config/i18n_common.config.php:53
-    'This item has <strong>{{children_count}} sub-items</strong>.' => 'Элемент имеет <strong>{{children_count}} вложенных элементов</strong>.',
+    #: config/i18n_common.config.php:57
+    'This item has <strong>one sub-item</strong>.' => array(
+        0 => '',
+        1 => '',
+        2 => 'Элемент имеет <strong>{{children_count}} вложенных элементов</strong>.',
+        3 => '',
+    ),
 
     #. Visualise action's labels
-    #: config/i18n_common.config.php:56
+    #: config/i18n_common.config.php:62
     'This application hasn’t yet been added to a page. Visualising is therefore impossible.' => 'Приложение еще не было добавлено на страницу, и поэтому просмотр невозможен.',
 
     #. Appdesk: allLanguages
-    #: config/i18n_common.config.php:59
+    #: config/i18n_common.config.php:65
     'All languages' => 'Все языки',
 
-    #: config/i18n_common.config.php:60
+    #: config/i18n_common.config.php:66
     'All sites' => 'Все сайты',
 
-    #: config/i18n_common.config.php:61
+    #: config/i18n_common.config.php:67
     'All contexts' => 'Все контексты',
 
-    #: config/i18n_common.config.php:62
+    #: config/i18n_common.config.php:68
     'List' => 'Список',
 
-    #: config/i18n_common.config.php:63
+    #: config/i18n_common.config.php:69
     'Tree' => 'Дерево',
 
-    #: config/i18n_common.config.php:64
+    #: config/i18n_common.config.php:70
     'Thumbnails' => 'Миниатюры',
 
-    #: config/i18n_common.config.php:65
+    #: config/i18n_common.config.php:71
     'Preview' => 'Предпросмотр',
 
-    #: config/i18n_common.config.php:67
-    #: config/i18n_common.config.php:78
+    #: config/i18n_common.config.php:73
+    #: config/i18n_common.config.php:84
     'Languages' => 'Языки',
 
-    #: config/i18n_common.config.php:69
+    #: config/i18n_common.config.php:75
     'Select the site(s) to show' => 'Выберите сайт(ы) для отображения',
 
-    #: config/i18n_common.config.php:70
+    #: config/i18n_common.config.php:76
     'Select the language(s) to show' => 'Выберите язык(и) для отображения',
 
-    #: config/i18n_common.config.php:71
+    #: config/i18n_common.config.php:77
     'Select the context(s) to show' => 'Выберите контекст(ы) для отображения',
 
-    #: config/i18n_common.config.php:72
+    #: config/i18n_common.config.php:78
     'Show {{context}}' => 'Показать {{context}}',
 
-    #: config/i18n_common.config.php:73
+    #: config/i18n_common.config.php:79
     'Other sites' => 'Другие сайты',
 
-    #: config/i18n_common.config.php:74
+    #: config/i18n_common.config.php:80
     'Other languages' => 'Другие языки',
 
-    #: config/i18n_common.config.php:75
+    #: config/i18n_common.config.php:81
     'Other contexts' => 'Другие контексты',
 
-    #: config/i18n_common.config.php:76
+    #: config/i18n_common.config.php:82
     'Contexts' => 'Контексты',
 
-    #: config/i18n_common.config.php:77
+    #: config/i18n_common.config.php:83
     'Sites' => 'Сайты',
 
     #: config/validation.config.php:15

@@ -1,9 +1,9 @@
 <?php
 
-// Generated on 02/12/2013 17:53:33
+// Generated on 03/12/2013 16:06:58
 
-// 122 out of 122 messages are translated (100%).
-// 675 out of 675 words are translated (100%).
+// 120 out of 120 messages are translated (100%).
+// 657 out of 657 words are translated (100%).
 
 return array(
     #: classes/controller/admin/attachment.ctrl.php:38
@@ -83,13 +83,13 @@ return array(
     #: views/admin/media_delete.view.php:21
     'The media is not used anywhere and can be safely deleted.' => 'Ce média n’est utilisé nulle part et peut ainsi être supprimé sans problème.',
 
-    #: views/admin/media_delete.view.php:26
-    'The media is used <strong>once</strong> by an application.' => 'Ce média est utilisé <strong>une fois</strong> par une application.',
+    #: views/admin/media_delete.view.php:28
+    'The media is used <strong>once</strong> by an application.' => array(
+        0 => 'Ce média est utilisé <strong>une fois</strong> par une application.',
+        1 => 'Ce média est utilisé <strong>{{count}} fois</strong> par vos applications.',
+    ),
 
-    #: views/admin/media_delete.view.php:27
-    'The media is used <strong>{{count}} times</strong> by your applications.' => 'Ce média est utilisé <strong>{{count}} fois</strong> par vos applications.',
-
-    #: views/admin/media_delete.view.php:32
+    #: views/admin/media_delete.view.php:37
     'Yes, I want to delete this media file even though it is used {{count}} times.' => 'Oui, je veux supprimer ce média bien qu’il soit utilisé {{count}} fois.',
 
     #: views/admin/wysiwyg_image.view.php:29
@@ -215,7 +215,7 @@ return array(
 
     #: views/admin/media_edit.view.php:50
     #: views/admin/media_add.view.php:30
-    'The file size must not exceed {{size}}.' => '',
+    'The file size must not exceed {{size}}.' => 'Le poids du fichier ne doit pas dépasser {{size}}.',
 
     #: views/admin/media_edit.view.php:62
     #: config/controller/admin/appdesk.config.php:51
@@ -228,13 +228,13 @@ return array(
     #: views/admin/folder_delete.view.php:21
     'The folder is empty and can be safely deleted.' => 'Le dossier est vide et peut donc être supprimé sans problème.',
 
-    #: views/admin/folder_delete.view.php:26
-    'There is <strong>one media file</strong> in this folder.' => 'Il y a <strong>un média</strong> dans ce dossier.',
+    #: views/admin/folder_delete.view.php:28
+    'There is <strong>one media file</strong> in this folder.' => array(
+        0 => 'Il y a <strong>un média</strong> dans ce dossier.',
+        1 => 'Il y a <strong>{{count}} médias</strong> dans ce dossier.',
+    ),
 
-    #: views/admin/folder_delete.view.php:27
-    'There are <strong>{{count}} media files</strong> in this folder.' => 'Il y a <strong>{{count}} médias</strong> dans ce dossier.',
-
-    #: views/admin/folder_delete.view.php:32
+    #: views/admin/folder_delete.view.php:37
     'Yes, I want to delete this folder and the {{count}} media files it contains.' => 'Oui, je veux supprimer ce dossier et les {{count}} médias qu’il contient.',
 
     #: views/admin/folder.view.php:51
@@ -287,7 +287,7 @@ return array(
     'SEO, Media URL:' => 'Référencement, URL du média&nbsp;:',
 
     #: config/controller/admin/folder.config.php:20
-    #: config/common/folder.config.php:42
+    #: config/common/folder.config.php:45
     'Add a folder' => 'Ajouter un dossier',
 
     #: config/controller/admin/folder.config.php:42
@@ -295,14 +295,14 @@ return array(
 
     #. Note to translator: This is a placeholder, i.e. a field’s label shown within the field
     #: config/controller/admin/folder.config.php:48
-    #: config/common/media.config.php:47
+    #: config/common/media.config.php:50
     'Title' => 'Titre',
 
     #: config/controller/admin/folder.config.php:60
     'SEO, folder URL:' => 'Référencement, URL du dossier&nbsp;:',
 
     #: config/controller/admin/media.config.php:20
-    #: config/common/media.config.php:118
+    #: config/common/media.config.php:121
     'Add a media file' => 'Ajouter un média',
 
     #: config/controller/admin/media.config.php:53
@@ -330,26 +330,32 @@ return array(
     #: config/controller/admin/appdesk.config.php:99
     'media files' => 'médias',
 
-    #: config/controller/admin/appdesk.config.php:100
-    'Showing {{x}} media files out of {{y}}' => '{{x}} médias sur {{y}} affichés',
-
     #: config/controller/admin/appdesk.config.php:101
-    'Showing 1 media file' => '1 média affiché',
+    '1 media file' => array(
+        0 => '1 média',
+        1 => '{{x}} médias',
+    ),
 
-    #: config/controller/admin/appdesk.config.php:102
+    #: config/controller/admin/appdesk.config.php:105
+    'Showing 1 media file out of {{y}}' => array(
+        0 => '1 média sur {{y}} affiché',
+        1 => '{{x}} médias sur {{y}} affichés',
+    ),
+
+    #: config/controller/admin/appdesk.config.php:108
     'No media files' => 'Pas de média',
 
     #. Note to translator: This is the action that clears the 'Search' field
-    #: config/controller/admin/appdesk.config.php:104
+    #: config/controller/admin/appdesk.config.php:110
     'Show all media files' => 'Afficher tous les médias',
 
-    #: config/controller/admin/appdesk.config.php:106
+    #: config/controller/admin/appdesk.config.php:112
     'Pick' => 'Choisir',
 
-    #: config/controller/admin/appdesk.config.php:124
+    #: config/controller/admin/appdesk.config.php:130
     'Add many files at once' => 'Ajouter plusieurs fichiers d’un coup',
 
-    #: config/controller/admin/appdesk.config.php:137
+    #: config/controller/admin/appdesk.config.php:143
     'Renew media cache' => 'Régénérer le cache média',
 
     #. Crud
@@ -370,20 +376,22 @@ return array(
     #: config/common/folder.config.php:35
     'Deleting the folder ‘{{title}}’' => 'Supprimer le dossier «&nbsp;{{title}}&nbsp;»',
 
-    #. Delete action's labels
-    #: config/common/folder.config.php:38
-    'Yes, delete this folder' => 'Oui, supprimer ce dossier',
+    #: config/common/folder.config.php:39
+    'Yes, delete this folder' => array(
+        0 => 'Oui, supprimer ce dossier',
+        1 => '',
+    ),
 
-    #: config/common/folder.config.php:53
+    #: config/common/folder.config.php:56
     'You can’t edit the root folder.' => 'Vous ne pouvez modifier le dossier racine.',
 
-    #: config/common/folder.config.php:62
+    #: config/common/folder.config.php:65
     'You can’t delete the root folder.' => 'Vous ne pouvez supprimer le dossier racine.',
 
-    #: config/common/folder.config.php:69
+    #: config/common/folder.config.php:72
     'Add a media file in this folder' => 'Ajouter un média dans ce dossier',
 
-    #: config/common/folder.config.php:88
+    #: config/common/folder.config.php:91
     'Add a sub-folder to this folder' => 'Ajouter un sous-dossier dans ce dossier',
 
     #. Crud
@@ -404,14 +412,16 @@ return array(
     #: config/common/media.config.php:39
     'Deleting the media ‘{{title}}’' => 'Supprimer le média «&nbsp;{{title}}&nbsp;»',
 
-    #. Delete action's labels
-    #: config/common/media.config.php:42
-    'Yes, delete this media file' => 'Oui, supprimer ce média',
+    #: config/common/media.config.php:43
+    'Yes, delete this media file' => array(
+        0 => 'Oui, supprimer ce média',
+        1 => '',
+    ),
 
-    #: config/common/media.config.php:59
+    #: config/common/media.config.php:62
     'Extension' => 'Extension',
 
-    #: config/common/media.config.php:134
+    #: config/common/media.config.php:137
     'Visualise' => 'Visualiser',
 
 );

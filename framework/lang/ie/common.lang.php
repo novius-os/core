@@ -1,9 +1,9 @@
 <?php
 
-// Generated on 02/12/2013 17:53:33
+// Generated on 03/12/2013 16:06:58
 
-// 162 out of 162 messages are translated (100%).
-// 865 out of 865 words are translated (100%).
+// 155 out of 155 messages are translated (100%).
+// 813 out of 813 words are translated (100%).
 
 return array(
     #. Date syntax is the one from PHP strftime() function: http://php.net/strftime
@@ -17,58 +17,58 @@ return array(
     #: classes/fuel/fieldset_field.php:59
     'Mandatory' => 'Obligatori',
 
-    #: classes/fuel/fieldset.php:532
+    #: classes/fuel/fieldset.php:514
     'Something went wrong. Please refresh your browser window and try again. Contact your developer or Novius OS if the problem persists. We apologise for the inconvenience caused.' => 'Un problema occuret. Ples refriscar tu browser e essayar ancor. Contacta tu developator o Novius OS si li problema persiste. Ples pardonar nos pri ti problema.',
 
-    #: classes/fuel/fieldset.php:587
+    #: classes/fuel/fieldset.php:569
     'OK, it’s done.' => 'OK, it es fat.',
 
-    #: classes/controller/inspector/date.ctrl.php:145
+    #: classes/controller/inspector/date.ctrl.php:152
     'Custom dates' => 'Personalisar dates',
 
-    #: classes/controller/inspector/date.ctrl.php:146
+    #: classes/controller/inspector/date.ctrl.php:153
     'from {{begin}} to {{end}}' => 'desde {{begin}} til {{end}}',
 
-    #: classes/controller/inspector/date.ctrl.php:147
+    #: classes/controller/inspector/date.ctrl.php:154
     'until {{end}}' => 'til {{end}}',
 
-    #: classes/controller/inspector/date.ctrl.php:148
+    #: classes/controller/inspector/date.ctrl.php:155
     'since {{begin}}' => 'desde {{begin}}',
 
-    #: classes/controller/inspector/date.ctrl.php:152
+    #: classes/controller/inspector/date.ctrl.php:159
     'Since' => 'Desde',
 
-    #: classes/controller/inspector/date.ctrl.php:154
+    #: classes/controller/inspector/date.ctrl.php:161
     '3 last days' => '3 passat dies',
 
-    #: classes/controller/inspector/date.ctrl.php:155
+    #: classes/controller/inspector/date.ctrl.php:162
     'Week beginning' => 'Seman comensant',
 
-    #: classes/controller/inspector/date.ctrl.php:156
+    #: classes/controller/inspector/date.ctrl.php:163
     'Less than a week' => 'minu quam un seman',
 
-    #: classes/controller/inspector/date.ctrl.php:157
+    #: classes/controller/inspector/date.ctrl.php:164
     'Month beginning' => 'Mensu comensant',
 
-    #: classes/controller/inspector/date.ctrl.php:158
+    #: classes/controller/inspector/date.ctrl.php:165
     'Less than one month' => 'Minu quam un mensu',
 
-    #: classes/controller/inspector/date.ctrl.php:159
+    #: classes/controller/inspector/date.ctrl.php:166
     'Less than two months' => 'Minu quam du mensus',
 
-    #: classes/controller/inspector/date.ctrl.php:160
+    #: classes/controller/inspector/date.ctrl.php:167
     'Less than three months' => 'Minu quam tri mensus',
 
-    #: classes/controller/inspector/date.ctrl.php:161
+    #: classes/controller/inspector/date.ctrl.php:168
     'Less than six months' => 'Minu quam six mensus',
 
-    #: classes/controller/inspector/date.ctrl.php:162
+    #: classes/controller/inspector/date.ctrl.php:169
     'Less than one year' => 'Minu quam un annu',
 
-    #: classes/controller/inspector/date.ctrl.php:166
+    #: classes/controller/inspector/date.ctrl.php:173
     'Previous months' => 'Precedent mensus',
 
-    #: classes/controller/inspector/date.ctrl.php:172
+    #: classes/controller/inspector/date.ctrl.php:179
     'Years' => 'Annus',
 
     #: classes/controller/inspector.ctrl.php:77
@@ -91,10 +91,10 @@ return array(
     #: classes/controller/admin/datacatcher.ctrl.php:80
     'We cannot find ‘{{item}}’. It must have been deleted while you tried to share it. Bad luck.' => 'Noi ne posse truvar ‘{{item}}’. It certmen ha esset deletet quande tu ha distribuet it. Mal chance.',
 
-    #: classes/controller/admin/datacatcher.ctrl.php:87
+    #: classes/controller/admin/datacatcher.ctrl.php:85
     'Surprisingly it appears ‘{{item}}’ cannot be shared with ‘{{catcher}}’. Contact your developer for further details.' => 'Surprisali li ‘{{item}}’ ne posse esset distribuet con ‘{{catcher}}’. Ples contacter tu developator.',
 
-    #: classes/controller/admin/datacatcher.ctrl.php:94
+    #: classes/controller/admin/datacatcher.ctrl.php:92
     'Something went wrong. Please ask your developer or Novius OS to have a look into this. You could call your mother too but we doubt she would be much help. Unless your mum is a software engineer, which would be awesome. We forgot to say: We apologise for the inconvenience caused.' => 'Un problema occuret. Ples questionar tu developator o Novius OS por examinar it. Tu posse anc questionar tu matre ma illa ne vell esser certmen util except si ila es un bon ingeniero, to que es possibil. Noi obliviat dir : Ples pardonar nos pri ti problema.',
 
     #: classes/controller/admin/noviusos.ctrl.php:116
@@ -122,7 +122,7 @@ return array(
     #: classes/controller/admin/noviusos.ctrl.php:123
     #: views/inspector/modeltree_checkbox.view.php:15
     #: views/inspector/modeltree_radio.view.php:15
-    #: config/i18n_common.config.php:66
+    #: config/i18n_common.config.php:72
     'Loading...' => 'Cargant...',
 
     #: classes/controller/admin/enhancer.ctrl.php:122
@@ -138,7 +138,7 @@ return array(
 
     #: views/form/action_or_cancel.view.php:15
     #: views/admin/enhancer/popup.view.php:50
-    #: views/admin/data_catcher/form.view.php:166
+    #: views/admin/data_catcher/form.view.php:168
     'Save' => 'Preservar',
 
     #: views/form/layout_standard.view.php:82
@@ -239,13 +239,13 @@ return array(
     #: views/admin/login.view.php:45
     'Let’s get started' => 'Iniciar!',
 
-    #: views/admin/html.view.php:467
+    #: views/admin/html.view.php:479
     'Select a media file' => 'Selecter un multimedia documente',
 
-    #: views/admin/html.view.php:468
+    #: views/admin/html.view.php:480
     'Pick an image' => 'Selecter un foto',
 
-    #: views/admin/html.view.php:469
+    #: views/admin/html.view.php:481
     'We’re afraid we cannot find this image.' => 'Noi ne posse truvar ti foto.',
 
     #: views/admin/orm/publishable_label.view.php:21
@@ -279,7 +279,7 @@ return array(
     'About Novius OS' => 'Pri Novius OS',
 
     #: views/admin/appstab.view.php:19
-    #: config/i18n_common.config.php:68
+    #: config/i18n_common.config.php:74
     'Search' => 'Serchar',
 
     #: views/admin/data_catcher/applications.view.php:59
@@ -312,10 +312,10 @@ return array(
     #: views/admin/data_catcher/form.view.php:64
     'Description:' => 'Descrition:',
 
-    #: views/admin/data_catcher/form.view.php:110
+    #: views/admin/data_catcher/form.view.php:112
     'Use default' => 'Usar li pro absentie',
 
-    #: views/admin/data_catcher/form.view.php:142
+    #: views/admin/data_catcher/form.view.php:144
     'Pick a custom image' => 'Selecte un image personificat',
 
     #: views/admin/data_catcher/panel.view.php:29
@@ -338,6 +338,7 @@ return array(
     #: config/common.config.php:38
     'Edit' => 'Modificar',
 
+    #. Deletion popup
     #: config/common.config.php:61
     #: config/i18n_common.config.php:20
     'Deleting the item ‘{{title}}’' => 'Deleter li item ‘{{title}}’',
@@ -402,116 +403,107 @@ return array(
     #: config/i18n_common.config.php:26
     'Nothing to delete' => 'Nequo a deleter',
 
-    #: config/i18n_common.config.php:27
-    'Yes, delete this item' => 'Yes, delete ti item',
-
     #: config/i18n_common.config.php:28
-    'Yes, delete these {{count}} items' => 'Yes, deleter ti {{count}} items',
+    'Yes, delete this item' => array(
+        0 => 'Yes, delete ti item',
+        1 => 'Yes, deleter ti {{count}} items',
+    ),
 
-    #: config/i18n_common.config.php:30
+    #: config/i18n_common.config.php:32
     'To confirm the deletion, you need to enter this number in the field below:' => 'Por confirmar li deletion, tu deve intrar li numere sequent:',
 
-    #: config/i18n_common.config.php:31
+    #: config/i18n_common.config.php:33
     'We cannot delete this item as the number of sub-items you’ve entered is wrong. Please amend it.' => 'Noi ne posse deleter ti item pro que li numere de sub-items tu ha intrat es incorect.',
 
-    #: config/i18n_common.config.php:33
-    '1 item' => '1 item',
-
-    #: config/i18n_common.config.php:34
-    '{{count}} items' => '{{count}} items',
-
-    #. Keep only if the model has the behaviour Contextable
-    #: config/i18n_common.config.php:37
-    'This item exists in <strong>{{context_count}} contexts</strong>.' => 'Ti item existe in <strong>{{context_count}} contextus</strong>.',
-
-    #: config/i18n_common.config.php:38
-    'This item exists in <strong>{{language_count}} languages</strong>.' => 'Ti item existe in <strong>{{language_count}} lingues</strong>.',
-
-    #. Keep only if the model has the behaviours Contextable + Tree
-    #: config/i18n_common.config.php:41
-    'This item exists in <strong>{{context_count}} contexts</strong> and has <strong>{{children_count}} sub-items</strong>.' => 'Ti item existe in <strong>{{context_count}} contextus</strong> e have <strong>{{children_count}} sub-items</strong>.',
+    #: config/i18n_common.config.php:36
+    '1 item' => array(
+        0 => '1 item',
+        1 => '{{count}} items',
+    ),
 
     #: config/i18n_common.config.php:42
-    'This item exists in <strong>{{context_count}} contexts</strong> and has <strong>one sub-item</strong>.' => 'Ti item existe in <strong>{{context_count}} contextus</strong> e have <strong>un sub-item</strong>.',
+    'This item exists in <strong>one context</strong>.' => array(
+        0 => 'Ti item existe in <strong>1 contextu</strong>.',
+        1 => 'Ti item existe in <strong>{{context_count}} contextus</strong>.',
+    ),
 
-    #: config/i18n_common.config.php:43
-    'This item exists in <strong>{{language_count}} languages</strong> and has <strong>{{children_count}} sub-items</strong>.' => 'Ti item existe in <strong>{{language_count}} lingues</strong> e have <strong>{{children_count}} sub-items</strong>.',
-
-    #: config/i18n_common.config.php:44
-    'This item exists in <strong>{{language_count}} languages</strong> and has <strong>one sub-item</strong>.' => 'Ti item existe in <strong>{{language_count}} lingues</strong> e have <strong>un sub-item</strong>.',
+    #: config/i18n_common.config.php:46
+    'This item exists in <strong>one language</strong>.' => array(
+        0 => 'Ti item existe in <strong>1 lingue</strong>.',
+        1 => 'Ti item existe in <strong>{{language_count}} lingues</strong>.',
+    ),
 
     #. Keep only if the model has the behaviour Twinnable
-    #: config/i18n_common.config.php:47
+    #: config/i18n_common.config.php:51
     'We’re afraid this item cannot be added to {{context}} because its <a>parent</a> is not available in this context yet.' => 'Ti item ne posse esser addit a {{context} pro que su <a>parent</a> ne es ancor disponibil in ti contextu.',
 
-    #: config/i18n_common.config.php:48
+    #: config/i18n_common.config.php:52
     'We’re afraid this item cannot be translated into {{language}} because its <a>parent</a> is not available in this language yet.' => 'Ti item ne posse esser traductet in {{language} pro que su <a>parent</a> ne es ancor disponibil in ti lingue.',
 
-    #: config/i18n_common.config.php:49
+    #: config/i18n_common.config.php:53
     'This item cannot be added in {{context}}. (How come you get this error message? You’ve hacked your way into here, haven’t you?)' => 'Ti item ne posse esser addit in {{context}}.',
 
-    #. Keep only if the model has the behaviour Tree
-    #: config/i18n_common.config.php:52
-    'This item has <strong>1 sub-item</strong>.' => 'Ti item have <strong>1 sub-item</strong>.',
-
-    #: config/i18n_common.config.php:53
-    'This item has <strong>{{children_count}} sub-items</strong>.' => 'Ti item have <strong>{{children_count}} sub-items</strong>.',
+    #: config/i18n_common.config.php:57
+    'This item has <strong>one sub-item</strong>.' => array(
+        0 => 'Ti item have <strong>1 sub-item</strong>.',
+        1 => 'Ti item have <strong>{{children_count}} sub-items</strong>.',
+    ),
 
     #. Visualise action's labels
-    #: config/i18n_common.config.php:56
+    #: config/i18n_common.config.php:62
     'This application hasn’t yet been added to a page. Visualising is therefore impossible.' => 'Ti application ne ha esset ancor addit a un pagine. Visualisar es ergo impossibil.',
 
     #. Appdesk: allLanguages
-    #: config/i18n_common.config.php:59
+    #: config/i18n_common.config.php:65
     'All languages' => 'Omni lingues',
 
-    #: config/i18n_common.config.php:60
+    #: config/i18n_common.config.php:66
     'All sites' => 'Omni websites',
 
-    #: config/i18n_common.config.php:61
+    #: config/i18n_common.config.php:67
     'All contexts' => 'Omni contextus',
 
-    #: config/i18n_common.config.php:62
+    #: config/i18n_common.config.php:68
     'List' => 'Liste',
 
-    #: config/i18n_common.config.php:63
+    #: config/i18n_common.config.php:69
     'Tree' => 'Arbor',
 
-    #: config/i18n_common.config.php:64
+    #: config/i18n_common.config.php:70
     'Thumbnails' => 'Tabuls',
 
-    #: config/i18n_common.config.php:65
+    #: config/i18n_common.config.php:71
     'Preview' => 'Previsualisar',
 
-    #: config/i18n_common.config.php:67
-    #: config/i18n_common.config.php:78
+    #: config/i18n_common.config.php:73
+    #: config/i18n_common.config.php:84
     'Languages' => 'Lingues',
 
-    #: config/i18n_common.config.php:69
+    #: config/i18n_common.config.php:75
     'Select the site(s) to show' => 'Selecte li website(s) por exhibir',
 
-    #: config/i18n_common.config.php:70
+    #: config/i18n_common.config.php:76
     'Select the language(s) to show' => 'Selecte li lingue(s) por exhibir',
 
-    #: config/i18n_common.config.php:71
+    #: config/i18n_common.config.php:77
     'Select the context(s) to show' => 'Selecte li contextu(s) por exhibir',
 
-    #: config/i18n_common.config.php:72
+    #: config/i18n_common.config.php:78
     'Show {{context}}' => 'Exhibir {{context}}',
 
-    #: config/i18n_common.config.php:73
+    #: config/i18n_common.config.php:79
     'Other sites' => 'Altri websites',
 
-    #: config/i18n_common.config.php:74
+    #: config/i18n_common.config.php:80
     'Other languages' => 'Altri lingues',
 
-    #: config/i18n_common.config.php:75
+    #: config/i18n_common.config.php:81
     'Other contexts' => 'Altri contextus',
 
-    #: config/i18n_common.config.php:76
+    #: config/i18n_common.config.php:82
     'Contexts' => 'Contextus',
 
-    #: config/i18n_common.config.php:77
+    #: config/i18n_common.config.php:83
     'Sites' => 'Websites',
 
     #: config/validation.config.php:15

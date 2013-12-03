@@ -1,9 +1,9 @@
 <?php
 
-// Generated on 02/12/2013 17:53:33
+// Generated on 03/12/2013 16:06:58
 
-// 162 out of 162 messages are translated (100%).
-// 865 out of 865 words are translated (100%).
+// 155 out of 155 messages are translated (100%).
+// 813 out of 813 words are translated (100%).
 
 return array(
     #. Date syntax is the one from PHP strftime() function: http://php.net/strftime
@@ -122,7 +122,7 @@ return array(
     #: classes/controller/admin/noviusos.ctrl.php:123
     #: views/inspector/modeltree_checkbox.view.php:15
     #: views/inspector/modeltree_radio.view.php:15
-    #: config/i18n_common.config.php:66
+    #: config/i18n_common.config.php:72
     'Loading...' => 'Chargement...',
 
     #: classes/controller/admin/enhancer.ctrl.php:122
@@ -239,13 +239,13 @@ return array(
     #: views/admin/login.view.php:45
     'Let’s get started' => 'Allez, au travail',
 
-    #: views/admin/html.view.php:475
+    #: views/admin/html.view.php:479
     'Select a media file' => 'Sélectionner un média',
 
-    #: views/admin/html.view.php:476
+    #: views/admin/html.view.php:480
     'Pick an image' => 'Sélectionner une image',
 
-    #: views/admin/html.view.php:477
+    #: views/admin/html.view.php:481
     'We’re afraid we cannot find this image.' => 'Malheureusement nous n’arrivons pas à trouver cette image.',
 
     #: views/admin/orm/publishable_label.view.php:21
@@ -279,7 +279,7 @@ return array(
     'About Novius OS' => 'À propos de Novius OS',
 
     #: views/admin/appstab.view.php:19
-    #: config/i18n_common.config.php:68
+    #: config/i18n_common.config.php:74
     'Search' => 'Recherche',
 
     #: views/admin/data_catcher/applications.view.php:59
@@ -403,116 +403,107 @@ return array(
     #: config/i18n_common.config.php:26
     'Nothing to delete' => 'Rien à supprimer',
 
-    #: config/i18n_common.config.php:27
-    'Yes, delete this item' => 'Oui, supprimer cet item',
-
     #: config/i18n_common.config.php:28
-    'Yes, delete these {{count}} items' => 'Oui, supprimer ces {{count}} items',
+    'Yes, delete this item' => array(
+        0 => 'Oui, supprimer cet item',
+        1 => 'Oui, supprimer ces {{count}} items',
+    ),
 
-    #: config/i18n_common.config.php:30
+    #: config/i18n_common.config.php:32
     'To confirm the deletion, you need to enter this number in the field below:' => 'Pour confirmer la suppression, vous devez entrer ce nombre dans le champ ci-dessous&nbsp;:',
 
-    #: config/i18n_common.config.php:31
+    #: config/i18n_common.config.php:33
     'We cannot delete this item as the number of sub-items you’ve entered is wrong. Please amend it.' => 'Nous ne pouvons supprimer cet item car le nombre de sous-items indiqué est faux. Merci de le corriger.',
 
-    #: config/i18n_common.config.php:33
-    '1 item' => '1 item',
-
-    #: config/i18n_common.config.php:34
-    '{{count}} items' => '{{count}} items',
-
-    #. Keep only if the model has the behaviour Contextable
-    #: config/i18n_common.config.php:37
-    'This item exists in <strong>{{context_count}} contexts</strong>.' => 'Cet item existe dans <strong>{{context_count}} contextes</strong>.',
-
-    #: config/i18n_common.config.php:38
-    'This item exists in <strong>{{language_count}} languages</strong>.' => 'Cet item existe dans <strong>{{language_count}} langues</strong>.',
-
-    #. Keep only if the model has the behaviours Contextable + Tree
-    #: config/i18n_common.config.php:41
-    'This item exists in <strong>{{context_count}} contexts</strong> and has <strong>{{children_count}} sub-items</strong>.' => 'Cet item existe dans <strong>{{context_count}} contextes</strong> et a<strong>{{children_count}} sous-items</strong>.',
+    #: config/i18n_common.config.php:36
+    '1 item' => array(
+        0 => '1 item',
+        1 => '{{count}} items',
+    ),
 
     #: config/i18n_common.config.php:42
-    'This item exists in <strong>{{context_count}} contexts</strong> and has <strong>one sub-item</strong>.' => 'Cet item existe dans <strong>{{context_count}} contextes</strong> et a<strong>un sous-item</strong>.',
+    'This item exists in <strong>one context</strong>.' => array(
+        0 => 'Cet item existe dans <strong>un contexte</strong>.',
+        1 => 'Cet item existe dans <strong>{{context_count}} contextes</strong>.',
+    ),
 
-    #: config/i18n_common.config.php:43
-    'This item exists in <strong>{{language_count}} languages</strong> and has <strong>{{children_count}} sub-items</strong>.' => 'Cet item existe dans <strong>{{language_count}} langues</strong> et a<strong>{{children_count}} sous-items</strong>.',
-
-    #: config/i18n_common.config.php:44
-    'This item exists in <strong>{{language_count}} languages</strong> and has <strong>one sub-item</strong>.' => 'Cet item existe dans <strong>{{language_count}} langues</strong> et a<strong>un sous-item</strong>.',
+    #: config/i18n_common.config.php:46
+    'This item exists in <strong>one language</strong>.' => array(
+        0 => 'Cet item existe dans <strong>une langue</strong>.',
+        1 => 'Cet item existe dans <strong>{{language_count}} langues</strong>.',
+    ),
 
     #. Keep only if the model has the behaviour Twinnable
-    #: config/i18n_common.config.php:47
+    #: config/i18n_common.config.php:51
     'We’re afraid this item cannot be added to {{context}} because its <a>parent</a> is not available in this context yet.' => 'Malheureusement cet item ne peut être ajouté à {{context}} car il dépendd’<a>un item</a> qui n’est pas encore disponible dans ce contexte.',
 
-    #: config/i18n_common.config.php:48
+    #: config/i18n_common.config.php:52
     'We’re afraid this item cannot be translated into {{language}} because its <a>parent</a> is not available in this language yet.' => 'Malheureusement cet item ne peut être traduit en {{language}} car il dépendd’<a>un item</a> qui n’est pas encore disponible dans cette langue.',
 
-    #: config/i18n_common.config.php:49
+    #: config/i18n_common.config.php:53
     'This item cannot be added in {{context}}. (How come you get this error message? You’ve hacked your way into here, haven’t you?)' => 'Cet item ne peut être ajouté à {{context}}. (Mais comment avez-vous obtenu ce message&nbsp;? Vous bidouillez le système, non&nbsp;?)',
 
-    #. Keep only if the model has the behaviour Tree
-    #: config/i18n_common.config.php:52
-    'This item has <strong>1 sub-item</strong>.' => 'Cet item a <strong>un sous-item</strong>.',
-
-    #: config/i18n_common.config.php:53
-    'This item has <strong>{{children_count}} sub-items</strong>.' => 'Cet item a <strong>{{children_count}} sous-items</strong>.',
+    #: config/i18n_common.config.php:57
+    'This item has <strong>one sub-item</strong>.' => array(
+        0 => 'Cet item a <strong>un sous-item</strong>.',
+        1 => 'Cet item a <strong>{{children_count}} sous-items</strong>.',
+    ),
 
     #. Visualise action's labels
-    #: config/i18n_common.config.php:56
+    #: config/i18n_common.config.php:62
     'This application hasn’t yet been added to a page. Visualising is therefore impossible.' => 'Cette application n’a pas encore été ajoutée à une page. La visualisation est donc impossible.',
 
     #. Appdesk: allLanguages
-    #: config/i18n_common.config.php:59
+    #: config/i18n_common.config.php:65
     'All languages' => 'Toutes les langues',
 
-    #: config/i18n_common.config.php:60
+    #: config/i18n_common.config.php:66
     'All sites' => 'Tous les sites',
 
-    #: config/i18n_common.config.php:61
+    #: config/i18n_common.config.php:67
     'All contexts' => 'Tous les contextes',
 
-    #: config/i18n_common.config.php:62
+    #: config/i18n_common.config.php:68
     'List' => 'Liste',
 
-    #: config/i18n_common.config.php:63
+    #: config/i18n_common.config.php:69
     'Tree' => 'Arborescence',
 
-    #: config/i18n_common.config.php:64
+    #: config/i18n_common.config.php:70
     'Thumbnails' => 'Vignettes',
 
-    #: config/i18n_common.config.php:65
+    #: config/i18n_common.config.php:71
     'Preview' => 'Prévisualisation',
 
-    #: config/i18n_common.config.php:67
-    #: config/i18n_common.config.php:78
+    #: config/i18n_common.config.php:73
+    #: config/i18n_common.config.php:84
     'Languages' => 'Langues',
 
-    #: config/i18n_common.config.php:69
+    #: config/i18n_common.config.php:75
     'Select the site(s) to show' => 'Sélectionner quel(s) site(s) afficher',
 
-    #: config/i18n_common.config.php:70
+    #: config/i18n_common.config.php:76
     'Select the language(s) to show' => 'Sélectionner quelle(s) langue(s) afficher',
 
-    #: config/i18n_common.config.php:71
+    #: config/i18n_common.config.php:77
     'Select the context(s) to show' => 'Sélectionner quel(s) contexte(s) afficher',
 
-    #: config/i18n_common.config.php:72
+    #: config/i18n_common.config.php:78
     'Show {{context}}' => 'Afficher {{context}}',
 
-    #: config/i18n_common.config.php:73
+    #: config/i18n_common.config.php:79
     'Other sites' => 'Autres sites',
 
-    #: config/i18n_common.config.php:74
+    #: config/i18n_common.config.php:80
     'Other languages' => 'Autres langues',
 
-    #: config/i18n_common.config.php:75
+    #: config/i18n_common.config.php:81
     'Other contexts' => 'Autres contextes',
 
-    #: config/i18n_common.config.php:76
+    #: config/i18n_common.config.php:82
     'Contexts' => 'Contextes',
 
-    #: config/i18n_common.config.php:77
+    #: config/i18n_common.config.php:83
     'Sites' => 'Sites',
 
     #: config/validation.config.php:15

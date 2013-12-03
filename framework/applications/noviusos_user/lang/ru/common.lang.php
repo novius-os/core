@@ -1,9 +1,9 @@
 <?php
 
-// Generated on 02/12/2013 17:53:33
+// Generated on 03/12/2013 16:06:58
 
-// 56 out of 56 messages are translated (100%).
-// 246 out of 246 words are translated (100%).
+// 54 out of 56 messages are translated (96%).
+// 237 out of 245 words are translated (96%).
 
 return array(
     #: classes/controller/admin/user.ctrl.php:70
@@ -27,7 +27,7 @@ return array(
     #: classes/controller/admin/account.ctrl.php:134
     'Your wallpaper is now the default one.' => 'Ваши обои сделаны обоями по умолчанию.',
 
-    #: classes/controller/admin/account.ctrl.php:140
+    #: classes/controller/admin/account.ctrl.php:141
     'Something went wrong. Please refresh your browser window and try again. Contact your developer or Novius OS if the problem persists. We apologise for the inconvenience caused.' => 'Что-то пошло не так. Обновите окно браузера, и попробуйте снова. Свяжитесь с вашим разработчиком или с командой Novius OS, если проблема не разрешится. Сожалеем, что доставили вам неудобства.',
 
     #: classes/controller/admin/role.ctrl.php:29
@@ -80,7 +80,7 @@ return array(
     'Theme' => 'Оформление',
 
     #: config/controller/admin/user.config.php:19
-    #: config/common/user.config.php:47
+    #: config/common/user.config.php:50
     'Add a user' => 'Добавить учетную запись',
 
     #: config/controller/admin/user.config.php:35
@@ -113,7 +113,7 @@ return array(
     'Role' => 'Роль',
 
     #: config/controller/admin/role.config.php:19
-    #: config/common/role.config.php:34
+    #: config/common/role.config.php:37
     'Add a role' => 'Добавить роль:',
 
     #: config/controller/admin/role.config.php:40
@@ -125,17 +125,27 @@ return array(
     #: config/controller/admin/appdesk.config.php:27
     'users' => 'пользователи',
 
-    #: config/controller/admin/appdesk.config.php:28
-    'Showing {{x}} users out of {{y}}' => 'Показано {{x}} пользователей из {{y}}',
-
     #: config/controller/admin/appdesk.config.php:29
-    'Showing 1 user' => 'Показан 1 пользователь',
+    '1 user' => array(
+        0 => '',
+        1 => '',
+        2 => '',
+        3 => '',
+    ),
 
-    #: config/controller/admin/appdesk.config.php:30
+    #: config/controller/admin/appdesk.config.php:33
+    'Showing 1 user out of {{y}}' => array(
+        0 => '',
+        1 => '',
+        2 => 'Показано {{x}} пользователей из {{y}}',
+        3 => '',
+    ),
+
+    #: config/controller/admin/appdesk.config.php:36
     'No users' => 'Нет пользователей',
 
     #. Note to translator: This is the action that clears the 'Search' field
-    #: config/controller/admin/appdesk.config.php:32
+    #: config/controller/admin/appdesk.config.php:38
     'Show all users' => 'Показать всех пользователей',
 
     #: config/common/user.config.php:8
@@ -162,9 +172,13 @@ return array(
     #: config/common/user.config.php:40
     'Deleting the user ‘{{title}}’' => 'Удаление учетной записи «{{title}}»',
 
-    #. Delete action's labels
-    #: config/common/user.config.php:43
-    'Yes, delete this user' => 'Да, я хочу удалить эту учетную запись',
+    #: config/common/user.config.php:44
+    'Yes, delete this user' => array(
+        0 => 'Да, я хочу удалить эту учетную запись',
+        1 => '',
+        2 => '',
+        3 => '',
+    ),
 
     #. Crud
     #: config/common/role.config.php:19
@@ -184,8 +198,12 @@ return array(
     #: config/common/role.config.php:27
     'Deleting the role ‘{{title}}’' => 'Удаляем роль «{{title}}»',
 
-    #. Delete action's labels
-    #: config/common/role.config.php:30
-    'Yes, delete this role' => 'Да, я хочу удалить эту роль',
+    #: config/common/role.config.php:31
+    'Yes, delete this role' => array(
+        0 => 'Да, я хочу удалить эту роль',
+        1 => '',
+        2 => '',
+        3 => '',
+    ),
 
 );

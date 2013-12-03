@@ -1,9 +1,9 @@
 <?php
 
-// Generated on 02/12/2013 17:53:33
+// Generated on 03/12/2013 16:06:58
 
-// 110 out of 110 messages are translated (100%).
-// 618 out of 618 words are translated (100%).
+// 96 out of 100 messages are translated (96%).
+// 533 out of 556 words are translated (96%).
 
 return array(
     #: classes/controller/admin/page.ctrl.php:32
@@ -45,27 +45,26 @@ return array(
     #: views/admin/permissions.view.php:14
     'Can add, edit and delete unpublished pages only' => 'Можно добавлять, редактировать, удалять только непубликованные страницы',
 
-    #: views/admin/popup_duplicate.view.php:58
+    #: views/admin/popup_duplicate.view.php:76
     'Duplicate sub-pages' => 'Дублировать подчиненные страницы',
 
-    #: views/admin/popup_duplicate.view.php:99
-    'Nothing to duplicate' => 'Нечего дублировать',
+    #: views/admin/popup_duplicate.view.php:137
+    'Duplicate this page' => array(
+        0 => 'Продублировать эту страницу',
+        1 => 'Продублировать эти {{count}} страниц',
+        2 => '',
+        3 => '',
+    ),
 
-    #: views/admin/popup_duplicate.view.php:100
-    'Duplicate this page' => 'Продублировать эту страницу',
-
-    #: views/admin/popup_duplicate.view.php:101
-    'Duplicate these {{count}} pages' => 'Продублировать эти {{count}} страниц',
-
-    #: views/admin/popup_duplicate.view.php:102
-    #: config/common/page.config.php:220
+    #: views/admin/popup_duplicate.view.php:139
+    #: config/common/page.config.php:226
     'Duplicate' => 'Продублировать',
 
-    #: views/admin/popup_duplicate.view.php:103
+    #: views/admin/popup_duplicate.view.php:140
     #: views/admin/wysiwyg_link.view.php:91
     'or' => 'или',
 
-    #: views/admin/popup_duplicate.view.php:104
+    #: views/admin/popup_duplicate.view.php:141
     #: views/admin/wysiwyg_link.view.php:91
     'Cancel' => 'Отменить',
 
@@ -161,8 +160,8 @@ return array(
     'Permissions for this application' => 'Разрешения для этого приложения',
 
     #: config/controller/admin/page.config.php:25
-    #: config/common/page.config.php:132
-    #: config/common/page.config.php:160
+    #: config/common/page.config.php:138
+    #: config/common/page.config.php:166
     'Add a page' => 'Добавить страницу',
 
     #: config/controller/admin/page.config.php:26
@@ -247,16 +246,27 @@ return array(
     #: config/controller/admin/appdesk.config.php:31
     'pages' => 'страницы',
 
-    #: config/controller/admin/appdesk.config.php:32
-    'Showing {{x}} pages out of {{y}}' => 'Показано страниц: {{x}} из {{y}}',
-
     #: config/controller/admin/appdesk.config.php:33
-    'Showing 1 page' => 'Показана 1 страница',
+    #: config/common/page.config.php:69
+    '1 page' => array(
+        0 => '1 страница',
+        1 => '{{count}} страниц',
+        2 => '',
+        3 => '',
+    ),
 
-    #: config/controller/admin/appdesk.config.php:34
+    #: config/controller/admin/appdesk.config.php:37
+    'Showing 1 page out of {{y}}' => array(
+        0 => '',
+        1 => '',
+        2 => 'Показано страниц: {{x}} из {{y}}',
+        3 => '',
+    ),
+
+    #: config/controller/admin/appdesk.config.php:40
     'No pages' => 'Нет страниц',
 
-    #: config/controller/admin/appdesk.config.php:35
+    #: config/controller/admin/appdesk.config.php:41
     'Showing all pages' => 'Показаны все страницы',
 
     #: config/model/page.config.php:11
@@ -287,74 +297,66 @@ return array(
     #: config/common/page.config.php:60
     'Deleting the page ‘{{title}}’' => 'Удаление страницы «{{title}}»',
 
-    #. Delete action's labels
-    #: config/common/page.config.php:63
-    'Yes, delete this page' => 'Да, я хочу удалить эту страницу',
-
     #: config/common/page.config.php:64
-    'Yes, delete these {{count}} pages' => 'Да, я хочу удалить эти {{count}} страниц',
-
-    #: config/common/page.config.php:66
-    '1 page' => '1 страница',
-
-    #: config/common/page.config.php:67
-    '{{count}} pages' => '{{count}} страниц',
-
-    #. Keep only if the model has the behaviour Contextable
-    #: config/common/page.config.php:70
-    'This page exists in <strong>{{context_count}} contexts</strong>.' => 'Страница присутствует в <strong>{{context_count}} контекстах</strong>.',
-
-    #: config/common/page.config.php:71
-    'This page exists in <strong>{{language_count}} languages</strong>.' => 'Страница переведена на <strong>{{language_count}} языков</strong>.',
-
-    #. Keep only if the model has the behaviours Contextable + Tree
-    #: config/common/page.config.php:74
-    'This page exists in <strong>{{context_count}} contexts</strong> and has <strong>{{children_count}} sub-pages</strong>.' => 'Страница присутствует в <strong>{{context_count}} контекстах</strong> и имеет <strong>{{children_count}} подчиненных страниц</strong>.',
+    'Yes, delete this page' => array(
+        0 => 'Да, я хочу удалить эту страницу',
+        1 => 'Да, я хочу удалить эти {{count}} страниц',
+        2 => '',
+        3 => '',
+    ),
 
     #: config/common/page.config.php:75
-    'This page exists in <strong>{{context_count}} contexts</strong> and has <strong>one sub-page</strong>.' => 'Страница присутствует в <strong>{{context_count}} контекстах</strong> и имеет <strong>одну подчиненную страницу</strong>.',
+    'This page exists in <strong>one context</strong>.' => array(
+        0 => '',
+        1 => '',
+        2 => 'Страница присутствует в <strong>{{context_count}} контекстах</strong>.',
+        3 => '',
+    ),
 
-    #: config/common/page.config.php:76
-    'This page exists in <strong>{{language_count}} languages</strong> and has <strong>{{children_count}} sub-pages</strong>.' => 'Эта страница переведена на <strong>{{language_count}} языков</strong> и имеет <strong>{{children_count}} подчиненных страниц</strong>.',
+    #: config/common/page.config.php:79
+    'This page exists in <strong>one language</strong>.' => array(
+        0 => '',
+        1 => '',
+        2 => 'Страница переведена на <strong>{{language_count}} языков</strong>.',
+        3 => '',
+    ),
 
-    #: config/common/page.config.php:77
-    'This page exists in <strong>{{language_count}} languages</strong> and has <strong>one sub-page</strong>.' => 'Эта страница переведена на <strong>{{language_count}} языков</strong> и имеет <strong>одну подчиненную страницу</strong>.',
+    #: config/common/page.config.php:85
+    'This page has <strong>one sub-page</strong>.' => array(
+        0 => '',
+        1 => '',
+        2 => '',
+        3 => 'Эта страница имеет <strong>{{children_count}} подчиненных страниц</strong>.',
+    ),
 
-    #. Keep only if the model has the behaviour Tree
-    #: config/common/page.config.php:80
-    'This page has <strong>1 sub-page</strong>.' => 'Эта страница имеет <strong>1 подчиненную страницу</strong>.',
-
-    #: config/common/page.config.php:81
-    'This page has <strong>{{children_count}} sub-pages</strong>.' => 'Эта страница имеет <strong>{{children_count}} подчиненных страниц</strong>.',
-
-    #: config/common/page.config.php:89
+    #: config/common/page.config.php:95
     'The home page cannot be deleted. To delete this page, set another page as home page first.' => 'Главная страница не может быть удалена. Чтобы удалить эту страницу, установите в качестве главной другую.',
 
-    #: config/common/page.config.php:92
+    #: config/common/page.config.php:98
     'You can’t delete this page. It is locked.' => 'Вы не можете удалить эту страницу. Она заблокирована.',
 
-    #: config/common/page.config.php:135
+    #: config/common/page.config.php:141
     'Visualise' => 'Просмотреть',
 
-    #: config/common/page.config.php:154
+    #: config/common/page.config.php:160
     'Add a sub-page to this page' => 'Добавить подчиненную страницу к этой странице.',
 
-    #: config/common/page.config.php:169
+    #: config/common/page.config.php:175
     'Set as home page' => 'Установить в качестве главной страницы',
 
-    #: config/common/page.config.php:196
+    #: config/common/page.config.php:202
     'We know it’s frustrating, but you can only set a page as home page when viewing one language. Select a language from the drop-down list in the top-right corner to do so.' => 'Мы понимаем, что это может вас расстроить, но установить страницу в качестве главной, только когда выбран язык. Выберите язык в выпадающем меню, расположенном в верхнем правом углу.',
 
-    #: config/common/page.config.php:198
+    #: config/common/page.config.php:204
     'We know it’s frustrating, but you can only set a page as home page when viewing one context. Select a context from the drop-down list in the top-right corner to do so.' => 'Мы понимаем, что это может вас расстроить, но установить страницу в качестве главной, только когда выбран контекст. Выберите контекст в выпадающем меню, расположенном в верхнем правом углу.',
 
-    #: config/common/page.config.php:206
+    #: config/common/page.config.php:212
     'You cannot set this page as home page because it isn’t published. Publish it first.' => 'Вы не можете установить эту страницу в качестве главной, так как она не опубликована. Сперва опубликуйте ее.',
 
-    #: config/common/page.config.php:209
+    #: config/common/page.config.php:215
     'This page is the home page already.' => 'Эта страница уже является главной.',
 
-    #: config/common/page.config.php:229
+    #: config/common/page.config.php:235
     'Renew pages’ cache' => 'Обновить кэш страниц',
 
 );
