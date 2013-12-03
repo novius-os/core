@@ -7,7 +7,7 @@ Nos\I18n::current_dictionary('nos::common');
 <?php
 foreach (\Config::get('novius-os.locales', array()) as $code => $locale) {
     ?>
-    <li><a href="#" data-action='{"action":"nosAjax","params":{"url":"admin/noviusos_user/account/lang/<?= $code ?>"}}'><?= $locale['title'] ?></a></li>
+    <li><a href="#" data-action='{"action":"nosAjax","params":{"url":"admin/noviusos_user/account/lang/<?= $code ?>"}}'><span class="nos-flag nos-flag-<?= $locale['flag'] ?> wijmo-wijmenu-icon-left"></span><span class="wijmo-wijmenu-text"><?= $locale['title'] ?></span></a></li>
     <?php
 }
 ?>

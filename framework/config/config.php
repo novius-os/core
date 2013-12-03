@@ -248,10 +248,17 @@ return array(
                 'title' => 'Français',
                 'flag' => 'fr',
             ),
-            // @todo uncomment when the translations will be available
             'ja_JP' =>  array(
                 'title' => '日本語',
                 'flag' => 'jp',
+            ),
+            'ru_RU' =>  array(
+                'title' => 'Русский',
+                'flag' => 'ru',
+            ),
+            'ie_IE' =>  array(
+                'title' => 'Interlingue',
+                'flag' => 'interlingue',
             ),
         ),
 
