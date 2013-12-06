@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20132.15
+ * Wijmo Library 3.20133.20
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -405,7 +405,11 @@ var wijmo;
                 var that = this;
                 url = url.toLowerCase();
                 return this._menuDiv.find("a").is(function () {
-                    return that._getUrl($(this)).toLowerCase() === url;
+                    var getUrl = that._getUrl($(this));
+                    if(!getUrl) {
+                        return false;
+                    }
+                    return getUrl.toLowerCase() === url;
                 });
             };
             wijappview.prototype._showLoading = function () {

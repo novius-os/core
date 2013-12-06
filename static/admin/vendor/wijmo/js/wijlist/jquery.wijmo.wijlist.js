@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20132.15
+ * Wijmo Library 3.20133.20
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -338,6 +338,8 @@ var wijmo;
                 var items = [];
                 $.each(_items, function (i, item) {
                     items[i] = $.extend(true, {
+                        label: "",
+                        value: ""
                     }, item);
                 });
                 if(isExtend) {
@@ -381,15 +383,15 @@ var wijmo;
             };
             wijlist.prototype.filterItems = /** @ignore */
             function (searchTerm, autoFilter, needHighlightMatching, hightWord) {
-                var self = this, term1 = self._escapeRegex(searchTerm), matcher, selectedActive = listItemCSSSelected + " " + self.options.wijCSS.stateActive, priorityPrimary = self.options.wijCSS.priorityPrimary, label, liText = '', itemsChanged = false, listItemCss = self.options.wijCSS.listItem, topHit = null;
+                var self = this, term1 = self._escapeRegex(searchTerm), matcher, selectedActive = listItemCSSSelected + " " + self.options.wijCSS.stateActive, priorityPrimary = self.options.wijCSS.priorityPrimary, priorityPrimaryFilter = "highlight-filter", label, liText = '', itemsChanged = false, topHit = null;
                 /// TODO : start with or contains and case sensitive.
                 if(!this.items) {
                     return null;
                 }
-                if($("li[wijhidden]." + listItemCss, self.element) && $("li[wijhidden]." + listItemCss, self.element).length > 0) {
+                if($("li[wijhidden]." + listItemCSS, self.element) && $("li[wijhidden]." + listItemCSS, self.element).length > 0) {
                     itemsChanged = true;
                 }
-                if($("span." + priorityPrimary, self.element) && $("span." + priorityPrimary, self.element).length > 0) {
+                if($("span." + priorityPrimaryFilter, self.element) && $("span." + priorityPrimaryFilter, self.element).length > 0) {
                     itemsChanged = true;
                 }
                 if(!itemsChanged && (!searchTerm || searchTerm.length === 0)) {
@@ -420,7 +422,7 @@ var wijmo;
                     /* remove the code the close the dropdown list
                     * when close the dropdown list, all items need to
                     * restore original style, see resetItemsStyle*/
-                    if($("span." + priorityPrimary, item.element).length > 0) {
+                    if($("span." + priorityPrimaryFilter, item.element).length > 0) {
                         item.element.empty().append(label);
                     }
                     //filter still use the item.label;
@@ -445,7 +447,7 @@ var wijmo;
                             }
                         }
                         if(needHighlightMatching) {
-                            liText = label.replace(new RegExp("(?![^&;]+;)(?!<[^<>]*)(" + term1 + ")(?![^<>]*>)(?![^&;]+;)", "gi"), "<span class='" + priorityPrimary + "'>$1</span>");
+                            liText = label.replace(new RegExp("(?![^&;]+;)(?!<[^<>]*)(" + term1 + ")(?![^<>]*>)(?![^&;]+;)", "gi"), "<span class='" + priorityPrimary + " " + priorityPrimaryFilter + "'>$1</span>");
                             if(item.element) {
                                 item.element.html(liText);
                             }
@@ -481,7 +483,7 @@ var wijmo;
                 if(self.options.disabled) {
                     return;
                 }
-                if(!$(e.target).closest("." + self.options.wijCSS.listItem).length) {
+                if(!$(e.target).closest("." + listItemCSS).length) {
                     return;
                 }
                 self.select(e);
@@ -506,16 +508,6 @@ var wijmo;
                 // $.wijmo.widget.prototype.destroy.apply(self, arguments);
                 _super.prototype.destroy.call(this);
             };
-            wijlist.prototype._getItemByDataItem = function (item) {
-                var result;
-                $.each(this.items, function (i, _item) {
-                    if(item.label === _item.label && item.value === _item.value) {
-                        result = _item;
-                        return false;
-                    }
-                });
-                return result;
-            };
             wijlist.prototype.activate = /** The activate method activates an item in the wijlist and allows the list to scroll to the item.
             * @param {object} event The event object that activates the item.
             * @param {object} item The listItem to activate.
@@ -530,8 +522,7 @@ var wijmo;
                 if(self._trigger("focusing", event, item) === false) {
                     return;
                 }
-                //active = self.active = item;
-                active = self.active = self._getItemByDataItem(item);
+                active = self.active = item;
                 activeElement = active && active.element;
                 if(activeElement) {
                     if(self.options.addHoverItemClass) {
@@ -563,7 +554,7 @@ var wijmo;
             * @param {object} event Event will raise activation.
             */
             function (event) {
-                this.move("next", "." + this.options.wijCSS.listItem + ":first", event);
+                this.move("next", "." + listItemCSS + ":first", event);
             };
             wijlist.prototype.nextPage = /** The nextPage method turns to the next page of the list.*/
             function () {
@@ -573,7 +564,7 @@ var wijmo;
             * @param {object} event Event will raise activation.
             */
             function (event) {
-                this.move("prev", "." + this.options.wijCSS.listItem + ":last", event);
+                this.move("prev", "." + listItemCSS + ":last", event);
             };
             wijlist.prototype.previousPage = /** The previous method moves focus to the previous list item.
             */
@@ -599,7 +590,7 @@ var wijmo;
                     self.activate(event, item, true);
                     return;
                 }
-                next = self.active.element[direction + "All"](":visible." + self.options.wijCSS.listItem).eq(0);
+                next = self.active.element[direction + "All"](":visible." + listItemCSS).eq(0);
                 /*
                 if (!self._templates) {
                 next = self.active.element[direction + "All"]("." + listItemCSS).eq(0);
@@ -621,7 +612,7 @@ var wijmo;
                 ///
                                 var self = this, ele, selectedIndex, selectedActive = listItemCSSSelected + " " + self.options.wijCSS.stateActive, item, singleMode, previous;
                 if(!self.active) {
-                    self.active = $($(event.target).closest("." + self.options.wijCSS.listItem)).data(itemKey);
+                    self.active = $($(event.target).closest("." + listItemCSS)).data(itemKey);
                     if(!self.active) {
                         return;
                     }
@@ -773,7 +764,8 @@ var wijmo;
                     selectedItem = self.selectedItem;
                     if(selectedItem) {
                         selectedItem.selected = false;
-                        selectedItem.element.removeClass(selectedActive);
+                        selectedItem.element.removeClass(selectedActive).removeClass(// when autopost back is true, this class can't removed
+                        "wijmo-wijcombobox-selecteditem");
                         self.selectedItem = undefined;
                     }
                 } else {
@@ -828,7 +820,7 @@ var wijmo;
                 self._trigger("listRendered", null, self);
             };
             wijlist.prototype._renderItem = function (ul, item, index, singleMode) {
-                var self = this, li = $("<li role='option' class='" + self.options.wijCSS.listItem + " " + self.options.wijCSS.cornerAll + "'></li>"), selectedActive = listItemCSSSelected + " " + self.options.wijCSS.stateActive, label, url;
+                var self = this, li = $("<li role='option' class='" + self.options.wijCSS.listItem + " " + listItemCSS + " " + self.options.wijCSS.cornerAll + "'></li>"), selectedActive = listItemCSSSelected + " " + self.options.wijCSS.stateActive, label, url;
                 item.element = li;
                 item.list = self;
                 if(self._trigger("itemRendering", null, item) === false) {
@@ -907,7 +899,7 @@ var wijmo;
             *  the wijlist to reflect a change in the wijlist content.
             */
             function () {
-                var self = this, ele = this.element, o = this.options, ul = this.ul, singleItem = ul.children("." + self.options.wijCSS.listItem + ":first"), headerHeight, ulOuterHeight, eleInnerWidth, spHeader = ele.find(".wijmo-wijsuperpanel-header"), spFooter = ele.find(".wijmo-wijsuperpanel-footer"), adjustHeight = null, h, percent, small, vScroller, large, spOptions, pt;
+                var self = this, ele = this.element, o = this.options, ul = this.ul, singleItem = ul.children("." + listItemCSS + ":first"), headerHeight, ulOuterHeight, eleInnerWidth, spHeader = ele.find(".wijmo-wijsuperpanel-header"), spFooter = ele.find(".wijmo-wijsuperpanel-footer"), adjustHeight = null, h, percent, small, vScroller, large, spOptions, pt;
                 if(!ele.is(":visible")) {
                     return false;
                 }

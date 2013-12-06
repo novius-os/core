@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20132.15
+ * Wijmo Library 3.20133.20
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -524,9 +524,11 @@ var wijmo;
                     mouseMove: $.proxy(this._mouseMove, this),
                     click: $.proxy(this._click, this),
                     widget: this,
-                    enableTouchBehavior: o.enableTouchBehavior
+                    enableTouchBehavior: o.enableTouchBehavior,
+                    availableWidth: width,
+                    availableHeight: height
                 });
-                this.piechartRender.render();
+                this.piechartRender.render(!o.radius);
             };
             wijpiechart.prototype._getTooltipText = function (fmt, target) {
                 var tar = $(target.node), dataObj, obj;
@@ -721,7 +723,7 @@ var wijmo;
                 this.options = options;
                 this.element = element;
             }
-            PieChartRender.prototype.render = function () {
+            PieChartRender.prototype.render = function (radiusNotSet) {
                 var ele = this.element, o = this.options, paintShadow = function (element, offset, stroke) {
                     if(o.shadow) {
                         chart.ChartUtil.paintShadow(element, offset, stroke);
@@ -738,7 +740,7 @@ var wijmo;
                 }, chartLabelStyle = $.extend(true, {
                 }, textStyle, o.chartLabelStyle, labelsOpts.style), chartLabelFormatString = labelsOpts.formatString || o.chartLabelFormatString, chartLabelFormatter = labelsOpts.formatter || o.chartLabelFormatter, culture = o.culture, bounds = o.bounds, startX = bounds.startX, startY = bounds.startY, radius = o.radius, showChartLabels = o.showChartLabels, animation = o.animation, seriesTransition = o.seriesTransition, innerRadius = o.innerRadius, fields = ele.data("fields") || {
                 }, chartElements = fields.chartElements || {
-                }, aniSectorAttrs = fields.aniSectorAttrs, aniLabelAttrs = fields.aniLabelAttrs, total = 0, angle = o.startAngle || 0, wijCSS = o.wijCSS, pieID, path, attr, sectorAttrs = [], labelAttrs = [], sectors = [], labels = [], tooltipTars = [], seriesEles = [], trackers = canvas.set(), widget = this.options.widget;
+                }, aniSectorAttrs = fields.aniSectorAttrs, aniLabelAttrs = fields.aniLabelAttrs, total = 0, angle = o.startAngle || 0, wijCSS = o.wijCSS, pieID, path, attr, sectorAttrs = [], labelAttrs = [], sectors = [], labels = [], tooltipTars = [], seriesEles = [], trackers = canvas.set(), widget = this.options.widget, calAngle = angle, availableWidth = o.availableWidth, availableHeight = o.availableHeight, oldRadius = o.radius;
                 canvas.customAttributes.segment = function (x, y, a1, a2, outerR, innerR) {
                     var path = null, offset = 0.01;
                     if(a2 - a1 > 360 - offset) {
@@ -760,6 +762,69 @@ var wijmo;
                         total += series.data;
                     }
                 });
+                if(radiusNotSet && showChartLabels && (labelsOpts.position === "outside")) {
+                    $.each(seriesList, function (idx, series) {
+                        var actualSize, textStyle, chartLabel, formatter, label, labelBounds, tempRadius = radius, seriesWidth = 0, seriesHeight = 0, anglePlus = 360 * series.data / total, seriesAngle = anglePlus / 2 + calAngle;
+                        series = $.extend(true, {
+                            offset: 0
+                        }, series);
+                        textStyle = $.extend(true, {
+                        }, textStyle, chartLabelStyle);
+                        if(series.textStyle) {
+                            textStyle = $.extend(true, textStyle, series.textStyle);
+                        }
+                        chartLabel = series.label;
+                        if(chartLabelFormatString && chartLabelFormatString.length > 0) {
+                            chartLabel = Globalize.format(chartLabel, chartLabelFormatString, culture);
+                        }
+                        if(chartLabelFormatter && $.isFunction(chartLabelFormatter)) {
+                            formatter = {
+                                index: idx,
+                                value: series.data,
+                                y: series.data,
+                                total: total,
+                                chartLabel: chartLabel,
+                                chartLabelFormatter: chartLabelFormatter
+                            };
+                            chartLabel = $.proxy(chartLabelFormatter, formatter)();
+                        }
+                        if(aniLabelAttrs && seriesTransition.enabled) {
+                            if(idx < aniLabelAttrs.length) {
+                                attr = aniLabelAttrs[idx];
+                                attr.text = chartLabel;
+                                label = widget._text.call(widget, 0, 0, "").attr(attr);
+                            } else {
+                                label = widget._text.call(widget, 0, 0, chartLabel).attr(textStyle);
+                            }
+                        } else {
+                            label = widget._text.call(widget, 0, 0, chartLabel).attr(textStyle);
+                        }
+                        labelBounds = label.wijGetBBox();
+                        actualSize = getPositionByAngle(0, 0, series.offset + labelsOpts.offset + radius, seriesAngle);
+                        seriesWidth = labelBounds.width + Math.abs(actualSize.x);
+                        seriesHeight = labelBounds.height / 2 + Math.abs(actualSize.y);
+                        if(seriesWidth > availableWidth / 2) {
+                            radius = tempRadius - (seriesWidth - availableWidth / 2) / Math.abs(Math.cos(Raphael.rad(seriesAngle)));
+                        }
+                        if(seriesHeight > availableHeight / 2) {
+                            radius = Math.min(radius, tempRadius - (availableHeight / 2 - seriesHeight) / Math.abs(Math.sin(Raphael.rad(seriesAngle))));
+                        }
+                        calAngle += anglePlus;
+                        label.remove();
+                        if(radius < innerRadius) {
+                            radius = innerRadius;
+                            return false;
+                        }
+                    });
+                    if(radius != oldRadius) {
+                        o.bounds.startX = o.bounds.startX + oldRadius - radius;
+                        o.bounds.endX = o.bounds.startX + 2 * radius;
+                        o.bounds.startY = o.bounds.startY + oldRadius - radius;
+                        o.bounds.endY = o.bounds.startY + 2 * radius;
+                        startX = bounds.startX;
+                        startY = bounds.startY;
+                    }
+                }
                 $.each(seriesList, function (idx, series) {
                     var seriesStyle = $.extend({
                         opacity: 1,

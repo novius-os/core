@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20132.15
+ * Wijmo Library 3.20133.20
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -164,9 +164,6 @@ var wijmo;
                         this.refresh();
                         break;
                     case "monthCols":
-                        if(this._myGrid) {
-                            this._myGrid = undefined;
-                        }
                         this._resetWidth();
                         this.refresh();
                         break;
@@ -192,9 +189,6 @@ var wijmo;
                         this.refresh();
                         break;
                     case "allowQuickPick":
-                        if(this._myGrid) {
-                            this._myGrid = undefined;
-                        }
                         this.refresh();
                         break;
                 }
@@ -215,6 +209,9 @@ var wijmo;
             };
             wijcalendar.prototype.refresh = /** Refreshes the calendar.*/
             function () {
+                if(this._myGrid) {
+                    this._myGrid = undefined;
+                }
                 this.element.empty().append(this._createCalendar());
                 this.element[(this._isRTL() ? 'add' : 'remove') + 'Class'](this.options.wijCSS.datepickerRtl);
                 if(!this.options.showTitle) {
@@ -382,7 +379,7 @@ var wijmo;
                                 this._onTouchstart(e);
                                 return false;
                             }
-                        } else if(e.originalEvent.originalEvent.pointerType) {
+                        } else if(e.originalEvent.originalEvent && e.originalEvent.originalEvent.pointerType) {
                             if(e.originalEvent.originalEvent.pointerType === 2 || e.originalEvent.originalEvent.pointerType === "touch") {
                                 this._onTouchstart(e);
                                 return false;
@@ -1324,7 +1321,12 @@ var wijmo;
                 cell.removeClass(this.options.wijCSS.stateHover);
             };
             wijcalendar.prototype._bindEvents = function () {
-                var wijCSS = this.options.wijCSS;
+                var wijCSS = this.options.wijCSS, eventPre = "";
+                // fix the issue 42890, if touch is enabled, all the touch events should use wij prefix.
+                // otherwise, do not use wij prefix.
+                if($.support.isTouchEnabled && $.support.isTouchEnabled()) {
+                    eventPre = "wij";
+                }
                 if(!this.element.data('preview.wijcalendar') && !this.options.disabledState && !this.options.disabled) {
                     this.element.find('div .wijmo-wijcalendar-navbutton').unbind().bind('mouseout.wijcalendar', function () {
                         var el = $(this);
@@ -1343,9 +1345,7 @@ var wijmo;
                             el.addClass(wijCSS.datepickerPrevHover);
                         }
                     }).bind('click.wijcalendar', $.proxy(this._onNavButtonClicked, this));
-                    this.element.unbind(".wijcalendar").bind({
-                        "mouseup.wijcalendar": $.proxy(this._onMouseUp, this)
-                    });
+                    this.element.unbind(".wijcalendar").bind(eventPre + "mouseup.wijcalendar", $.proxy(this._onMouseUp, this));
                     this.element.find("." + wijCSS.datepickerTitle).unbind().bind('mouseout.wijcalendar', function () {
                         $(this).removeClass(wijCSS.stateHover);
                     }).bind('mouseover.wijcalendar', function () {
@@ -1356,13 +1356,7 @@ var wijmo;
                         "mouseleave.wijcalendar": $.proxy(this._onPreviewMouseLeave, this)
                     });
                     if(this._myGrid === undefined) {
-                        this.element.find(".wijmo-wijcalendar-day-selectable").unbind().bind({
-                            "wijclick.wijcalendar": $.proxy(this._onDayClicked, this),
-                            "mouseenter.wijcalendar": $.proxy(this._onDayMouseEnter, this),
-                            "mouseleave.wijcalendar": $.proxy(this._onDayMouseLeave, this),
-                            "wijmousedown.wijcalendar": $.proxy(this._onDayMouseDown, this),
-                            "dragstart.wijcalendar": $.proxy(this._onDayDragStart, this)
-                        });
+                        this.element.find(".wijmo-wijcalendar-day-selectable").unbind().bind(eventPre + "click.wijcalendar", $.proxy(this._onDayClicked, this)).bind("mouseenter.wijcalendar", $.proxy(this._onDayMouseEnter, this)).bind("mouseleave.wijcalendar", $.proxy(this._onDayMouseLeave, this)).bind(eventPre + "mousedown.wijcalendar", $.proxy(this._onDayMouseDown, this)).bind("dragstart.wijcalendar", $.proxy(this._onDayDragStart, this));
                         if($.support.isTouchEnabled && $.support.isTouchEnabled()) {
                             if($.browser.msie) {
                                 this.element.unbind("contextmenu.wijcalendar").bind({
@@ -1371,9 +1365,7 @@ var wijmo;
                                     }
                                 });
                             }
-                            this.element.find(".wijmo-wijcalendar-day-selectable").unbind("wijmouseup.wijcalendar").bind({
-                                "wijmouseup.wijcalendar": $.proxy(this._onTouchend, this)
-                            });
+                            this.element.find(".wijmo-wijcalendar-day-selectable").unbind(eventPre + "mouseup.wijcalendar").bind(eventPre + "mouseup.wijcalendar", $.proxy(this._onTouchend, this));
                         }
                         if(!!this.options.selectionMode.month) {
                             this.element.find(".wijmo-wijcalendar-monthselector").unbind().bind({

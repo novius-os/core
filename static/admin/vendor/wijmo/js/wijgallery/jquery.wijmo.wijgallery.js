@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20132.15
+ * Wijmo Library 3.20133.20
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -837,7 +837,7 @@ var wijmo;
                 } else if(w < size.w && h < size.h) {
                     pic.addClass(self.options.wijCSS.stateDefault).addClass("wijmo-wijgallery-small-image");
                 }
-                if(index !== undefined) {
+                if(index !== undefined && image !== undefined) {
                     if(self.options.showCaption && self.caption) {
                         self._loadCaption(image);
                     }
@@ -1196,8 +1196,15 @@ var wijmo;
                 self.images.splice(idx, 0, data);
                 self._count++;
                 if(self.thumbs && self.thumbs[self.thumbWidgetName]) {
-                    self.thumbs[self.thumbWidgetName]("add", item, index);
+                    if(self.pointer && self.pointer.is(":hidden")) {
+                        self.pointer.show();
+                    }
+                    self.thumbs[self.thumbWidgetName]("add", item, idx);
                 }
+                if(self._count === 1) {
+                    self.show(0);
+                }
+                self._refreshStateWithItemsChanged(idx);
             };
             wijgallery.prototype.remove = /**
             * Removes the item at specified index.
@@ -1209,29 +1216,70 @@ var wijmo;
             */
             function (index) {
                 var self = this, idx;
-                if(isNaN(index) || index > self._count) {
-                    idx = self._count;
+                if(isNaN(index) || index >= self._count) {
+                    idx = self._count - 1;
                 } else if(index < 0) {
                     idx = 0;
                 } else {
                     idx = index;
                 }
-                self.images.splice(idx, 1);
-                self._count--;
-                if(self.thumbs && self.thumbs[self.thumbWidgetName]) {
-                    self.thumbs[self.thumbWidgetName]("remove", index);
+                if(idx >= 0) {
+                    self.images.splice(idx, 1);
+                    self._count--;
+                    if(self.thumbs && self.thumbs[self.thumbWidgetName]) {
+                        self.thumbs[self.thumbWidgetName]("remove", idx);
+                    }
+                    if(self.currentIdx == idx) {
+                        self.current.children("img").remove();
+                        self.last.children("img").remove();
+                        self.picture = null;
+                        self.currentIdx = -1;
+                        if(self._count > 0) {
+                            if(idx === self._count) {
+                                self.show(idx - 1);
+                            } else {
+                                self.show(idx);
+                            }
+                        }
+                    } else if(self.currentIdx > idx) {
+                        var ci = self.currentIdx;
+                        self.currentIdx = -1;
+                        self.show(ci);
+                    }
+                    self._refreshStateWithItemsChanged(idx);
                 }
-                if(self.currentIdx == index) {
-                    self.current.children("img").remove();
-                    self.last.children("img").remove();
-                    self.picture = null;
-                    self.currentIdx = -1;
-                    self.show(index);
-                } else if(self.currentIdx > index) {
-                    var ci = self.currentIdx;
-                    self.currentIdx = -1;
-                    self.show(ci);
+            };
+            wijgallery.prototype._refreshStateWithItemsChanged = function (index) {
+                var self = this, o = self.options;
+                if(self._count === 0) {
+                    self.nextBtn.removeClass(o.wijCSS.stateHover).addClass(o.wijCSS.stateDisabled);
+                    self.previousBtn.removeClass(o.wijCSS.stateHover).addClass(o.wijCSS.stateDisabled);
+                    if(self.playPauseBtn) {
+                        self.playPauseBtn.removeClass(o.wijCSS.stateHover).addClass(o.wijCSS.stateDisabled);
+                    }
+                    if(self.pointer) {
+                        self.pointer.hide();
+                    }
+                } else {
+                    if(self.currentIdx <= 0) {
+                        self.previousBtn.removeClass(o.wijCSS.stateHover).addClass(o.wijCSS.stateDisabled);
+                    } else if(self.currentIdx >= self._count - 1) {
+                        self.nextBtn.removeClass(o.wijCSS.stateHover).addClass(o.wijCSS.stateDisabled);
+                        if(self.playPauseBtn) {
+                            self.playPauseBtn.removeClass(o.wijCSS.stateHover).addClass(o.wijCSS.stateDisabled);
+                        }
+                    } else {
+                        self.nextBtn.removeClass(o.wijCSS.stateDisabled);
+                        self.previousBtn.removeClass(o.wijCSS.stateDisabled);
+                        if(self.playPauseBtn) {
+                            self.playPauseBtn.removeClass(o.wijCSS.stateDisabled);
+                        }
+                        if(self.pointer && self.pointer.is(":hidden")) {
+                            self.pointer.show();
+                        }
+                    }
                 }
+                self._refreshCounter();
             };
             wijgallery.prototype._getExt = function (url) {
                 var ext, m, regExt = /[0-9a-z]+$/i, q = url.indexOf("?");

@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20132.15
+ * Wijmo Library 3.20133.20
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -23,10 +23,13 @@ var wijmo;
             if(!val) {
                 return 0;
             }
+            // do not use the Globalize to round an number.
+            var rate = Math.pow(10, digits || 2);
+            return Math.round(val * rate) / rate;
             //var value = Globalize.format(val, "N" + digits);
             //return Globalize.parseFloat(value);
-            return Globalize.parseFloat(val.toFixed(digits), 10, Globalize.culture("en"));
-        };
+            //return Globalize.parseFloat(val.toFixed(digits), 10, Globalize.culture("en"));
+                    };
         ExtendJQuery.prototype.toOADate = function (time) {
             var day = 24 * 60 * 60 * 1000, oaDate = time - new Date(1900, 0, 1) + 2 * day;
             return oaDate;

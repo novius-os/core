@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20132.15
+ * Wijmo Library 3.20133.20
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -522,7 +522,15 @@ var wijmo;
                 }
             };
             wijwizard.prototype._addScrollForContent = function () {
-                var self = this, contentHeight = self.element.height() - self.list.outerHeight(true) - self.buttons.outerHeight(true) - (self.container.outerHeight(true) - self.container.innerHeight()) - (self.container.innerHeight() - self.container.height());
+                var self = this, contentHeight = self.element.height();
+                // fix the issue 42962, if there is no buttons or pageer list in the wizard, it will throw exception.
+                if(self.buttons) {
+                    contentHeight -= self.buttons.outerHeight(true);
+                }
+                if(self.list) {
+                    contentHeight -= self.list.outerHeight(true);
+                }
+                contentHeight -= (self.container.outerHeight(true) - self.container.innerHeight()) - (self.container.innerHeight() - self.container.height());
                 if(contentHeight < self.container.height()) {
                     self.container.height(contentHeight);
                 }

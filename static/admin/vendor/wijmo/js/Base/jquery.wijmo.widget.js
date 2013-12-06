@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20132.15
+ * Wijmo Library 3.20133.20
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -41,7 +41,7 @@ var wijmo;
             stateFocus: "ui-state-focus",
             stateActive: "ui-state-active",
             stateDefault: "ui-state-default",
-            stateHightlight: "ui-state-highlight",
+            stateHighlight: "ui-state-highlight",
             stateHover: "ui-state-hover",
             stateChecked: "ui-state-checked",
             stateError: "ui-state-error",
@@ -66,14 +66,28 @@ var wijmo;
             iconArrowDown: "ui-icon-triangle-1-s",
             iconArrowLeft: "ui-icon-triangle-1-w",
             iconArrowRightDown: "ui-icon-triangle-1-se",
+            iconArrowThickDown: "ui-icon-arrowthick-1-s glyphicon glyphicon-arrow-down",
+            iconArrowThickUp: "ui-icon-arrowthick-1-n glyphicon glyphicon-arrow-up",
             iconCaratUp: "ui-icon-carat-1-n",
             iconCaratRight: "ui-icon-carat-1-e",
             iconCaratDown: "ui-icon-carat-1-s",
             iconCaratLeft: "ui-icon-carat-1-w",
+            iconClock: "ui-icon-clock glyphicon glyphicon-time",
+            iconPencil: "ui-icon-pencil glyphicon glyphicon-pencil",
             iconSeekFirst: "ui-icon-seek-first",
             iconSeekEnd: "ui-icon-seek-end",
             iconSeekNext: "ui-icon-seek-next",
             iconSeekPrev: "ui-icon-seek-prev",
+            iconPrint: "ui-icon-print",
+            iconDisk: "ui-icon-disk",
+            iconSeekStart: "ui-icon-seek-start",
+            iconFullScreen: "ui-icon-newwin",
+            iconContinousView: "ui-icon-carat-2-n-s",
+            iconZoomIn: "ui-icon-zoomin",
+            iconZoomOut: "ui-icon-zoomout",
+            iconBookmark: "ui-icon-bookmark",
+            iconSearch: "ui-icon-search",
+            iconImage: "ui-icon-image",
             inputSpinnerLeft: "ui-input-spinner-left",
             inputSpinnerRight: "ui-input-spinner-right",
             inputTriggerLeft: "ui-input-trigger-left",

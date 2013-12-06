@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20132.15
+ * Wijmo Library 3.20133.20
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -922,10 +922,10 @@ var wijmo;
                     }, this)
                 });
                 if($.mobile == null) {
-                    toolsBar.find(".wijmo-wijev-day").button();
-                    toolsBar.find(".wijmo-wijev-week").button();
-                    toolsBar.find(".wijmo-wijev-month").button();
-                    toolsBar.find(".wijmo-wijev-list").button();
+                    toolsBar.find(".wijmo-wijev-day").button().button("widget").addClass(o.wijCSS.stateDefault);
+                    toolsBar.find(".wijmo-wijev-week").button().button("widget").addClass(o.wijCSS.stateDefault);
+                    toolsBar.find(".wijmo-wijev-month").button().button("widget").addClass(o.wijCSS.stateDefault);
+                    toolsBar.find(".wijmo-wijev-list").button().button("widget").addClass(o.wijCSS.stateDefault);
                     toolsBar.buttonset();
                 } else {
                     toolsBar.attr("data-role", "controlgroup");
@@ -1119,17 +1119,14 @@ var wijmo;
             wijevcal.prototype._initStatusbar = function () {
                 var statusbar = this.element.find(".wijmo-wijev-statusbar");
                 if(!this.options.statusBarVisible) {
-                    $(statusbar).css("float", "left");
-                    $(statusbar).css("display", "none");
                     statusbar.hide();
                     return;
                 } else {
                     statusbar.css("float", "left");
-                    statusbar.css("display", "none");
-                    if(this.statusbarEventsAdded) {
-                        $(statusbar).css("display", "table");
-                        statusbar.show();
-                    }
+                    statusbar.show();
+                }
+                if(!this.statusbarEventsAdded) {
+                    this.statusbarEventsAdded = true;
                 }
             };
             wijevcal.prototype._initHeaderbar = function () {
@@ -1492,7 +1489,7 @@ var wijmo;
                 }
             };
             wijevcal.prototype._ensureEditEventDialogCreated = function () {
-                var o = this.options, dialogTemplate;
+                var o = this.options, dialogTemplate, isInputDropdownClosing = false, dateChangedByClicking = false;
                 if(!this._editEventDialog) {
                     dialogTemplate = this.options.editEventDialogTemplate;
                     if(!dialogTemplate) {
@@ -1532,9 +1529,24 @@ var wijmo;
                         toolTipFormat: this.localizeString("calendarToolTipFormat", "dddd, MMMM dd, yyyy"),
                         nextTooltip: this.localizeString("calendarNextTooltip", "Next"),
                         prevTooltip: this.localizeString("calendarPrevTooltip", "Previous"),
-                        showTrigger: true,
+                        showDropDownButton: true,
                         dateFormat: "d",
+                        dropDownOpen: function (e, data) {
+                            isInputDropdownClosing = false;
+                        },
+                        dropDownClose: function (e, data) {
+                            isInputDropdownClosing = true;
+                            $(document).one("mouseup", function () {
+                                isInputDropdownClosing = false;
+                            });
+                        },
                         dateChanged: $.proxy(function (e, args) {
+                            if(isInputDropdownClosing) {
+                                dateChangedByClicking = true;
+                                $(document).one("mouseup", function () {
+                                    dateChangedByClicking = false;
+                                });
+                            }
                             var endDt = this._editEventDialog.find(".wijmo-wijev-end").wijinputdate("option", "date");
                             if(args.date > endDt) {
                                 this._editEventDialog.find(".wijmo-wijev-end").wijinputdate("option", "date", args.date);
@@ -1547,6 +1559,7 @@ var wijmo;
                         toolTipFormat: this.localizeString("calendarToolTipFormat", "dddd, MMMM dd, yyyy"),
                         nextTooltip: this.localizeString("calendarNextTooltip", "Next"),
                         prevTooltip: this.localizeString("calendarPrevTooltip", "Previous"),
+                        showDropDownButton: false,
                         dateFormat: "t",
                         dateChanged: $.proxy(function (e, args) {
                             var endDt = this._editEventDialog.find(".wijmo-wijev-end-time").wijinputdate("option", "date"), startDate = this._editEventDialog.find(".wijmo-wijev-start").wijinputdate("option", "date");
@@ -1565,9 +1578,24 @@ var wijmo;
                         toolTipFormat: this.localizeString("calendarToolTipFormat", "dddd, MMMM dd, yyyy"),
                         nextTooltip: this.localizeString("calendarNextTooltip", "Next"),
                         prevTooltip: this.localizeString("calendarPrevTooltip", "Previous"),
-                        showTrigger: true,
+                        showDropDownButton: true,
                         dateFormat: "d",
+                        dropDownOpen: function (e, data) {
+                            isInputDropdownClosing = false;
+                        },
+                        dropDownClose: function (e, data) {
+                            isInputDropdownClosing = true;
+                            $(document).one("mouseup", function () {
+                                isInputDropdownClosing = false;
+                            });
+                        },
                         dateChanged: $.proxy(function (e, args) {
+                            if(isInputDropdownClosing) {
+                                dateChangedByClicking = true;
+                                $(document).one("mouseup", function () {
+                                    dateChangedByClicking = false;
+                                });
+                            }
                             var startDt = this._editEventDialog.find(".wijmo-wijev-start").wijinputdate("option", "date");
                             if(args.date < startDt) {
                                 this._editEventDialog.find(".wijmo-wijev-start").wijinputdate("option", "date", args.date);
@@ -1580,6 +1608,7 @@ var wijmo;
                         toolTipFormat: this.localizeString("calendarToolTipFormat", "dddd, MMMM dd, yyyy"),
                         nextTooltip: this.localizeString("calendarNextTooltip", "Next"),
                         prevTooltip: this.localizeString("calendarPrevTooltip", "Previous"),
+                        showDropDownButton: false,
                         dateFormat: "t"
                     });
                     /*,
@@ -1623,6 +1652,10 @@ var wijmo;
                         autoHide: true,
                         hiding: /*qq*/
                         $.proxy(function (e) {
+                            if(dateChangedByClicking) {
+                                dateChangedByClicking = false;
+                                return false;
+                            }
                             if(this._colorMenu) {
                                 this._colorMenu.wijpopup("hide");
                             }
@@ -3677,10 +3710,10 @@ var wijmo;
                         }
                         if(this._compareDayDates(curDayDate, todayDate) === 0) {
                             //curDayColumn.addClass("wijmo-wijev-today ui-state-highlight");
-                            curDayColumn.addClass("wijmo-wijev-today " + o.wijCSS.stateHightlight);
+                            curDayColumn.addClass("wijmo-wijev-today " + o.wijCSS.stateHighlight);
                             curDayColumn.addClass("wijmo-wijev-leftborder");
                             curDayColumn.addClass("wijmo-wijev-rightborder");
-                            curDayHeader.addClass("wijmo-wijev-today").find(".wijmo-wijev-allday-cell").addClass(o.wijCSS.stateHightlight);
+                            curDayHeader.addClass("wijmo-wijev-today").find(".wijmo-wijev-allday-cell").addClass(o.wijCSS.stateHighlight);
                             curDayHeader.addClass("wijmo-wijev-leftborder");
                             curDayHeader.addClass("wijmo-wijev-rightborder");
                             skipNextBorder = true;
@@ -3770,7 +3803,8 @@ var wijmo;
                 allDayCellH = allDayApptH * maxAllDayApptCount + allDayLabelH + allDayApptH;
                 headercontainer.outerHeight(allDayCellH + Math.round(allDayApptH / 2));
                 headercontainer.find(".wijmo-wijev-allday-cell").outerHeight(allDayCellH);
-                viewWidth = this.element.find(".wijmo-wijev-view").innerWidth();
+                viewWidth = this.element.find(".wijmo-wijev-view").width()// Getting the viewWidth shall not contain the padding of the view container.
+                ;
                 dayscontainerWidth = viewWidth - timeRulerOuterWidth;
                 dayscontainerWidth = dayscontainerWidth - 18//vertical scrollbar width
                 ;
@@ -3851,7 +3885,9 @@ var wijmo;
                         }
                         this._renderAgendaEventsTimeoutId = setTimeout($.proxy(function () {
                             this._renderAgendaEventsTimeoutId = null;
-                            this._renderAgendaEvents($agendaList, null, null, true);
+                            // fix the issue 42885, this method lack an argument, and when scroll the superpanel to load
+                            // more events, it will throw exception.
+                            this._renderAgendaEvents($agendaList, null, null, true, supPanel);
                             // fix for 29488:
                             $agendaList.find(".wijmo-wijev-agenda-more-events").remove();
                         }, this), 100);
@@ -4604,7 +4640,7 @@ var wijmo;
                     }
                     if(isToday) {
                         //s += " ui-state-highlight";
-                        s += " " + o.wijCSS.stateHightlight;
+                        s += " " + o.wijCSS.stateHighlight;
                     }
                     s += "\">";
                     if(isToday) {
@@ -4623,7 +4659,7 @@ var wijmo;
                     }
                     if(isToday) {
                         //s += " ui-state-highlight";
-                        s += " " + o.wijCSS.stateHightlight;
+                        s += " " + o.wijCSS.stateHighlight;
                     }
                     s += "\"></div>";
                     s += "</div>";
@@ -4781,13 +4817,8 @@ var wijmo;
             wijevcal.prototype._invalidateView = //<--
             /* common view code */
             function () {
-                var rightPane = this.element.find(".wijmo-wijev-rightpane"), leftPane = this.element.find(".wijmo-wijev-leftpane"), header = this.element.find(".wijmo-wijev-headerbar"), navigationbar = this.element.find(".wijmo-wijev-navigationbar"), footer = this.element.find(".wijmo-wijev-statusbar"), viewContainer = this.element.find(".wijmo-wijev-view-container"), view = this.element.find(".wijmo-wijev-view"), elemInnerW, elemInnerH, headerH, navigationbarH, footerH, viewHeight, viewWidth, leftPaneW, rightPaneW, i, elementWidth, minWidth = this.options.minWidth;
-                elementWidth = this.element.innerWidth();
-                if(elementWidth < minWidth) {
-                    elementWidth = minWidth;
-                    this.element.width(minWidth);
-                }
-                elemInnerW = elementWidth - (viewContainer.outerWidth(true) - viewContainer.innerWidth());
+                var rightPane = this.element.find(".wijmo-wijev-rightpane"), leftPane = this.element.find(".wijmo-wijev-leftpane"), header = this.element.find(".wijmo-wijev-headerbar"), navigationbar = this.element.find(".wijmo-wijev-navigationbar"), footer = this.element.find(".wijmo-wijev-statusbar"), viewContainer = this.element.find(".wijmo-wijev-view-container"), view = this.element.find(".wijmo-wijev-view"), elemInnerW, elemInnerH, headerH, navigationbarH, footerH, viewHeight, viewWidth, leftPaneW, rightPaneW, i;
+                elemInnerW = this.element.innerWidth() - (viewContainer.outerWidth(true) - viewContainer.innerWidth());
                 elemInnerH = this.element.innerHeight() - (viewContainer.outerHeight(true) - viewContainer.innerHeight());
                 headerH = header.is(":visible") ? header.outerHeight(true) : 0;
                 navigationbarH = navigationbar.is(":visible") ? navigationbar.outerHeight(true) : 0;
@@ -5329,10 +5360,6 @@ var wijmo;
                 *		"visibleCalendars", ["My Calendar"]);
                 */
                 this.visibleCalendars = new Array("Default");
-                /**
-                * The minimum width of the eventcalendar.
-                */
-                this.minWidth = 750;
                 /** Occurs when calendars option has been changed.
                 * @event
                 * @dataKey {object} calendars the new calendars option value.

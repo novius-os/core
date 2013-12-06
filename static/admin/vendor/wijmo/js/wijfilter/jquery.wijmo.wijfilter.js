@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20132.15
+ * Wijmo Library 3.20133.20
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -504,12 +504,15 @@ var wijmo;
                     $.each(fv, function (i, o) {
                         if(i < 2) {
                             // two first values only
-                            var $item = self._elements.$filterValuesDdl.eq(i);
-                            $item.wijcombobox("option", "selectedValue", self._getDisplayValue(o[0]));
-                            if(!$item.val()) {
-                                // no such item?
-                                $item.val(self._getDisplayValue(o[0]) + "")// update text area
-                                ;
+                                                        var singleFilterValue = o[0], $item = self._elements.$filterValuesDdl.eq(i);
+                            if(singleFilterValue !== undefined) {
+                                var displayValue = self._getDisplayValue(singleFilterValue);
+                                $item.wijcombobox("option", "selectedValue", displayValue);
+                                if(!$item.val()) {
+                                    // no such item?
+                                    $item.val(displayValue + "")// update text area
+                                    ;
+                                }
                             }
                         }
                     });

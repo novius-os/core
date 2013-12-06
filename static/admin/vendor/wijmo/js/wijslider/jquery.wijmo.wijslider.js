@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20132.15
+ * Wijmo Library 3.20133.20
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -256,6 +256,9 @@ var wijmo;
                     return;
                 }
                 _super.prototype._create.call(this);
+                if(self.range) {
+                    self.range.removeClass("ui-slider-range").addClass(wijCSS.uiSliderRange);
+                }
                 element.removeClass("ui-slider").removeClass("ui-slider-" + this.options.orientation).removeClass("ui-widget").removeClass("ui-widget-content").removeClass("ui-corner-all").addClass(wijCSS.uiSlider).addClass(o.orientation === "horizontal" ? wijCSS.uiSliderHorizontal : wijCSS.uiSliderVertical).addClass(wijCSS.widget).addClass(wijCSS.content).addClass(wijCSS.cornerAll);
                 element.data("originalStyle", element.attr("style"));
                 element.data("originalContent", element.html());

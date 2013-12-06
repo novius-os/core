@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20132.15
+ * Wijmo Library 3.20133.20
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -51,6 +51,8 @@ var wijmo;
                 } else {
                     this.element.data("mobile-listview", listview);
                 }
+                // add an css class for binding the event to document.
+                this.element.addClass("wijmo-wijlistview");
                 _super.prototype._create.call(this);
                 var dataContent = this.element.closest("div[data-role='content']");
                 if(!(dataContent && dataContent.length > 0)) {
@@ -81,7 +83,7 @@ var wijmo;
                     return text.toString().toLowerCase().indexOf(searchValue) === -1;
                 };
                 wijlistview.prototype.options.filterCallback = defaultFilterCallback;
-                $(document).delegate("ul,ol", "listviewcreate", function () {
+                $(document).delegate("ul.wijmo-wijlistview,ol.wijmo-wijlistview", "listviewcreate", function () {
                     var list = $(this), listview = list.data("listview");
                     if(!listview.options.filter) {
                         return;

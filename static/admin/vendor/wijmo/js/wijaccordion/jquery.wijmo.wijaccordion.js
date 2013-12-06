@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20132.15
+ * Wijmo Library 3.20133.20
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -616,6 +616,13 @@ var wijmo;
         $.wijmo.registerWidget(widgetName, wijaccordion.prototype);
         $.extend($.wijmo.wijaccordion, {
             animations: {
+                _parseWidth: function (width) {
+                    var parts = ('' + width).match(/^([\d+-.]+)(.*)$/);
+                    return {
+                        value: parts ? parts[1] : "0",
+                        unit: parts ? (parts[2] || "px") : "px"
+                    };
+                },
                 slide: function (options, additions) {
                     options = $.extend({
                         easing: "swing",
@@ -667,16 +674,9 @@ var wijmo;
                     $.each(fxAttrs, function (i, prop) {
                         hideProps[prop] = "hide";
                         if(!options.horizontal && prop === "height") {
-                            var parts = ('' + $.css(options.toShow[0], prop)).match(/^([\d+-.]+)(.*)$/);
-                            showProps[prop] = {
-                                value: parts ? parts[1] : "0",
-                                unit: parts ? (parts[2] || "px") : "px"
-                            };
+                            showProps[prop] = $.wijmo.wijaccordion.animations._parseWidth($.css(options.toShow[0], prop));
                         } else {
-                            showProps[prop] = {
-                                value: options.defaultLayoutSetting[prop],
-                                unit: "px"
-                            };
+                            showProps[prop] = $.wijmo.wijaccordion.animations._parseWidth(options.defaultLayoutSetting[prop]);
                         }
                     });
                     if(options.horizontal) {

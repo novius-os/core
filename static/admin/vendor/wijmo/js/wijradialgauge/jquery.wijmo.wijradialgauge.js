@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20132.15
+ * Wijmo Library 3.20133.20
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -410,17 +410,19 @@ var wijmo;
                     self._drawRange(coercedFrom, coercedTo, startDistance, endDistance, calculateStartWidth, calculateEndWidth, range);
                 }
             };
-            wijradialgauge.prototype._drawRange = function (from, to, startDistance, endDistance, startWidth, endWidth, range) {
+            wijradialgauge.prototype._drawRange = // fix the issue 42503, in the previous version, here will use math.round to convert the float value to int value, and in this case,
+            // concat the points, the path looks not smooth. here I convert the float value to two decimal.
+            function (from, to, startDistance, endDistance, startWidth, endWidth, range) {
                 var self = this, startAngle = self._valueToAngle(from), endAngle = self._valueToAngle(to), outerPointers = self._generatePoints(startAngle, endAngle, startWidth + startDistance, endWidth + endDistance), innerPointers = self._generatePoints(startAngle, endAngle, startDistance, endDistance), i, rangeEl, path = "";
                 $.each(outerPointers, function (i, n) {
                     if(i === 0) {
-                        path += "M" + Math.round(n.x + self.centerPoint.x) + " " + Math.round(n.y + self.centerPoint.y);
+                        path += "M" + $.round(n.x + self.centerPoint.x) + " " + $.round(n.y + self.centerPoint.y);
                     } else {
-                        path += "L" + (n.x + self.centerPoint.x) + " " + Math.round(n.y + self.centerPoint.y);
+                        path += "L" + $.round(n.x + self.centerPoint.x) + " " + $.round(n.y + self.centerPoint.y);
                     }
                 });
                 for(i = innerPointers.length - 1; i >= 0; i--) {
-                    path += "L" + Math.round(innerPointers[i].x + self.centerPoint.x) + " " + Math.round(innerPointers[i].y + self.centerPoint.y);
+                    path += "L" + $.round(innerPointers[i].x + self.centerPoint.x) + " " + $.round(innerPointers[i].y + self.centerPoint.y);
                 }
                 path += "Z";
                 rangeEl = self.canvas.path(path);

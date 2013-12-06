@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20132.15
+ * Wijmo Library 3.20133.20
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -131,7 +131,7 @@ var wijmo;
                 }
                 if(this.options.autoHide) {
                     window.setTimeout(function () {
-                        $(document).bind('mouseup.wijpopup', $.proxy(self._onDocMouseUp, self));
+                        self._bindDocMouseUpEvent();
                     }, 0);
                 }
                 var effect = this.options.showEffect || "show";
@@ -178,9 +178,10 @@ var wijmo;
                     return;
                 }
                 if(this._trigger('hiding') === false) {
+                    this._bindDocMouseUpEvent();
                     return;
                 }
-                $(document).unbind('mouseup.wijpopup');
+                //$(document).unbind('mouseup.wijpopup');
                 var effect = this.options.hideEffect || "hide";
                 var duration = this.options.hideDuration || 300;
                 var ops = this.options.hideOptions || {
@@ -210,13 +211,26 @@ var wijmo;
                 }
                 this._trigger('hidden');
             };
-            wijpopup.prototype._onDocMouseUp = function (e) {
+            wijpopup.prototype._onDocMouseUp = // fix the issue 42892, the widget bind mouseup to document widget, and when call hide method, it will
+            // unbind the mouseup event, it use namespace to bind/unbind the event. If there are more than one popup
+            // widget in a page, when hide one, it will unbind the others's mouseup event will unbind.
+            // here use one instead of bind, and if mouse click inside of the element, the event should bind one more time.
+            // If use one popup inside another popup, this argument will wrong. so when bind the event, send this to event arguments.
+            function (e, self) {
                 var srcElement = e.target ? e.target : e.srcElement;
-                if(this.isVisible() && !!this.options.autoHide) {
-                    if(srcElement != this.element.get(0) && $(srcElement).parents().index(this.element) < 0) {
-                        this.hide();
+                if(self.isVisible() && !!self.options.autoHide) {
+                    if(srcElement != self.element.get(0) && $(srcElement).parents().index(self.element) < 0) {
+                        self.hide();
+                    } else {
+                        this._bindDocMouseUpEvent();
                     }
                 }
+            };
+            wijpopup.prototype._bindDocMouseUpEvent = function () {
+                var _this = this;
+                $(document).one('mouseup.wijpopup', function (e) {
+                    _this._onDocMouseUp(e, _this);
+                });
             };
             wijpopup.prototype._onMove = function (e) {
                 var jFrame = this.element.data('backframe.wijpopup');

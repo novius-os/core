@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20132.15
+ * Wijmo Library 3.20133.20
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -28,7 +28,7 @@ var wijmo;
     (function (upload) {
         "use strict";
         var $ = jQuery, widgetName = "wijupload";
-        var uploadClass = "wijmo-wijupload", uploadFileRowClass = "wijmo-wijupload-fileRow", isUploadFileRow = "." + uploadFileRowClass, uploadFilesListClass = "wijmo-wijupload-filesList", uploadCommandRowClass = "wijmo-wijupload-commandRow", uploadUploadAllClass = "wijmo-wijupload-uploadAll", uploadCancelAllClass = "wijmo-wijupload-cancelAll", uploadButtonContainer = "wijmo-wijupload-buttonContainer", uploadUploadClass = "wijmo-wijupload-upload", isUploadUpload = "." + uploadUploadClass, uploadCancelClass = "wijmo-wijupload-cancel", isUploadCancel = "." + uploadCancelClass, uploadFileClass = "wijmo-wijupload-file", uploadProgressClass = "wijmo-wijupload-progress", uploadLoadingClass = "wijmo-wijupload-loading", uiContentClass = "ui-widget-content", uiCornerClass = "ui-corner-all", uiHighlight = "ui-state-highlight", wijuploadXhr, wijuploadFrm, _getFileName = function (fileName) {
+        var uploadClass = "wijmo-wijupload", uploadFileRowClass = "wijmo-wijupload-fileRow", isUploadFileRow = "." + uploadFileRowClass, uploadFilesListClass = "wijmo-wijupload-filesList", uploadCommandRowClass = "wijmo-wijupload-commandRow", uploadUploadAllClass = "wijmo-wijupload-uploadAll", uploadCancelAllClass = "wijmo-wijupload-cancelAll", uploadButtonContainer = "wijmo-wijupload-buttonContainer", uploadUploadClass = "wijmo-wijupload-upload", isUploadUpload = "." + uploadUploadClass, uploadCancelClass = "wijmo-wijupload-cancel", isUploadCancel = "." + uploadCancelClass, uploadFileClass = "wijmo-wijupload-file", uploadProgressClass = "wijmo-wijupload-progress", uploadLoadingClass = "wijmo-wijupload-loading", wijuploadXhr, wijuploadFrm, _getFileName = function (fileName) {
             // Trim path on IE.
             if(fileName.indexOf("\\") > -1) {
                 fileName = fileName.substring(fileName.lastIndexOf("\\") + 1);
@@ -739,17 +739,17 @@ var wijmo;
                 self._createCommandRow(commandRow);
             };
             wijupload.prototype._createCommandRow = function (commandRow) {
-                var self = this, uploadAllBtn = $("<a>").attr("href", "#").text("uploadAll").addClass(uploadUploadAllClass).button({
+                var self = this, o = self.options, uploadAllBtn = $("<a>").attr("href", "#").text("uploadAll").addClass(uploadUploadAllClass).button({
                     icons: {
-                        primary: "ui-icon-circle-arrow-n"
+                        primary: o.wijCSS.iconCircleArrowN
                     },
                     label: self._getLocalization("uploadAll", "Upload All")
-                }), cancelAllBtn = $("<a>").attr("href", "#").text("cancelAll").addClass(uploadCancelAllClass).button({
+                }).button("widget").addClass(o.wijCSS.stateDefault), cancelAllBtn = $("<a>").attr("href", "#").text("cancelAll").addClass(uploadCancelAllClass).button({
                     icons: {
-                        primary: "ui-icon-cancel"
+                        primary: o.wijCSS.iconCancel
                     },
                     label: self._getLocalization("cancelAll", "Cancel All")
-                });
+                }).button("widget").addClass(o.wijCSS.stateDefault);
                 commandRow.append(uploadAllBtn).append(cancelAllBtn);
             };
             wijupload.prototype._getLocalization = function (key, defaultVal) {
@@ -757,9 +757,9 @@ var wijmo;
                 return (lo && lo[key]) || defaultVal;
             };
             wijupload.prototype._createUploadButton = function () {
-                var self = this, addBtn = $("<a>").attr("href", "javascript:void(0);").button({
+                var self = this, o = self.options, addBtn = $("<a>").attr("href", "javascript:void(0);").button({
                     label: self._getLocalization("uploadFiles", "Upload files")
-                });
+                }).button("widget").addClass(o.wijCSS.stateDefault);
                 addBtn.mousemove(function (e) {
                     var disabled = addBtn.data("uiButton").options.disabled;
                     if(self.input) {
@@ -849,17 +849,17 @@ var wijmo;
                 var self = this, o = self.options, fileRow = $("<li>"), fileName = '', file, progress, fileRows, buttonContainer = $("<span>").addClass(uploadButtonContainer), uploadBtn = $("<a>").attr("href", "#").text("upload").addClass(uploadUploadClass).button({
                     text: false,
                     icons: {
-                        primary: "ui-icon-circle-arrow-n"
+                        primary: o.wijCSS.iconCircleArrowN
                     },
                     label: self._getLocalization("upload", "upload")
-                }), cancelBtn = $("<a>").attr("href", "#").text("cancel").addClass(uploadCancelClass).button({
+                }).button("widget").addClass(o.wijCSS.stateDefault), cancelBtn = $("<a>").attr("href", "#").text("cancel").addClass(uploadCancelClass).button({
                     text: false,
                     icons: {
-                        primary: "ui-icon-cancel"
+                        primary: o.wijCSS.iconCancel
                     },
                     label: self._getLocalization("cancel", "cancel")
-                });
-                fileRow.addClass(uploadFileRowClass).addClass(uiContentClass).addClass(uiCornerClass);
+                }).button("widget").addClass(o.wijCSS.stateDefault);
+                fileRow.addClass(uploadFileRowClass).addClass(o.wijCSS.content).addClass(o.wijCSS.cornerAll);
                 if((o.enableSWFUploadOnIE && $.browser.msie) || o.enableSWFUpload) {
                     fileName = uploadFile.name;
                     fileRow.attr("id", uploadFile.id).data("file", uploadFile);
@@ -868,7 +868,7 @@ var wijmo;
                     uploadFile.hide();
                     fileName = _getFileNameByInput(uploadFile[0]);
                 }
-                file = $("<span>" + fileName + "</span>").addClass(uploadFileClass).addClass(uiHighlight).addClass(uiCornerClass);
+                file = $("<span>" + fileName + "</span>").addClass(uploadFileClass).addClass(o.wijCSS.stateHighlight).addClass(o.wijCSS.cornerAll);
                 fileRow.append(file);
                 fileRow.append(buttonContainer);
                 progress = $("<span />").addClass(uploadProgressClass);
@@ -1150,6 +1150,13 @@ var wijmo;
         upload.wijupload = wijupload;        
         var wijupload_options = (function () {
             function wijupload_options() {
+                /**
+                * @ignore
+                */
+                this.wijCSS = {
+                    iconCircleArrowN: "ui-icon-circle-arrow-n",
+                    iconCancel: "ui-icon-cancel"
+                };
                 /** Specifies the URL path of the server-side handler that handles the post request, validates file size and type, renames files, and saves the file to the server disk.
                 * @example
                 * For php:

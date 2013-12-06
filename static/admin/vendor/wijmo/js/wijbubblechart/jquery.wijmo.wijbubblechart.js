@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20132.15
+ * Wijmo Library 3.20133.20
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -1257,7 +1257,7 @@ var wijmo;
                 });
             };
             BubbleChartRender.prototype.bindLiveEvents = function (element, mouseDown, mouseUp, mouseOver, mouseOut, mouseMove, click, disabled) {
-                var o = this.options, wijCSS = o.wijCSS, proxyObj = {
+                var o = this.options, wijCSS = o.wijCSS, eventPrefix = "", proxyObj = {
                     mousedown: function (e) {
                         if(disabled) {
                             return;
@@ -1366,6 +1366,9 @@ var wijmo;
                         click.call(element, e, dataObj);
                     }
                 };
+                if($.support.isTouchEnabled && $.support.isTouchEnabled()) {
+                    eventPrefix = "wij";
+                }
                 $.each([
                     "click", 
                     "mouseover", 
@@ -1374,7 +1377,7 @@ var wijmo;
                     "mousedown", 
                     "mouseup"
                 ], function (i, n) {
-                    $("." + wijCSS.bubbleTracker, element).on(n + ".wijbubblechart", proxyObj[n]);
+                    $("." + wijCSS.bubbleTracker, element).on(eventPrefix + n + ".wijbubblechart", proxyObj[n]);
                 });
             };
             BubbleChartRender.prototype.render = function () {

@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20132.15
+ * Wijmo Library 3.20133.20
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -131,14 +131,21 @@ var wijmo;
                 var self = this, wijCSS = self.options.wijCSS, ele = self.element, height;
                 listContainer.show();
                 ele.children().each(function (i, n) {
-                    var item = $(n), group, groupText, goupItems;
+                    var item = $(n), group, groupText, goupItems, groupDisabled = false;
                     if(item.is("option")) {
                         list.append(self._buildItem(item));
                     } else {
                         group = $("<li></li>").addClass(wijCSS.wijdropdownOptgroup);
                         groupText = $("<span>" + item.attr("label") + "</span>").addClass(wijCSS.wijdropdownOptgroupHeader).addClass(wijCSS.priorityPrimary);
                         goupItems = $("<ul></ul>").addClass(wijCSS.helperReset).addClass(wijCSS.wijdropdownItems);
+                        if(item.attr("disabled") == "disabled") {
+                            groupDisabled = true;
+                            group.addClass(wijCSS.stateDisabled);
+                        }
                         item.children("option").each(function () {
+                            if(groupDisabled) {
+                                $(this).attr("disabled", "disabled");
+                            }
                             goupItems.append(self._buildItem($(this)));
                             return this;
                         });
@@ -277,7 +284,11 @@ var wijmo;
                     }
                 });
                 listContainer.bind("click" + namespace, function (e) {
-                    var target = $(e.target);
+                    var target = $(e.target), liItem = target.closest("li"), isTargetDisable = liItem.attr("disabled") && liItem.attr("disabled") === "disabled";
+                    //
+                                        if(isTargetDisable) {
+                        return;
+                    }
                     if(target.closest("li." + wijCSS.wijdropdownItem, $(this).get(0)).length > 0) {
                         self._setValue();
                         listContainer.css("z-index", "");
@@ -410,13 +421,18 @@ var wijmo;
                 if(text === "") {
                     text = "&nbsp;";
                 }
-                $li = $("<li></li>").addClass(wijCSS.wijdropdownItem).addClass(wijCSS.cornerAll).append($("<span>" + text + "</span>")).mousemove(function (event) {
-                    var current = $(event.target).closest("." + wijCSS.wijdropdownItem);
-                    if(current !== this.last) {
-                        self._activate($(this));
-                    }
-                    this.last = $(event.target).closest("." + wijCSS.wijdropdownItem);
-                }).attr("role", "option");
+                $li = $("<li></li>").addClass(wijCSS.wijdropdownItem).addClass(wijCSS.stateDefault).addClass(wijCSS.cornerAll).append($("<span>" + text + "</span>")).attr("role", "option");
+                if($item.is(":disabled")) {
+                    $li.attr("disabled", "disabled").addClass(wijCSS.stateDisabled);
+                } else {
+                    $li.mousemove(function (event) {
+                        var current = $(event.target).closest("." + wijCSS.wijdropdownItem);
+                        if(current !== this.last) {
+                            self._activate($(this));
+                        }
+                        this.last = $(event.target).closest("." + wijCSS.wijdropdownItem);
+                    });
+                }
                 $li.data("value", val);
                 return $li;
             };
@@ -593,15 +609,14 @@ var wijmo;
                 } else if(self._activeItem.closest("." + wijCSS.wijdropdownOptgroup).length) {
                     next = self._getNextItem(self._activeItem.closest("." + wijCSS.wijdropdownOptgroup)[direction](), direction, edge);
                 }
-                if(next && next.length) {
-                    self._activate(next);
-                } else {
-                    self._activate(self._list.find("." + wijCSS.wijdropdownItem + ":" + edge));
+                if(!(next && next.length)) {
+                    next = self._getNextItem(self._list.find("." + wijCSS.wijdropdownItem + ":" + edge), direction, edge);
                 }
+                self._activate(next);
             };
             wijdropdown.prototype._movePage = function (direction) {
                 //argu: "first","last"
-                                var self = this, wijCSS = self.options.wijCSS, base, height, result, antiDirection = direction === "first" ? "last" : "first";
+                                var self = this, wijCSS = self.options.wijCSS, base, height, result, next, nextDirection = direction === "first" ? "next" : "prev", antiDirection = direction === "first" ? "last" : "first";
                 if(self.superpanel.vNeedScrollBar) {
                     base = self._activeItem.offset().top;
                     height = self.options.height;
@@ -612,22 +627,38 @@ var wijmo;
                     if(!result.length) {
                         result = self._list.find("." + wijCSS.wijdropdownItem + ":" + antiDirection);
                     }
-                    self._activate(result);
                 } else {
-                    self._activate(self._list.find("." + wijCSS.wijdropdownItem + ":" + (!self._activeItem ? direction : antiDirection)));
+                    result = self._list.find("." + wijCSS.wijdropdownItem + ":" + (!self._activeItem ? direction : antiDirection));
                 }
+                next = self._getNextItem(result, nextDirection);
+                if(!(next && next.length)) {
+                    next = self._getNextItem(result, nextDirection === "next" ? "prev" : "next");
+                }
+                self._activate(next);
             };
             wijdropdown.prototype._getNextItem = function (next, direction, edge) {
-                var wijCSS = this.options.wijCSS;
+                var wijCSS = this.options.wijCSS, result;
                 if(next.length) {
                     if(next.is("." + wijCSS.wijdropdownOptgroup)) {
                         if(!!next.find(">ul>li." + wijCSS.wijdropdownItem).length) {
-                            return next.find(">ul>li." + wijCSS.wijdropdownItem + ":" + edge).eq(0);
+                            result = next.find(">ul>li." + wijCSS.wijdropdownItem + ":" + edge).eq(0);
                         } else {
-                            this._getNextItem(next[direction]().eq(0));
+                            result = this._getNextItem(next[direction]().eq(0));
                         }
                     } else {
-                        return next;
+                        result = next;
+                    }
+                    if(result.attr("disabled") === "disabled") {
+                        if(result[direction]().length) {
+                            return this._getNextItem(result[direction](), direction);
+                        } else {
+                            if(!edge) {
+                                edge = direction == "next" ? "first" : "last";
+                            }
+                            return this._getNextItem(result.closest("." + wijCSS.wijdropdownOptgroup)[direction](), direction, edge);
+                        }
+                    } else {
+                        return result;
                     }
                 }
             };

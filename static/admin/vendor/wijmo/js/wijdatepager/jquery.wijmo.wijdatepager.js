@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20132.15
+ * Wijmo Library 3.20133.20
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -158,7 +158,7 @@ var wijmo;
             };
             wijdatepager.prototype.invalidate = /** Redraws the widget layout.*/
             function () {
-                var selectedPage, o = this.options, selectedDate = o.selectedDate, newIndex, container = this.element.find("." + containerClass), decBtn = this.element.find("." + decButtonClass), incBtn = this.element.find("." + incButtonClass), innerWidth = this.element.innerWidth(), decBtnW = decBtn.is(":visible") ? decBtn.outerWidth(true) : 0, incBtnW = incBtn.is(":visible") ? incBtn.outerWidth(true) : 0, pagesBg, pageLabels, pageWidth;
+                var selectedPage, o = this.options, selectedDate = o.selectedDate, newIndex, container = this.element.find("." + containerClass), decBtn = this.element.find("." + decButtonClass), incBtn = this.element.find("." + incButtonClass), innerWidth = this.element.innerWidth(), decBtnW = decBtn.is(":visible") ? decBtn.outerWidth(true) : 0, incBtnW = incBtn.is(":visible") ? incBtn.outerWidth(true) : 0, pagesBg, pageLabels, pageWidth, activeStates, activeLabelSelector;
                 selectedPage = this.element.find("." + pageLabelClass + "." + this._getDateClass(selectedDate));
                 if(selectedPage.length !== 1) {
                     selectedPage = $(this.element.find("." + pageLabelClass)[this._index]);
@@ -166,7 +166,12 @@ var wijmo;
                     newIndex = this.element.find("." + pageLabelClass).index(selectedPage);
                     this._index = newIndex;
                 }
-                this.element.find("." + pageLabelClass + "." + o.wijCSS.stateActive).removeClass(o.wijCSS.stateActive);
+                activeLabelSelector = "." + pageLabelClass;
+                activeStates = o.wijCSS.stateActive.split(" ");
+                $.each(activeStates, function (i) {
+                    activeLabelSelector += "." + activeStates[i];
+                });
+                this.element.find(activeLabelSelector).removeClass(o.wijCSS.stateActive);
                 selectedPage.addClass(this.options.wijCSS.stateActive);
                 container.css("left", decBtnW);
                 this.element.removeClass(widthSmallestClass).removeClass(o.wijCSS.wijdatepagerWidthSmallest).removeClass(widthSmallClass).removeClass(o.wijCSS.wijdatepagerWidthSmall).removeClass(widthMediumClass).removeClass(o.wijCSS.wijdatepagerWidthMedium).removeClass(widthNormalClass).removeClass(o.wijCSS.wijdatepagerWidthNormal);
@@ -240,7 +245,7 @@ var wijmo;
                         page.addClass(pageRangeClass).addClass(o.wijCSS.wijdatepagerPageRange);
                     }
                     if(dateDef.header) {
-                        page.addClass(pageHeaderClass).addClass(o.wijCSS.wijdatepagerPageHeader).addClass(o.wijCSS.stateHightlight);
+                        page.addClass(pageHeaderClass).addClass(o.wijCSS.wijdatepagerPageHeader).addClass(o.wijCSS.stateHighlight);
                     }
                     if(i === _this._max) {
                         page.addClass(pageLabelLastClass).addClass(o.wijCSS.wijdatepagerPageLabelLast);

@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20132.15
+ * Wijmo Library 3.20133.20
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -197,13 +197,13 @@ var wijmo;
                     uiDialogTitleBar: "ui-dialog-titlebar",
                     uiDialogButtonPanel: "ui-dialog-buttonpane",
                     uiDialogButtons: "ui-dialog-buttons",
-                    wijdialogTitleBarClose: "wijmo-wijdialog-titlebar-close",
-                    wijdialogTitleBarPin: "wijmo-wijdialog-titlebar-pin",
-                    wijdialogTitleBarRefresh: "wijmo-wijdialog-titlebar-refresh",
-                    wijdialogTitleBarToggle: "wijmo-wijdialog-titlebar-toggle",
-                    wijdialogTitleBarMinimize: "wijmo-wijdialog-titlebar-minimize",
-                    wijdialogTitleBarMaximize: "wijmo-wijdialog-titlebar-maximize",
-                    wijdialogTitleBarRestore: "wijmo-wijdialog-titlebar-restore"
+                    wijdialogTitleBarClose: "",
+                    wijdialogTitleBarPin: "",
+                    wijdialogTitleBarRefresh: "",
+                    wijdialogTitleBarToggle: "",
+                    wijdialogTitleBarMinimize: "",
+                    wijdialogTitleBarMaximize: "",
+                    wijdialogTitleBarRestore: ""
                 };
                 /**
                 * Which element the dialog (and overlay, if modal) should be appended to.
@@ -485,7 +485,8 @@ var wijmo;
             wijdialog.prototype._create = function () {
                 var self = this, o = self.options, wijCSS = o.wijCSS, toolTip = self.element.attr("title");
                 // this is for the ToolTip property of asp.net control
-                                // enable touch support:
+                                self._titlebarButtonClassPrefix = "wijmo-wijdialog-titlebar-";
+                // enable touch support:
                 //if (window.wijmoApplyWijTouchUtilEvents) {
                 //    $ = window.wijmoApplyWijTouchUtilEvents($);
                 //}
@@ -738,6 +739,10 @@ var wijmo;
                     if(self.getState() === "minimized" && $("#" + value).length > 0) {
                         $("#" + value).append(self.uiDialog);
                     }
+                } else if(key === "stack") {
+                    if(!value) {
+                        self.uiDialog.css('z-index', self.options.zIndex);
+                    }
                 }
             };
             wijdialog.prototype._createCaptionButtons = function () {
@@ -792,7 +797,7 @@ var wijmo;
                 }
             };
             wijdialog.prototype._createCaptionButton = function (buttonHash, uiDialogTitlebar, notAppendToHeader) {
-                var self = this, wijCSS = self.options.wijCSS, buttonObject, buttonCSS = wijCSS["wijdialogTitleBar" + buttonHash.button.charAt(0).toUpperCase() + buttonHash.button.substring(1)], button = uiDialogTitlebar.children("." + buttonCSS), info = buttonHash.info, buttonIcon = $("<span></span>");
+                var self = this, wijCSS = self.options.wijCSS, buttonObject, buttonCSS = self._titlebarButtonClassPrefix + buttonHash.button + " " + wijCSS["wijdialogTitleBar" + buttonHash.button.charAt(0).toUpperCase() + buttonHash.button.substring(1)], button = uiDialogTitlebar.children("." + self._titlebarButtonClassPrefix + buttonHash.button), info = buttonHash.info, buttonIcon = $("<span></span>");
                 if(info.visible) {
                     if(button.size() === 0) {
                         buttonIcon.addClass("ui-icon " + info.iconClassOn).text(info.text || buttonHash.button);

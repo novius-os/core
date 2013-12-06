@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20132.15
+ * Wijmo Library 3.20133.20
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -60,6 +60,8 @@ var wijmo;
                     transform: // translation: newOffset + " " + newOffset,
                     Raphael.format("...T{0},{1}", newOffset, newOffset),
                     stroke: newStroke,
+                    fill: // the shadow should not fill an color.
+                    "none",
                     "stroke-width": newOffset
                 });
                 shadow.toBack();
@@ -1956,7 +1958,7 @@ var wijmo;
             wijchartcore.prototype._setOption = function (key, value) {
                 var self = this, o = self.options, ev = null, len = 0, idx = 0, oldXMajorFactor = o.axis.x.tickMajor.factor, oldXMinorFactor = o.axis.x.tickMinor.factor, oldYMajorFactor, oldYMinorFactor, bakYAxis, newYAxis, hoverStyleLen, baseAxis = //				oldYMajorFactor = o.axis.y.tickMajor.factor,
                 //				oldYMinorFactor = o.axis.y.tickMinor.factor,
-                wijchartcore.prototype.options.axis, oldYAxis;
+                wijchartcore.prototype.options.axis, oldYAxis, axisVal;
                 /*
                 if (key === "dataSource" || key === "data") {
                 self.seriesTransition = true;
@@ -2012,23 +2014,28 @@ var wijmo;
                         }
                         //extend the axis from base chartcore.
                         if(key === "axis") {
-                            $.extend(true, o.axis.x, value.x || {
+                            //extend axis value first to prevent modify original data.
+                            axisVal = $.extend(true, {
+                            }, value);
+                            //if min/max value is set, set autoMin and autoMax to false.
+                            self._verifyAxisAutoMinMax(axisVal);
+                            $.extend(true, o.axis.x, axisVal.x || {
                             });
-                            if($.isArray(o.axis.y) || $.isArray(value.y)) {
+                            if($.isArray(o.axis.y) || $.isArray(axisVal.y)) {
                                 oldYAxis = {
                                 };
                             } else {
                                 oldYAxis = o.axis.y;
                             }
-                            if($.isArray(value.y)) {
-                                $.each(value.y, function (i, _yaxis) {
-                                    value.y[i] = $.extend(true, {
+                            if($.isArray(axisVal.y)) {
+                                $.each(axisVal.y, function (i, _yaxis) {
+                                    axisVal.y[i] = $.extend(true, {
                                     }, baseAxis.y, oldYAxis, _yaxis);
                                 });
-                                o.axis.y = value.y;
+                                o.axis.y = axisVal.y;
                             } else {
                                 o.axis.y = $.extend(true, {
-                                }, baseAxis.y, oldYAxis, value.y);
+                                }, baseAxis.y, oldYAxis, axisVal.y);
                             }
                         } else {
                             $.extend(true, o[key], value);
@@ -2158,12 +2165,58 @@ var wijmo;
                     }
                 }
             };
+            wijchartcore.prototype._verifyAxisAutoMinMax = function (axis) {
+                var isNullOrUndefined = function (value) {
+                    return value === null || typeof value === "undefined";
+                };
+                if(axis.x) {
+                    if(!isNullOrUndefined(axis.x.min)) {
+                        axis.x.autoMin = false;
+                    } else {
+                        axis.x.autoMin = true;
+                    }
+                    if(!isNullOrUndefined(axis.x.max)) {
+                        axis.x.autoMax = false;
+                    } else {
+                        axis.x.autoMax = true;
+                    }
+                }
+                if(axis.y) {
+                    if($.isArray(axis.y)) {
+                        $.each(axis.y, function (i, yaxis) {
+                            if(!isNullOrUndefined(yaxis.min)) {
+                                yaxis.autoMin = false;
+                            } else {
+                                yaxis.autoMin = true;
+                            }
+                            if(!isNullOrUndefined(yaxis.max)) {
+                                yaxis.autoMax = false;
+                            } else {
+                                yaxis.autoMax = true;
+                            }
+                        });
+                    } else {
+                        if(!isNullOrUndefined(axis.y.min)) {
+                            axis.y.autoMin = false;
+                        } else {
+                            axis.y.autoMin = true;
+                        }
+                        if(!isNullOrUndefined(axis.y.max)) {
+                            axis.y.autoMax = false;
+                        } else {
+                            axis.y.autoMax = true;
+                        }
+                    }
+                }
+            };
             wijchartcore.prototype._create = function () {
                 var self = this, o = self.options, width = o.width || self.element.width(), height = o.height || self.element.height(), newEle = null, canvas;
                 // enable touch support:
                 if(window.wijmoApplyWijTouchUtilEvents) {
                     $ = window.wijmoApplyWijTouchUtilEvents($);
                 }
+                //if min/max value is set, set autoMin and autoMax to false.
+                self._verifyAxisAutoMinMax(o.axis);
                 self.updating = 0;
                 self.innerState = {
                 };
@@ -2879,7 +2932,7 @@ var wijmo;
                             }
                             if(legend.textWidth) {
                                 $.each(text, function (i, t) {
-                                    if(series.visible === false && !isline) {
+                                    if(series.visible === false && (!isline || (isline && !(series.markers && series.markers.visible)))) {
                                         $(t.node).data("hidden", true).data("textOpacity", t.attr("opacity") || 1);
                                         t.attr("opacity", 0.3);
                                     }
@@ -2887,7 +2940,7 @@ var wijmo;
                                     $(t.node).data("legendIndex", legendIndex).data("index", idx);
                                 });
                             } else {
-                                if(series.visible === false && !isline) {
+                                if(series.visible === false && (!isline || (isline && !(series.markers && series.markers.visible)))) {
                                     $(text.node).data("hidden", true).data("textOpacity", text.attr("opacity") || 1);
                                     text.attr("opacity", 0.3);
                                 }
@@ -4178,24 +4231,26 @@ var wijmo;
                     case "east":
                         //startPoint.x = canvasBounds.endX;
                         startPoint.x = canvasBounds.endX - thickness;
-                        if(axisInfo.preStartOffset) {
-                            startPoint.x += axisInfo.preStartOffset;
-                        }
                         startPoint.y = canvasBounds.endY;
                         //endPoint.x = canvasBounds.endX;
                         endPoint.x = canvasBounds.endX - thickness;
                         endPoint.y = canvasBounds.startY;
+                        if(axisInfo.preStartOffset) {
+                            startPoint.x += axisInfo.preStartOffset;
+                            endPoint.x += axisInfo.preStartOffset;
+                        }
                         break;
                     case "west":
                         //startPoint.x = canvasBounds.startX - thickness;
                         startPoint.x = canvasBounds.startX;
-                        if(axisInfo.preStartOffset) {
-                            startPoint.x -= axisInfo.preStartOffset;
-                        }
                         startPoint.y = canvasBounds.endY;
                         //endPoint.x = canvasBounds.startX - thickness;
                         endPoint.x = canvasBounds.startX;
                         endPoint.y = canvasBounds.startY;
+                        if(axisInfo.preStartOffset) {
+                            startPoint.x -= axisInfo.preStartOffset;
+                            endPoint.x -= axisInfo.preStartOffset;
+                        }
                         break;
                 }
                 if(axisOptions.visible) {

@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20132.15
+ * Wijmo Library 3.20133.20
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -56,7 +56,7 @@ var wijmo;
                     return;
                 }
                 //end for fixing bug 18204
-                this.$video.wrap($("<div></div>").addClass(wijvideoClass).addClass(wijCSS.wijvideo).addClass(wijCSS.content).addClass(wijCSS.widget)).after($("<div></div>").addClass(wijvideoWrapperClass).addClass(wijCSS.wijvideoWrapper).append($("<ul></ul>").addClass(wijvideoControlsClass).addClass(wijCSS.wijvideoControls).addClass(wijCSS.header).addClass(wijCSS.helperClearFix).addClass(wijCSS.helperReset).append($("<li></li>").addClass(wijvideoPlayClass).addClass(wijCSS.wijvideoPlay).addClass(wijCSS.stateDefault).addClass(wijCSS.cornerAll).append($("<span></span>").addClass(wijCSS.icon).addClass(wijCSS.iconPlay))).append($("<li></li>").addClass(wijvideoIndexClass).addClass(wijCSS.wijvideoIndex).append($("<div></div>").addClass(wijvideoIndexSliderClass).addClass(wijCSS.wijvideoIndexSlider))).append($("<li>00:00</li>").addClass(wijvideoTimerClass).addClass(wijCSS.wijvideoTimer)).append($("<li></li>").addClass(wijvideoVolumeClass).addClass(wijCSS.wijvideoVolume).addClass(wijCSS.stateDefault).addClass(wijCSS.cornerAll).append($("<div></div>").addClass(wijvideoVolumeContainerClass).addClass(wijCSS.wijvideoVolumeContainer).append($("<div></div>").addClass(wijvideoVolumeSliderClass).addClass(wijCSS.wijvideoVolumeSlider).addClass(wijCSS.stateDefault).addClass(wijCSS.cornerTop))).append($("<span></span>").addClass(wijCSS.icon).addClass(wijCSS.iconVolumeOn))).append($("<li></li>").addClass(wijvideoFullScreen).addClass(wijCSS.wijvideoFullScreen).addClass(wijCSS.stateDefault).addClass(wijCSS.cornerAll).append($("<span></span>").addClass(wijCSS.icon).addClass(wijCSS.iconArrow4Diag)))));
+                this.$video.wrap($("<div></div>").addClass(wijvideoClass).addClass(wijCSS.wijvideo).addClass(wijCSS.content).addClass(wijCSS.widget)).after($("<div></div>").addClass(wijvideoWrapperClass).addClass(wijCSS.wijvideoWrapper).append($("<ul></ul>").addClass(wijvideoControlsClass).addClass(wijCSS.wijvideoControls).addClass(wijCSS.header).addClass(wijCSS.helperClearFix).addClass(wijCSS.helperReset).append($("<li></li>").addClass(wijvideoPlayClass).addClass(wijCSS.wijvideoPlay).addClass(wijCSS.stateDefault).addClass(wijCSS.cornerAll).append($("<span></span>").addClass(wijCSS.icon).addClass(wijCSS.iconPlay))).append($("<li></li>").addClass(wijvideoIndexClass).addClass(wijCSS.wijvideoIndex).append($("<div></div>").addClass(wijvideoIndexSliderClass).addClass(wijCSS.wijvideoIndexSlider))).append($("<li>00:00</li>").addClass(wijvideoTimerClass).addClass(wijCSS.wijvideoTimer).addClass(wijCSS.stateDefault)).append($("<li></li>").addClass(wijvideoVolumeClass).addClass(wijCSS.wijvideoVolume).addClass(wijCSS.stateDefault).addClass(wijCSS.cornerAll).append($("<div></div>").addClass(wijvideoVolumeContainerClass).addClass(wijCSS.wijvideoVolumeContainer).append($("<div></div>").addClass(wijvideoVolumeSliderClass).addClass(wijCSS.wijvideoVolumeSlider).addClass(wijCSS.stateDefault).addClass(wijCSS.cornerTop))).append($("<span></span>").addClass(wijCSS.icon).addClass(wijCSS.iconVolumeOn))).append($("<li></li>").addClass(wijvideoFullScreen).addClass(wijCSS.wijvideoFullScreen).addClass(wijCSS.stateDefault).addClass(wijCSS.cornerAll).append($("<span></span>").addClass(wijCSS.icon).addClass(wijCSS.iconArrow4Diag)))));
                 this.$vidParent = this.$video.parent('.' + wijvideoClass);
                 // size the div wrapper to the height and width of the controls
                 this.$vidParent.width(this.$video.outerWidth()).height(this.$video.outerHeight());
@@ -91,7 +91,7 @@ var wijmo;
                             slide: function () {
                                 self.seek = true;
                             }
-                        });
+                        }).slider("widget").addClass(o.wijCSS.stateDefault);
                         self._updateTime();
                         // wire up the volume
                         self.$volumeSlider = self.$vidParent.find('.' + wijvideoVolumeSliderClass);
@@ -112,7 +112,7 @@ var wijmo;
                                     self.$volumeBtn.find("span").removeClass(wijCSS.iconVolumeOff).addClass(wijCSS.iconVolumeOn);
                                 }
                             }
-                        });
+                        }).slider("widget").addClass(o.wijCSS.stateDefault);
                         wijvideoControl.css('display', 'none');
                         self._initialToolTip();
                         if(!o.showControlsOnHover) {

@@ -104,7 +104,7 @@
  *
  * http://docs.jquery.com/UI/Theming/API
  *
- * To view and modify this theme, visit http://jqueryui.com/themeroller/?ffDefault=Arial,sans-serif&fwDefault=bold&fsDefault=1.1em&cornerRadius=3px&bgColorHeader=c4c4c4&bgTextureHeader=03_highlight_soft.png&bgImgOpacityHeader=100&borderColorHeader=a8a8a8&fcHeader=4f4f4f&iconColorHeader=898989&bgColorContent=ffffff&bgTextureContent=01_flat.png&bgImgOpacityContent=100&borderColorContent=a8a8a8&fcContent=4f4f4f&iconColorContent=616161&bgColorDefault=c4c4c4&bgTextureDefault=04_highlight_hard.png&bgImgOpacityDefault=80&borderColorDefault=a8a8a8&fcDefault=4f4f4f&iconColorDefault=ffffff&bgColorHover=c4c4c4&bgTextureHover=04_highlight_hard.png&bgImgOpacityHover=80&borderColorHover=a8a8a8&fcHover=4f4f4f&iconColorHover=ffffff&bgColorActive=c4c4c4&bgTextureActive=06_inset_hard.png&bgImgOpacityActive=65&borderColorActive=aaaaaa&fcActive=4f4f4f&iconColorActive=ffffff&bgColorHighlight=fbf9ee&bgTextureHighlight=02_glass.png&bgImgOpacityHighlight=55&borderColorHighlight=fcefa1&fcHighlight=363636&iconColorHighlight=2e83ff&bgColorError=fef1ec&bgTextureError=05_inset_soft.png&bgImgOpacityError=95&borderColorError=cd0a0a&fcError=cd0a0a&iconColorError=cd0a0a&bgColorOverlay=aaaaaa&bgTextureOverlay=01_flat.png&bgImgOpacityOverlay=0&opacityOverlay=30&bgColorShadow=4f4f4f&bgTextureShadow=01_flat.png&bgImgOpacityShadow=0&opacityShadow=30&thicknessShadow=8px&offsetTopShadow=-8px&offsetLeftShadow=-8px&cornerRadiusShadow=8px
+ * To view and modify this theme, visit http://jqueryui.com/themeroller/?ffDefault=Arial,sans-serif&fwDefault=bold&fsDefault=100%25&cornerRadius=3px&bgColorHeader=c0c0c0&bgTextureHeader=03_highlight_soft.png&bgImgOpacityHeader=100&borderColorHeader=a8a8a8&fcHeader=333&iconColorHeader=898989&bgColorContent=ffffff&bgTextureContent=01_flat.png&bgImgOpacityContent=100&borderColorContent=a8a8a8&fcContent=4f4f4f&iconColorContent=616161&bgColorDefault=c4c4c4&bgTextureDefault=04_highlight_hard.png&bgImgOpacityDefault=80&borderColorDefault=a8a8a8&fcDefault=4f4f4f&iconColorDefault=ffffff&bgColorHover=83b0ca&bgTextureHover=04_highlight_soft.png&bgImgOpacityHover=100&borderColorHover=8ab0c6&fcHover=313131&iconColorHover=ffffff&bgColorActive=85b2cb&bgTextureActive=06_inset_hard.png&bgImgOpacityActive=65&borderColorActive=7096ab&fcActive=1C4257&iconColorActive=ffffff&bgColorHighlight=fbf9ee&bgTextureHighlight=02_glass.png&bgImgOpacityHighlight=55&borderColorHighlight=666666&fcHighlight=363636&iconColorHighlight=2e83ff&bgColorError=fef1ec&bgTextureError=05_inset_soft.png&bgImgOpacityError=95&borderColorError=cd0a0a&fcError=cd0a0a&iconColorError=cd0a0a&bgColorOverlay=2d5972&bgTextureOverlay=01_flat.png&bgImgOpacityOverlay=0&opacityOverlay=30&bgColorShadow=4f4f4f&bgTextureShadow=01_flat.png&bgImgOpacityShadow=0&opacityShadow=30&thicknessShadow=8px&offsetTopShadow=-8px&offsetLeftShadow=-8px&cornerRadiusShadow=8px
  */
 
 
@@ -1907,6 +1907,71 @@ button.ui-button::-moz-focus-inner {
         position: relative;
         z-index: 99;
     }
+/*@wijmo*/
+.ui-widget-header {
+    background: #c0c0c0 url(images/ui-bg_highlight-soft_100_c0c0c0_1x100.png) top repeat-x;
+    text-shadow: 0px 1px 0px rgba(255,255,255,0.7);
+}
+
+.ui-widget-header a {
+    color: #4f4f4f;
+}
+
+.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {
+    text-shadow: 0px 1px 0px rgba(255,255,255,0.7);
+}
+
+.ui-state-default {
+    -moz-box-shadow: inset 0px 1px 0px rgba(255,255,255,0.25);
+    -webkit-box-shadow: inset 0px 1px 0px rgba(255,255,255,0.25);
+    box-shadow: inset 0px 1px 0px rgba(255,255,255,0.25);
+}
+
+.ui-state-default a, .ui-state-default a:link, .ui-state-default a:visited {
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.ui-state-hover, .ui-widget-content .ui-state-hover, .ui-widget-header .ui-state-hover, .ui-state-focus, .ui-widget-content .ui-state-focus, .ui-widget-header .ui-state-focus {
+    background: #83b0ca url(images/ui-bg_highlight-soft_100_83b0ca_1x100.png) repeat-x top;
+    -moz-box-shadow: 0 0 3px #85b2cb;
+    -webkit-box-shadow: 0px 0px 3px #85b2cb;
+    box-shadow: 0px 0px 3px #85b2cb;
+}
+
+.ui-state-hover {
+    -moz-box-shadow: 0px 0px 3px #85b2cb, inset 0px 1px 0px rgba(255,255,255,0.25);
+    -webkit-box-shadow: 0px 0px 3px #85b2cb, inset 0px 1px 0px rgba(255,255,255,0.25);
+    box-shadow: 0px 0px 3px #85b2cb, inset 0px 1px 0px rgba(255,255,255,0.25);
+}
+
+    .ui-state-hover a, .ui-state-hover a:hover {
+        color: #2f556a;
+    }
+
+.ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active {
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+    .ui-state-active a, .ui-state-active a:link, .ui-state-active a:visited {
+        color: #2f556a;
+    }
+
+.ui-widget :active {
+    outline: none;
+}
+
+.ui-state-active {
+    -moz-box-shadow: inset 0px 1px 0px rgba(255,255,255,0.25);
+    -webkit-box-shadow: inset 0px 1px 0px rgba(255,255,255,0.25);
+    box-shadow: inset 0px 1px 0px rgba(255,255,255,0.25);
+}
+
+.ui-round-all {
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+}
+
 
 .wijmo-wijcalendar-preview-wrapper div.wijmo-wijcalendar .ui-datepicker-header {
     width: 84.5%;
@@ -2766,3 +2831,4 @@ div.wijmo-wijribbon .ui-icon, .wijmo-wijribbon-abbrevicon, div.wijmo-wijribbon-s
     margin-left: -9px;
     margin-top: 0;
 }
+/*@wijmo*/

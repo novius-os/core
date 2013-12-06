@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20132.15
+ * Wijmo Library 3.20133.20
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -124,8 +124,52 @@ var wijmo;
             };
             wijtooltip.prototype.show = /** Shows the tooltip */
             function () {
+                this.showAt(null);
+            };
+            wijtooltip.prototype.showAt = /** Shows the tooltip at the specified position
+            * @param {object} point A point value that indicates the position that tooltip will be shown.
+            * @example
+            * //Shows the tooltip at point {x: 100, y: 120}.
+            * $("#tooltip").wijtooltip("showAt", {x:100, y:120});
+            */
+            function (point) {
                 var self = this, tooltipCache = self._tooltipCache, _$tooltip = tooltipCache ? tooltipCache._$tooltip : null, o = self.options;
                 if(!tooltipCache || o.disabled) {
+                    return;
+                }
+                _$tooltip.stop(true, true);
+                if(tooltipCache._showAnimationTimer) {
+                    clearTimeout(tooltipCache._showAnimationTimer);
+                    tooltipCache._showAnimationTimer = null;
+                }
+                if(tooltipCache._showAtAnimationTimer) {
+                    clearTimeout(tooltipCache._showAtAnimationTimer);
+                    tooltipCache._showAtAnimationTimer = null;
+                }
+                if(tooltipCache._hideAnimationTimer) {
+                    clearTimeout(tooltipCache._hideAnimationTimer);
+                    tooltipCache._hideAnimationTimer = null;
+                }
+                if(!point) {
+                    if(o.ajaxCallback && $.isFunction(o.ajaxCallback) && !self._callbacked) {
+                        self._isAjaxCallback = true;
+                        o.ajaxCallback.call(self.element);
+                        return;
+                    }
+                    self._setText();
+                }
+                if(!!o.showDelay) {
+                    tooltipCache._showAtAnimationTimer = setTimeout(function () {
+                        self._showToolTipHelper(point, _$tooltip);
+                    }, o.showDelay);
+                } else {
+                    self._showToolTipHelper(point, _$tooltip);
+                }
+            };
+            wijtooltip.prototype.hide = /** Hides the tooltip.*/
+            function () {
+                var self = this, tooltipCache = self._tooltipCache;
+                if(!tooltipCache) {
                     return;
                 }
                 if(tooltipCache._showAnimationTimer) {
@@ -140,47 +184,38 @@ var wijmo;
                     clearTimeout(tooltipCache._hideAnimationTimer);
                     tooltipCache._hideAnimationTimer = null;
                 }
-                _$tooltip.stop(true, true);
-                if(o.ajaxCallback && $.isFunction(o.ajaxCallback) && !self._callbacked) {
-                    self._isAjaxCallback = true;
-                    o.ajaxCallback.call(self.element);
-                    return;
+                //clearTimeout(tooltip._showAnimationTimer);
+                if(!!self.options.hideDelay) {
+                    tooltipCache._hideAnimationTimer = setTimeout($.proxy(self._hideTooltip, self), self.options.hideDelay);
+                } else {
+                    self._hideTooltip();
                 }
-                self._setText();
-                tooltipCache._showAnimationTimer = setTimeout(function () {
-                    //self._setText();
-                    oldTipPos = _$tooltip.offset();
-                    if(o.mouseTrailing) {
-                        self._setCalloutCss();
+            };
+            wijtooltip.prototype._createTooltip = //begin private methods
+            function () {
+                var self = this, o = self.options, tooltipCache = new TooltipCache(), _$tooltip = $("<div></div>").addClass(o.wijCSS.tooltip).addClass(o.wijCSS.widget).addClass(o.wijCSS.content).addClass(o.wijCSS.cornerAll), container = $("<div></div>").addClass(o.wijCSS.tooltipContainer), callout = $("<div></div>").addClass(o.wijCSS.content).addClass(o.wijCSS.tooltipPointer).append($("<div></div>").addClass(o.wijCSS.tooltipPointerInner)), title = $("<div></div>").addClass(o.wijCSS.tooltipTitle).addClass(o.wijCSS.header).addClass(o.wijCSS.cornerAll), closeBtn = $("<a href='#'></a>").addClass(o.wijCSS.tooltipClose).addClass(o.wijCSS.stateDefault).addClass(o.wijCSS.cornerAll);
+                closeBtn.append($("<span></span>").addClass(o.wijCSS.icon).addClass(o.wijCSS.iconClose)).bind("click", $.proxy(self._onClickCloseBtn, self));
+                if(o.closeBehavior !== "sticky") {
+                    closeBtn.hide();
+                }
+                if(!o.showCallout) {
+                    callout.hide();
+                }
+                _$tooltip.append(title).append(closeBtn).append(container).append(callout).css("position", "absolute").attr("role", "tooltip").appendTo("body").hide();
+                tooltipCache._$tooltip = _$tooltip;
+                tooltipCache._container = container;
+                tooltipCache._callout = callout;
+                tooltipCache._closeBtn = closeBtn;
+                tooltipCache._title = title;
+                return tooltipCache;
+            };
+            wijtooltip.prototype._showToolTipHelper = function (point, _$tooltip) {
+                if(point) {
+                    var self = this, tooltipCache = self._tooltipCache, calloutPos, offsetX = 0, offsetY = 0, hBorder, vBorder, border, width, height, offset = {
+                    }, calloutShape, callout, visible = _$tooltip.is(":visible"), callout = tooltipCache ? tooltipCache._callout : null;
+                    if(!callout) {
                         return;
                     }
-                    self._setPosition();
-                    self._showTooltip();
-                }, self.options.showDelay);
-            };
-            wijtooltip.prototype.showAt = /** Shows the tooltip at the specified position
-            * @param {object} point A point value that indicates the position that tooltip will be shown.
-            * @example
-            * //Shows the tooltip at point {x: 100, y: 120}.
-            * $("#tooltip").wijtooltip("showAt", {x:100, y:120});
-            */
-            function (point) {
-                var self = this, tooltipCache = self._tooltipCache, _$tooltip = tooltipCache ? tooltipCache._$tooltip : null, callout = tooltipCache ? tooltipCache._callout : null, calloutPos, offsetX = 0, offsetY = 0, offset = {
-                }, calloutShape, border, hBorder, vBorder, width, height;
-                if(!tooltipCache || !callout) {
-                    return;
-                }
-                _$tooltip.stop(true, true);
-                if(tooltipCache._showAtAnimationTimer) {
-                    clearTimeout(tooltipCache._showAtAnimationTimer);
-                    tooltipCache._showAtAnimationTimer = null;
-                }
-                if(tooltipCache._hideAnimationTimer) {
-                    clearTimeout(tooltipCache._hideAnimationTimer);
-                    tooltipCache._hideAnimationTimer = null;
-                }
-                tooltipCache._showAtAnimationTimer = setTimeout(function () {
-                    var visible = _$tooltip.is(":visible");
                     self._setText();
                     oldTipPos = _$tooltip.offset();
                     _$tooltip.offset({
@@ -258,47 +293,15 @@ var wijmo;
                         _$tooltip.hide();
                     }
                     self._calloutShape = calloutShape;
-                    self._showTooltip();
-                }, self.options.showDelay);
-            };
-            wijtooltip.prototype.hide = /** Hides the tooltip.*/
-            function () {
-                var self = this, tooltipCache = self._tooltipCache;
-                if(!tooltipCache) {
-                    return;
+                } else {
+                    oldTipPos = _$tooltip.offset();
+                    if(this.options.mouseTrailing) {
+                        this._setCalloutCss();
+                        return;
+                    }
+                    this._setPosition();
                 }
-                if(tooltipCache._showAnimationTimer) {
-                    clearTimeout(tooltipCache._showAnimationTimer);
-                    tooltipCache._showAnimationTimer = null;
-                }
-                if(tooltipCache._showAtAnimationTimer) {
-                    clearTimeout(tooltipCache._showAtAnimationTimer);
-                    tooltipCache._showAtAnimationTimer = null;
-                }
-                if(tooltipCache._hideAnimationTimer) {
-                    clearTimeout(tooltipCache._hideAnimationTimer);
-                    tooltipCache._hideAnimationTimer = null;
-                }
-                //clearTimeout(tooltip._showAnimationTimer);
-                tooltipCache._hideAnimationTimer = setTimeout($.proxy(self._hideTooltip, self), self.options.hideDelay);
-            };
-            wijtooltip.prototype._createTooltip = //begin private methods
-            function () {
-                var self = this, o = self.options, tooltipCache = new TooltipCache(), _$tooltip = $("<div></div>").addClass(o.wijCSS.tooltip).addClass(o.wijCSS.widget).addClass(o.wijCSS.content).addClass(o.wijCSS.cornerAll), container = $("<div></div>").addClass(o.wijCSS.tooltipContainer), callout = $("<div></div>").addClass(o.wijCSS.content).addClass(o.wijCSS.tooltipPointer).append($("<div></div>").addClass(o.wijCSS.tooltipPointerInner)), title = $("<div></div>").addClass(o.wijCSS.tooltipTitle).addClass(o.wijCSS.header).addClass(o.wijCSS.cornerAll), closeBtn = $("<a href='#'></a>").addClass(o.wijCSS.tooltipClose).addClass(o.wijCSS.stateDefault).addClass(o.wijCSS.cornerAll);
-                closeBtn.append($("<span></span>").addClass(o.wijCSS.icon).addClass(o.wijCSS.iconClose)).bind("click", $.proxy(self._onClickCloseBtn, self));
-                if(o.closeBehavior !== "sticky") {
-                    closeBtn.hide();
-                }
-                if(!o.showCallout) {
-                    callout.hide();
-                }
-                _$tooltip.append(title).append(closeBtn).append(container).append(callout).css("position", "absolute").attr("role", "tooltip").appendTo("body").hide();
-                tooltipCache._$tooltip = _$tooltip;
-                tooltipCache._container = container;
-                tooltipCache._callout = callout;
-                tooltipCache._closeBtn = closeBtn;
-                tooltipCache._title = title;
-                return tooltipCache;
+                this._showTooltip();
             };
             wijtooltip.prototype._bindLiveEvents = function () {
                 var self = this, o = self.options, element = self.element;
@@ -326,9 +329,10 @@ var wijmo;
                         }
                     });
                 }
+                element.bind("mouseout.tooltip", $.proxy(self._hideIfNeeded, self));
                 switch(o.triggers) {
                     case "hover":
-                        element.bind("mouseover.tooltip", $.proxy(self.show, self)).bind("mouseout.tooltip", $.proxy(self._hideIfNeeded, self));
+                        element.bind("mouseover.tooltip", $.proxy(self.show, self));
                         break;
                     case "click":
                         element.bind("click.tooltip", $.proxy(self.show, self));

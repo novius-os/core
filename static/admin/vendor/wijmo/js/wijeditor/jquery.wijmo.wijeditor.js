@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20132.15
+ * Wijmo Library 3.20133.20
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -589,10 +589,6 @@ var wijmo;
                     self.editor.wijAddVisibilityObserver(function (e) {
                         if($.contains(self.editor[0], e.target)) {
                             return;
-                        }
-                        //update for 42252 issue
-                        if(self._getContent().wijsplitter("option", "splitterDistance") === -1) {
-                            self._getContent().wijsplitter("option", "splitterDistance", 100);
                         }
                         self.refresh();
                         if(self.editor.wijRemoveVisibilityObserver) {
@@ -1350,7 +1346,7 @@ var wijmo;
                     //end for hiding path
                     self._getPathSelector().hide();
                 }
-                self._ribbonCommand(o.editorMode);
+                self._ribbonCommand(o.editorMode, null, true);
                 //update for supporting fullscreenmode by wuhao at 2011/8/2
                 if(o.fullScreenMode) {
                     //fullScreen = self.options.fullScreenMode;
@@ -2053,6 +2049,8 @@ var wijmo;
                         }
                     }, 40);
                 }
+                //update fullScreenButton UI
+                self.$modes.wijribbon(setButtonChecked, cmd_fullscreen, fullScreenMode);
             };
             wijeditor.prototype._createWijMenu = //fixed bug for customContextMenu
             function () {
@@ -2110,8 +2108,8 @@ var wijmo;
             wijeditor.prototype._doSpellCheck = //end for fixing issue
             function () {
             };
-            wijeditor.prototype._ribbonCommand = function (cmd, parentCmd) {
-                var self = this, doc = self._getDesignViewDocument(), content = self._getContent(), elementName, selectedHtml, range;
+            wijeditor.prototype._ribbonCommand = function (cmd, parentCmd, isInit) {
+                var self = this, doc = self._getDesignViewDocument(), content = self._getContent(), distance = content.height() / 2, elementName, selectedHtml, range;
                 if(parentCmd === cmd_fontname) {
                     self._fontNameCommand(cmd);
                     //add for any change happens, the text would be saved by wh at 2011/12/07
@@ -2128,7 +2126,16 @@ var wijmo;
                 }
                 //for case: 35318 issue 2013/3/28
                 if(!self.editor.hasClass("ui-helper-hidden-accessible")) {
-                    self._setIEFocus();
+                    // when the editor is place another container widget, such as accordion, and the container is invisible after
+                    // the container widget init. if firstly create the editor widget, and then create the container widget,
+                    // the iframe will be focusd in ie9, and in the container widget, it looks like someting can edit.
+                    if(isInit) {
+                        setTimeout(function () {
+                            self._setIEFocus();
+                        }, 0);
+                    } else {
+                        self._setIEFocus();
+                    }
                 }
                 switch(cmd) {
                     case cmd_blockquote:
@@ -2313,6 +2320,7 @@ var wijmo;
                         }
                         self.$ribbon.wijribbon("option", "disabled", false);
                         content.wijsplitter("option", {
+                            splitterDistance: distance,
                             panel1: {
                                 collapsed: false
                             },
@@ -2776,9 +2784,6 @@ var wijmo;
             wijeditor.prototype._onDesignViewBlur = function (e) {
                 var self = this, o = self.options, sourceView;
                 sourceView = self._getDesignViewText();
-                //update for fixing issue 20372 by wh at 2012/3/9
-                self._onTextChange(e);
-                //end for 20372 issue
                 if(o.mode === "bbcode") {
                     //Note: trim leading/trailing whitespace
                     //because when get the innerhtml from body, there
@@ -2786,6 +2791,9 @@ var wijmo;
                     sourceView = self._convertHtmlToBBCode($.trim(sourceView));
                 }
                 self.sourceView.val(sourceView);
+                //update for fixing issue 20372 by wh at 2012/3/9
+                self._onTextChange(e);
+                //end for 20372 issue
                 o.text = sourceView;
             };
             wijeditor.prototype._onTextChange = function (e) {
@@ -2814,6 +2822,11 @@ var wijmo;
                 data = data.replace(/>/g, '&gt;');
                 //note: can't asure  there is no problem.
                 //data = data.replace(/ /g, '&nbsp;');
+                // In IE, recover "&lt;p&gt;""&lt;/p&gt;" to <p></p>.
+                if($.browser.msie) {
+                    data = data.replace(/&lt;p&gt;/gim, '<p>');
+                    data = data.replace(/&lt;\/p&gt;/gim, '</p>');
+                }
                 // Convert line breaks to <br>.
                 data = data.replace(/(?:\r\n|\n|\r)/g, '<br>');
                 //[email]
@@ -2886,6 +2899,11 @@ var wijmo;
                 data = self._replaceComplexHtml(data);
                 // Convert <br> to line breaks.
                 data = data.replace(/<br(?=[ \/>]).*?>/gim, '\r\n');
+                // In IE, convert <p></p> to "&lt;p&gt;""&lt;/p&gt;" to prevent from being deleted.
+                if($.browser.msie) {
+                    data = data.replace(/<p>/gim, '&lt;p&gt;');
+                    data = data.replace(/<\/p>/gim, '&lt;/p&gt;');
+                }
                 // [URL]
                 data = data.replace(/<a .*?href=(["'])(.+?)\1.*?>(.+?)<\/a>/gi, '[URL=$2]$3[/URL]');
                 // [Email]
@@ -4709,8 +4727,16 @@ var wijmo;
             };
             wijeditor.prototype._setFocusNotIE = //end of focus related methods in ie.
             function () {
-                var win = this._getDesignViewWindow();
-                if(!$.browser.msie) {
+                var win = this._getDesignViewWindow(), doc = win.document;
+                if($.browser.msie) {
+                    return;
+                }
+                if(!$.browser.mozilla) {
+                    //for chrome version has updated, the unittest failed
+                    if(doc.body) {
+                        doc.body.focus();
+                    }
+                } else {
                     win.focus();
                 }
             };
@@ -5894,8 +5920,15 @@ var wijmo;
                 var self = this, doc = self._getDesignViewDocument(), element = self.element, header = self._getHeader(), footer = self._getFooter(), width = self._oriEleWidth, height = self._oriEleHeight, content = self._getContent(), contentHeight;
                 self.editor.width(width).height(height);
                 this.$ribbon.wijribbon("updateRibbonSize");
-                contentHeight = self.editor.height() - header.outerHeight(true) - footer.outerHeight(true);
-                content.height(contentHeight).wijsplitter("refresh");
+                // the ribbon has not resized completed, so can't get
+                // the correct header width
+                window.setTimeout(function () {
+                    contentHeight = self.editor.height() - header.outerHeight(true) - footer.outerHeight(true);
+                    content.height(contentHeight);
+                    if(content.data("wijmoWijsplitter")) {
+                        content.wijsplitter("refresh");
+                    }
+                }, 0);
                 if($.browser.mozilla) {
                     setTimeout(self._setDesignModeForFF, 1000, self);
                 } else {

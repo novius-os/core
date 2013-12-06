@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20132.15
+ * Wijmo Library 3.20133.20
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -100,15 +100,6 @@ var wijmo;
                 } else {
                     self.innerData = o.data;
                 }
-                if($.isArray(self.innerData)) {
-                    self.items = [];
-                    $.each(self.innerData, function (i, item) {
-                        self.items.push($.extend(true, {
-                        }, item));
-                    });
-                    self.innerData = self.items;
-                    //self.items = self.innerData;
-                                    }
                 self.listHasCreated = false;
             };
             wijcombobox.prototype._checkSelectIndex = function () {
@@ -128,8 +119,6 @@ var wijmo;
                 }
                 index = o.selectedIndex;
                 if(!self._usingRemoteData() && (index >= 0 || $.isArray(index))) {
-                    // when set the selected Item, remove the all selected items.
-                    this.menu.unselectItems(index);
                     self.search(null, "checkindex");
                 }
                 // if the selecteIndex is -1 and selectedValue is null, the text
@@ -293,14 +282,13 @@ var wijmo;
                         // fixed an issue of IE10(browser mode IE9), when runs in this mode,
                         // the input element will show clear button at the right side of the input element.
                         // click the button, the widget's text value will not cleared.
-                        if(input.val() == '') {
+                        if(input.val() === '') {
                             return;
                         }
                         // Wait for it....
                         setTimeout(function () {
-                            if(input.val() == '') {
-                                self._clearSelection();
-                                self._setSelectedIndex(-1);
+                            if(input.val() === '') {
+                                self.menu.deactivate();
                             }
                         }, 5);
                     });
@@ -330,28 +318,6 @@ var wijmo;
             };
             wijcombobox.prototype._hasSameValueText = function (item1, item2) {
                 return item1.label === item2.label && item1.value === item2.value;
-            };
-            wijcombobox.prototype._getItemIndex = function (item, items) {
-                var index = -1;
-                if(!item) {
-                    return -1;
-                }
-                $.each(items, function (i, node) {
-                    if(node.label === item.label && node.value === item.value) {
-                        index = i;
-                    }
-                });
-                return index;
-            };
-            wijcombobox.prototype._getListItemByComboboxItem = function (item) {
-                var index;
-                if(this.items) {
-                    index = this._getItemIndex(item, this.items);
-                    if(this.menu.items && index < this.menu.items.length && index > -1) {
-                        return this.menu.items[index];
-                    }
-                }
-                return null;
             };
             wijcombobox.prototype._initDropDownList = function () {
                 var self = this, doc, menuElement, o, header, listOptions, wijCSS = this.options.wijCSS, zIndex = parseInt(self._input.css("zIndex"), 10), dropDownContainer;
@@ -391,31 +357,17 @@ var wijmo;
                     },
                     selected: function (event, ui) {
                         window.clearTimeout(self.closing);
-                        var mode = o.selectionMode, item, newIndex, cancelSelect = false, oldText, oldIndex, oldItem, previousItem, preIndex, listItem;
-                        item = ui.item , previousItem = ui.previousItem;
-                        // because now the list's item is not related with the combobox items for fixing the issue 39687.
-                        // we need to set the selected status to the combobox's item.
-                        newIndex = self._getItemIndex(item, self.items);
+                        var mode = o.selectionMode, item, newIndex, cancelSelect = false, oldText, oldIndex, oldItem;
+                        item = ui.item;
+                        newIndex = $.inArray(item, self.items);
                         if(newIndex < 0) {
                             return;
-                        }
-                        self.items[newIndex].selected = item.selected;
-                        // set the previous item's selected state to the items.
-                        if(previousItem) {
-                            preIndex = self._getItemIndex(previousItem, self.items);
-                            if(preIndex > -1) {
-                                self.items[preIndex].selected = previousItem.selected;
-                            }
                         }
                         if(self._trigger("select", event, item)) {
                             if(mode === "single") {
                                 // single mode selection
                                 // local data select
                                 if(!self._usingRemoteData()) {
-                                    //newIndex = self._getItemIndex(item, self.items);
-                                    if(newIndex === -1) {
-                                        newIndex = ui.selectedIndex;
-                                    }
                                     if(newIndex !== o.selectedIndex) {
                                         oldIndex = o.selectedIndex;
                                         oldItem = self.selectedItem;
@@ -438,11 +390,8 @@ var wijmo;
                                         o.inputTextInDropDownList = true;
                                         //o.text = self._input.val();for #33666 issue
                                         // fixed the issue 41831
-                                        if(oldItem) {
-                                            listItem = self._getListItemByComboboxItem(oldItem);
-                                            if(listItem && listItem.element) {
-                                                listItem.element.removeClass("wijmo-wijcombobox-selecteditem");
-                                            }
+                                        if(oldItem && oldItem.element) {
+                                            oldItem.element.removeClass("wijmo-wijcombobox-selecteditem");
                                         }
                                         self._trigger("changed", null, {
                                             oldItem: oldItem,
@@ -472,10 +421,6 @@ var wijmo;
                                         //o.text = self._input.val();for #33666 issue
                                         self.selectedItem = item;
                                         //update for 29162 issue.
-                                        //newIndex = $.inArray(item, self.items);
-                                        if(newIndex === undefined) {
-                                            newIndex = ui.selectedIndex;
-                                        }
                                         if(newIndex !== o.selectedIndex) {
                                             o.selectedIndex = newIndex;
                                             o.selectedValue = self.selectedItem.value;
@@ -521,8 +466,7 @@ var wijmo;
                         }
                     },
                     itemRendering: function (event, data) {
-                        var item = data, css, index, optSelectedIndex;
-                        css = "";
+                        var item = data, css = "";
                         if(item.isSeparator) {
                             css += " wijmo-wijcombobox-separator";
                         }
@@ -559,7 +503,7 @@ var wijmo;
                     listRendered: function (event, data) {
                         var selectedItem = self.menu.selectedItem, selectedItems = self.menu.selectedItems, selecedIndex, items;
                         if(o.selectionMode === "single" && selectedItem) {
-                            selecedIndex = self._getItemIndex(selectedItem, self.items);
+                            selecedIndex = $.inArray(selectedItem, self.items);
                             if(selecedIndex < 0) {
                                 return;
                             }
@@ -569,7 +513,7 @@ var wijmo;
                             selecedIndex = [];
                             items = [];
                             $.each(selectedItems, function (i, item) {
-                                var index = self._getItemIndex(item, self.items);
+                                var index = $.inArray(item, self.items);
                                 if(index < 0) {
                                     return true;
                                 }
@@ -580,18 +524,6 @@ var wijmo;
                         }
                         if(selecedIndex >= -1) {
                             o.selectedIndex = selecedIndex;
-                        }
-                    },
-                    added: function (event, data) {
-                        var item = data.item, index = data.index;
-                        if(self.items.indexOf(item) === -1) {
-                            if(index === null || index === undefined) {
-                                self.items.push(item);
-                            } else {
-                                if(self.items) {
-                                    self.items.splice(index, 0, item);
-                                }
-                            }
                         }
                     },
                     superPanelOptions: {
@@ -637,7 +569,7 @@ var wijmo;
                         oldIndex: oldIndex
                     });
                 } else {
-                    curSelectedIdx = this._getItemIndex(newItem, this.items);
+                    curSelectedIdx = $.inArray(newItem, this.items);
                     this._trigger("selectedIndexChanged", null, {
                         selectedItem: newItem,
                         selectedIndex: curSelectedIdx,
@@ -646,7 +578,7 @@ var wijmo;
                 }
             };
             wijcombobox.prototype._triggerSelectedIndexChanging = function (oldItem, newItem, oldIndex, newIndex) {
-                var o = this.options, curSelectedIdx, args, isSelect = true, listItem;
+                var o = this.options, curSelectedIdx, args, isSelect = true;
                 if(o.selectionMode === "single") {
                     args = {
                         oldItem: oldItem,
@@ -656,7 +588,7 @@ var wijmo;
                     };
                     isSelect = this._trigger("selectedIndexChanging", null, args);
                 } else {
-                    curSelectedIdx = this._getItemIndex(newItem, this.items);
+                    curSelectedIdx = $.inArray(newItem, this.items);
                     args = {
                         selectedItem: newItem,
                         selectedIndex: curSelectedIdx,
@@ -666,8 +598,7 @@ var wijmo;
                 }
                 if(!isSelect) {
                     newItem.selected = false;
-                    listItem = this._getListItemByComboboxItem(newItem);
-                    if(listItem && listItem.element) {
+                    if(newItem.element) {
                         newItem.element.removeClass("wijmo-wijcombobox-selecteditem");
                     }
                 }
@@ -687,12 +618,26 @@ var wijmo;
                     //update for case 20689 at 2012/4/11
                     if(!self.listHasCreated && items && items.length > 0) {
                         self.menu.setTemplateItems(o.data);
+                        if($.isArray(self.innerData)) {
+                            self.innerData = self.menu.items;
+                        } else {
+                            self.innerData.items = self.menu.items;
+                        }
+                        //self.innerData = self.menu.items;
+                        self.items = self.menu.items;
                         self.menu.renderList();
                         self.listHasCreated = true;
                     }
                 } else {
                     if(!self.listHasCreated && items && items.length > 0) {
                         self.menu.setItems(items);
+                        if($.isArray(self.innerData)) {
+                            self.innerData = self.menu.items;
+                        } else {
+                            self.innerData.items = self.menu.items;
+                        }
+                        //self.innerData = self.menu.items;
+                        self.items = self.menu.items;
                         self.menu.renderList();
                         self.listHasCreated = true;
                     }
@@ -834,7 +779,8 @@ var wijmo;
                         selectClone.remove();
                     }
                     //update for bind array
-                    input.width(selectWidth + (self.innerData.length > 20 ? o.selectElementWidthFix : 0));
+                    comboElement.css("width", "");
+                    input.width(selectWidth + (o.dropdownHeight < self.menu.element.height() ? o.selectElementWidthFix : 0));
                     self._select.hide();
                 }
                 //update for fixing bug 15920 by wuhao
@@ -1108,7 +1054,6 @@ var wijmo;
                     if(value === oldSelectedIndex) {
                         return;
                     }
-                    //self.selectedItem = null;
                     if(self.innerData === null) {
                         items = null;
                     } else {
@@ -1129,7 +1074,6 @@ var wijmo;
                             // need use oldSelectedIndex to clear selection
                             if(oldSelectedIndex !== null && oldSelectedIndex !== -1 && oldSelectedIndex !== undefined && oldSelectedItem) {
                                 oldSelectedItem.selected = false;
-                                oldSelectedItem = this._getListItemByComboboxItem(oldSelectedItem);
                                 this.menu.unselectItems(oldSelectedIndex);
                                 if(oldSelectedItem.element) {
                                     oldSelectedItem.element.removeClass("wijmo-wijcombobox-selecteditem");
@@ -1139,11 +1083,8 @@ var wijmo;
                                 self.selectedItem = items[value];
                                 if(self.selectedItem) {
                                     self.selectedItem.selected = true;
-                                    //self._input.val(self.selectedItem.label);
                                     self._setInputText(self.selectedItem.label);
                                     o.selectedValue = self.selectedItem.value;
-                                    self.menu.items[value].selected = true;
-                                    self.menu.selectedItem = self.menu.items[value];
                                     o.inputTextInDropDownList = true;
                                     //o.text = self._input.val();for #33666 issue
                                                                     }
@@ -1173,9 +1114,6 @@ var wijmo;
                         $.each(oldSelectedIndex, function (i, index) {
                             if(self.menu.items && self.menu.items[index]) {
                                 self.menu.items[index].selected = false;
-                            }
-                            if(self.items && self.items[index]) {
-                                self.items[index].selected = false;
                             }
                         });
                         this.menu.unselectItems(oldSelectedIndex);
@@ -1246,10 +1184,13 @@ var wijmo;
                     }
                     //self._input.val(value);
                     self._setInputText(value);
+                } else if(key === "selectElementWidthFix") {
+                    self._showTrigger();
                 }
             };
             wijcombobox.prototype._setSelectedIndex = function (value) {
-                var self = this, o = self.options, selectedItems = [];
+                var self = this, o = self.options, selectedItems = [], data = //data = self.items;
+                self.innerData;
                 if(value === null || value === undefined) {
                     return;
                 }
@@ -1266,19 +1207,19 @@ var wijmo;
                     if($.isArray(value)) {
                         self.selectedItems = [];
                         $.each(value, function (i, val) {
-                            if(self.items && self.items[val] !== null && self.items[val] !== undefined) {
-                                self.items[val].selected = true;
-                                selectedItems.push(self.items[val]);
+                            if(data && data[val] !== null && data[val] !== undefined) {
+                                data[val].selected = true;
+                                selectedItems.push(data[val]);
                             }
                         });
                         self.selectedItems = selectedItems;
                         self._selectedItemsToInputVal(selectedItems);
                     } else {
-                        if(self.items && self.items[value] !== null && self.items[value] !== undefined) {
-                            self.items[value].selected = true;
-                            self._input.val(self.items[value].label);
-                            self.selectedItem = self.items[value];
-                        } else if(self.items && $.isArray(self.items) && value > self.items.length - 1) {
+                        if(data && data[value] !== null && data[value] !== undefined) {
+                            data[value].selected = true;
+                            self._input.val(data[value].label);
+                            self.selectedItem = data[value];
+                        } else if(data && $.isArray(data) && value > data.length - 1) {
                             o.selectedIndex = -1;
                             self._input.val("");
                         }
@@ -1315,7 +1256,7 @@ var wijmo;
                             return;
                         }
                     }
-                    if($.isArray(datasource) || isBind || self._comboDiv) {
+                    if($.isArray(datasource) || isBind || self._comboDiv || (!self._usingRemoteData() && datasource.items && $.isArray(datasource.items) && datasource.items.length > 0)) {
                         self._hideShowArrow(false);
                         self._onListLoaded(datasource, d);
                     } else if(!isBind && $.isArray(o.dataSource)) {
@@ -1332,6 +1273,7 @@ var wijmo;
                             //datasource condition the data is get by proxy
                             self.listHasCreated = false;
                             self._createDropDownList(e);
+                            //self._onListLoaded(self.items, data);
                             self._onListLoaded(e, data);
                             if(self.originalDataSourceLoaded) {
                                 self.originalDataSourceLoaded(e, data);
@@ -1388,37 +1330,19 @@ var wijmo;
             };
             wijcombobox.prototype._clearSelection = //end for bind data
             function () {
-                var self = this, o = self.options, index, listIndex;
+                var self = this, o = self.options;
                 if(o.selectionMode === "single") {
                     if(self.selectedItem !== null) {
                         self.selectedItem.selected = false;
-                        // set the items selected status.
-                        index = self._getItemIndex(self.selectedItem, self.items);
-                        if(index < 0) {
-                            return;
-                        }
-                        self.items[index].selected = false;
-                        listIndex = self._getItemIndex(self.selectedItem, self.menu.items);
-                        self.menu.unselectItems(listIndex);
-                        //call the list to remove the selected item
                         self.selectedItem = null;
                     }
                 } else {
                     if(self.selectedItems) {
-                        listIndex = [];
                         $.each(self.selectedItems, function (index, item) {
                             if(item && item.selected) {
                                 item.selected = false;
-                                // set the items selected status.
-                                index = self._getItemIndex(item, self.items);
-                                if(index < 0) {
-                                    return true;
-                                }
-                                self.items[index].selected = false;
-                                listIndex.push(self._getItemIndex(item, self.menu.items));
                             }
                         });
-                        self.menu.unselectItems(listIndex);
                         self.selectedItem = null;
                         self.selectedItems = [];
                     }
@@ -1446,7 +1370,7 @@ var wijmo;
                 input[show ? "removeClass" : "addClass"]("wijmo-wijcombobox-loading");
             };
             wijcombobox.prototype._onListLoaded = function (datasource, data) {
-                var self = data.self, ele, o, wijCSS = this.options.wijCSS, searchTerm, items, idx, itemsToRender, listIndex;
+                var self = data.self, ele, o, wijCSS = this.options.wijCSS, searchTerm, items, idx, itemsToRender;
                 ele = self._input;
                 o = self.options;
                 searchTerm = data.value;
@@ -1457,12 +1381,6 @@ var wijmo;
                 }
                 self.items = items;
                 if(data.e === "checkindex") {
-                    // if set checkIndex, remove the history selected status in data source.
-                    $.each(self.items, function (i, _item) {
-                        if(_item.selected) {
-                            _item.selected = false;
-                        }
-                    });
                     idx = o.selectedIndex;
                     if(o.selectionMode === "multiple" && $.isArray(idx)) {
                         self.selectedItems = [];
@@ -1470,26 +1388,23 @@ var wijmo;
                             var itm = items[n];
                             itm.selected = true;
                             self.selectedItems.push(itm);
-                            listIndex = self._getItemIndex(itm, self.menu.items);
-                            self.menu.items[listIndex].selected = true;
-                            self.menu.selectedItems.push(self.menu.items[listIndex]);
                         });
                         self._selectedItemsToInputVal(self.selectedItems);
                     } else {
                         items[idx].selected = true;
                         self.selectedItem = items[idx];
-                        listIndex = self._getItemIndex(items[idx], self.menu.items);
-                        //self.menu.select();
-                        self.menu.items[listIndex].selected = true;
-                        self.menu.selectedItem = self.menu.items[listIndex];
                         ele.val(self.selectedItem.label);
                     }
                     self._hideShowArrow(true);
                     return;
                 }
+                // fixed the issue 42893, if the selected item's label is empty, here should
+                // not reset the selection.
                 if(ele.val() === "") {
-                    self._clearSelection();
-                    self._setSelectedIndex(-1);
+                    // If user not select any item, the text option's default value is emtpy, So here can't use o.text.
+                    if(!(this.selectedItem && this.selectedItem.label === "")) {
+                        self.menu.deactivate();
+                    }
                 }
                 // only fileter result when using local data.
                 if(!self._usingRemoteData() && items) {
@@ -1566,7 +1481,7 @@ var wijmo;
                 t = ele.val();
                 itm = self.selectedItem;
                 items = self.selectedItems;
-                oldIndex = o.selectedIndex ? o.selectedIndex : -1;
+                oldIndex = (o.selectedIndex || o.selectedIndex > -1) ? o.selectedIndex : -1;
                 innerData = self.innerData;
                 if(f) {
                     if(m === "single") {
@@ -1636,10 +1551,10 @@ var wijmo;
                 }
             };
             wijcombobox.prototype._checkTextInItems = function (text) {
-                var self = this, index = -1, data = self.items;
+                var index = -1, data = this.items;
                 if(text) {
                     $.each(data, function (i, item) {
-                        if(data[i] && data[i].label && data[i].label.toString() === text) {
+                        if(item && item.label && item.label.toString() === text) {
                             index = i;
                             return false;
                         }

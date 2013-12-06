@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20132.15
+ * Wijmo Library 3.20133.20
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -531,8 +531,11 @@ var wijmo;
                 this.fields.clipRect = this.clipRect;
             };
             ScatterChartRender.prototype.bindLiveEvents = function () {
-                var isFunction = $.isFunction, o = this.options, wijCSS = o.wijCSS, element = this.element, widgetName = o.widgetName, mouseDown = o.mouseDown, mouseUp = o.mouseUp, mouseOver = o.mouseOver, mouseOut = o.mouseOut, mouseMove = o.mouseMove, click = o.click, zoomOnHover = o.zoomOnHover, seriesHoverStyles = o.seriesHoverStyles, seriesStyles = o.seriesStyles, disabled = o.disabled;
-                $("." + wijCSS.scatterElement, element[0]).on("mousedown." + widgetName, function (e) {
+                var isFunction = $.isFunction, o = this.options, wijCSS = o.wijCSS, element = this.element, widgetName = o.widgetName, mouseDown = o.mouseDown, mouseUp = o.mouseUp, mouseOver = o.mouseOver, mouseOut = o.mouseOut, mouseMove = o.mouseMove, click = o.click, zoomOnHover = o.zoomOnHover, seriesHoverStyles = o.seriesHoverStyles, seriesStyles = o.seriesStyles, disabled = o.disabled, touchEventPre = "";
+                if($.support.isTouchEnabled && $.support.isTouchEnabled()) {
+                    touchEventPre = "wij";
+                }
+                $("." + wijCSS.scatterElement, element[0]).on(touchEventPre + "mousedown." + widgetName, function (e) {
                     if(disabled) {
                         return;
                     }
@@ -543,7 +546,7 @@ var wijmo;
                         }
                         mouseDown.call(element, e, dataObj);
                     }
-                }).on("mouseup." + widgetName, function (e) {
+                }).on(touchEventPre + "mouseup." + widgetName, function (e) {
                     if(disabled) {
                         return;
                     }
@@ -554,7 +557,7 @@ var wijmo;
                         }
                         mouseUp.call(element, e, dataObj);
                     }
-                }).on("mouseover." + widgetName, function (e) {
+                }).on(touchEventPre + "mouseover." + widgetName, function (e) {
                     if(disabled) {
                         return;
                     }
@@ -581,7 +584,7 @@ var wijmo;
                     if(isFunction(mouseOver)) {
                         mouseOver.call(element, e, dataObj);
                     }
-                }).on("mouseout." + widgetName, function (e) {
+                }).on(touchEventPre + "mouseout." + widgetName, function (e) {
                     if(disabled) {
                         return;
                     }
@@ -603,7 +606,7 @@ var wijmo;
                     if(isFunction(mouseOut)) {
                         mouseOut.call(element, e, dataObj);
                     }
-                }).on("mousemove." + widgetName, function (e) {
+                }).on(touchEventPre + "mousemove." + widgetName, function (e) {
                     if(disabled) {
                         return;
                     }
@@ -614,7 +617,7 @@ var wijmo;
                         }
                         mouseMove.call(element, e, dataObj);
                     }
-                }).on("click." + widgetName, function (e) {
+                }).on(touchEventPre + "click." + widgetName, function (e) {
                     if(disabled) {
                         return;
                     }

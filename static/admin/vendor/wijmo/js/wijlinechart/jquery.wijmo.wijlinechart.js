@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20132.15
+ * Wijmo Library 3.20133.20
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -125,7 +125,8 @@ var wijmo;
                 }
                 if(seriesEle.path) {
                     obj = $(seriesEle.path.node).data("wijchartDataObj");
-                    if(obj.visible) {
+                    // If line is invisible and markers are visible, in this case, do not show the line. Otherwise, show the line.
+                    if(!(!obj.visible && obj.markers && obj.markers.visible)) {
                         seriesEle.path.show();
                         if(seriesEle.path.shadow) {
                             seriesEle.path.shadow.show();
@@ -612,6 +613,12 @@ var wijmo;
                 });
                 this.linechartRender.render();
             };
+            wijlinechart.prototype._clearChartElement = function () {
+                _super.prototype._clearChartElement.call(this);
+                this.hoverLine = null;
+                this.hoverPoint = null;
+                this.hoverVirtualPoint = null;
+            };
             return wijlinechart;
         })(chart.wijchartcore);
         chart.wijlinechart = wijlinechart;        
@@ -841,7 +848,8 @@ var wijmo;
                         if(path.shadow && path.visible !== false) {
                             path.shadow.show();
                         }
-                        if(path.tracker) {
+                        // If the path is not visible, not show the tracker.
+                        if(path.tracker && path.visible !== false) {
                             path.tracker.show();
                         }
                     });
@@ -892,7 +900,8 @@ var wijmo;
                     if(path.shadow && path.visible !== false) {
                         path.shadow.show();
                     }
-                    if(path.tracker) {
+                    // If the path is invisible. not show the trackers.
+                    if(path.tracker && path.visible !== false) {
                         path.tracker.show();
                     }
                 });
@@ -930,7 +939,8 @@ var wijmo;
                 animationSet.wijAnimate({
                     "clip-rect": Raphael.format("{0} {1} {2} {3}", (cBounds.startX + clipRect.left), (cBounds.startY + clipRect.top), width, height)
                 }, duration, easing, function () {
-                    if(this.tracker) {
+                    // If the path is invisible not show the tracker.
+                    if(this.tracker && this.visible !== false) {
                         this.tracker.show();
                     }
                     if(Raphael.vml && !clipRectEnable) {
@@ -952,7 +962,14 @@ var wijmo;
                                 });
                             }
                             //end comments.
-                                                    }
+                            // fixed the issue 42963, I have checked the issue and found when play animation, the gradient color will disapear.
+                            // according to the issue 19385 fixing, reset the gradient fill.
+                            if(attrs.gradient && attrs.gradient.length && attrs.fill === "none") {
+                                this.attr({
+                                    "fill": attrs.gradient
+                                });
+                            }
+                        }
                     }
                 });
             };
@@ -1254,6 +1271,9 @@ var wijmo;
                 }
                 if(!lineSeries.visible || lineSeries.display === "hide") {
                     path.hide();
+                    if(path.tracker) {
+                        path.tracker.hide();
+                    }
                     if(path.shadow) {
                         path.shadow.hide();
                     }

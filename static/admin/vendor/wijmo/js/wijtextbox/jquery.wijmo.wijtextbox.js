@@ -1,10 +1,10 @@
 /*
  *
- * Wijmo Library 3.20132.15
+ * Wijmo Library 3.20133.20
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
- *
+ * 
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * licensing@wijmo.com
  * http://wijmo.com/widgets/license/
@@ -89,7 +89,7 @@ var wijmo;
             };
             return wijtextbox;
         })(wijmo.wijmoWidget);
-        textbox.wijtextbox = wijtextbox;
+        textbox.wijtextbox = wijtextbox;        
         var wijtextbox_options = (function () {
             function wijtextbox_options() {
                 /** Selector option for auto self initialization. This option is internal.
@@ -104,7 +104,7 @@ var wijmo;
                 };
             }
             return wijtextbox_options;
-        })();
+        })();        
         ;
         wijtextbox.prototype.options = $.extend(true, {
         }, wijmo.wijmoWidget.prototype.options, new wijtextbox_options());

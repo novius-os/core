@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20132.15
+ * Wijmo Library 3.20133.20
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -47,7 +47,7 @@ var wijmo;
 
             }
             wijcompositechart.prototype._create = function () {
-                var self = this, o = self.options, defFill = self._getDefFill(), seriesStyles = o.seriesStyles;
+                var self = this, o = self.options, defFill = self._getDefFill(), seriesStyles = o.seriesStyles, yAxis, yAxes;
                 $.each(o.seriesList, function (idx, series) {
                     if(series.type === "bar") {
                         $.extend(true, o.axis, {
@@ -72,7 +72,15 @@ var wijmo;
                 }
                 //handle the multiple y axis for extender and controls
                 if(o.yAxes && $.isArray(o.yAxes) && o.yAxes.length > 0) {
-                    o.axis.y = o.yAxes;
+                    // for composite chart, if user set the y axis option, here should get the settings from y axis.
+                    yAxes = [];
+                    //yAxis = $.extend(true, {}, o.axis.y);
+                    //o.axis.y = o.yAxes;
+                    $.each(o.yAxes, function (i, axis) {
+                        yAxes.push($.extend({
+                        }, o.axis.y, axis));
+                    });
+                    o.axis.y = yAxes;
                 }
                 self._handleChartStyles();
                 // default some fills
@@ -424,7 +432,8 @@ var wijmo;
                         }
                         if(eles.path) {
                             dataObj = $(eles.path.node).data("wijchartDataObj");
-                            if(dataObj.visible) {
+                            // if markers are invisible and line path is invisible, when click the legend, show the line path.
+                            if(dataObj.visible || !(!dataObj.visible && dataObj.markers && dataObj.markers.visible)) {
                                 eles.path.show();
                                 if(eles.path.shadow) {
                                     eles.path.shadow.show();

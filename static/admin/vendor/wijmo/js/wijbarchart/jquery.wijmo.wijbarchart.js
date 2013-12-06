@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20132.15
+ * Wijmo Library 3.20133.20
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -1316,7 +1316,10 @@ var wijmo;
                 }
             };
             BarChartRender.prototype.bindLiveEvents = function () {
-                var o = this.options, wijCSS = o.wijCSS, widgetName = o.widgetName, disabled = o.disabled, mouseDown = o.mouseDown, mouseUp = o.mouseUp, mouseOver = o.mouseOver, mouseOut = o.mouseOut, mouseMove = o.mouseMove, click = o.click, element = this.element, isFunction = $.isFunction;
+                var o = this.options, wijCSS = o.wijCSS, widgetName = o.widgetName, disabled = o.disabled, mouseDown = o.mouseDown, mouseUp = o.mouseUp, mouseOver = o.mouseOver, mouseOut = o.mouseOut, mouseMove = o.mouseMove, click = o.click, element = this.element, isFunction = $.isFunction, touchEventPrefix = "";
+                if($.support.isTouchEnabled && $.support.isTouchEnabled()) {
+                    touchEventPrefix = "wij";
+                }
                 //				if (hintEnable && !tooltip) {
                 //					hint = $.extend(true, {}, options.hint);
                 //					hint.offsetY = hint.offsetY || -2;
@@ -1341,7 +1344,7 @@ var wijmo;
                 //					};
                 //					tooltip = canvas.tooltip(bars, hint);
                 //				}
-                $("." + wijCSS.barElement, element[0]).on("mousedown." + widgetName, function (e) {
+                $("." + wijCSS.barElement, element[0]).on(touchEventPrefix + "mousedown." + widgetName, function (e) {
                     if(disabled) {
                         return;
                     }
@@ -1354,7 +1357,7 @@ var wijmo;
                         mouseDown.call(element, e, dataObj);
                         dataObj = null;
                     }
-                }).on("mouseup." + widgetName, function (e) {
+                }).on(touchEventPrefix + "mouseup." + widgetName, function (e) {
                     if(disabled) {
                         return;
                     }
@@ -1367,7 +1370,7 @@ var wijmo;
                         mouseUp.call(element, e, dataObj);
                         dataObj = null;
                     }
-                }).on("mouseover." + widgetName, function (e) {
+                }).on(touchEventPrefix + "mouseover." + widgetName, function (e) {
                     if(disabled) {
                         return;
                     }
@@ -1392,7 +1395,7 @@ var wijmo;
                         mouseOver.call(element, e, dataObj);
                         dataObj = null;
                     }
-                }).on("mouseout." + widgetName, function (e) {
+                }).on(touchEventPrefix + "mouseout." + widgetName, function (e) {
                     if(disabled) {
                         return;
                     }
@@ -1423,7 +1426,7 @@ var wijmo;
                     //if (tooltip) {
                     //	tooltip.hide();
                     //}
-                                    }).on("mousemove." + widgetName, function (e) {
+                                    }).on(touchEventPrefix + "mousemove." + widgetName, function (e) {
                     if(disabled) {
                         return;
                     }
@@ -1438,7 +1441,7 @@ var wijmo;
                     }
                     dataObj = null;
                     //end of code for adding hover state effect.
-                                    }).on("click." + widgetName, function (e) {
+                                    }).on(touchEventPrefix + "click." + widgetName, function (e) {
                     if(disabled) {
                         return;
                     }

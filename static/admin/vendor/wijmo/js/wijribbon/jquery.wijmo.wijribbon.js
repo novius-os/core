@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20132.15
+ * Wijmo Library 3.20133.20
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -172,9 +172,9 @@ var wijmo;
                     // wijcss.stateactive
                     //if ($(button).hasAllClasses(wijCSS.stateActive)) {
                     if($(button).hasAllClasses(css_active_state)) {
-                        $("." + wijCSS.buttonText, button).addClass(wijCSS.stateActive);
+                        $("." + wijCSS.buttonText, button).addClass(wijCSS.stateActive).addClass(wijCSS.stateDefault);
                     } else {
-                        $("." + wijCSS.buttonText, button).removeClass(wijCSS.stateActive);
+                        $("." + wijCSS.buttonText, button).removeClass(wijCSS.stateActive).removeClass(wijCSS.stateDefault);
                     }
                 }
             };
@@ -200,10 +200,10 @@ var wijmo;
                 }
                 radioLabelEle = $("[for='" + $(button).attr("id") + "']", $(button).parent());
                 if(radioLabelEle) {
-                    if(radioLabelEle.hasAllClasses(wijCSS.stateActive)) {
-                        radioLabelEle.children("." + wijCSS.buttonText).addClass(wijCSS.stateActive);
+                    if(radioLabelEle.hasAllClasses(css_active_state)) {
+                        radioLabelEle.children("." + wijCSS.buttonText).addClass(wijCSS.stateActive).addClass(wijCSS.stateDefault);
                     } else {
-                        radioLabelEle.children("." + wijCSS.buttonText).removeClass(wijCSS.stateActive);
+                        radioLabelEle.children("." + wijCSS.buttonText).removeClass(wijCSS.stateActive).removeClass(wijCSS.stateDefault);
                     }
                 }
             };
@@ -370,7 +370,7 @@ var wijmo;
                 };
                 $.each(self.dropdowns, function (i, dropdown) {
                     var list = dropdown.children("ul"), button = dropdown.children("button:eq(0)"), dropdownName = button.data("commandName"), dropdownObj;
-                    list.children("li").addClass(wijCSS.cornerAll);
+                    list.children("li").addClass(wijCSS.cornerAll + " " + wijCSS.stateDefault);
                     dropdown.addClass(css_ribbon + "-" + dropdownName);
                     button.button({
                         icons: {
@@ -425,7 +425,7 @@ var wijmo;
                     var list = dropdown.children("ul"), inputEle = dropdown.children("input[type='text']:eq(0)"), inputDropDownWrapper = //create whole input dropdown appearance
                     self._createInputDropDownWrapper(inputEle), dropdownName = inputEle.prop("name"), dropdownObj;
                     dropdown.prepend(inputDropDownWrapper);
-                    list.children("li").addClass(wijCSS.cornerAll);
+                    list.children("li").addClass(wijCSS.cornerAll + " " + wijCSS.stateDefault);
                     dropdown.addClass(css_ribbon + "-" + dropdownName);
                     inputEle.removeProp("name").data("commandName", dropdownName).addClass(wijCSS.stateDefault + " " + wijCSS.content + " " + wijCSS.cornerLeft);
                     inputDropDownWrapper.find("a").bind("mouseup", function (e) {

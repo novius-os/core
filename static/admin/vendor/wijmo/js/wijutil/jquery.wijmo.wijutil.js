@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20132.15
+ * Wijmo Library 3.20133.20
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -29,7 +29,10 @@ var wijmo;
             var val = this.val();
             if(arguments.length === 0) {
                 var range, stored_range, s, e;
-                if($.browser.msie && parseInt($.browser.version) < 9) {
+                if(typeof t.selectionStart !== "undefined") {
+                    s = t.selectionStart;
+                    e = t.selectionEnd;
+                } else {
                     try  {
                         var selection = document.selection;
                         if(t.tagName.toLowerCase() != "textarea") {
@@ -51,9 +54,6 @@ var wijmo;
                     } catch (e) {
                     }//fixed bug 26153
                     
-                } else {
-                    s = t.selectionStart;
-                    e = t.selectionEnd;
                 }
                 var te = val.substring(s, e);
                 return {
@@ -89,7 +89,7 @@ var wijmo;
                 start = 0;
                 end = val.length;
             }
-            if($.browser.msie) {
+            if(typeof t.createTextRange !== "undefined") {
                 var selRange = t.createTextRange();
                 selRange.collapse(true);
                 selRange.moveStart('character', start);

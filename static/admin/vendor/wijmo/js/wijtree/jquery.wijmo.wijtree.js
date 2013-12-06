@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20132.15
+ * Wijmo Library 3.20133.20
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -812,6 +812,12 @@ var wijmo;
                 var self = this, o = self.options, style, nodeClass = "wijmo-wijtree-item", hitClass = o.wijCSS.icon + " " + (o.expanded ? o.wijCSS.iconArrowRightDown : o.wijCSS.iconArrowRight);
                 if(self._tree.options.showExpandCollapse) {
                     if(self._hasChildren || !!o.hasChildren) {
+                        self.$nodeBody.removeClass("wijmo-state-expanded").removeClass("wijmo-state-collapsed");
+                        if(o.expanded) {
+                            self.$nodeBody.addClass("wijmo-state-expanded");
+                        } else {
+                            self.$nodeBody.addClass("wijmo-state-collapsed");
+                        }
                         if(self.$hitArea !== null) {
                             self.$hitArea.removeClass([
                                 o.wijCSS.icon, 
@@ -1032,7 +1038,16 @@ var wijmo;
                     css.iconArrowRightDown, 
                     css.iconArrowRight
                 ].join(' ');
-                this.$hitArea && this.$hitArea.removeClass(iconCss).addClass(css.icon).addClass(expanded ? css.iconArrowRightDown : css.iconArrowRight);
+                if(!this.$hitArea) {
+                    return;
+                }
+                this.$hitArea.removeClass(iconCss).addClass(css.icon).addClass(expanded ? css.iconArrowRightDown : css.iconArrowRight);
+                this.$nodeBody.removeClass("wijmo-state-expanded").removeClass("wijmo-state-collapsed");
+                if(expanded) {
+                    this.$nodeBody.addClass("wijmo-state-expanded");
+                } else {
+                    this.$nodeBody.addClass("wijmo-state-collapsed");
+                }
             };
             wijtreenode.prototype._show = function () {
                 this._animation(true);
