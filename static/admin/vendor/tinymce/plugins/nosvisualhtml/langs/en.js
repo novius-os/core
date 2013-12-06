@@ -1,3 +1,3 @@
 tinyMCE.addI18n('en.nosvisualhtml',{
-    desc : "Show paragraphs"
+    "desc" : "Show paragraphs"
 });
