@@ -55,7 +55,7 @@
                     self.onEnhancerAdd(enhancer);
 
                     var enhancer_id = $(this).data('enhancer');
-                    var metadata  = self.settings.theme_nos_enhancers[enhancer_id];
+                    var metadata  = self.nosenhancer_enhancers[enhancer_id];
                     var data      = $.extend(true, {enhancer: enhancer_id}, $(this).data('config'));
                     $.ajax({
                         url: metadata.previewUrl,
