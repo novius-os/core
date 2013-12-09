@@ -73,7 +73,7 @@ class Controller_Admin_Attachment extends \Nos\Controller_Admin_Application
                 ));
             $fieldset->form()->set_config('field_template', '<tr><th class="{error_class}">{label}{required}</th><td class="{error_class}">{field} {error_msg}</td></tr>');
 
-            $query = Model_Folder::find();
+            $query = Model_Folder::query();
             $query->where(array('medif_parent_id' => null));
             $root = $query->get_one();
             $fieldset->field('media_folder_id')->set_value($root->medif_id);
