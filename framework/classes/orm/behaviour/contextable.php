@@ -110,7 +110,7 @@ class Orm_Behaviour_Contextable extends Orm_Behaviour
                         $where[$k] = array($this->_properties['context_property'] => $w[$keys[0]]);
                     }
 
-                    if (count($w) > 1 && $w[0] == 'context') {
+                    if (count($w) > 1 && isset($w[0]) && $w[0] == 'context') {
                         $w[0] = $this->_properties['context_property'];
                         if (count($w) == 2 && is_array($w[1])) {
                             $w[2] = $w[1];
@@ -120,6 +120,7 @@ class Orm_Behaviour_Contextable extends Orm_Behaviour
                     }
                 }
             }
+
             $options['where'] = $where;
         }
     }

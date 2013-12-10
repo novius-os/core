@@ -12,18 +12,19 @@ class Response extends \Fuel\Core\Response
 {
     public static function json($status, $data = null)
     {
-        if ($data === null) {
-            $data = $status;
-            $status = 200;
-        }
-        static::forge(\Format::forge()->to_json($data), $status, array(
-            'Content-Type' => \Input::is_ajax() ? 'application/json' : 'text/plain',
-            'Cache-Control' => 'no-cache, no-store, max-age=0, must-revalidate',
-            'Expires' => 'Mon, 26 Jul 1997 05:00:00 GMT',
-            'Pragma' => 'no-cache',
-        ))->send(true);
-        Event::shutdown();
-        exit();
+        Event::register('fuel-shutdown', function () use ($status, $data) {
+            if ($data === null) {
+                $data = $status;
+                $status = 200;
+            }
+            Response::forge(\Format::forge()->to_json($data), $status, array(
+                'Content-Type' => \Input::is_ajax() ? 'application/json' : 'text/plain',
+                'Cache-Control' => 'no-cache, no-store, max-age=0, must-revalidate',
+                'Expires' => 'Mon, 26 Jul 1997 05:00:00 GMT',
+                'Pragma' => 'no-cache',
+            ))->send(true);
+        });
+        exit;
     }
 
     /**

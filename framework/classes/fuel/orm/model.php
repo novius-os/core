@@ -742,7 +742,7 @@ class Model extends \Orm\Model
         return $obj;
     }
 
-    public function & get($property)
+    public function & get($property, array $conditions = array())
     {
         if (isset(static::$_properties_cached[get_called_class()][static::prefix().$property])) {
             $property = static::prefix().$property;
@@ -766,7 +766,7 @@ class Model extends \Orm\Model
             }
         }
 
-        return parent::get($property);
+        return parent::get($property, $conditions);
     }
 
     public function & __get($name)
