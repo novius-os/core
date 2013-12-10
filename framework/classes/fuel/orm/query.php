@@ -67,7 +67,9 @@ class Query extends \Orm\Query
                     if (empty($condition)) {
                         return $this;
                     }
-                    $condition = $this->_parse_where_array($condition);
+                    if (\Arr::is_assoc($condition) || is_array(reset($condition))) {
+                        return $this->_parse_where_array($condition);
+                    }
                 } elseif (is_string($column)) {
                     $condition[0] = $replace;
                 }
