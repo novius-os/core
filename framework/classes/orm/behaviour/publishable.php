@@ -96,57 +96,30 @@ class Orm_Behaviour_Publishable extends Orm_Behaviour
 
     public function before_query(&$options)
     {
-        if (array_key_exists('where', $options)) {
-            $where = $options['where'];
-            if (isset($where['published'])) {
-                $where[$this->_properties['publication_state_property']] = $where['published'];
-                unset($where['published']);
+        $options = \Arr::merge((array) $options, array('before_where' => array()));
+        $_properties = $this->_properties;
+        $options['before_where']['published'] = function ($condition) use ($_properties) {
+            $published_value = $condition[1];
+            $now = date('Y-m-d H:i:00', strtotime('now'));
+            $where = array(
+                array($_properties['publication_state_property'], $published_value),
+            );
+            if (isset($_properties['publication_start_property'])) {
+                $where['or'] = array(
+                    array($_properties['publication_state_property'], 2),
+                    array(
+                        array($_properties['publication_start_property'], 'IS', null),
+                        'or' => array($_properties['publication_start_property'], $published_value ? '<=' : '>', $now),
+                    ),
+                    array(
+                        array($_properties['publication_end_property'], 'IS', null),
+                        'or' => array($_properties['publication_end_property'], $published_value ? '>=' : '<', $now),
+                    ),
+                );
             }
 
-            $published_key = null;
-            $published_value = null;
-
-            foreach ($where as $k => $w) {
-                if (is_int($k)) {
-                    reset($w);
-                    // This handles the case where the column is a key: array('published' => 1);
-                    if (count($w) == 1 && key($w) == 'published') {
-                        $published_key = $k;
-                        $published_value = (bool) current($w);
-                    }
-
-                    // This handles the case the column is a value: array('published', $value);
-                    if (count($w) > 1 && current($w) == 'published') {
-                        $published_key = $k;
-                        end($w);
-                        $published_value = (bool) current($w);
-                    }
-
-                    if ($published_key !== null) {
-                        // Round to last minute to benefit from the SQL query cache
-                        $now = date('Y-m-d H:i:00', strtotime('now'));
-                        $where[$published_key] = array(
-                            array($this->_properties['publication_state_property'], $published_value),
-                        );
-                        if (isset($this->_properties['publication_start_property'])) {
-                            $where[$published_key]['or'] = array(
-                                array($this->_properties['publication_state_property'], 2),
-                                array(
-                                    array($this->_properties['publication_start_property'], 'IS', null),
-                                    'or' => array($this->_properties['publication_start_property'], $published_value ? '<=' : '>', $now),
-                                ),
-                                array(
-                                    array($this->_properties['publication_end_property'], 'IS', null),
-                                    'or' => array($this->_properties['publication_end_property'], $published_value ? '>=' : '<', $now),
-                                ),
-                            );
-                        }
-                        break;
-                    }
-                }
-            }
-            $options['where'] = $where;
-        }
+            return $where;
+        };
     }
 
     public function form_processing(Orm\Model $item, $data, $response_json)

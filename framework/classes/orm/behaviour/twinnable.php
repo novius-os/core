@@ -624,28 +624,8 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
 
     public function before_query(&$options)
     {
-        if (array_key_exists('where', $options)) {
-            $where = $options['where'];
-            if (isset($where['context_main'])) {
-                $where[$this->_properties['is_main_property']] = $where['context_main'];
-                unset($where['context_main']);
-            }
-
-            foreach ($where as $k => $w) {
-                if (is_int($k)) {
-                    $keys = array_keys($w);
-                    if (count($w) == 1 && $keys[0] == 'context_main') {
-                        $where[$k] = array($this->_properties['is_main_property'] => $w[$keys[0]]);
-                    }
-
-                    if (count($w) > 1 && $w[0] == 'context_main') {
-                        $w[0] = $this->_properties['is_main_property'];
-                        $where[$k] = $w;
-                    }
-                }
-            }
-            $options['where'] = $where;
-        }
+        $options = \Arr::merge((array) $options, array('before_where' => array()));
+        $options['before_where']['context_main'] = $this->_properties['is_main_property'];
     }
 
     public function gridAfter($config, $objects, &$items)

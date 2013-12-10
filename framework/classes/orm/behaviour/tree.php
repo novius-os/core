@@ -48,25 +48,21 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
 
     public function before_query(&$options)
     {
-        if (array_key_exists('where', $options)) {
-            $where = $options['where'];
-            foreach ($where as $k => $w) {
-                if (isset($w[0])  && $w[0] == 'parent') {
-                    $property = $this->_parent_relation->key_from[0];
-                    if ($w[1] === null) {
-                        $where[$k] = array($property, 'IS', null);
-                    } else {
-                        $id = $w[1]->id;
-                        if (empty($id)) {
-                            unset($where[$k]);
-                        } else {
-                            $where[$k] = array($property, $id);
-                        }
-                    }
+        $options = \Arr::merge((array) $options, array('before_where' => array()));
+        $property = $this->_parent_relation->key_from[0];
+        $options['before_where']['parent'] = function ($condition) use ($property) {
+            if ($condition[1] === null) {
+                $condition = array($property, 'IS', null);
+            } else {
+                $id = $condition[1]->id;
+                if (empty($id)) {
+                    $condition = null;
+                } else {
+                    $condition = array($property, $id);
                 }
             }
-            $options['where'] = $where;
-        }
+            return $condition;
+        };
     }
 
     /**

@@ -21,14 +21,8 @@ class Orm_Behaviour_Sortable extends Orm_Behaviour
 
     public function before_query(&$options)
     {
-        if (array_key_exists('order_by', $options)) {
-            $order_by = $options['order_by'];
-            if (is_array($order_by) && !empty($order_by['default_sort'])) {
-                unset($order_by['default_sort']);
-                $order_by[$this->_properties['sort_property']] = \Arr::get($this->_properties, 'sort_order', 'ASC');
-            }
-            $options['order_by'] = $order_by;
-        }
+        $options = array_merge(array('before_order_by' => array()), (array) $options);
+        $options['before_order_by']['default_sort'] = $this->_properties['sort_property'];
     }
 
     /**

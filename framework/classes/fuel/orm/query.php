@@ -14,6 +14,97 @@ namespace Nos\Orm;
 
 class Query extends \Orm\Query
 {
+    protected $before_where = array();
+
+    protected $before_order_by = array();
+
+    /**
+     * Create a new instance of the Query class.
+     *
+     * @param	string  $model        Name of the model this instance has to operate on
+     * @param	mixed   $connection   DB connection to use to run the query
+     * @param	array   $options      Any options to pass on to the query
+     * @param	mixed   $table_alias  Optionally, the alias to use for the models table
+     */
+    protected function __construct($model, $connection, $options, $table_alias = null)
+    {
+        foreach ($options as $opt => $val) {
+            switch ($opt) {
+                case 'before_where':
+                    $val = (array) $val;
+                    $this->before_where = $val;
+                    break;
+
+                case 'before_order_by':
+                    $val = (array) $val;
+                    $this->before_order_by = $val;
+                    break;
+            }
+        }
+
+        parent::__construct($model, $connection, $options, $table_alias);
+    }
+
+    /**
+     * Does the work for where() and or_where()
+     *
+     * @param   array   $condition
+     * @param   string  $type
+     *
+     * @throws \FuelException
+     *
+     * @return  $this
+     */
+    public function _where($condition, $type = 'and_where')
+    {
+        if (!is_array(reset($condition)) && !is_string(key($condition))) {
+            foreach ($this->before_where as $column => $replace) {
+                if (is_string($column) && $column !== $condition[0]) {
+                    continue;
+                }
+                if (is_callable($replace)) {
+                    $condition = $replace($condition);
+                    if (empty($condition)) {
+                        return $this;
+                    }
+                } elseif (is_string($column)) {
+                    $condition[0] = $replace;
+                }
+            }
+        }
+
+        return parent::_where($condition, $type);
+    }
+
+    /**
+     * Set the order_by
+     *
+     * @param   string|array  $property
+     * @param   string        $direction
+     *
+     * @return  $this
+     */
+    public function order_by($property, $direction = 'ASC')
+    {
+        if (!is_array($property)) {
+            foreach ($this->before_order_by as $column => $replace) {
+                if (is_string($column) && $column !== $property) {
+                    continue;
+                }
+                if (is_callable($replace)) {
+                    $property = $replace($property);
+                    if (empty($property)) {
+                        return $this;
+                    }
+                } elseif (is_string($column)) {
+                    $property = $replace;
+                }
+            }
+        }
+
+        return parent::order_by($property, $direction);
+    }
+
     public function _join_relation($relation_name, &$infos)
     {
         static $count = 99;
