@@ -63,7 +63,7 @@ class Query extends \Orm\Query
                     continue;
                 }
                 if (is_callable($replace)) {
-                    $condition = $replace($condition);
+                    $condition = $this->_parse_where_array($replace($condition));
                     if (empty($condition)) {
                         return $this;
                     }
