@@ -624,7 +624,6 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
 
     public function before_query(&$options)
     {
-        $options = \Arr::merge((array) $options, array('before_where' => array()));
         $options['before_where']['context_main'] = $this->_properties['is_main_property'];
     }
 

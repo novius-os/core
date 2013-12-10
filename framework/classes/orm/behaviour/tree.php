@@ -48,7 +48,6 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
 
     public function before_query(&$options)
     {
-        $options = \Arr::merge((array) $options, array('before_where' => array()));
         $property = $this->_parent_relation->key_from[0];
         $options['before_where']['parent'] = function ($condition) use ($property) {
             if ($condition[1] === null) {

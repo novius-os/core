@@ -21,7 +21,6 @@ class Orm_Behaviour_Sortable extends Orm_Behaviour
 
     public function before_query(&$options)
     {
-        $options = array_merge(array('before_order_by' => array()), (array) $options);
         $options['before_order_by']['default_sort'] = $this->_properties['sort_property'];
     }
 

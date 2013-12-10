@@ -96,7 +96,6 @@ class Orm_Behaviour_Publishable extends Orm_Behaviour
 
     public function before_query(&$options)
     {
-        $options = \Arr::merge((array) $options, array('before_where' => array()));
         $_properties = $this->_properties;
         $options['before_where']['published'] = function ($condition) use ($_properties) {
             $published_value = $condition[1];

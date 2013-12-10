@@ -57,20 +57,19 @@ class Query extends \Orm\Query
      */
     public function _where($condition, $type = 'and_where')
     {
+        // Only check before_where if $condition is a single condition
         if (!is_array(reset($condition)) && !is_string(key($condition))) {
-            foreach ($this->before_where as $column => $replace) {
-                if (is_string($column) && $column !== $condition[0]) {
-                    continue;
-                }
+            if ($replace = \Arr::get($this->before_where, $condition[0], false)) {
                 if (is_callable($replace)) {
                     $condition = $replace($condition);
                     if (empty($condition)) {
                         return $this;
                     }
                     if (\Arr::is_assoc($condition) || is_array(reset($condition))) {
-                        return $this->_parse_where_array($condition);
+                        $this->_parse_where_array($condition);
+                        return $this;
                     }
-                } elseif (is_string($column)) {
+                } else {
                     $condition[0] = $replace;
                 }
             }
@@ -90,16 +89,13 @@ class Query extends \Orm\Query
     public function order_by($property, $direction = 'ASC')
     {
         if (!is_array($property)) {
-            foreach ($this->before_order_by as $column => $replace) {
-                if (is_string($column) && $column !== $property) {
-                    continue;
-                }
+            if ($replace = \Arr::get($this->before_order_by, $property, false)) {
                 if (is_callable($replace)) {
                     $property = $replace($property);
                     if (empty($property)) {
                         return $this;
                     }
-                } elseif (is_string($column)) {
+                } else {
                     $property = $replace;
                 }
             }

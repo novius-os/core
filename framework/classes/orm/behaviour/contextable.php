@@ -96,7 +96,6 @@ class Orm_Behaviour_Contextable extends Orm_Behaviour
 
     public function before_query(&$options)
     {
-        $options = \Arr::merge((array) $options, array('before_where' => array()));
         $context_property = $this->_properties['context_property'];
         $options['before_where']['context'] = function ($condition) use ($context_property) {
             $condition[0] = $context_property;

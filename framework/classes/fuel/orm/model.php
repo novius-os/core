@@ -543,6 +543,11 @@ class Model extends \Orm\Model
 
     public static function query($options = array())
     {
+        $options = array_merge(array(
+            'before_where' => array(),
+            'before_order_by' => array(),
+        ), (array) $options);
+
         static::eventStatic('before_query', array(&$options));
 
         return Query::forge(get_called_class(), array(static::connection(), static::connection(true)), $options);
