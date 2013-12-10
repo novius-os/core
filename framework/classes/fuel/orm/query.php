@@ -59,7 +59,7 @@ class Query extends \Orm\Query
     {
         // Only check before_where if $condition is a single condition
         if (!is_array(reset($condition)) && !is_string(key($condition))) {
-            if ($replace = \Arr::get($this->before_where, $condition[0], false)) {
+            if (is_string($condition[0]) && $replace = \Arr::get($this->before_where, $condition[0], false)) {
                 if (is_callable($replace)) {
                     $condition = $replace($condition);
                     if (empty($condition)) {
@@ -89,7 +89,7 @@ class Query extends \Orm\Query
     public function order_by($property, $direction = 'ASC')
     {
         if (!is_array($property)) {
-            if ($replace = \Arr::get($this->before_order_by, $property, false)) {
+            if (is_string($property) && $replace = \Arr::get($this->before_order_by, $property, false)) {
                 if (is_callable($replace)) {
                     $property = $replace($property);
                     if (empty($property)) {
