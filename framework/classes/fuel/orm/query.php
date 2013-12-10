@@ -63,10 +63,11 @@ class Query extends \Orm\Query
                     continue;
                 }
                 if (is_callable($replace)) {
-                    $condition = $this->_parse_where_array($replace($condition));
+                    $condition = $replace($condition);
                     if (empty($condition)) {
                         return $this;
                     }
+                    $condition = $this->_parse_where_array($condition);
                 } elseif (is_string($column)) {
                     $condition[0] = $replace;
                 }
