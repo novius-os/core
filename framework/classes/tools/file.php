@@ -149,7 +149,7 @@ class Tools_File
         };
 
         if ($exit) {
-            Event::register('fuel-shutdown', function () use ($function) {
+            \Event::register('fuel-shutdown', function () use ($function) {
                 $function();
             });
             exit;
