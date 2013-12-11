@@ -1,9 +1,9 @@
 <?php
 
-// Generated on 03/12/2013 16:22:23
+// Generated on 11/12/2013 10:31:03
 
-// 55 out of 56 messages are translated (98%).
-// 243 out of 245 words are translated (98%).
+// 56 out of 56 messages are translated (100%).
+// 245 out of 245 words are translated (100%).
 
 return array(
     #: classes/controller/admin/user.ctrl.php:70
@@ -127,7 +127,7 @@ return array(
 
     #: config/controller/admin/appdesk.config.php:29
     '1 user' => array(
-        0 => '',
+        0 => '1人{{count}}人',
     ),
 
     #: config/controller/admin/appdesk.config.php:33

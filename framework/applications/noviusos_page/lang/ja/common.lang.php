@@ -1,13 +1,13 @@
 <?php
 
-// Generated on 03/12/2013 16:22:23
+// Generated on 11/12/2013 10:31:03
 
 // 99 out of 100 messages are translated (99%).
 // 550 out of 556 words are translated (99%).
 
 return array(
     #: classes/controller/admin/page.ctrl.php:32
-    'The home page must be published. To unpublish this page, set another page as home page first.' => '',
+    'The home page must be published. To unpublish this page, set another page as home page first.' => 'ホームページは「公開」にしなければなりません。このページを公開しなくするには、他のページをまずホームページにセットしてください。',
 
     #: classes/controller/admin/page.ctrl.php:64
     'Use title' => 'タイトルを使用する',
@@ -40,10 +40,10 @@ return array(
     'The cache has been renewed. All ready for you to enjoy!' => 'キャッシュが更新されました。',
 
     #: views/admin/permissions.view.php:7
-    'Can add, edit, delete and publish pages' => '',
+    'Can add, edit, delete and publish pages' => 'ページを追加／編集／削除／公開できます。',
 
     #: views/admin/permissions.view.php:14
-    'Can add, edit and delete unpublished pages only' => '',
+    'Can add, edit and delete unpublished pages only' => '公開されていないページを追加／編集／削除できます。',
 
     #: views/admin/popup_duplicate.view.php:76
     'Duplicate sub-pages' => '子ページを複製',
@@ -154,7 +154,7 @@ return array(
     'Insert this link' => 'リンクを挿入',
 
     #: config/permissions.config.php:11
-    'Permissions for this application' => '',
+    'Permissions for this application' => 'このアプリケーションの権限',
 
     #: config/controller/admin/page.config.php:25
     #: config/common/page.config.php:138
@@ -309,7 +309,7 @@ return array(
     ),
 
     #: config/common/page.config.php:95
-    'The home page cannot be deleted. To delete this page, set another page as home page first.' => '',
+    'The home page cannot be deleted. To delete this page, set another page as home page first.' => 'ホームページは削除できません。このページを削除するには、まず別のページをホームページにセットしてください。',
 
     #: config/common/page.config.php:98
     'You can’t delete this page. It is locked.' => 'このページは削除できません。ロックされています。',
@@ -324,13 +324,13 @@ return array(
     'Set as home page' => 'ホームページに設定する',
 
     #: config/common/page.config.php:202
-    'We know it’s frustrating, but you can only set a page as home page when viewing one language. Select a language from the drop-down list in the top-right corner to do so.' => '',
+    'We know it’s frustrating, but you can only set a page as home page when viewing one language. Select a language from the drop-down list in the top-right corner to do so.' => '申し訳ありませんが、1つの言語を閲覧するとき、ホームページには1つのページのみセットできます。画面右上のドロップダウンリストから言語を選択してください。',
 
     #: config/common/page.config.php:204
-    'We know it’s frustrating, but you can only set a page as home page when viewing one context. Select a context from the drop-down list in the top-right corner to do so.' => '',
+    'We know it’s frustrating, but you can only set a page as home page when viewing one context. Select a context from the drop-down list in the top-right corner to do so.' => '申し訳ありませんが、1つのコンテキストを閲覧するとき、ホームページには1つのページのみセットできます。画面右上のドロップダウンリストからコンテキストを選択してください。',
 
     #: config/common/page.config.php:212
-    'You cannot set this page as home page because it isn’t published. Publish it first.' => '',
+    'You cannot set this page as home page because it isn’t published. Publish it first.' => 'このページをホームページにセットすることはできません。公開されていないからです。まず公開してください。',
 
     #: config/common/page.config.php:215
     'This page is the home page already.' => 'このページはホームページに設定されています。',

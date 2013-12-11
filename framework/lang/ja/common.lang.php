@@ -1,6 +1,6 @@
 <?php
 
-// Generated on 03/12/2013 16:22:23
+// Generated on 11/12/2013 10:31:03
 
 // 155 out of 155 messages are translated (100%).
 // 813 out of 813 words are translated (100%).
@@ -30,10 +30,10 @@ return array(
     'from {{begin}} to {{end}}' => '{{begin}}から{{end}}まで',
 
     #: classes/controller/inspector/date.ctrl.php:154
-    'until {{end}}' => '',
+    'until {{end}}' => '{{end}}まで',
 
     #: classes/controller/inspector/date.ctrl.php:155
-    'since {{begin}}' => '',
+    'since {{begin}}' => '{{begin}}から',
 
     #: classes/controller/inspector/date.ctrl.php:159
     'Since' => '以降',
@@ -325,7 +325,7 @@ return array(
     'Applications' => 'アプリケーション',
 
     #: config/permissions.config.php:21
-    'Is granted access to the following contexts:' => '',
+    'Is granted access to the following contexts:' => '以下のコンテキストからアクセスできます。',
 
     #: config/permissions.config.php:26
     'Is granted access to the following applications:' => '以下のアプリケーションからアクセスできます。',
@@ -388,7 +388,7 @@ return array(
     'Bye bye' => 'それではまた。',
 
     #: config/i18n_common.config.php:17
-    'You’re not allowed to carry out this action. Ask your colleagues to find out why.' => '',
+    'You’re not allowed to carry out this action. Ask your colleagues to find out why.' => 'あなたはこの操作を許可されていません。管理者に問い合わせてください。',
 
     #: config/i18n_common.config.php:21
     'Last chance, there’s no undo. Are you sure you want to do this?' => '最終確認です。この作業は取り消しできません。本当に実行しますか？',

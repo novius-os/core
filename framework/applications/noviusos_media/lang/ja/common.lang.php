@@ -1,9 +1,9 @@
 <?php
 
-// Generated on 03/12/2013 16:22:23
+// Generated on 11/12/2013 10:31:03
 
-// 119 out of 120 messages are translated (99%).
-// 654 out of 657 words are translated (99%).
+// 120 out of 120 messages are translated (100%).
+// 657 out of 657 words are translated (100%).
 
 return array(
     #: classes/controller/admin/attachment.ctrl.php:38
@@ -34,20 +34,20 @@ return array(
     'Please pick a file from your hard drive.' => '手元の端末からファイルを選択してください。',
 
     #: classes/controller/admin/media.ctrl.php:61
-    'We’re afraid you’re not allowed to upload files this big. Don’t blame Novius OS though, your developer or system administrator are the ones who make the rules.' => '',
+    'We’re afraid you’re not allowed to upload files this big. Don’t blame Novius OS though, your developer or system administrator are the ones who make the rules.' => 'この大きさのファイルをアップロードする事は許可されていません。(Novius OSではなく)システム管理者にお問い合わせください。',
 
     #: classes/controller/admin/media.ctrl.php:67
     #: classes/controller/admin/upload.ctrl.php:80
     'This extension is not allowed due to security reasons.' => 'セキュリティ上の理由で、この拡張子のファイルは許可されていません。',
 
     #: classes/controller/admin/upload.ctrl.php:30
-    'Mass upload' => '',
+    'Mass upload' => '複数アップロード',
 
     #: classes/controller/admin/upload.ctrl.php:99
-    'Done! All files have been uploaded.' => '',
+    'Done! All files have been uploaded.' => '全てのファイルがアップロードされました。',
 
     #: classes/controller/admin/appdesk.ctrl.php:76
-    'The cache has been renewed. All ready for you to enjoy!' => '',
+    'The cache has been renewed. All ready for you to enjoy!' => 'キャッシュが更新され、利用する準備が完了しました。',
 
     #: classes/model/folder.model.php:246
     'This is strange: This folder should be empty but isn’t. Please contact your developer or Novius OS to fix this. We apologise for the inconvenience caused.' => 'おかしなことが起きました。このフォルダは空のはずですが、空ではありません。開発者または Novius OS に相談して、修復してください。ご迷惑をかけたことをお詫びします。',
@@ -69,16 +69,16 @@ return array(
     'This extension is not allowed.' => 'この拡張子の画像は許可されていません。',
 
     #: views/admin/permissions/folders.view.php:14
-    'Note: when no folders are selected, no restriction applies, all folders are accessible. The root folder is always accessible.' => '',
+    'Note: when no folders are selected, no restriction applies, all folders are accessible. The root folder is always accessible.' => '注意: フォルダが選択されていない場合、全てのフォルダにアクセス可能です。ルートフォルダは常にアクセス可能です。',
 
     #: views/admin/permissions/general.view.php:16
-    'Can add, edit and delete media files' => '',
+    'Can add, edit and delete media files' => 'メディアファイルを追加／編集／削除できます。',
 
     #: views/admin/permissions/general.view.php:23
-    'Can visualise and use media files only' => '',
+    'Can visualise and use media files only' => 'メディアファイルを閲覧できます。',
 
     #: views/admin/permissions/general.view.php:30
-    'Can add, edit and delete folders' => '',
+    'Can add, edit and delete folders' => 'フォルダを追加／編集／削除できます。',
 
     #: views/admin/media_delete.view.php:21
     'The media is not used anywhere and can be safely deleted.' => 'このメディアは使用されていません。削除しても構いません。',
@@ -179,19 +179,19 @@ return array(
     'This is unusual: It seems that no image has been selected. Please try again. Contact your developer or Novius OS if the problem persists. We apologise for the inconvenience caused.' => 'おかしなことが起きました。画像が選択されていません。もう一度お試しください。問題が解決しない場合は、開発者または Novius OS にご相談ください。ご迷惑をかけたことをお詫びします。',
 
     #: views/admin/upload.view.php:24
-    'Files from your hard drive:' => '',
+    'Files from your hard drive:' => '手元のドライブからのファイル: ',
 
     #: views/admin/upload.view.php:30
-    'Unzip (both files and folders)' => '',
+    'Unzip (both files and folders)' => '解凍する (ファイルとフォルダの両方)',
 
     #: views/admin/upload.view.php:31
-    'Leave unzipped' => '',
+    'Leave unzipped' => '解凍しない',
 
     #: views/admin/upload.view.php:34
-    'What to do with ZIP files:' => '',
+    'What to do with ZIP files:' => '圧縮ファイルへの操作: ',
 
     #: views/admin/upload.view.php:41
-    'Select a folder where to put your media files:' => '',
+    'Select a folder where to put your media files:' => 'メディアファイルを置くフォルダを選択: ',
 
     #. Note to translator: This is a submit button
     #: views/admin/upload.view.php:48
@@ -199,30 +199,30 @@ return array(
     'Add' => '追加',
 
     #: views/admin/upload.view.php:73
-    'Hold the Ctrl/Cmd key to select multiple files.' => '',
+    'Hold the Ctrl/Cmd key to select multiple files.' => '複数のファイルを選択するには、Ctrl/Cmdキーを押した状態にしてください。',
 
     #: views/admin/upload.view.php:83
-    'Total files size must not exceed {{size}}.' => '',
+    'Total files size must not exceed {{size}}.' => 'ファイルサイズの合計は、{{size}}以内にしてください。',
 
     #: views/admin/upload.view.php:83
     #: views/admin/media_edit.view.php:50
     #: views/admin/media_add.view.php:30
-    'What’s more these file types are not allowed: {{extensions}}.' => '',
+    'What’s more these file types are not allowed: {{extensions}}.' => 'また、ファイル形式{{extensions}}は、許可されていません。',
 
     #: views/admin/upload.view.php:108
-    'Total files size exceeds the upload limit {{size}}.' => '',
+    'Total files size exceeds the upload limit {{size}}.' => 'ファイルサイズの合計が{{size}}を超えています。',
 
     #: views/admin/media_edit.view.php:50
     #: views/admin/media_add.view.php:30
-    'The file size must not exceed {{size}}.' => '',
+    'The file size must not exceed {{size}}.' => 'ファイルサイズは{{size}}以内にしてください。',
 
     #: views/admin/media_edit.view.php:62
     #: config/controller/admin/appdesk.config.php:51
-    'File size:' => '',
+    'File size:' => 'ファイルサイズ: ',
 
     #: views/admin/media_edit.view.php:69
     #: config/controller/admin/appdesk.config.php:54
-    'Dimensions:' => '',
+    'Dimensions:' => '大きさ: ',
 
     #: views/admin/folder_delete.view.php:21
     'The folder is empty and can be safely deleted.' => 'このフォルダは空です。削除しても構いません。',
@@ -242,10 +242,10 @@ return array(
     'Warning: moving a folder changes the URL of all the files it contains.' => '警告: フォルダを移動すると、そのフォルダ内の全てのファイルの URL が変わります。',
 
     #: config/permissions.config.php:19
-    'Permissions for this application' => '',
+    'Permissions for this application' => 'このアプリケーションの権限',
 
     #: config/permissions.config.php:23
-    'Restrict access to specific folders' => '',
+    'Restrict access to specific folders' => '特定のフォルダにアクセス制限する',
 
     #: config/controller/admin/inspector/folder.config.php:40
     #: config/common/folder.config.php:17
@@ -278,7 +278,7 @@ return array(
 
     #: config/controller/admin/attachment.config.php:25
     #: config/controller/admin/media.config.php:46
-    'Select a folder where to put your media file:' => 'メディアファイルを置くフォルダを選択する:',
+    'Select a folder where to put your media file:' => 'メディアファイルを置くフォルダを選択: ',
 
     #: config/controller/admin/attachment.config.php:37
     #: config/controller/admin/media.config.php:65
@@ -330,7 +330,7 @@ return array(
 
     #: config/controller/admin/appdesk.config.php:101
     '1 media file' => array(
-        0 => '',
+        0 => '1個のメディアファイル{{count}}個のメディアファイル',
     ),
 
     #: config/controller/admin/appdesk.config.php:105
@@ -349,10 +349,10 @@ return array(
     'Pick' => '選択する',
 
     #: config/controller/admin/appdesk.config.php:130
-    'Add many files at once' => '',
+    'Add many files at once' => '複数のメディアファイルを追加する',
 
     #: config/controller/admin/appdesk.config.php:143
-    'Renew media cache' => '',
+    'Renew media cache' => 'メディアキャッシュを更新する',
 
     #. Crud
     #: config/common/folder.config.php:27

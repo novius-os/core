@@ -1,6 +1,6 @@
 <?php
 
-// Generated on 03/12/2013 16:22:23
+// Generated on 11/12/2013 10:31:03
 
 // 18 out of 18 messages are translated (100%).
 // 99 out of 99 words are translated (100%).
@@ -13,13 +13,13 @@ return array(
     'Default view' => 'デフォルトビュー',
 
     #: views/crud/context_common_fields.view.php:17
-    'This field is common to all languages' => '',
+    'This field is common to all languages' => 'このフィールドは全ての言語に共通です。',
 
     #: views/crud/context_common_fields.view.php:17
     'This field is common to all contexts' => 'このフィールドは全てのコンテキストに共通です。',
 
     #: views/crud/context_common_fields.view.php:19
-    'When you modify the value of this field, the change applies to the following languages:' => '',
+    'When you modify the value of this field, the change applies to the following languages:' => 'このフィールドの値を変更すると、以下の言語に適用されます。',
 
     #: views/crud/context_common_fields.view.php:20
     'When you modify the value of this field, the change applies to the following contexts:' => 'このフィールドの値を変更すると、以下のコンテキストに適用されます。',
