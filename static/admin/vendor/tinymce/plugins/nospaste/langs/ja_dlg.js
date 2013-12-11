@@ -1,3 +1,3 @@
 tinyMCE.addI18n('ja.nospaste_dlg', {
-    "pastehtml_title" : "Use CTRL+V on your keyboard to paste the HTML code into the window."
+"pastehtml_title":"\u30ad\u30fc\u30dc\u30fc\u30c9\u3067CTRL\u30ad\u30fc\u3068V\u30ad\u30fc\u3092\u62bc\u3059\u3068\u3001HTML\u30b3\u30fc\u30c9\u3092\u8cbc\u4ed8\u3051\u307e\u3059\u3002"
 });
