@@ -111,7 +111,13 @@ function n__($singular, $plural, $n = false)
     } while ($function == '{closure}');
 
     if ($n === false) {
-        return \Nos\I18n::translate_from_file($dbg[$i]['file'], $singular, $singular);
+        $return = \Nos\I18n::translate_from_file($dbg[$i]['file'], $singular, $singular);
+        if (!is_array($return)) {
+            return array(
+                $singular,
+                $plural,
+            );
+        }
     } else {
         return \Nos\I18n::nTranslateFromFile($dbg[$i]['file'], $singular, $plural, $n);
     }
