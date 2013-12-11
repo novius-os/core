@@ -24,8 +24,10 @@ if (in_array($nos_url, array(
     'robots.txt',
     'humans.txt',
 ))) {
-    is_file(DOCROOT.$nos_url) && Nos\Tools_File::send(DOCROOT.$nos_url);
-    exit();
+    if (is_file(DOCROOT.$nos_url)) {
+		Nos\Tools_File::send(DOCROOT.$nos_url);
+		exit();
+	}
 }
 
 
