@@ -102,7 +102,7 @@ class Controller_Front extends Controller
 
         \Event::trigger_function('front.start', array(array('url' => &$url, 'cache_path' => &$cache_path)));
 
-        $cache_path = \Nos\FrontCache::getPathFromUrl($this->_base_href, $this->_url);
+        $cache_path = \Nos\FrontCache::getPathFromUrl($this->_base_href, $cache_path);
 
         $this->_cache = FrontCache::forge($cache_path);
 
