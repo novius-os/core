@@ -1,9 +1,9 @@
 <?php
 
-// Generated on 11/12/2013 10:31:03
+// Generated on 11/12/2013 17:57:29
 
-// 99 out of 100 messages are translated (99%).
-// 550 out of 556 words are translated (99%).
+// 100 out of 100 messages are translated (100%).
+// 556 out of 556 words are translated (100%).
 
 return array(
     #: classes/controller/admin/page.ctrl.php:32
@@ -300,7 +300,7 @@ return array(
 
     #: config/common/page.config.php:79
     'This page exists in <strong>one language</strong>.' => array(
-        0 => '',
+        0 => 'このページは<strong>{{language_count}}つの言語</strong>にあります。',
     ),
 
     #: config/common/page.config.php:85

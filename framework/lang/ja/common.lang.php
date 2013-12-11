@@ -1,6 +1,6 @@
 <?php
 
-// Generated on 11/12/2013 10:31:03
+// Generated on 11/12/2013 17:57:29
 
 // 155 out of 155 messages are translated (100%).
 // 813 out of 813 words are translated (100%).
@@ -239,13 +239,13 @@ return array(
     #: views/admin/login.view.php:45
     'Let’s get started' => 'では始めましょう',
 
-    #: views/admin/html.view.php:479
+    #: views/admin/html.view.php:92
     'Select a media file' => 'メディアファイルを選択',
 
-    #: views/admin/html.view.php:480
+    #: views/admin/html.view.php:93
     'Pick an image' => '画像を選択',
 
-    #: views/admin/html.view.php:481
+    #: views/admin/html.view.php:94
     'We’re afraid we cannot find this image.' => 'この画像は見つかりませんでした。',
 
     #: views/admin/orm/publishable_label.view.php:21
