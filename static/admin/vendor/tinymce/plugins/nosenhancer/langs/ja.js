@@ -1,10 +1,10 @@
 tinyMCE.addI18n('ja.nosenhancer', {
-    "desc":"Application",
-    "delete":"Delete",
-    "options":"Options",
-    "p_after":"New paragraph after",
-    "p_before":"New paragraph before",
-    "new_paragraph" : "New paragraph",
-    "loading" : "Loading...",
-    "loading_error" : "Error when loading the preview of the application"
+"desc":"Application",
+"delete":"\u524a\u9664",
+"options":"\u30aa\u30d7\u30b7\u30e7\u30f3",
+"p_after":"\u3053\u3053\u306e\u5f8c\u306b\u6bb5\u843d\u8ffd\u52a0",
+"p_before":"\u3053\u3053\u306e\u524d\u306b\u6bb5\u843d\u8ffd\u52a0",
+"new_paragraph":"\u6bb5\u843d\u8ffd\u52a0",
+"loading":"\u8aad\u307f\u8fbc\u307f\u4e2d...",
+"loading_error":"\u3053\u306e\u30a2\u30d7\u30ea\u30b1\u30fc\u30b7\u30e7\u30f3\u306e\u30d7\u30ec\u30d3\u30e5\u30fc\u6642\u306b\u30a8\u30e9\u30fc\u304c\u767a\u751f\u3057\u307e\u3057\u305f\u3002"
 });

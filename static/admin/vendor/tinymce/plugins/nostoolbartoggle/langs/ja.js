@@ -1,5 +1,5 @@
 tinyMCE.addI18n('ja.nostoolbartoggle', {
-    "title": "Show / Hide more toolbars",
-    "label_close": "Less toolbars",
-    "label_open": "More toolbars"
+"title":"\u8a73\u7d30\u30c4\u30fc\u30eb\u30d0\u30fc\u3092\u8868\u793a\uff0f\u96a0\u3059",
+"label_close":"\u30b7\u30f3\u30d7\u30eb\u306a\u30c4\u30fc\u30eb\u30d0\u30fc\u306b\u3059\u308b",
+"label_open":"\u8a73\u7d30\u306a\u30c4\u30fc\u30eb\u30d0\u30fc\u306b\u3059\u308b"
 });
