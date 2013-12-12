@@ -625,6 +625,7 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
     public function before_query(&$options)
     {
         $options['before_where']['context_main'] = $this->_properties['is_main_property'];
+        $options['before_order_by']['context_main'] = $this->_properties['is_main_property'];
     }
 
     public function gridAfter($config, $objects, &$items)

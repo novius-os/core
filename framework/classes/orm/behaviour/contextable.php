@@ -105,6 +105,7 @@ class Orm_Behaviour_Contextable extends Orm_Behaviour
             }
             return $condition;
         };
+        $options['before_order_by']['context'] = $context_property;
     }
 
     public function crudFields(&$fields, $crud)
