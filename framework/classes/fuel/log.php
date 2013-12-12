@@ -10,6 +10,12 @@
 
 class Log extends Fuel\Core\Log
 {
+    /**
+     * Logs a deprecated functionality
+     *
+     * @param string $message  Description of the deprecated functionality
+     * @param string $since  Version since the functionality is deprecated
+     */
     public static function deprecated($message, $since = null)
     {
         $debug_backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
@@ -35,6 +41,12 @@ class Log extends Fuel\Core\Log
         logger(\Fuel::L_WARNING, $log);
     }
 
+    /**
+     * Logs an exception
+     *
+     * @param \Exception $e  Exception to display
+     * @param string $prefix  Prefix to the exception message (can be used to add explanations)
+     */
     public static function exception($e, $prefix = '')
     {
         \Log::error($prefix.$e->getCode().' - '.$e->getMessage().' in '.$e->getFile().' on line '.$e->getLine());
