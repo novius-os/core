@@ -99,6 +99,7 @@ class Controller_Admin_Enhancer extends \Nos\Controller_Admin_Application
                 'layout' => $this->config['popup']['layout'],
                 'params' => $this->config['popup']['params'],
                 'enhancer_args' => \Input::get(),
+                'fieldset' => $this->config['fields'] ? $fieldset : null,
             ), false);
     }
 

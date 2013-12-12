@@ -12,7 +12,9 @@ Nos\I18n::current_dictionary('nos::common');
 
 ?>
 <div id="<?= $id = uniqid('temp_') ?>">
-    <form method="POST" action="<?= $url ?>">
+<?php
+echo !empty($fieldset) ? $fieldset->open($url) : '<form method="POST" action="'.$url.'">';
+?>
         <input type="hidden" name="enhancer" value="<?= $enhancer_args['enhancer'] ?>" />
         <div class="line myBody fieldset">
             <div class="col c1"></div>
@@ -58,7 +60,9 @@ switch ($enhancerAction) {
             </div>
             <div class="col c1"></div>
         </div>
-    </form>
+<?php
+echo !empty($fieldset) ? $fieldset->close() : '</form>';
+?>
 </div>
 
 <script type="text/javascript">
