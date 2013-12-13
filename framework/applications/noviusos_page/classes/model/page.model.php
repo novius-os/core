@@ -256,6 +256,7 @@ class Model_Page extends \Nos\Orm\Model
     );
 
     protected $_page_id_for_delete = null;
+    protected $_old_virtual_path = null;
 
     const TYPE_CLASSIC       = 0;
     const TYPE_EXTERNAL_LINK = 3;
@@ -387,6 +388,29 @@ class Model_Page extends \Nos\Orm\Model
 
             \Nos\FrontCache::deleteDir('pages'.DS.$host.DS.$path);
         }
+    }
+
+    public function _event_before_change_virtual_path()
+    {
+        $this->_old_virtual_path = \Arr::get($this->get_diff(), '0.page_virtual_url', $this->page_virtual_url);
+    }
+
+    public function _event_after_change_virtual_path()
+    {
+        $old_virtual_path = preg_replace('`\.html$`iUu', '/', $this->_old_virtual_path);
+        $new_virtual_path = $this->virtual_path(true);
+
+        \Nos\Config_Data::load('enhancers');
+
+        $url_enhanced = \Nos\Config_Data::get('url_enhanced', array());
+        // No need for try / catch because it's a page, we know it's contextable
+        $context = $this->get_context();
+        foreach ($url_enhanced as $page_id => $enhanced) {
+            if ($context == $enhanced['context'] && \Str::starts_with($enhanced['url'], $old_virtual_path)) {
+                $url_enhanced[$page_id]['url'] = $new_virtual_path . \Str::sub($url_enhanced[$page_id]['url'], \Str::length($old_virtual_path));
+            }
+        }
+        \Nos\Config_Data::save('url_enhanced', $url_enhanced);
     }
 
     public function _event_after_save()
