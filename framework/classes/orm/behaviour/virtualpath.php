@@ -129,6 +129,7 @@ class Orm_Behaviour_Virtualpath extends Orm_Behaviour_Virtualname
             if (!isset($diff[0][$virtual_path_property])) {
                 $diff[0][$virtual_path_property] = $item->{$virtual_path_property};
             }
+            $item->observe('before_change_virtual_path');
             $item->{$virtual_path_property} = $dir_name_virtual_path.$this->virtual_name($item).$new_extension;
             $diff[1][$virtual_path_property] = $item->{$virtual_path_property};
             $this->_data_diff[$item::implode_pk($item)] = $diff;
@@ -173,6 +174,8 @@ class Orm_Behaviour_Virtualpath extends Orm_Behaviour_Virtualname
                 ->set($replaces)
                 ->where($virtual_path_property, 'LIKE', $old_virtual_path.'%')
                 ->execute();
+
+            $item->observe('after_change_virtual_path');
         }
     }
 

@@ -76,9 +76,20 @@ define('jquery-nos-context-common-fields',
                                                 of: $el
                                             });
                                         };
+                                    if ($element.is(':checkbox') && $element.is(':checked')) {
+                                        $('<input type="hidden" class="js_fake_checkbox_context_common_field" />')
+                                            .attr({
+                                                name: $element.attr('name'),
+                                                value: $element.attr('value')
+                                            })
+                                            .insertBefore($element);
+                                    }
                                     $element.data('click_context_common_field', function() {
                                         $element.prop('disabled', false);
                                         $element.removeAttr('disabled');
+                                        if ($element.is(':checkbox')) {
+                                            $element.prev('.js_fake_checkbox_context_common_field').remove();
+                                        }
                                         if ($.isFunction(click)) {
                                             click();
                                         }
