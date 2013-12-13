@@ -21,6 +21,14 @@ class Migrate extends \Fuel\Core\Migrate
 
     public static function _init()
     {
+        static::$table_definition = array(
+            'id'                => array('type' => 'int', 'auto_increment' => true, 'primary_key' => true),
+            'type'              => array('type' => 'varchar', 'constraint' => 25),
+            'name'              => array('type' => 'varchar', 'constraint' => 50),
+            'migration'         => array('type' => 'varchar', 'constraint' => 100, 'null' => false, 'default' => ''),
+            'execution_date'    => array('type' => 'datetime', 'default' => \DB::expr('CURRENT_TIMESTAMP')),
+        );
+
         if (!\Config::get('novius-os.migration_config_file')) {
             \Config::load('migrations', true);
             \Config::set('migrations.version', array());
