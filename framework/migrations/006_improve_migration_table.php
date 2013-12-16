@@ -12,4 +12,10 @@ namespace Nos\Migrations;
 
 class Improve_Migration_Table extends \Nos\Migration
 {
+    public function up()
+    {
+        if (\DB::query('SHOW COLUMNS IN nos_migration WHERE field="id"')->execute() == 0) {
+            parent::up();
+        }
+    }
 }
