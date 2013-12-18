@@ -10,7 +10,7 @@ var SearchReplaceDialog = {
 
 		// Focus input field
 		f[m + '_panel_searchstring'].focus();
-		
+
 		mcTabs.onChange.add(function(tab_id, panel_id) {
 			t.switchMode(tab_id.substring(0, tab_id.indexOf('_')));
 		});
@@ -39,6 +39,11 @@ var SearchReplaceDialog = {
 	searchNext : function(a) {
 		var ed = tinyMCEPopup.editor, se = ed.selection, r = se.getRng(), f, m = this.lastMode, s, b, fl = 0, w = ed.getWin(), wm = ed.windowManager, fo = 0;
 
+        if (tinymce.isIE11 && !window.find) {
+            ed.windowManager.alert("This feature is not available in IE 11+. Upgrade TinyMCE to 4.x to get this functionallity back.");
+            return;
+        }
+
 		// Get input
 		f = document.forms[0];
 		s = f[m + '_panel_searchstring'].value;
@@ -55,7 +60,7 @@ var SearchReplaceDialog = {
 
 		function fix() {
 			// Correct Firefox graphics glitches
-			// TODO: Verify if this is actually needed any more, maybe it was for very old FF versions? 
+			// TODO: Verify if this is actually needed any more, maybe it was for very old FF versions?
 			r = se.getRng().cloneRange();
 			ed.getDoc().execCommand('SelectAll', false, null);
 			se.setRng(r);

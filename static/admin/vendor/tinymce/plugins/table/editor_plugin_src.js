@@ -166,7 +166,7 @@
 
 					// Add something to the inner node
 					if (curNode)
-						curNode.innerHTML = tinymce.isIE ? '&nbsp;' : '<br data-mce-bogus="1" />';
+						curNode.innerHTML = tinymce.isIE && !tinymce.isIE11 ? '&nbsp;' : '<br data-mce-bogus="1" />';
 
 					return false;
 				}
@@ -179,7 +179,7 @@
 			if (formatNode) {
 				cell.appendChild(formatNode);
 			} else {
-				if (!tinymce.isIE)
+				if (!tinymce.isIE || tinymce.isIE11)
 					cell.innerHTML = '<br data-mce-bogus="1" />';
 			}
 
@@ -348,7 +348,7 @@
 										startCell.removeChild(node);
 								});
 							}
-							
+
 							// Remove cell
 							dom.remove(cell);
 						}
@@ -998,23 +998,23 @@
 				});
 				function tableCellSelected(ed, rng, n, currentCell) {
 					// The decision of when a table cell is selected is somewhat involved.  The fact that this code is
-					// required is actually a pointer to the root cause of this bug. A cell is selected when the start 
+					// required is actually a pointer to the root cause of this bug. A cell is selected when the start
 					// and end offsets are 0, the start container is a text, and the selection node is either a TR (most cases)
 					// or the parent of the table (in the case of the selection containing the last cell of a table).
-					var TEXT_NODE = 3, table = ed.dom.getParent(rng.startContainer, 'TABLE'), 
+					var TEXT_NODE = 3, table = ed.dom.getParent(rng.startContainer, 'TABLE'),
 					tableParent, allOfCellSelected, tableCellSelection;
-					if (table) 
+					if (table)
 					tableParent = table.parentNode;
-					allOfCellSelected =rng.startContainer.nodeType == TEXT_NODE && 
-						rng.startOffset == 0 && 
-						rng.endOffset == 0 && 
-						currentCell && 
+					allOfCellSelected =rng.startContainer.nodeType == TEXT_NODE &&
+						rng.startOffset == 0 &&
+						rng.endOffset == 0 &&
+						currentCell &&
 						(n.nodeName=="TR" || n==tableParent);
-					tableCellSelection = (n.nodeName=="TD"||n.nodeName=="TH")&& !currentCell;	   
+					tableCellSelection = (n.nodeName=="TD"||n.nodeName=="TH")&& !currentCell;
 					return  allOfCellSelected || tableCellSelection;
 					// return false;
 				}
-				
+
 				// this nasty hack is here to work around some WebKit selection bugs.
 				function fixTableCellSelection(ed) {
 					if (!tinymce.isWebKit)
@@ -1023,18 +1023,18 @@
 					var rng = ed.selection.getRng();
 					var n = ed.selection.getNode();
 					var currentCell = ed.dom.getParent(rng.startContainer, 'TD,TH');
-				
+
 					if (!tableCellSelected(ed, rng, n, currentCell))
 						return;
 						if (!currentCell) {
 							currentCell=n;
 						}
-					
+
 					// Get the very last node inside the table cell
 					var end = currentCell.lastChild;
 					while (end.lastChild)
 						end = end.lastChild;
-					
+
 					// Select the entire table cell. Nothing outside of the table cell should be selected.
 					rng.setEnd(end, end.nodeValue.length);
 					ed.selection.setRng(rng);
@@ -1249,7 +1249,7 @@
 
 					if (last && last.nodeName == 'TABLE') {
 						if (ed.settings.forced_root_block)
-							ed.dom.add(ed.getBody(), ed.settings.forced_root_block, null, tinymce.isIE ? '&nbsp;' : '<br data-mce-bogus="1" />');
+							ed.dom.add(ed.getBody(), ed.settings.forced_root_block, null, tinymce.isIE && !tinymce.isIE11 ? '&nbsp;' : '<br data-mce-bogus="1" />');
 						else
 							ed.dom.add(ed.getBody(), 'br', {'data-mce-bogus': '1'});
 					}
