@@ -11,7 +11,22 @@ define('jquery-nos-appdesk',
     ['jquery', 'jquery-nos', 'jquery-ui.widget', 'jquery-nos-thumbnailsgrid', 'jquery-nos-listgrid', 'jquery-nos-treegrid', 'jquery-nos-preview', 'jquery-ui.button', 'wijmo.wijtabs', 'wijmo.wijsuperpanel', 'wijmo.wijsplitter', 'wijmo.wijgrid', 'wijmo.wijmenu'],
     function($) {
         "use strict";
-        var undefined = void(0);
+        var undefined = void(0),
+
+            wijhttpproxy_extended = function (options) {
+                wijhttpproxy.call(this, options);
+            };
+
+        wijhttpproxy_extended.prototype = $.extend({}, wijhttpproxy.prototype, {
+            request: function (datasource, callBack, userData) {
+                if (this._appdeskxhr) {
+                    this._appdeskxhr.abort();
+                }
+                this._appdeskxhr = wijhttpproxy.prototype.request.call(this, datasource, callBack, userData);
+                return this._appdeskxhr;
+            }
+        });
+
         $.widget( "nos.appdesk", {
             options: {
                 buttons : [],
@@ -1022,7 +1037,7 @@ define('jquery-nos-appdesk',
                         allowColMoving : true,
                         data: new wijdatasource({
                             dynamic: true,
-                            proxy: new wijhttpproxy({
+                            proxy: new wijhttpproxy_extended({
                                 url: o.grid.urlJson,
                                 dataType: "json",
                                 error: function(jqXHR, textStatus, errorThrown) {

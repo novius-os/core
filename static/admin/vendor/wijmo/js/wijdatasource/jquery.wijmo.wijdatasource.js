@@ -4,7 +4,7 @@
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
- * 
+ *
  * Licensed under the Wijmo Commercial License. Also available under the GNU GPL Version 3 license.
  * licensing@wijmo.com
  * http://wijmo.com/widgets/license/
@@ -23,7 +23,7 @@
 	"use strict";
 	/// <summary>
 	/// wijdatasource reads local raw data or remote raw data through proxy by using
-	/// a DataReader and provide tabular object data for widgets. 
+	/// a DataReader and provide tabular object data for widgets.
 	/// </summary>
 	var wijdatasource, wijarrayreader, wijhttpproxy;
 	wijdatasource = function (options) {
@@ -31,7 +31,7 @@
 		/// <summary>
 		/// The data to process using the wijdatasource class.
 		/// Default: {}.
-		/// Type: Object. 
+		/// Type: Object.
 		/// </summary>
 		self.data = {};
 		/// <summary>
@@ -42,30 +42,30 @@
 		/// If no reader is configured with wijdatasource it will directly return the
 		/// raw data.
 		/// Default: null.
-		/// Type: Object. 
+		/// Type: Object.
 		/// </summary>
 		self.reader = null;
 		/// <summary>
 		/// The proxy to use with wijdatasource. The wijdatasource class will call
-		/// the proxy object's request method.  
+		/// the proxy object's request method.
 		/// In the proxy object, you can send a request to a remote server to
 		/// obtain data with the ajaxs options object provided.
 		/// Then you can use the wijdatasource reader to process the raw data in the call.
 		/// Default: null.
-		/// Type: Object. 
+		/// Type: Object.
 		/// </summary>
 		self.proxy = null;
 		/// <summary>
 		/// The processed items from the raw data.  This can be obtained after
 		/// datasource is loaded.
 		/// Default: [].
-		/// Type: Array. 
+		/// Type: Array.
 		/// </summary>
 		self.items = [];
 		/// <summary>
 		/// Function called before loading process starts
 		/// Default: null.
-		/// Type: Function. 
+		/// Type: Function.
 		/// Code example:
 		/// var datasource = new wijdatasource({loading: function(e, data) { }})
 		/// </summary>
@@ -79,7 +79,7 @@
 		/// <summary>
 		/// Function called after loading.
 		/// Default: null.
-		/// Type: Function. 
+		/// Type: Function.
 		/// Code example:
 		/// var datasource = new wijdatasource({loaded: function(e, data) { }})
 		/// </summary>
@@ -89,7 +89,7 @@
 		/// <param name="data" type="Object">
 		/// data passed in by load method.
 		/// </param>
-		self.loaded = null;		
+		self.loaded = null;
 		self._constructor(options);
 	};
 	window.wijdatasource = wijdatasource;
@@ -278,7 +278,9 @@
 				}
 				self._complete(data, datasource, callBack, o, userData);
 			};
-			$.ajax(o);
+
+            // Novius OS : add the return for aborting XHR if a new request is send
+			return $.ajax(o);
 		},
 
 		_complete: function (data, datasource, callback, options, userData) {
