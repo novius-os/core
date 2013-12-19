@@ -68,7 +68,8 @@ class Renderer_Datetime_Picker extends Renderer
         $fieldset = \Fieldset::build_from_config(array(
             $renderer['name'] => $renderer,
         ));
-        return $fieldset->field($renderer['name'])->set_template('{field}')->build().$fieldset->build_append();
+        $field = $fieldset->field($renderer['name'])->set_value(!empty($renderer['value']) ? $renderer['value'] : '' );
+        return $field->set_template('{field}')->build().$fieldset->build_append();
     }
 
     /**
