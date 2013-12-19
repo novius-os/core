@@ -235,8 +235,8 @@ return array(
         'temp_dir' => APPPATH.'data'.DS.'temp',
 
         'cache' => true,
-        'cache_duration_page' => \Fuel::$env !== \Fuel::PRODUCTION ? 3600 : 600,
-        'cache_duration_function' => \Fuel::$env !== \Fuel::PRODUCTION ? 3600 : 600,
+        'cache_duration_page' => \Fuel::$env !== \Fuel::PRODUCTION ? 600 : 3600,
+        'cache_duration_function' => \Fuel::$env !== \Fuel::PRODUCTION ? 600 : 3600,
         'cache_model_properties' => false,
 
         'locales' => array(
