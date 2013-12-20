@@ -187,7 +187,6 @@ if ($local->is_dirty()) {
             function ($) {
                 $(function() {
                     var $container = $('#<?= $uniqid ?>');
-                    $container.nosFormUI();
 
                     $container.nosTabs('update', {
                         label: <?= \Format::forge(__('Applications manager'))->to_json() ?>,
@@ -240,10 +239,19 @@ if (\Session::user()->user_expert) {
                         selectionMode: 'none',
                         highlightCurrentCell: false
                     });
+                    $container.nosFormUI();
 
                     $container.find('a').click(function(e) {
                         e.preventDefault();
-                        var data = $(this).data('app');
+                        var $a = $(this),
+                            data = $a.data('app');
+
+                        $a.find('button').button('option',
+                            {
+                                'label': '...',
+                                'disabled': true
+                            }
+                        );
 
                         $container.nosAjax({
                             url: 'admin/noviusos_appmanager/appmanager/' + data.action + '/' + data.name,
