@@ -26,7 +26,7 @@ class Migrate extends \Fuel\Core\Migrate
             'type'              => array('type' => 'varchar', 'constraint' => 25),
             'name'              => array('type' => 'varchar', 'constraint' => 50),
             'migration'         => array('type' => 'varchar', 'constraint' => 100, 'null' => false, 'default' => ''),
-            'execution_date'    => array('type' => 'datetime', 'default' => \DB::expr('CURRENT_TIMESTAMP'), 'null' => true),
+            'execution_date'    => array('type' => 'timestamp', 'default' => \DB::expr('CURRENT_TIMESTAMP'), 'null' => true),
         );
 
         if (!\Config::get('novius-os.migration_config_file')) {
