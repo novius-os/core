@@ -57,20 +57,6 @@ class Renderer_Datetime_Picker extends Renderer
     );
 
     /**
-     * Standalone build of the renderer.
-     *
-     * @param  array  $renderer Renderer definition (attributes + renderer_options)
-     * @return string The <input> tag + JavaScript to initialise it
-     */
-    public static function renderer($renderer = array())
-    {
-        $fieldset = \Fieldset::forge(uniqid());
-        $field = new static($renderer['name'], '', $renderer, array(), $fieldset);
-        $fieldset->add_field($field);
-        return $fieldset->field($renderer['name'])->set_template('{field}')->build().$fieldset->build_append();
-    }
-
-    /**
      * Build the field
      *
      * @return  string

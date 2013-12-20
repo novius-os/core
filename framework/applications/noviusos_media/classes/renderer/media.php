@@ -40,20 +40,6 @@ class Renderer_Media extends \Nos\Renderer
             ),
         );
     }
-    /**
-     * Standalone build of the media renderer.
-     *
-     * @param  array  $renderer Renderer definition (attributes + renderer_options)
-     * @return string The <input> tag + JavaScript to initialise it
-     */
-    public static function renderer($renderer = array())
-    {
-        list($attributes, $renderer_options) = static::parseOptions($renderer);
-        static::hydrate_options($renderer_options, $attributes);
-        $attributes['data-media-options'] = htmlspecialchars(\Format::forge()->to_json($renderer_options));
-
-        return '<input '.array_to_attr($attributes).' />'.static::js_init($attributes['id']);
-    }
 
     /**
      * Build the field
