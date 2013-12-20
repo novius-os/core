@@ -64,10 +64,9 @@ class Renderer_Datetime_Picker extends Renderer
      */
     public static function renderer($renderer = array())
     {
-        $renderer['renderer'] = get_called_class();
-        $fieldset = \Fieldset::build_from_config(array(
-            $renderer['name'] => $renderer,
-        ));
+        $fieldset = \Fieldset::forge(uniqid());
+        $field = new static($renderer['name'], '', $renderer, array(), $fieldset);
+        $fieldset->add_field($field);
         return $fieldset->field($renderer['name'])->set_template('{field}')->build().$fieldset->build_append();
     }
 

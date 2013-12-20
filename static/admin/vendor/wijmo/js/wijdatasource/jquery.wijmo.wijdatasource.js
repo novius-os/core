@@ -4,7 +4,7 @@
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
- * 
+ *
  * Licensed under the Wijmo Commercial License. Also available under the GNU GPL Version 3 license.
  * licensing@wijmo.com
  * http://wijmo.com/widgets/license/
@@ -254,7 +254,8 @@ var wijmo;
                     }
                     self._complete(data, datasource, callBack, o, userData);
                 };
-                $.ajax(o);
+                // Novius OS : add the return for aborting XHR if a new request is send
+                return $.ajax(o);
             },
             _complete: function (data, datasource, callback, options, userData) {
                 // set raw data
