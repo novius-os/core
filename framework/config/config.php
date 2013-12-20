@@ -132,6 +132,13 @@ return array(
         ),
     ),
 
+    'response' => array(
+        /**
+         *  Wether to support URI wildcards when redirecting
+         */
+        'redirect_with_wildcards' => false,
+    ),
+
     /**
      * Cookie settings
      */
