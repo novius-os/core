@@ -217,7 +217,7 @@ class FrontCache
         $this->_level = ob_get_level();
     }
 
-    public static function checkExpires($expires, $initial_cache_duration)
+    public static function checkExpires($expires, $initial_cache_duration = 0)
     {
         if ($expires > 0 && $expires <= time()) {
             throw new CacheExpiredException();
