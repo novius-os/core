@@ -22,6 +22,8 @@ class FrontCache
 {
     protected static $_php_begin = null;
 
+    public static $cache_duration = 60;
+
     /**
      * Loads any default caching settings when available
      */
@@ -215,9 +217,12 @@ class FrontCache
         $this->_level = ob_get_level();
     }
 
-    public static function checkExpires($expires)
+    public static function checkExpires($expires, $initial_cache_duration = 0)
     {
         if ($expires > 0 && $expires <= time()) {
+            throw new CacheExpiredException();
+        }
+        if ($initial_cache_duration > static::$cache_duration) {
             throw new CacheExpiredException();
         }
     }
@@ -234,7 +239,7 @@ class FrontCache
             $expires = time() + $duration;
             $prepend .= '<?php
 
-            '.__CLASS__.'::checkExpires('.$expires.');'."\n";
+            '.__CLASS__.'::checkExpires('.$expires.', '.$duration.');'."\n";
 
             if (!empty($controller)) {
                 if ($this->_path === $this->_init_path && !empty($this->_suffix_handlers)) {
