@@ -255,6 +255,10 @@ return array(
                 'title' => 'Français',
                 'flag' => 'fr',
             ),
+            'es_ES' => array(
+                'title' => 'Español',
+                'flag' => 'es',
+            ),
             'ja_JP' =>  array(
                 'title' => '日本語',
                 'flag' => 'jp',
