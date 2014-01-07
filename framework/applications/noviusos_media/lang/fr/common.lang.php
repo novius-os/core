@@ -338,6 +338,7 @@ return array(
     'Select a folder where to put your media files:' => 'Sélectionner un dossier où ranger vos médias&nbsp;:',
     'Hold the Ctrl/Cmd key to select multiple files.' => 'Maintenir la touche Ctrl/Cmd enfoncée pour sélectionner plusieurs fichiers.',
     'Total files size must not exceed {{size}}.' => 'La somme des fichiers ne doit pas dépasser {{size}}.',
+    'The file size must not exceed {{size}}.'
     'What’s more these file types are not allowed: {{extensions}}.' => 'De plus, ces types de fichier ne sont pas autorisés&nbsp;: {{extensions}}.',
     'Total files size exceeds the upload limit {{size}}.' => 'La somme des fichiers dépasse la limite {{size}}.',
 
@@ -353,4 +354,8 @@ return array(
     'Border:' => 'Bordure :',
     'Vertical space:' => 'Espacement vertical :',
     'Horizontal space:' => 'Espacement horizontal :',
+    
+    #: views/admin/media_add.view.php:31
+    #: views/admin/media_edit.view.php:50
+    'The file size must not exceed {{size}}.' => 'La taille du fichier dépasse la limite {{size}}',
 );
