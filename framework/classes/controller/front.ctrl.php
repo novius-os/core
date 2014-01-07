@@ -105,6 +105,7 @@ class Controller_Front extends Controller
         $cache_path = \Nos\FrontCache::getPathFromUrl($this->_base_href, $cache_path);
 
         $this->_cache = FrontCache::forge($cache_path);
+        \Nos\FrontCache::$cache_duration = $this->_cache_duration;
 
         try {
             if (!$this->_use_cache) {
