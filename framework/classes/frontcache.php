@@ -50,8 +50,8 @@ class FrontCache
     {
         echo static::_phpBegin();
         // Serialize allow to persist objects in the cache file
-        // API is Nos\Nos::hmvc('location', array('args' => $args))
-        echo 'echo \Nos\Nos::hmvc('.var_export($uri, true).', unserialize('.var_export(serialize(array('args' => $args)), true).'));';
+        // API is Nos\Nos::hmvc('location', $args)
+        echo 'echo \Nos\Nos::hmvc('.var_export($uri, true).', unserialize('.var_export(serialize($args), true).'));';
         echo '?>';
     }
 

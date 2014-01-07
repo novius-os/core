@@ -57,20 +57,25 @@ class Nos
     {
         \Fuel::$profiling && \Profiler::console("HMVC $where");
 
-        if (empty($args['args'])) {
-            $args['args'] = array();
+        if (!empty($args['args']) && is_array($args['args'])) {
+            $args = $args['args'];
+            \Log::deprecated(
+                'The second argument of Nos::hmvc() containing an "args" key is deprecated, '.
+                'you can now directly passed the array of parameters for the request.'.
+                'Version D'
+            );
         }
 
         ob_start();
         try {
             $request = \Request::forge($where);
 
-            $response = $request->execute($args['args']);
+            $response = $request->execute($args);
 
             echo $response;
-        } catch (\Nos\FrontIgnoreTemplateException $e) {
+        } catch (FrontIgnoreTemplateException $e) {
             throw $e;
-        } catch (\Nos\NotFoundException $e) {
+        } catch (NotFoundException $e) {
             throw $e;
         } catch (\Exception $e) {
             if (\Fuel::$env == \Fuel::DEVELOPMENT) {
@@ -188,9 +193,7 @@ class Nos
         if ($found) {
             $function_content = self::hmvc(
                 (!empty($config['urlEnhancer']) ? $config['urlEnhancer'] : $config['enhancer']),
-                array(
-                    'args' => array($args),
-                )
+                array($args)
             );
             if (empty($function_content) && \Fuel::$env == \Fuel::DEVELOPMENT) {
                 $function_content = 'Enhancer '.$enhancer.' ('.$config['enhancer'].') returned empty content.';
