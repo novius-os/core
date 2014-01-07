@@ -97,7 +97,7 @@ class Migrate extends \Fuel\Core\Migrate
             } catch (\Exception $e) {
                 $ignore = false;
                 $result = true;
-                \Event::trigger_function('migrate.on_exception', array($e, &$ignore, $migration));
+                \Event::trigger_function('migrate.exception', array($e, &$ignore, $migration));
                 if (!$ignore) {
                     throw $e;
                 }
