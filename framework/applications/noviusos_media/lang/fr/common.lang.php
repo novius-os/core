@@ -353,4 +353,8 @@ return array(
     'Border:' => 'Bordure :',
     'Vertical space:' => 'Espacement vertical :',
     'Horizontal space:' => 'Espacement horizontal :',
+    
+    #: views/admin/media_add.view.php:31
+    #: views/admin/media_edit.view.php:50
+    'The file size must not exceed {{size}}.' => 'La taille du fichier dépasse la limite {{size}}',
 );
