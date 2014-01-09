@@ -219,6 +219,7 @@ if (\Session::user()->user_expert) {
 }
 ?>
                     $(".app_list_available table, .app_list_installed table").wijgrid({
+                        scrollMode : "auto",
                         rendered: function(args) {
                             $(args.target).closest('.wijmo-wijgrid').find('thead').hide();
 
