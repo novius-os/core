@@ -22,7 +22,7 @@ abstract class Task
     protected function _config()
     {
         list($application, $relative_path) = \Config::configFile(str_replace('Tasks\\', 'Tasks_', get_called_class()));
-        $this->_config = \Config::loadConfiguration($application, $relative_path);
+        $this->_config = \Config::load($application.'::'.$relative_path, true);
     }
 
     public function success($msg)

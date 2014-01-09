@@ -315,7 +315,8 @@ class Application
     {
         if (empty($application)) {
             \Log::deprecated(
-                'The Scope "public" of the method \Nos\Application::applicationRequiredFromMetadata() is deprecated.',
+                'The scope "public" of the method \Nos\Application::applicationRequiredFromMetadata() is deprecated '.
+                '(will become protected)',
                 'Version D'
             );
         }

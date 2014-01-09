@@ -124,7 +124,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
     {
         list($application, $file_name) = \Config::configFile(get_called_class());
 
-        return \Config::loadConfiguration($application, $file_name);
+        return \Config::load($application.'::'.$file_name, true);
     }
 
     protected static function getGlobalConfiguration()

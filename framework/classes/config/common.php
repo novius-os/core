@@ -8,7 +8,7 @@ class Config_Common
         list($application_name, $file) = \Config::configFile($model);
         $file = 'common'.substr($file, strrpos($file, DS));
 
-        $config = \Config::loadConfiguration($application_name, $file);
+        $config = \Config::load($application_name.'::'.$file, true);
 
         $config = static::process_placeholders($model, $config);
         $config = static::process_callable_keys($config);

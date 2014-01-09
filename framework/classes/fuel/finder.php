@@ -105,11 +105,15 @@ class Finder extends Fuel\Core\Finder
                         return $found;
                     }
                 }
-            } else if ($dir === 'config') {
-                // Novius OS : load config in local if exist
-                $paths_add = array(APPPATH.'config'.DS.($dir_app === 'nos' ? 'novius-os'.DS : 'apps'.DS.$dir_app.DS));
-            } else if ($dir === 'lang' && $dir_app !== 'local') {
-                $paths_add = array(APPPATH.'lang'.DS.($dir_app === 'nos' ? 'novius-os'.DS : 'apps'.DS.$dir_app.DS));
+
+            } else if ($dir === 'config' || ($dir === 'lang' && $dir_app !== 'local')) {
+                $is_extend_allowed = substr($dir_app, 0, 1) !== '!';
+                if (!$is_extend_allowed) {
+                    $file = substr($file, 1);
+                    $dir_app = substr($dir_app, 1);
+                } else {
+                    $paths_add = static::pathsExtended($dir, $dir_app, substr($file, $pos + 2));
+                }
             }
 
             // get the namespace path
@@ -196,5 +200,41 @@ class Finder extends Fuel\Core\Finder
         }
 
         return $found;
+    }
+
+    protected static function pathsExtended($dir, $app_extended, $file)
+    {
+        $paths_add = array(APPPATH.$dir.DS.($app_extended === 'nos' ? 'novius-os'.DS : 'apps'.DS.$app_extended.DS));
+
+        $dependencies = \Nos\Config_Data::get('app_dependencies', array());
+
+        if (!empty($dependencies[$app_extended])) {
+            $metadata = \Nos\Config_Data::load('app_installed', false);
+            foreach ($dependencies[$app_extended] as $application => $dependency) {
+                if ($dir === 'config') {
+                    $extends = $metadata[$application]['extends'];
+                    if (!is_array($extends) ||
+                        (isset($extends['application']) && \Arr::get($extends, 'extend_configuration', true))) {
+                        $extend_config = \Config::load($application.'::'.$file, true);
+                        if (!empty($extend_config)) {
+                            $paths_add[] = \Nos\Application::get_application_path($application).DS.$dir.DS;
+
+                            \Log::deprecated(
+                                'The config file "'.$app_extended.'::'.$file.'" is extended by application '.
+                                '"'.$application.'" without using a subdirectory "'.($app_extended === 'nos' ? 'novius-os/' : 'apps/'.$app_extended.'/').'", this '.
+                                'mechanism is deprecated.',
+                                'Version D'
+                            );
+                            continue;
+                        }
+                    }
+                }
+
+                $paths_add[] = \Nos\Application::get_application_path($application).DS.$dir.DS.
+                    ($app_extended === 'nos' ? 'novius-os'.DS : 'apps'.DS.$app_extended.DS);
+            }
+        }
+
+        return $paths_add;
     }
 }

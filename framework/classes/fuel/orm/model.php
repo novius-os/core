@@ -395,7 +395,7 @@ class Model extends \Orm\Model
             $application = static::getApplication();
             $file_name = mb_strtolower(str_replace('_', DS, \Inflector::denamespace($class)));
 
-            static::$_configs[$class] = \Config::loadConfiguration($application, $file_name);
+            static::$_configs[$class] = \Config::load($application.'::'.$file_name, true);
         }
 
         return static::$_configs[$class];

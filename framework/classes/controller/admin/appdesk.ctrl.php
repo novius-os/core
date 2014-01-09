@@ -262,7 +262,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
                     continue;
                 }
                 list($application, $file_name) = \Config::configFile($inspector_name);
-                $inspector_config = \Config::loadConfiguration($application, $file_name);
+                $inspector_config = \Config::load($application.'::'.$file_name, true);
                 if (is_array($value)) {
                     $inspector_config = \Arr::merge($inspector_config, $value);
                 }
