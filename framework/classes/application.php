@@ -42,7 +42,7 @@ class Application
         }
 
         foreach (static::$rawAppInstalled as $key => $application) {
-            $requires = static::applicationRequiredFromMetadata($application);
+            $requires = static::applicationRequiredFromMetadata($application, $key);
 
             static::$requirements[$key]['requires'] = $requires;
             foreach ($requires as $application_required) {
@@ -306,23 +306,29 @@ class Application
     public function applicationsRequired()
     {
         $new_metadata = $this->getRealMetadata();
-        $required = static::applicationRequiredFromMetadata($new_metadata);
+        $required = static::applicationRequiredFromMetadata($new_metadata, $this->folder);
 
         return $required;
     }
 
-    public static function applicationRequiredFromMetadata($metadata)
+    public static function applicationRequiredFromMetadata($metadata, $application = null)
     {
-        $requires = array();
-        if (isset($metadata['requires'])) {
-            $requires = $metadata['requires'];
-        } else if (isset($metadata['extends'])) {
-            $requires = static::extendsToDependency($metadata['extends']);
-            $requires = $requires['application'];
+        if (empty($application)) {
+            \Log::deprecated(
+                'The Scope "public" of the method \Nos\Application::applicationRequiredFromMetadata() is deprecated.',
+                'Version D'
+            );
         }
 
-        if ($requires && is_string($requires)) {
-            $requires = array($requires);
+        $requires = array();
+        if (isset($metadata['requires'])) {
+            $requires = (array) $metadata['requires'];
+        }
+        if (isset($metadata['extends'])) {
+            $extends = static::extendsToDependency($metadata['extends'], $application);
+            foreach ($extends as $extended) {
+                $requires[] = $extended;
+            }
         }
         return $requires;
     }
@@ -552,36 +558,40 @@ class Application
             $config['app_namespaces'][$this->folder] = $new_namespace;
         }
 
-        $old_dependency = static::extendsToDependency(\Arr::get($old_metadata, 'extends', null));
-        $new_dependency = static::extendsToDependency(\Arr::get($new_metadata, 'extends', null));
+        $old_dependencies = static::extendsToDependency(\Arr::get($old_metadata, 'extends', null));
+        $new_dependencies = static::extendsToDependency(\Arr::get($new_metadata, 'extends', null), $this->folder);
 
         // Remove old dependency
-        unset($config['app_dependencies'][$old_dependency['application']][$this->folder]);
+        foreach ($old_dependencies as $dependency) {
+            unset($config['app_dependencies'][$dependency][$this->folder]);
+        }
         // Set new dependency
-        if ($new_dependency === null) {
-            unset($config['app_dependencies'][$new_dependency['application']][$this->folder]);
-        } else {
-            $config['app_dependencies'][$new_dependency['application']][$this->folder] = $new_dependency;
+        foreach ($new_dependencies as $dependency) {
+            $config['app_dependencies'][$dependency][$this->folder] = $this->folder;
         }
 
         return $config;
     }
 
-    protected static function extendsToDependency($extends)
+    protected static function extendsToDependency($extends, $application = null)
     {
-        if ($extends === null) {
-            return $extends;
+        if (empty($extends)) {
+            return array();
         }
         if (!is_array($extends)) {
-            $extends = array(
-                'application' => $extends,
-            );
+            $extends = array($extends);
         }
+        if (isset($extends['application'])) {
+            if (!empty($application)) {
+                \Log::deprecated(
+                    'In the metadata of the application "'.$application.'", the extends key containing '.
+                    'an array with an application key is deprecated.',
+                    'Version D'
+                );
+            }
 
-        if (!isset($extends['extend_configuration'])) {
-            $extends['extend_configuration'] = true;
+            $extends = array($extends['application']);
         }
-
         return $extends;
     }
 

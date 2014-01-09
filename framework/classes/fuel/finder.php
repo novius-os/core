@@ -83,9 +83,27 @@ class Finder extends Fuel\Core\Finder
             if ($dir === 'views' && $dir_app !== 'local') {
                 // Novius OS : load view in local if exist
                 $local_file = substr($file, $pos + 2);
-                $found = \Finder::search('views', $dir_app === 'nos' ? 'local::novius-os'.DS.$local_file : 'local::apps'.DS.$dir_app.DS.$local_file, $ext, $multiple, $cache);
-                if ($found !== false) {
-                    return $found;
+
+                $dependencies = \Nos\Config_Data::get('app_dependencies', array());
+                $extend_dirs = array('local');
+                if (!empty($dependencies[$dir_app])) {
+                    foreach ($dependencies[$dir_app] as $application => $dependency) {
+                        $extend_dirs[] = $application;
+                    }
+                }
+                foreach ($extend_dirs as $extend_dir) {
+                    $found = \Finder::search(
+                        'views',
+                        $dir_app === 'nos' ?
+                        $extend_dir.'::novius-os'.DS.$local_file :
+                        $extend_dir.'::apps'.DS.$dir_app.DS.$local_file,
+                        $ext,
+                        $multiple,
+                        $cache
+                    );
+                    if ($found !== false) {
+                        return $found;
+                    }
                 }
             } else if ($dir === 'config') {
                 // Novius OS : load config in local if exist

@@ -88,10 +88,35 @@ class Config extends \Fuel\Core\Config
         $dependencies = \Nos\Config_Data::get('app_dependencies', array());
 
         if (!empty($dependencies[$application_name])) {
+            $metadata = \Nos\Config_Data::load('app_installed', false);
+
             foreach ($dependencies[$application_name] as $application => $dependency) {
-                if ($dependency['extend_configuration']) {
-                    $config = \Arr::merge($config, \Config::load($application.'::'.$file_name, true));
+                $extends = $metadata[$application]['extends'];
+                if (!is_array($extends) ||
+                    (isset($extends['application']) && \Arr::get($extends, 'extend_configuration', true))) {
+                    $extend_config = \Config::load($application.'::'.$file_name, true);
+                    if (!empty($extend_config)) {
+                        $config = \Arr::merge($config, $extend_config);
+
+                        \Log::deprecated(
+                            'The config file "'.$application_name.'::'.$file_name.'" is extended by application '.
+                            '"'.$application.'" without using a subdirectory "apps/'.$application_name.'/", this '.
+                            'mechanism is deprecated.',
+                            'Version D'
+                        );
+                        continue;
+                    }
                 }
+
+                $config = \Arr::merge(
+                    $config,
+                    \Config::load(
+                        $application_name === 'nos' ?
+                        $application.'::novius-os/'.$file_name :
+                        $application.'::apps/'.$application_name.'/'.$file_name,
+                        true
+                    )
+                );
             }
         }
         $config = \Arr::recursive_filter(
