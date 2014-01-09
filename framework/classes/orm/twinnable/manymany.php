@@ -225,8 +225,7 @@ class Orm_Twinnable_ManyMany extends \Orm\ManyMany
         //search for twin models
         $query = \DB::select()->from($this->table_through);
         reset($this->key_from);
-        foreach ($this->key_through_from as $key)
-        {
+        foreach ($this->key_through_from as $key) {
             $query->where($key, '=', $model_from->{current($this->key_from)});
             next($this->key_from);
         }
