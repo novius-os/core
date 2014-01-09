@@ -10,7 +10,7 @@
 
 namespace Nos\Migrations;
 
-class New_Dependencies_Configuration extends \Nos\Migration
+class Update_Dependencies_Configuration extends \Nos\Migration
 {
     public function up()
     {
