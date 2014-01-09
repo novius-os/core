@@ -219,4 +219,21 @@ class Orm_Twinnable_ManyMany extends \Orm\ManyMany
             'primary_key' => $primary_key,
         );
     }
+    
+    public function delete_related($model_from)
+    {
+        //search for twin models
+        $query = \DB::select()->from($this->table_through);
+        reset($this->key_from);
+        foreach ($this->key_through_from as $key) {
+            $query->where($key, '=', $model_from->{current($this->key_from)});
+            next($this->key_from);
+        }
+        $result = $query->execute(call_user_func(array($model_from, 'connection')));
+        //if there's more than one result, prevent from deleting relation (still used by twin models)
+        //otherwise, the current model is the last to use te relation and relation can be destroyed
+        if (count($result) === 1) {
+            parent::delete_related($model_from);
+        }
+    }
 }
