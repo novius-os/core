@@ -134,6 +134,7 @@ function n__($singular, $plural, $n = false)
                 $plural,
             );
         }
+        return $return;
     } else {
         return \Nos\I18n::nTranslateFromFile($dbg[$i]['file'], $singular, $plural, $n);
     }
