@@ -68,6 +68,28 @@ if ($is_media) {
                 exit();
             }
 
+            $path_parts = pathinfo($nos_url);
+            $lock_file = APPPATH.$nos_url.'.lock';
+            $dir = dirname($lock_file);
+            if (!is_dir($dir) && !\File::create_dir(dirname($dir), basename($dir))) {
+                error_log("Can't create dir ".$dir);
+                exit("Can't create dir ".$dir);
+            }
+            if (file_exists($lock_file)) {
+                $time = file_get_contents($lock_file);
+                if ((time() - $time) < 120) {
+                    if ($_SERVER['REDIRECT_QUERY_STRING'] === 'lock') {
+                        header('HTTP/1.0 503 Service Unavailable');
+                        header('HTTP/1.1 503 Service Unavailable');
+                        exit();
+                    }
+                    sleep(2);
+                    \Response::redirect(\Uri::base(false).$nos_url.'?lock');
+                    exit();
+                }
+            }
+            file_put_contents($lock_file, time(), LOCK_EX);
+
             try {
                 $send_file = $toolkit_image->save();
                 $target = $toolkit_image->url(false);
@@ -75,6 +97,7 @@ if ($is_media) {
                 Log::error($e->getMessage());
                 $send_file = false;
             }
+            unlink($lock_file);
         } else {
             $send_file = $media->path();
             $target = $media->url(false);
