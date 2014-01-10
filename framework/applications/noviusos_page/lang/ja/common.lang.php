@@ -7,7 +7,7 @@
 
 return array(
     #: classes/controller/admin/page.ctrl.php:32
-    'The home page must be published. To unpublish this page, set another page as home page first.' => 'ホームページは「公開」にしなければなりません。このページを公開しなくするには、他のページをまずホームページにセットしてください。',
+    'This page is the home page and must therefore be published. To unpublish this page, set another page as home page first.' => 'ホームページは「公開」にしなければなりません。このページを公開しなくするには、他のページをまずホームページにセットしてください。',
 
     #: classes/controller/admin/page.ctrl.php:64
     'Use title' => 'タイトルを使用する',

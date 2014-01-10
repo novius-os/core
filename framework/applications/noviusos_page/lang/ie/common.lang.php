@@ -7,7 +7,7 @@
 
 return array(
     #: classes/controller/admin/page.ctrl.php:32
-    'The home page must be published. To unpublish this page, set another page as home page first.' => 'Li principal pagine deve esser publicat. Por despublicar ti pagine, defini in prim un altri pagine quam principal pagine.',
+    'This page is the home page and must therefore be published. To unpublish this page, set another page as home page first.' => 'Li principal pagine deve esser publicat. Por despublicar ti pagine, defini in prim un altri pagine quam principal pagine.',
 
     #: classes/controller/admin/page.ctrl.php:64
     'Use title' => 'Usar titul',

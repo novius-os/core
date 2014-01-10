@@ -7,7 +7,7 @@
 
 return array(
     #: classes/controller/admin/page.ctrl.php:32
-    'The home page must be published. To unpublish this page, set another page as home page first.' => 'Esta es la página de inicio y tiene que estar publicada. Para retirarla de la publicación, elige primero otra página de inicio.',
+    'This page is the home page and must therefore be published. To unpublish this page, set another page as home page first.' => 'Esta es la página de inicio y tiene que estar publicada. Para retirarla de la publicación, elige primero otra página de inicio.',
 
     #: classes/controller/admin/page.ctrl.php:64
     'Use title' => 'Usar título',

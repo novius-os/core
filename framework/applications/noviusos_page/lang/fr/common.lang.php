@@ -7,7 +7,7 @@
 
 return array(
     #: classes/controller/admin/page.ctrl.php:32
-    'The home page must be published. To unpublish this page, set another page as home page first.' => 'La page d’accueil doit être publiée. Pour dépublier cette page, définissez d’abord une autre page comme page d’accueil.',
+    'This page is the home page and must therefore be published. To unpublish this page, set another page as home page first.' => 'Cette page est la page d’accueil et doit donc être publiée. Pour dépublier cette page, choisissez d’abord une autre page comme page d’accueil.',
 
     #: classes/controller/admin/page.ctrl.php:64
     'Use title' => 'Reprendre le titre',
@@ -282,10 +282,10 @@ return array(
 
     #. Blank slate
     #: config/common/page.config.php:56
-    'We’re afraid this page cannot be added to {{context}} because its <a>parent</a> is not available in this context yet.' => 'Malheureusement cette page ne peut être ajoutée à {{context}} car elledépend d’<a>une autre page</a> qui n’est pas encore disponible dans cecontexte.',
+    'We’re afraid this page cannot be added to {{context}} because its <a>parent</a> is not available in this context yet.' => 'Malheureusement cette page ne peut être ajoutée à {{context}} car elle dépend d’<a>une autre page</a> qui n’est pas encore disponible dans ce contexte.',
 
     #: config/common/page.config.php:57
-    'We’re afraid this page cannot be translated into {{language}} because its <a>parent</a> is not available in this language yet.' => 'Malheureusement cette page ne peut être traduite en {{language}} car elledépend d’<a>une autre page</a> qui n’est pas encore disponible dans cettelangue.',
+    'We’re afraid this page cannot be translated into {{language}} because its <a>parent</a> is not available in this language yet.' => 'Malheureusement cette page ne peut être traduite en {{language}} car elle dépend d’<a>une autre page</a> qui n’est pas encore disponible dans cette langue.',
 
     #. Deletion popup
     #: config/common/page.config.php:60

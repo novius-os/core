@@ -435,7 +435,7 @@ return array(
 
     #. Keep only if the model has the behaviour Twinnable
     #: config/i18n_common.config.php:51
-    'We’re afraid this item cannot be added to {{context}} because its <a>parent</a> is not available in this context yet.' => 'Malheureusement cet item ne peut être ajouté à {{context}} car il dépendd’<a>un item</a> qui n’est pas encore disponible dans ce contexte.',
+    'We’re afraid this item cannot be added to {{context}} because its <a>parent</a> is not available in this context yet.' => 'Malheureusement cet item ne peut être ajouté à {{context}} car il dépend d’<a>un item</a> qui n’est pas encore disponible dans ce contexte.',
 
     #: config/i18n_common.config.php:52
     'We’re afraid this item cannot be translated into {{language}} because its <a>parent</a> is not available in this language yet.' => 'Malheureusement cet item ne peut être traduit en {{language}} car il dépendd’<a>un item</a> qui n’est pas encore disponible dans cette langue.',

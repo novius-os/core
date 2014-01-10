@@ -29,7 +29,10 @@ class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
     public function before_save($page, $data)
     {
         if ($this->item->page_entrance && !$this->item->published()) {
-            $this->send_error(new \Exception(__('The home page must be published. To unpublish this page, set another page as home page first.')));
+            $this->send_error(new \Exception(__(
+                'This page is the home page and must therefore be published. '.
+                'To unpublish this page, set another page as home page first.'
+            )));
         }
 
         parent::before_save($page, $data);

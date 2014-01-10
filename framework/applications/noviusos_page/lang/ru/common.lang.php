@@ -7,7 +7,7 @@
 
 return array(
     #: classes/controller/admin/page.ctrl.php:32
-    'The home page must be published. To unpublish this page, set another page as home page first.' => 'Главная страница сайта должна быть опубликована. Чтобы отменить публикацию этой страницы, сперва установите главной другую страницу.',
+    'This page is the home page and must therefore be published. To unpublish this page, set another page as home page first.' => 'Главная страница сайта должна быть опубликована. Чтобы отменить публикацию этой страницы, сперва установите главной другую страницу.',
 
     #: classes/controller/admin/page.ctrl.php:64
     'Use title' => 'Использовать заголовок',
