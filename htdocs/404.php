@@ -71,7 +71,7 @@ if ($is_media) {
             $path_parts = pathinfo($nos_url);
             $lock_file = APPPATH.$nos_url.'.lock';
             $dir = dirname($lock_file);
-            if (!is_dir($dir) && !\File::create_dir(dirname($dir), basename($dir))) {
+            if (!is_dir($dir) && !\File::create_dir(APPPATH.'cache', substr($dir, strlen(APPPATH.'cache'.DS)))) {
                 error_log("Can't create dir ".$dir);
                 exit("Can't create dir ".$dir);
             }
