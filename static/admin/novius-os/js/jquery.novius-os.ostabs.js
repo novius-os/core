@@ -1307,8 +1307,10 @@ define('jquery-nos-ostabs',
                 var self = this,
                     o = self.options;
 
-                $.each(self.panels, function(i) {
-                    var $panel = $(this);
+                $.each(self.panels, function() {
+                    var $panel = $(this),
+                        i = $panel.find('.nos-ostabs-panel-content' ).data('nos-ostabs-index');
+
                     if (i === o.selected) {
                         self._firePanelEvent($panel, event);
                     } else {
