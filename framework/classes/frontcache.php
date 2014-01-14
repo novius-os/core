@@ -96,12 +96,20 @@ class FrontCache
         );
 
         $cache = new static($path);
+
+        $old_cache_duration = static::$cache_duration;
+        static::$cache_duration = $params['duration'];
+
         try {
-            return $cache->executeOrStart($params['controller']);
+            $result = $cache->executeOrStart($params['controller']);
+            static::$cache_duration = $old_cache_duration;
+            return $result;
         } catch (CacheNotFoundException $e) {
             call_user_func_array($params['callback_func'], $params['callback_args']);
 
-            return $cache->saveAndExecute($params['duration'], $params['controller']);
+            $result = $cache->saveAndExecute($params['duration'], $params['controller']);
+            static::$cache_duration = $old_cache_duration;
+            return $result;
         }
     }
 
