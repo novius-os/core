@@ -52,9 +52,13 @@ if (\Nos\Application::areNativeApplicationsDirty()) {
 
         <div class="line app_list_installed">
             <h1 class="title"><?= __('Installed applications'); ?></h1>
+<?php
+if (!empty($installed)) {
+    ?>
             <table>
                 <tbody>
-<?php
+    <?php
+}
 foreach ($installed as $app) {
     $metadata = $app->metadata;
     ?>
@@ -102,9 +106,13 @@ foreach ($installed as $app) {
 ?>
                 </tbody>
             </table>
-
 <?php
-if (empty($installed)) {
+if (!empty($installed)) {
+    ?>
+                </tbody>
+            </table>
+    <?php
+} else {
     ?>
             <em><?php echo __('No applications found.') ?>.</em>
     <?php
@@ -114,9 +122,13 @@ if (empty($installed)) {
 
         <div class="line app_list_available">
             <h1 class="title"><?= __('Available applications'); ?></h1>
+<?php
+if (!empty($others)) {
+    ?>
             <table>
                 <tbody>
-<?php
+    <?php
+}
 foreach ($others as $app) {
     $metadata = $app->getRealMetadata();
     $can_install = $app->canInstall();
@@ -152,12 +164,12 @@ foreach ($others as $app) {
                     </tr>
     <?php
 }
-?>
+if (!empty($others)) {
+    ?>
                 </tbody>
             </table>
-
-<?php
-if (empty($others)) {
+    <?php
+} else {
     ?>
             <em><?= __('No applications found.') ?></em>
     <?php
@@ -219,8 +231,13 @@ if (\Session::user()->user_expert) {
     <?php
 }
 ?>
-                    $(".app_list_available table, .app_list_installed table").wijgrid({
+                    $container.find(".app_list_available table, .app_list_installed table").wijgrid({
                         scrollMode : "auto",
+                        rowStyleFormatter: function(args) {
+                            if (args.type == wijmo.grid.rowType.header) {
+                                args.$rows.hide();
+                            }
+                        },
                         rendered: function(args) {
                             $(args.target).closest('.wijmo-wijgrid').find('thead').hide();
 
