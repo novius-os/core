@@ -81,8 +81,11 @@ class Renderer_Media extends \Nos\Renderer
      */
     protected static function parse_options($renderer = array())
     {
-        \Log::deprecated('Renderer_Media::parse_options($renderer) is deprecated, '.
-            'use Renderer_Media::parseOptions($renderer) instead.', 'Chiba.2.1');
+        \Log::deprecated(
+            'Renderer_Media::parse_options($renderer) is deprecated, '.
+            'use Renderer_Media::parseOptions($renderer) instead.',
+            'Chiba.2.1'
+        );
         return static::parseOptions($renderer);
     }
 
