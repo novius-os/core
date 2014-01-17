@@ -119,7 +119,6 @@ class Controller_Admin_Appmanager extends \Nos\Controller_Admin_Application
             'templates',
         );
         foreach ($files as $metadata) {
-            \Nos\Config_Data::set($metadata, array());
             \Nos\Config_Data::save($metadata, array());
         }
 
