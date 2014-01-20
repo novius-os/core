@@ -98,6 +98,10 @@ class Model_Media extends \Nos\Orm\Model
 
     protected static $_has_one = array();
     protected static $_many_many = array();
+    protected static $_twinnable_has_one = array();
+    protected static $_twinnable_has_many = array();
+    protected static $_twinnable_belongs_to = array();
+    protected static $_twinnable_many_many = array();
 
     protected static $_belongs_to = array(
         'folder' => array(

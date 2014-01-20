@@ -85,9 +85,14 @@ class Model_User extends \Nos\Orm\Model
         'roles' => array(),
     );
 
-    protected static $_belongs_to = array();
-    protected static $_has_many = array();
     protected static $_has_one = array();
+    protected static $_belongs_to  = array();
+    protected static $_has_many  = array();
+    protected static $_twinnable_has_one = array();
+    protected static $_twinnable_has_many = array();
+    protected static $_twinnable_belongs_to = array();
+    protected static $_twinnable_many_many = array();
+
     protected static $_many_many = array(
         'roles' => array(
             'key_from' => 'user_id',
@@ -199,7 +204,7 @@ class Model_User extends \Nos\Orm\Model
      */
     public function checkPermission($permission_name, $category_key = null, $allowEmpty = false)
     {
-        return $this->checkRolesPermissions('exists', func_get_args());
+        return $this->checkRolesPermission('exists', $permission_name, $category_key, $allowEmpty);
     }
 
     /**

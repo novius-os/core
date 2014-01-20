@@ -69,6 +69,10 @@ class Model_Folder extends \Nos\Orm\Model
 
     protected static $_has_one = array();
     protected static $_many_many = array();
+    protected static $_twinnable_has_one = array();
+    protected static $_twinnable_has_many = array();
+    protected static $_twinnable_belongs_to = array();
+    protected static $_twinnable_many_many = array();
 
     protected static $_has_many = array(
         'children' => array(
@@ -244,9 +248,11 @@ class Model_Folder extends \Nos\Orm\Model
         $count_medias = $this->count_media();
         // Basic check to prevent false suppression
         if (!is_dir($this->path()) && $count_medias > 0) {
-            throw new \Exception(__('This is strange: This folder should be empty but isn’t. '.
-            'Please contact your developer or Novius OS to fix this. '.
-            'We apologise for the inconvenience caused.'));
+            throw new \Exception(__(
+                'This is strange: This folder should be empty but isn’t. '.
+                'Please contact your developer or Novius OS to fix this. '.
+                'We apologise for the inconvenience caused.'
+            ));
         }
 
         // Strategy : try to delete the database records first,
@@ -289,19 +295,25 @@ class Model_Folder extends \Nos\Orm\Model
         $table_link   = Model_Link::table();
 
         // Delete linked medias
-        \DB::query('DELETE '.$table_link.'.* FROM '.$table_link.'
+        \DB::query(
+            'DELETE '.$table_link.'.* FROM '.$table_link.'
             LEFT JOIN '.$table_media.' ON media_id = medil_media_id
-            WHERE media_folder_id IN ('.$escaped_folder_ids.')')->execute();
+            WHERE media_folder_id IN ('.$escaped_folder_ids.')'
+        )->execute();
 
         // Delete media entries
-        \DB::query('DELETE '.$table_media.'.* FROM '.$table_media.'
-            WHERE media_folder_id IN ('.$escaped_folder_ids.')')->execute();
+        \DB::query(
+            'DELETE '.$table_media.'.* FROM '.$table_media.'
+            WHERE media_folder_id IN ('.$escaped_folder_ids.')'
+        )->execute();
 
         // Can throw an exception
         $this->deleteFromDisk();
 
         // Delete folder entries
-        \DB::query('DELETE '.$table_folder.'.* FROM '.$table_folder.'
-            WHERE medif_id IN ('.$escaped_folder_ids.')')->execute();
+        \DB::query(
+            'DELETE '.$table_folder.'.* FROM '.$table_folder.'
+            WHERE medif_id IN ('.$escaped_folder_ids.')'
+        )->execute();
     }
 }
