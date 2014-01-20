@@ -204,7 +204,7 @@ class Model_User extends \Nos\Orm\Model
      */
     public function checkPermission($permission_name, $category_key = null, $allowEmpty = false)
     {
-        return $this->checkRolesPermissions('exists', func_get_args());
+        return $this->checkRolesPermission('exists', $permission_name, $category_key, $allowEmpty);
     }
 
     /**
