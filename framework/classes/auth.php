@@ -50,6 +50,8 @@ class Auth
         $logged_user_md5 = \Session::get('logged_user_md5', false);
         $remember_me = \Cookie::get('remember_me', false);
 
+        $session_user_id = $logged_user_id;
+
         if (empty($logged_user_id) && $remember_me) {
             $logged_user_id = \Cookie::get('logged_user_id', false);
             $logged_user_md5 = \Cookie::get('logged_user_md5', false);
@@ -57,24 +59,40 @@ class Auth
 
         if (empty($logged_user_id)) {
             return false;
-        } else {
-            $logged_user = User\Model_User::find_by_user_id($logged_user_id); // We reload the user
-            if (!$logged_user || $logged_user->user_md5 != $logged_user_md5) {
-                return false;
-            }
-            \Session::setUser($logged_user);
-            // Only extend the cookie duration for the main request (preventing N 'Set-Cookie' headers if we have N HMVC requests)
-            if (!\Request::is_hmvc()) {
-                \Session::set('logged_user_id', $logged_user_id);
-                \Session::set('logged_user_md5', $logged_user_md5);
-                \Cookie::set('remember_me', $remember_me, static::$default_cookie_lasting);
-                if ($remember_me) {
-                    \Cookie::set('logged_user_id', $logged_user_id, static::$default_cookie_lasting);
-                    \Cookie::set('logged_user_md5', $logged_user_md5, static::$default_cookie_lasting);
-                }
-            }
-            return true;
         }
+
+        $logged_user = User\Model_User::find_by_user_id($logged_user_id); // We reload the user
+        if (!$logged_user || $logged_user->user_md5 != $logged_user_md5) {
+
+            static::disconnect();
+
+            // It's a new session (= auto-login using Cookie)
+            if (empty($session_user_id)) {
+                \Event::trigger('admin.loginFailWithCookie');
+            }
+
+            return false;
+        }
+
+        \Session::setUser($logged_user);
+        // Only extend the cookie duration for the main request (preventing N 'Set-Cookie' headers if we have N HMVC requests)
+        if (!\Request::is_hmvc()) {
+
+            \Session::set('logged_user_id', $logged_user_id);
+            \Session::set('logged_user_md5', $logged_user_md5);
+            \Cookie::set('remember_me', $remember_me, static::$default_cookie_lasting);
+            if ($remember_me) {
+                \Cookie::set('logged_user_id', $logged_user_id, static::$default_cookie_lasting);
+                \Cookie::set('logged_user_md5', $logged_user_md5, static::$default_cookie_lasting);
+            }
+        }
+
+        // It's a new session (= auto-login using Cookie)
+        if (empty($session_user_id)) {
+            \Event::trigger('admin.loginSuccessWithCookie');
+        }
+
+        return true;
     }
 
     public static function set_user_md5($user_md5)
