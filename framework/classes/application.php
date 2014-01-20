@@ -21,6 +21,8 @@ class Application
         list($file) = \Nos\Config_Data::getFile('app_installed');
         static::$rawAppInstalled = \Fuel::load($file);
 
+        // default initialisation because it's used by get_application_path() which is called when extending 'local' or 'nos'.
+        static::$repositories = array();
         \Config::load('nos::applications_repositories', true);
         \Config::load('local::applications_repositories', true);
         static::$repositories = \Arr::merge(
@@ -702,9 +704,9 @@ class Application
 
     /**
      * Computes the diff between 2 arrays, bith on keys and values.
-     * @param type $arr1 First array to compare
-     * @param type $arr2 Second array to compare
-     * @param type $diff Returns the diff between the 2 array
+     * @param array $arr1 First array to compare
+     * @param array $arr2 Second array to compare
+     * @param array $diff Returns the diff between the 2 array
      */
     protected static function array_diff_key_assoc($arr1, $arr2, &$diff = array())
     {
