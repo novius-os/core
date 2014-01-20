@@ -15,14 +15,16 @@ class Version_0_2 extends \Nos\Migration
     public function up()
     {
         // stop migration if install_legacy has been executed
-        $existing_migration = \DB::query('SELECT * FROM nos_migration WHERE
-        type = "package" AND name="nos" AND migration="002_version_0_2";')->execute();
+        $existing_migration = \DB::query(
+            'SELECT * FROM nos_migration WHERE type = "package" AND name="nos" AND migration="002_version_0_2";'
+        )->execute();
         if (count($existing_migration) > 0) {
             return true;
         }
 
         if ($this->canUpdateMetadata()) {
-            // Add new namespaces before everything else, or run into 'Fatal error: class Nos\Page\Model_Page not found!'
+            // Add new namespaces before everything else,
+            // or run into 'Fatal error: class Nos\Page\Model_Page not found!'
             $app_namespaces = \Config::load(APPPATH.'metadata/app_namespaces.php', 'data::app_namespaces', true, true) +
                 array(
                     'noviusos_appmanager' => 'Nos\Appmanager',
