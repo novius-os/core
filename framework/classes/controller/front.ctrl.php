@@ -683,6 +683,7 @@ class Controller_Front extends Controller
 
         if (!empty($this->_page->page_cache_duration)) {
             $this->_cache_duration = $this->_page->page_cache_duration;
+            \Nos\FrontCache::$cache_duration = $this->_cache_duration;
         }
     }
 
@@ -756,6 +757,7 @@ class Controller_Front extends Controller
     public function setCacheDuration($cache_duration)
     {
         $this->_cache_duration = $cache_duration;
+        \Nos\FrontCache::$cache_duration = $this->_cache_duration;
 
         return $this;
     }
