@@ -10,7 +10,7 @@
 
 namespace Nos\Migrations;
 
-class Version_0_2 extends \Nos\Migration
+class Version_Chiba_2_4 extends \Nos\Migration
 {
     public function up()
     {
