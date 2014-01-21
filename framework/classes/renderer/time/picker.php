@@ -62,7 +62,7 @@ class Renderer_Time_Picker extends Renderer
     {
         parent::build();
 
-        $this->fieldset()->append($this->js_init($this->get_attribute('id')));
+        $this->fieldset()->append(static::js_init($this->get_attribute('id')));
         $timepicker_options = $this->renderer_options;
         $this->set_attribute('data-timepicker-options', htmlspecialchars(\Format::forge()->to_json($timepicker_options)));
 
@@ -75,7 +75,7 @@ class Renderer_Time_Picker extends Renderer
      * @param string $id ID attribute of the <input> tag
      * @return string JavaScript to execute to initialise the renderer
      */
-    public function js_init($id)
+    public static function js_init($id)
     {
         return \View::forge(
             'renderer/time_picker',
