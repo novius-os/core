@@ -117,7 +117,7 @@ class Orm_Behaviour_Publishable extends Orm_Behaviour
                 );
             }
 
-            return $where;
+            return array($where);
         };
     }
 
