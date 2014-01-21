@@ -78,7 +78,7 @@ if ($is_media) {
             if (file_exists($lock_file)) {
                 $time = file_get_contents($lock_file);
                 if ((time() - $time) < 120) {
-                    if ($_SERVER['REDIRECT_QUERY_STRING'] === 'lock') {
+                    if (isset($_SERVER['REDIRECT_QUERY_STRING']) && $_SERVER['REDIRECT_QUERY_STRING'] === 'lock') {
                         header('HTTP/1.0 503 Service Unavailable');
                         header('HTTP/1.1 503 Service Unavailable');
                         exit();
