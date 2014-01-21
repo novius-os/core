@@ -21,7 +21,8 @@ class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
     }
 
     /**
-     * Saves the wysiwyg. They're not part of the fields and handled automatically, because we don't know how much there are.
+     * Saves the wysiwyg.
+     * They're not part of the fields and handled automatically, because we don't know how much there are.
      *
      * @param $page
      * @param $data
@@ -70,7 +71,10 @@ class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
         $cache_duration->set_template(str_replace('{{duration}}', '{field} {required}', $cache_duration->label));
         $fieldset->field('page_lock')->set_template('{label} {field} {required}');
 
-        $fieldset->field('page_menu_title')->set_template("\t\t<span class=\"{error_class}\">{label}{required}</span>\n\t\t<br />\n\t\t<span class=\"{error_class}\">{field} <br />$checkbox_menu {error_msg}</span>\n");
+        $fieldset->field('page_menu_title')->set_template(
+            "\t\t<span class=\"{error_class}\">{label}{required}</span>\n\t\t<br />".
+            "\n\t\t<span class=\"{error_class}\">{field} <br />$checkbox_menu {error_msg}</span>\n"
+        );
 
         $form_attributes = $fieldset->get_config('form_attributes');
 
@@ -148,7 +152,7 @@ class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
         $contexts_list = $page->find_context('all');
         $has_children = $page->find_children();
         $has_children = !empty($has_children);
-        $contexts = \Input::post( ($recursive ? 'contexts_multi' : 'contexts_single'), null);
+        $contexts = \Input::post(($recursive ? 'contexts_multi' : 'contexts_single'), null);
         if (empty($contexts) && (count($contexts_list) > 1 || $has_children)) {
             \Response::json(array(
                 'action' => array(
@@ -175,7 +179,9 @@ class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
                     'action' => 'insert',
                     'context' => $contexts,
                 ),
-                'notify' => $recursive ? __('Here you are! The page and its subpages have just been duplicated.') : __('Here you are! The page has just been duplicated.'),
+                'notify' => $recursive ?
+                        __('Here you are! The page and its subpages have just been duplicated.') :
+                        __('Here you are! The page has just been duplicated.'),
             ));
         } catch (\Exception $e) {
             $this->send_error($e);
@@ -265,13 +271,22 @@ class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
                 }
                 $try++;
                 if ($try > 5) {
-                    throw new \Exception(__('Slow down, slow down. You have duplicated this page 5 times already. Edit them first before creating more duplicates.'));
+                    throw new \Exception(__(
+                        'Slow down, slow down. You have duplicated this page 5 times already. '.
+                        'Edit them first before creating more duplicates.'
+                    ));
                 }
             }
         } while ($try <= 5);
 
         if ($failed) {
-            throw new \Exception(__('Something went wrong. Please refresh your browser window. If the page has not been duplicated, please try again. Contact your developer or Novius OS if the problem persists. We apologise for the inconvenience caused.').' - '.$try.', '.$parent->id);
+            throw new \Exception(
+                __(
+                    'Something went wrong. Please refresh your browser window. If the page has not been duplicated, '.
+                    'please try again. Contact your developer or Novius OS if the problem persists. '.
+                    'We apologise for the inconvenience caused.'
+                ).' - '.$try.', '.$parent->id
+            );
         }
 
         $parents[$clone->get_context()] = $clone;
@@ -301,7 +316,11 @@ class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
             try {
                 $clone->save();
             } catch (\Nos\BehaviourDuplicateException $e) {
-                throw new \Exception(__('Something went wrong. Please refresh your browser window and try again. Contact your developer or Novius OS if the problem persists. We apologise for the inconvenience caused.'));
+                throw new \Exception(__(
+                    'Something went wrong. Please refresh your browser window and try again. '.
+                    'Contact your developer or Novius OS if the problem persists. '.
+                    'We apologise for the inconvenience caused.'
+                ));
             }
             $parents[$clone->get_context()] = $clone;
         }
@@ -314,7 +333,13 @@ class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
                 foreach ($parent->find_children() as $child) {
                     $child_common_id = $child->page_context_common_id;
                     $clone_common_id = \Arr::get($child_common_ids, $child_common_id, null);
-                    $child_common_ids[$child_common_id] = static::duplicate_page($child, $child->get_context(), $recursive, $parents[$child->get_context()], $clone_common_id);
+                    $child_common_ids[$child_common_id] = static::duplicate_page(
+                        $child,
+                        $child->get_context(),
+                        $recursive,
+                        $parents[$child->get_context()],
+                        $clone_common_id
+                    );
                 }
             }
         }

@@ -49,12 +49,7 @@ abstract class Orm_Behaviour extends \Orm\Observer
             }
 
             if ($valueTo !== false) {
-                \Arr::set($config, $keyTo.'.'.$key,
-                    \Arr::merge(
-                        $value,
-                        $valueTo
-                    )
-                );
+                \Arr::set($config, $keyTo.'.'.$key, \Arr::merge($value, $valueTo));
             }
         }
     }

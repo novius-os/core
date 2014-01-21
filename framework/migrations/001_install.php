@@ -16,7 +16,8 @@ class Install extends \Nos\Migration
     {
         \Config::load('migrations', true);
 
-        if (in_array('migration', \DB::list_tables()) && count(\DB::query('SELECT * FROM nos_migration')->execute()) == 0) {
+        if (in_array('migration', \DB::list_tables()) &&
+            count(\DB::query('SELECT * FROM nos_migration')->execute()) == 0) {
             \DB::query('DROP TABLE IF EXISTS  `nos_migration`;')->execute();
             \DB::query('RENAME TABLE `migration` TO  `nos_migration`;')->execute();
             \Migrate::set_table('nos_migration');
@@ -24,8 +25,9 @@ class Install extends \Nos\Migration
         }
 
         // test if there exists old migrations
-        $old_migration = \DB::query('SELECT * FROM nos_migration WHERE
-        type = "app" AND name="default" AND migration="001_installation_0_1";')->execute();
+        $old_migration = \DB::query(
+            'SELECT * FROM nos_migration WHERE type = "app" AND name="default" AND migration="001_installation_0_1";'
+        )->execute();
         if (count($old_migration) > 0) {
             $sql_file_legacy = substr($this->path, 0, strlen($this->path) - 4).'_legacy.sql';
             static::executeSqlFile($sql_file_legacy);

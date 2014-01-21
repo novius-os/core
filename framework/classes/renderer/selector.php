@@ -24,8 +24,11 @@ abstract class Renderer_Selector extends Renderer
      */
     public function set_renderer_options(array $options)
     {
-        \Log::deprecated('The method Renderer_Selector->set_renderer_options() is deprecated, '.
-            'use Renderer_Selector->setRendererOptions() instead.', 'Chiba.2');
+        \Log::deprecated(
+            'The method Renderer_Selector->set_renderer_options() is deprecated, '.
+            'use Renderer_Selector->setRendererOptions() instead.',
+            'Chiba.2'
+        );
         parent::setRendererOptions($options);
     }
 

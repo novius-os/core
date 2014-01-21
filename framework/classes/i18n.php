@@ -113,12 +113,11 @@ class I18n
             static::$_encoding = $encoding;
         }
         setlocale(LC_ALL, array(
-                static::$_locale.'.'.static::$_encoding.'@'.$variant,
-                static::$_locale.'.'.static::$_encoding,
-                static::$_locale.'@'.$variant,
-                static::$_locale,
-            )
-        );
+            static::$_locale.'.'.static::$_encoding.'@'.$variant,
+            static::$_locale.'.'.static::$_encoding,
+            static::$_locale.'@'.$variant,
+            static::$_locale,
+        ));
     }
 
     /**
@@ -165,11 +164,17 @@ class I18n
             foreach ($languages as $lang) {
                 if ($path = \Finder::search('lang', $namespace.$lang.DS.$local_file, '.php', true)) {
                     foreach ($path as $p) {
-                        static::$_messages[static::$_locale][$group] = \Arr::merge(array_filter(\Fuel::load($p)), static::$_messages[static::$_locale][$group]);
+                        static::$_messages[static::$_locale][$group] = \Arr::merge(
+                            array_filter(\Fuel::load($p)),
+                            static::$_messages[static::$_locale][$group]
+                        );
                     }
                 }
             }
-            \Event::trigger_function('i18n.'.static::$_locale.'|'.$file, array(&static::$_messages[static::$_locale][$group]));
+            \Event::trigger_function(
+                'i18n.'.static::$_locale.'|'.$file,
+                array(&static::$_messages[static::$_locale][$group])
+            );
             static::$_loaded_files[static::$_locale][$file] = true;
         }
     }
@@ -223,7 +228,9 @@ class I18n
             return static::$_priority_messages[static::$_language][$message];
         }
 
-        $result = isset(static::$_messages[static::$_locale][$group][$message]) ? static::$_messages[static::$_locale][$group][$message] : false;
+        $result = isset(static::$_messages[static::$_locale][$group][$message]) ?
+            static::$_messages[static::$_locale][$group][$message] :
+            false;
 
         if (empty($result)) {
             $result = $default === null ? $message : $default;
@@ -318,7 +325,10 @@ class I18n
         if (empty(static::$_files_dict[$file])) {
             $application_name = \Module::findFromCanonicalPath($file);
             if (!empty($application_name)) {
-                static::$_files_dict[$file] = call_user_func('static::dictionary', array($application_name.'::default'));
+                static::$_files_dict[$file] = call_user_func(
+                    'static::dictionary',
+                    array($application_name.'::default')
+                );
             } else {
                 return static::get($message, $default);
             }
