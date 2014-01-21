@@ -601,7 +601,7 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
         $class = $this->_class;
         $query = $class::query($options)
             ->and_where_open()
-                ->where($this->_properties['context_property'], '=', $context)
+                ->where($this->_properties['context_property'], is_array($context) ? 'IN' : '=', $context)
                 ->or_where($this->_properties['is_main_property'], '=', 1)
             ->and_where_close();
 
@@ -609,7 +609,8 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
         $result_context = array();
         foreach ($query->get() as $pk => $item) {
             if (isset($result_context[$item->{$this->_properties['common_id_property']}])) {
-                if ($item->{$this->_properties['context_property']} !== $context) {
+                if ((is_array($context) && in_array($item->{$this->_properties['context_property']}, $context)) ||
+                    $item->{$this->_properties['context_property']} !== $context) {
                     continue;
                 } else {
                     unset($result[$result_context[$item->{$this->_properties['common_id_property']}]]);
