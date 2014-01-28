@@ -4,7 +4,7 @@
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
- * 
+ *
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * licensing@wijmo.com
  * http://wijmo.com/widgets/license/
@@ -53,7 +53,7 @@ var wijmo;
                         }
                     } catch (e) {
                     }//fixed bug 26153
-                    
+
                 }
                 var te = val.substring(s, e);
                 return {
@@ -134,9 +134,16 @@ var wijmo;
             return this.each(function () {
                 var $el = $(this);
                 if($el.hasClass("wijmo-wijobserver-visibility")) {
-                    $el.trigger("wijmovisibilitychanged");
+                    // Novius OS add .wijmo-wijobserver-visibility-exec (like in nosOnShow) for avoid recursive loops
+                    $el.not('.wijmo-wijobserver-visibility-exec').addClass('wijmo-wijobserver-visibility-exec')
+                        .trigger("wijmovisibilitychanged")
+                        .removeClass('wijmo-wijobserver-visibility-exec');
                 }
-                $el.find(".wijmo-wijobserver-visibility").trigger("wijmovisibilitychanged");
+                // Novius OS add .wijmo-wijobserver-visibility-exec (like in nosOnShow) for avoid recursive loops
+                $el.find(".wijmo-wijobserver-visibility")
+                    .not('.wijmo-wijobserver-visibility-exec').addClass('wijmo-wijobserver-visibility-exec')
+                    .trigger("wijmovisibilitychanged")
+                    .removeClass('wijmo-wijobserver-visibility-exec');
             });
         },
         leftBorderWidth: function () {
@@ -327,9 +334,9 @@ var wijmo;
                 zIndex: element.css('z-index')
             });
             $.each([
-                'top', 
-                'left', 
-                'bottom', 
+                'top',
+                'left',
+                'bottom',
                 'right'
             ], function (i, pos) {
                 props[pos] = element.css(pos);
@@ -497,40 +504,40 @@ var wijmo;
         };
     }
     var c__escapeArr1 = [
-        '\n', 
-        '\r', 
-        '"', 
-        '@', 
-        '+', 
-        '\'', 
-        '<', 
-        '>', 
-        '%', 
-        '{', 
+        '\n',
+        '\r',
+        '"',
+        '@',
+        '+',
+        '\'',
+        '<',
+        '>',
+        '%',
+        '{',
         '}'
     ], c__escapeArr2 = [
-        "!ESC!NN!", 
-        "!ESC!RR!", 
-        "!ESC!01!", 
-        "!ESC!02!", 
-        "!ESC!03!", 
-        "!ESC!04!", 
-        "!ESC!05!", 
-        "!ESC!06!", 
-        "!ESC!07!", 
-        "!ESC!08!", 
+        "!ESC!NN!",
+        "!ESC!RR!",
+        "!ESC!01!",
+        "!ESC!02!",
+        "!ESC!03!",
+        "!ESC!04!",
+        "!ESC!05!",
+        "!ESC!06!",
+        "!ESC!07!",
+        "!ESC!08!",
         "!ESC!09!"
     ], c__escapeArr3 = [
-        "(\n)", 
-        "(\r)", 
-        "(\")", 
-        "(@)", 
-        "(\\+)", 
-        "(')", 
-        "(\\<)", 
-        "(\\>)", 
-        "(%)", 
-        "(\\{)", 
+        "(\n)",
+        "(\r)",
+        "(\")",
+        "(@)",
+        "(\\+)",
+        "(')",
+        "(\\<)",
+        "(\\>)",
+        "(%)",
+        "(\\{)",
         "(\\})"
     ];
     if(!$.wij) {
@@ -625,7 +632,7 @@ var wijmo;
                 ]) : rvertical.test(my[0]) ? [
                     "center"
                 ].concat(my) : [
-                    "center", 
+                    "center",
                     "center"
                 ];
             }

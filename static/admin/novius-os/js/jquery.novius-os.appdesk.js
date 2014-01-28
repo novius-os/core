@@ -1475,8 +1475,7 @@ define('jquery-nos-appdesk',
                         borderRightWidth : '0px'
                     })
                     .end()
-                    .wijsplitter('option', 'panel1', {collapsed : true})
-                    .wijsplitter('refresh', true, false);
+                    .wijsplitter('option', 'panel1', {collapsed : true});
 
                 return self;
             },
@@ -1490,8 +1489,7 @@ define('jquery-nos-appdesk',
                         borderTopWidth : '0px'
                     })
                     .end()
-                    .wijsplitter('option', 'panel1', {collapsed : true})
-                    .wijsplitter('refresh', true, false);
+                    .wijsplitter('option', 'panel1', {collapsed : true});
 
                 return self;
             },
@@ -1518,8 +1516,7 @@ define('jquery-nos-appdesk',
                 var self = this,
                     o = self.options;
 
-                self.uiSplitterVertical.wijsplitter('refresh', true, false);
-                self.uiSplitterHorizontal.wijsplitter('refresh', true, false);
+                self.uiSplitterVertical.wijsplitter('refresh');
 
                 self._resizeInspectorsV()
                     ._resizeInspectorsH()
