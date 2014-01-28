@@ -254,6 +254,9 @@ if (\Session::user()->user_expert) {
                                 content : $tooltip.find('div.content').html()
                             });
                         },
+                        cellStyleFormatter: function(args) {
+                            args.$cell.nosFormUI();
+                        },
                         selectionMode: 'none',
                         highlightCurrentCell: false
                     });
