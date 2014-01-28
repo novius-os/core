@@ -37,7 +37,7 @@
                     cmd : 'mceMedia'
                 });
 
-                this.parent(ed, url.replace('nos', 'advanced'));
+                this.parent(ed, url.replace('/themes/nos', '/themes/advanced'));
 
                 if (ed.settings.skin === 'bootstrap') {
                     ed.contentCSS.push(ed.baseURI.toAbsolute(url + "/skins/" + ed.settings.skin + "/content.css"));
