@@ -18,6 +18,10 @@ define('jquery-nos-layout-standard',
                 };
                 return this.each(function() {
                     var $container = $(this),
+                        $dispatcher = $container.closest('.nos-dispatcher').on('showPanel', function() {
+                            $container.nosOnShow();
+                            $dispatcher.wijTriggerVisibility();
+                        }),
                         id = $container.attr('id'),
                         $contextButton = $container.find('.change-context')
                             .attr('id', id + 'context')
@@ -78,7 +82,9 @@ define('jquery-nos-layout-standard',
                             });
                     }
 
+                    log('init');
                     $container.nosOnShow('one', function() {
+                        log('$container.nosFormUI()');
                             $container.nosFormUI();
                         })
                         .nosOnShow();
