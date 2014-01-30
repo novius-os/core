@@ -83,7 +83,7 @@ class Controller_Inspector_Model extends Controller_Inspector
             $data_mapping = isset($common_config['data_mapping']) ? $common_config['data_mapping'] : array(); //@todo: allow customization
 
             if (!isset($config['query'])) {
-                $config['query'] = $common_config['query'];
+                $config['query'] = empty($common_config['query']) ? array() : $common_config['query'];
             }
 
             if (!isset($config['query']['model'])) {
