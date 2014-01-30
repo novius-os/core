@@ -36,7 +36,7 @@ class Attachment
     /**
      * Returns a new Attachment object.
      *
-     * @param   mixed   $attached Can be the object that the file is attached, or his ID
+     * @param   string   $attached The ID of object that the file is attached
      * @param   array|string  $config The Config file or a configuration array
      * @return  Attachment
      */
@@ -48,7 +48,7 @@ class Attachment
     /**
      * Sets the attachment configuration.
      *
-     * @param   mixed   $attached Can be the object that the file is attached, or his ID
+     * @param   string   $attached The ID of object that the file is attached
      * @param   array|string  $config The Config file or a configuration array
      * @throws \InvalidArgumentException
      * @return \Nos\Attachment
@@ -80,6 +80,9 @@ class Attachment
         $config['alias'] = rtrim(str_replace(DS, '/', $config['alias']), '/').'/';
 
         $attached = preg_replace('`/`Uu', '_', $attached);
+        if (empty($attached)) {
+            throw new \InvalidArgumentException('No attached ID specified.');
+        }
 
         $this->config = $config;
         $this->attached = $attached;
@@ -231,6 +234,23 @@ class Attachment
 
         $this->new_file = $file;
         $this->new_file_name = $filename;
+
+        return $this;
+    }
+
+    /**
+     * Set a new ID of object that the file is attached
+     *
+     * @param   string  $id New ID
+     * @return \Nos\Attachment
+     */
+    public function setId($id)
+    {
+        $path = $this->path();
+        $this->attached = $id;
+        if ($path) {
+            $this->set($path);
+        }
 
         return $this;
     }

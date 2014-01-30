@@ -60,12 +60,29 @@ class Orm_Attachment extends \Orm\Relation
         foreach ($this->key_from as $key) {
             $attached .= (empty($attached) ? '' : '-').$from->{$key};
         }
+        if (empty($attached)) {
+            if (isset($from->{'attachment'.$this->name})) {
+                $attached = $from->get('attachment'.$this->name);
+            } else {
+                $attached = uniqid('temp-id-attachment-');
+                $from->set('attachment'.$this->name, $attached);
+            }
+        }
         return $attached;
     }
 
     public function get(\Orm\Model $from)
     {
         $attached = $this->attached($from);
+        if (isset($from->{'attachment'.$this->name}) && $attached != $from->{'attachment'.$this->name} &&
+            !empty(static::$cache[$this->attachment_config['dir'].'::'.$from->{'attachment'.$this->name}])) {
+
+            $attachment = static::$cache[$this->attachment_config['dir'].'::'.$from->{'attachment'.$this->name}];
+            unset(static::$cache[$this->attachment_config['dir'].'::'.$from->{'attachment'.$this->name}]);
+            unset($from->{'attachment'.$this->name});
+            $attachment->setId($attached);
+            static::$cache[$this->attachment_config['dir'].'::'.$attached] = $attachment;
+        }
         if (empty(static::$cache[$this->attachment_config['dir'].'::'.$attached])) {
             static::$cache[$this->attachment_config['dir'].'::'.$attached] = \Nos\Attachment::forge($this->attached($from), $this->attachment_config);
         }
