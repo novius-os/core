@@ -77,6 +77,11 @@ class Finder extends Fuel\Core\Finder
         // This is sometimes used to load a view from a non-loaded module.
         if ($pos = strripos($file, '::')) {
             // Novius OS : force load module if not already load
+            $is_extend_allowed = substr($file, 0, 1) !== '!';
+            if (!$is_extend_allowed) {
+                $file = substr($file, 1);
+                $pos--;
+            }
             $dir_app = substr($file, 0, $pos);
             Module::load(strtolower($dir_app));
 
@@ -106,14 +111,8 @@ class Finder extends Fuel\Core\Finder
                     }
                 }
 
-            } else if ($dir === 'config' || ($dir === 'lang' && $dir_app !== 'local')) {
-                $is_extend_allowed = substr($dir_app, 0, 1) !== '!';
-                if (!$is_extend_allowed) {
-                    $file = substr($file, 1);
-                    $dir_app = substr($dir_app, 1);
-                } else {
-                    $paths_add = static::pathsExtended($dir, $dir_app, substr($file, $pos + 2));
-                }
+            } else if ($is_extend_allowed && ($dir === 'config' || ($dir === 'lang' && $dir_app !== 'local'))) {
+                $paths_add = static::pathsExtended($dir, $dir_app, substr($file, $pos + 2));
             }
 
             // get the namespace path

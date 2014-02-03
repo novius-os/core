@@ -112,7 +112,7 @@ class Config extends \Fuel\Core\Config
 
     public static function metadata($application_name)
     {
-        $metadata = \Config::load($application_name.'::metadata', true);
+        $metadata = \Config::load('!'.$application_name.'::metadata', true);
 
         // More treatment for launchers
         // Small fix relative to permissions
