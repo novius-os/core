@@ -25,7 +25,7 @@ require(
     });
 </script>
 <div id="<?= $uniqid ?>" class="login_popup blank_slate">
-    <img src="static/novius-os/admin/novius-os/img/logo.png" style="width: 245px;" alt="" />
+    <div align="center"><img src="static/novius-os/admin/novius-os/img/logo.png" alt="" /></div>
     <form method="POST" action="/admin/nos/login/popup<?= $lang ? '?lang='.htmlspecialchars($lang) : '' ?>">
         <p><input type="email" name="email" id="<?= $uniqid ?>_email" value="<?= e(\Input::post('email', '')); ?>" placeholder="<?= __('Email address') ?>" /></p>
         <p><input type="password" name="password" placeholder="<?= __('Password') ?>" /></p>

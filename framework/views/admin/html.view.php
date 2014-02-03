@@ -51,7 +51,28 @@ if (hash.substr(0, 4) == 'tab=') {
 }
 </script>
 
-<link rel="shortcut icon" href="static/novius-os/admin/novius-os/img/noviusos.ico">
+<link rel="shortcut icon" href="static/novius-os/admin/novius-os/img/favicon/favicon.ico">
+<link rel="apple-touch-icon" sizes="57x57" href="static/novius-os/admin/novius-os/img/favicon/apple-touch-icon-57x57.png">
+<link rel="apple-touch-icon" sizes="114x114" href="static/novius-os/admin/novius-os/img/favicon/apple-touch-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="72x72" href="static/novius-os/admin/novius-os/img/favicon/apple-touch-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="144x144" href="static/novius-os/admin/novius-os/img/favicon/apple-touch-icon-144x144.png">
+<link rel="apple-touch-icon" sizes="60x60" href="static/novius-os/admin/novius-os/img/favicon/apple-touch-icon-60x60.png">
+<link rel="apple-touch-icon" sizes="120x120" href="static/novius-os/admin/novius-os/img/favicon/apple-touch-icon-120x120.png">
+<link rel="apple-touch-icon" sizes="76x76" href="static/novius-os/admin/novius-os/img/favicon/apple-touch-icon-76x76.png">
+<link rel="apple-touch-icon" sizes="152x152" href="static/novius-os/admin/novius-os/img/favicon/apple-touch-icon-152x152.png">
+<link rel="icon" type="image/png" href="static/novius-os/admin/novius-os/img/favicon/favicon-196x196.png" sizes="196x196">
+<link rel="icon" type="image/png" href="static/novius-os/admin/novius-os/img/favicon/favicon-160x160.png" sizes="160x160">
+<link rel="icon" type="image/png" href="static/novius-os/admin/novius-os/img/favicon/favicon-96x96.png" sizes="96x96">
+<link rel="icon" type="image/png" href="static/novius-os/admin/novius-os/img/favicon/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="static/novius-os/admin/novius-os/img/favicon/favicon-16x16.png" sizes="16x16">
+<meta name="msapplication-TileColor" content="#da532c">
+<meta name="msapplication-TileImage" content="static/novius-os/admin/novius-os/img/favicon/mstile-144x144.png">
+<meta name="msapplication-square70x70logo" content="static/novius-os/admin/novius-os/img/favicon/mstile-70x70.png">
+<meta name="msapplication-square144x144logo" content="static/novius-os/admin/novius-os/img/favicon/mstile-144x144.png">
+<meta name="msapplication-square150x150logo" content="static/novius-os/admin/novius-os/img/favicon/mstile-150x150.png">
+<meta name="msapplication-square310x310logo" content="static/novius-os/admin/novius-os/img/favicon/mstile-310x310.png">
+<meta name="msapplication-wide310x150logo" content="static/novius-os/admin/novius-os/img/favicon/mstile-310x150.png">
+
 <link rel="stylesheet" href="static/novius-os/admin/vendor/wijmo/css/aristo/jquery-wijmo.min.css">
 <link rel="stylesheet" href="static/novius-os/admin/vendor/wijmo/css/jquery.wijmo-pro.all.3.20133.20.min.css">
 <?php

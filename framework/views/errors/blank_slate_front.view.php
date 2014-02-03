@@ -18,7 +18,7 @@
 <base href="<?= $base_url ?>">
 <title>Novius OS welcomes you</title>
 <meta name="robots" content="noindex,nofollow">
-<link rel="shortcut icon" href="static/novius-os/admin/novius-os/img/noviusos.ico">
+<link rel="shortcut icon" href="static/novius-os/admin/novius-os/img/favicon/favicon.ico">
 
 <style type="text/css">
 html {
