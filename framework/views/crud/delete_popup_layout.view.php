@@ -43,7 +43,7 @@ if (!is_array($crud['config']['i18n']['deleting button N items'])) {
             $(function () {
                 var $form = $('#<?= $id ?>'),
                     $table = $form.find('table'),
-                    $checkboxes,
+                    $checkboxes, $checkall,
                     $confirmButton = $form.find(':submit'),
                     $cancelButton = $form.find('a:last'),
                     $verifications = $form.find('.verification');
@@ -57,17 +57,12 @@ if (!is_array($crud['config']['i18n']['deleting button N items'])) {
                         {},
                         {
                             cellFormatter: function(args) {
-                                if (args.row.type & $.wijmo.wijgrid.rowType.data) {
-                                    args.$container.css({
+                                args.$container.parent().css({
                                         textAlign: 'center'
-                                    });
-                                }
+                                });
                             }
                         }
-                    ],
-                    rendered: function(args) {
-                        $(args.target).closest('.wijmo-wijgrid').find('thead').hide();
-                    }
+                    ]
                 });
                 $form.nosFormUI();
 
@@ -92,6 +87,13 @@ if (!is_array($crud['config']['i18n']['deleting button N items'])) {
                     .first()
                     .trigger('change');
 
+                $checkall = $table.find(':checkbox[name=check_all]').change(function() {
+                    $checkboxes.each(function() {
+                        this.checked = $checkall[0].checked;
+                    });
+                }).click(function(e) {
+                    e.stopPropagation();
+                });
 
                 $table.find('tr').css({cursor: 'pointer'}).click(function() {
                     $(this).find(':checkbox').click();

@@ -83,6 +83,13 @@ if ($context_count > 1) {
     $contexts_list = array();
     ?>
     <table class="grid">
+        <thead>
+        <tr>
+            <th></th>
+            <th></th>
+            <th><input type="checkbox" name="check_all" checked /></th>
+        </tr>
+        </thead>
     <?php
     foreach ($item_contexts as $item_context) {
         $is_disabled = \Nos\Config_Common::checkActionDisabled('delete', $item_context, array(
