@@ -165,17 +165,6 @@ class Command extends \Oil\Command
         }
 
     }
-
-    private static function _clear_args($actions = array())
-    {
-        foreach ($actions as $key => $action) {
-            if (mb_substr($action, 0, 1) === '-') {
-                unset($actions[$key]);
-            }
-        }
-
-        return $actions;
-    }
 }
 
 /* End of file oil/classes/command.php */
