@@ -545,6 +545,7 @@ define('jquery-nos',
                                     ajax : true,
                                     width: 500,
                                     height: 'auto',
+                                    maxHeight: window.innerHeight - 100,
                                     'class': 'nos-confirmation-dialog'
                                 }, $.nosDataReplace($.extend(true, {}, obj.dialog), data));
                                 $(this).nosDialog(params);
@@ -1090,8 +1091,7 @@ define('jquery-nos',
                                         } catch (e) {}
 
                                         if (proceed) {
-                                            $dialog.wijdialog('open')
-                                                .html( responseText );
+                                            $dialog.html(responseText).wijdialog('open');
                                             $.isFunction(options['dialogRendered']) && options['dialogRendered']($dialog);
                                         } else {
                                             $dialog.empty()
