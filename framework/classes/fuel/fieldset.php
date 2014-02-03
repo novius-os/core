@@ -511,7 +511,7 @@ class Fieldset extends \Fuel\Core\Fieldset
         if (empty($options['error'])) {
             $options['error'] = function (\Exception $e, $item, $data) {
                 return array(
-                    'error' => \Fuel::$env == \Fuel::DEVELOPMENT ? $e->getMessage() : __('Something went wrong. Please refresh your browser window and try again. Contact your developer or Novius OS if the problem persists. We apologise for the inconvenience caused.'),
+                    'error' => $e->getMessage(),
                 );
             };
         }
