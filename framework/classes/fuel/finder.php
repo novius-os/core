@@ -131,7 +131,9 @@ class Finder extends Fuel\Core\Finder
             // get extra information of the active request
             if (class_exists('Request', false) and ($request = \Request::active())) {
                 $request->module and $cache_id .= $request->module;
-                $paths = array_merge($request->get_paths(), $paths);
+                if ($request->module !== 'nos') {
+                    $paths = array_merge($request->get_paths(), $paths);
+                }
             }
         }
 
