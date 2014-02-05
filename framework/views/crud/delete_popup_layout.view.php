@@ -46,7 +46,19 @@ if (!is_array($crud['config']['i18n']['deleting button N items'])) {
                     $checkboxes, $checkall,
                     $confirmButton = $form.find(':submit'),
                     $cancelButton = $form.find('a:last'),
-                    $verifications = $form.find('.verification');
+                    $verifications = $form.find('.verification'),
+                    checkboxes_sum = function() {
+                        var sum = 0;
+                        $checkboxes.filter(':checked').each(function() {
+                            sum += parseInt($(this).data('count'));
+                        });
+                        $confirmButton[sum == 0 ? 'addClass' : 'removeClass']('ui-state-disabled');
+                        $confirmButton.find('.ui-button-text').text(
+                            $.nosDataReplace($confirmButton.data('texts')[(sum > 1 ? '+' : sum).toString()], {
+                                'count': sum.toString()
+                            })
+                        );
+                    };
 
 
                 $table.wijgrid({
@@ -68,17 +80,7 @@ if (!is_array($crud['config']['i18n']['deleting button N items'])) {
 
                 $checkboxes = $form.find(':checkbox.count');
                 $checkboxes.change(function() {
-                        var sum = 0;
-                        $checkboxes.filter(':checked').each(function() {
-                            sum += parseInt($(this).data('count'));
-                        });
-                        $confirmButton[sum == 0 ? 'addClass' : 'removeClass']('ui-state-disabled');
-                        $confirmButton.find('.ui-button-text').text(
-                            $.nosDataReplace(
-                                $.nosI18nPlural($confirmButton.data('texts'), sum),
-                                {'count': sum.toString()}
-                            )
-                        );
+                        checkboxes_sum();
                         $(this).removeClass('ui-state-focus');
                     })
                     .click(function(e) {
@@ -91,6 +93,7 @@ if (!is_array($crud['config']['i18n']['deleting button N items'])) {
                     $checkboxes.each(function() {
                         this.checked = $checkall[0].checked;
                     });
+                    checkboxes_sum();
                 }).click(function(e) {
                     e.stopPropagation();
                 });
