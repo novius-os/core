@@ -82,9 +82,7 @@ define('jquery-nos-layout-standard',
                             });
                     }
 
-                    log('init');
                     $container.nosOnShow('one', function() {
-                        log('$container.nosFormUI()');
                             $container.nosFormUI();
                         })
                         .nosOnShow();
