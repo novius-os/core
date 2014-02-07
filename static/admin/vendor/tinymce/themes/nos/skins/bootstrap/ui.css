@@ -19,9 +19,17 @@
     /* </novius-os> */
 }
 .bootstrapSkin .mceMenu .mceText {
+    position: relative;
+    display: block;
+    font-family: 'Lucida Grande', Helvetica, Arial, sans-serif;
+    color: #000;
+    cursor: default;
+    margin: 0;
+    display: block;
     /* <novius-os> */
-    height: 16px;
-    line-height: 16px;
+    height: auto;
+    line-height: normal;
+    padding: 4px 25px;
     /* </novius-os> */
 }
 
