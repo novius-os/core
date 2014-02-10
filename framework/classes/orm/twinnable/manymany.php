@@ -202,19 +202,21 @@ class Orm_Twinnable_ManyMany extends \Orm\ManyMany
 
     public function save($model_from, $models_to, $original_model_ids, $parent_saved, $cascade)
     {
-        if ( ! $parent_saved) {
+        if (!$parent_saved) {
             return;
         }
 
-        if ( ! is_array($models_to) and ($models_to = is_null($models_to) ? array() : $models_to) !== array()) {
-            throw new \FuelException('Assigned relationships must be an array or null, given relationship value for '.
-                $this->name.' is invalid.');
+        if (!is_array($models_to) and ($models_to = is_null($models_to) ? array() : $models_to) !== array()) {
+            throw new \FuelException(
+                'Assigned relationships must be an array or null, given relationship value for '.
+                $this->name.' is invalid.'
+            );
         }
         $original_model_ids === null and $original_model_ids = array();
         $del_rels = $original_model_ids;
 
         foreach ($models_to as $key => $model_to) {
-            if ( ! $model_to instanceof $this->model_to) {
+            if (!$model_to instanceof $this->model_to) {
                 throw new \FuelException('Invalid Model instance added to relations in this model.');
             }
 
@@ -226,7 +228,7 @@ class Orm_Twinnable_ManyMany extends \Orm\ManyMany
             $current_model_id = $model_to ? $model_to->implode_pk($model_to) : null;
 
             // Check if the model was already assigned, if not INSERT relationships:
-            if ( ! in_array($current_model_id, $original_model_ids)) {
+            if (!in_array($current_model_id, $original_model_ids)) {
                 $ids = array();
                 reset($this->key_from);
                 foreach ($this->key_through_from as $pk) {
@@ -242,8 +244,7 @@ class Orm_Twinnable_ManyMany extends \Orm\ManyMany
 
                 \DB::insert($this->table_through)->set($ids)->execute(call_user_func(array($model_from, 'connection')));
                 $original_model_ids[] = $current_model_id; // prevents inserting it a second time
-            }
-            else {
+            } else {
                 // unset current model from from array of new relations
                 unset($del_rels[array_search($current_model_id, $original_model_ids)]);
             }
@@ -252,7 +253,7 @@ class Orm_Twinnable_ManyMany extends \Orm\ManyMany
             if ($key != $current_model_id) {
                 $model_from->unfreeze();
                 $rel = $model_from->_relate();
-                if ( ! empty($rel[$this->name][$key]) and $rel[$this->name][$key] === $model_to) {
+                if (!empty($rel[$this->name][$key]) and $rel[$this->name][$key] === $model_to) {
                     unset($rel[$this->name][$key]);
                 }
                 $rel[$this->name][$current_model_id] = $model_to;
@@ -266,7 +267,7 @@ class Orm_Twinnable_ManyMany extends \Orm\ManyMany
         //these must be replaced before deleting the relationship
 
         $model_to = $this->model_to;
-        if(!empty($del_rels)) {
+        if (!empty($del_rels)) {
             //As the context_common_id property can't be an array,
             //it is assumed that each del_rels and is key is a single id
             //(could have been several)
@@ -305,7 +306,7 @@ class Orm_Twinnable_ManyMany extends \Orm\ManyMany
             'primary_key' => $primary_key,
         );
     }
-    
+
     public function delete_related($model_from)
     {
         //search for twin models
