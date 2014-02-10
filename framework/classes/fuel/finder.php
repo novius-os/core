@@ -224,7 +224,7 @@ class Finder extends Fuel\Core\Finder
                                 'The config file "'.$app_extended.'::'.$file.'" is extended by application '.
                                 '"'.$application.'" without using a subdirectory "'.($app_extended === 'nos' ? 'novius-os/' : 'apps/'.$app_extended.'/').'", this '.
                                 'mechanism is deprecated.',
-                                'Version D'
+                                'Dubrovka'
                             );
                             continue;
                         }

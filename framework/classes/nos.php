@@ -62,7 +62,7 @@ class Nos
             \Log::deprecated(
                 'The second argument of Nos::hmvc() containing an "args" key is deprecated, '.
                 'you can now directly passed the array of parameters for the request.'.
-                'Version D'
+                'Dubrovka'
             );
         }
 

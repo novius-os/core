@@ -40,7 +40,7 @@ if ($children_count > 0 || $context_count > 1) {
                 'The "deleting with N '.$context_or_language.'s" key '.
                 'of CRUD '.$model.' config\'s i18n array must contain an array of different plurals'.
                 ' translation, and not the translated text.',
-                'Version D'
+                'Dubrovka'
             );
             $msg = $crud['i18n']['deleting with N '.$context_or_language.'s'];
         }
@@ -55,7 +55,7 @@ if ($children_count > 0 || $context_count > 1) {
                 'The "deleting with N children" key '.
                 'of CRUD '.$model.' config\'s i18n array must contain an array of different plurals '.
                 'translation, and not the translated text. In this case, the key "1 child" is unnecessary.',
-                'Version D'
+                'Dubrovka'
             );
             $msg = $crud['i18n']['deleting with '.($children_count == 1 ? '1 child' : 'N children')];
         }
@@ -87,7 +87,7 @@ if ($context_count > 1 || $children_count > 0) {
             \Log::deprecated(
                 'The "N items" key of CRUD '.$model.' config\'s i18n array must contain an array of different plurals '.
                 'translation, and not the translated text. In this case, the key "1 item" is unnecessary.',
-                'Version D'
+                'Dubrovka'
             );
             $msg = $crud['i18n']['1 item'];
         }

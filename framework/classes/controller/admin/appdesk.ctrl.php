@@ -473,7 +473,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
                 (isset($config['model']) ? $config['model'] : $application).
                 ' config\'s i18n array must contain an array of different plurals'.
                 ' translation, and not the translated text.',
-                'Version D'
+                'Dubrovka'
             );
         }
 

@@ -319,7 +319,7 @@ class Application
             \Log::deprecated(
                 'The scope "public" of the method \Nos\Application::applicationRequiredFromMetadata() is deprecated '.
                 '(will become protected)',
-                'Version D'
+                'Dubrovka'
             );
         }
 
@@ -589,7 +589,7 @@ class Application
                 \Log::deprecated(
                     'In the metadata of the application "'.$application.'", the extends key containing '.
                     'an array with an application key is deprecated.',
-                    'Version D'
+                    'Dubrovka'
                 );
             }
 

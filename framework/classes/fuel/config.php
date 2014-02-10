@@ -84,7 +84,7 @@ class Config extends \Fuel\Core\Config
         \Log::deprecated(
             'The method \Config::loadConfiguration($application_name, $file_name) is deprecated, '.
             'use \Config::load($application_name."::".$file_name, true) instead.',
-            'Version D'
+            'Dubrovka'
         );
 
         if ($file_name === null) {

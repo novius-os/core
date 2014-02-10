@@ -16,7 +16,7 @@ if (!is_array($crud['config']['i18n']['deleting button N items'])) {
         'of CRUD '.$crud['config']['model'].' config\'s i18n array must contain an array of different plurals '.
         'translation, and not the translated text. '.
         'In this case, the key "deleting button 1 item" and "deleting button 0 items" is unnecessary.',
-        'Version D'
+        'Dubrovka'
     );
     $crud['config']['i18n']['deleting button N items'] = array(
         0 => $crud['config']['i18n']['deleting button 1 item'],
