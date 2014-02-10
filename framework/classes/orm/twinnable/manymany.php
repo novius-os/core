@@ -200,6 +200,92 @@ class Orm_Twinnable_ManyMany extends \Orm\ManyMany
         return $models;
     }
 
+    public function save($model_from, $models_to, $original_model_ids, $parent_saved, $cascade)
+    {
+        if ( ! $parent_saved) {
+            return;
+        }
+
+        if ( ! is_array($models_to) and ($models_to = is_null($models_to) ? array() : $models_to) !== array()) {
+            throw new \FuelException('Assigned relationships must be an array or null, given relationship value for '.
+                $this->name.' is invalid.');
+        }
+        $original_model_ids === null and $original_model_ids = array();
+        $del_rels = $original_model_ids;
+
+        foreach ($models_to as $key => $model_to) {
+            if ( ! $model_to instanceof $this->model_to) {
+                throw new \FuelException('Invalid Model instance added to relations in this model.');
+            }
+
+            // Save if it's a yet unsaved object
+            if ($model_to->is_new()) {
+                $model_to->save(false);
+            }
+
+            $current_model_id = $model_to ? $model_to->implode_pk($model_to) : null;
+
+            // Check if the model was already assigned, if not INSERT relationships:
+            if ( ! in_array($current_model_id, $original_model_ids)) {
+                $ids = array();
+                reset($this->key_from);
+                foreach ($this->key_through_from as $pk) {
+                    $ids[$pk] = $model_from->{current($this->key_from)};
+                    next($this->key_from);
+                }
+
+                reset($this->key_to);
+                foreach ($this->key_through_to as $pk) {
+                    $ids[$pk] = $model_to->{current($this->key_to)};
+                    next($this->key_to);
+                }
+
+                \DB::insert($this->table_through)->set($ids)->execute(call_user_func(array($model_from, 'connection')));
+                $original_model_ids[] = $current_model_id; // prevents inserting it a second time
+            }
+            else {
+                // unset current model from from array of new relations
+                unset($del_rels[array_search($current_model_id, $original_model_ids)]);
+            }
+
+            // ensure correct pk assignment
+            if ($key != $current_model_id) {
+                $model_from->unfreeze();
+                $rel = $model_from->_relate();
+                if ( ! empty($rel[$this->name][$key]) and $rel[$this->name][$key] === $model_to) {
+                    unset($rel[$this->name][$key]);
+                }
+                $rel[$this->name][$current_model_id] = $model_to;
+                $model_from->_relate($rel);
+                $model_from->freeze();
+            }
+        }
+
+        // If any ids are left in $del_rels they are no longer assigned, DELETE the relationships:
+        //del_rels is made of ids, contrary to the content of the "table_through", made of common ids
+        //these must be replaced before deleting the relationship
+
+        $model_to = $this->model_to;
+        if(!empty($del_rels)) {
+            //As the context_common_id property can't be an array,
+            //it is assumed that each del_rels and is key is a single id
+            //(could have been several)
+            $subquery = \DB::select(reset($this->key_to))->from($model_to::table())->where(reset($model_to::primary_key()), 'IN', $del_rels);
+            $query = \DB::delete($this->table_through);
+
+            $query->where(reset($this->key_through_to), 'IN', $subquery);
+
+            $query->execute(call_user_func(array($model_from, 'connection')));
+        }
+
+        $cascade = is_null($cascade) ? $this->cascade_save : (bool) $cascade;
+        if ($cascade and ! empty($models_to)) {
+            foreach ($models_to as $m) {
+                $m->save();
+            }
+        }
+    }
+
     public function _selectFallback($table, $table_fallback)
     {
         $pks = call_user_func(array($this->model_to, 'primary_key'));
