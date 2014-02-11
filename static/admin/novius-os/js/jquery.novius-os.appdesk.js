@@ -443,7 +443,7 @@ define('jquery-nos-appdesk',
                 if (self.uiInspectorsTags.data('wijmo-wijsuperpanel')) {
                     self.uiInspectorsTags.wijsuperpanel('destroy');
                 }
-                self.uiInspectorsTags.empty();
+                self.uiInspectorsTags.empty().css('width', 'auto');
                 self._uiList();
 
                 self.dispatcher.data('nosContext', o.selectedContexts)
@@ -770,7 +770,8 @@ define('jquery-nos-appdesk',
 
                 inspector.selectionChanged = function(value, label) {
                         var multiple = false,
-                            name = inspector.inputName;
+                            name = inspector.inputName,
+                            max, width;
 
                         if (inspector.inputName.substr(-2, 2) === '[]') {
                             name = inspector.inputName.substr(0, inspector.inputName.length - 2);
@@ -812,12 +813,15 @@ define('jquery-nos-appdesk',
                             })
                             .appendTo(span);
 
-                        self.uiInspectorsTags.wijsuperpanel({
-                            showRounder: false,
-                            hScroller: {
-                                scrollMode: 'buttons'
-                            }
-                        });
+                        max = parseInt(self.uiInputContainer.width() * 0.7);
+                        width = self.uiInspectorsTags.css('width', '1%').outerWidth();
+                        self.uiInspectorsTags.width(width > max ? max : width)
+                            .wijsuperpanel({
+                                showRounder: false,
+                                hScroller: {
+                                    scrollMode: 'buttons'
+                                }
+                            });
 
                         if (o.defaultView === 'treeGrid') {
                             self.uiViewsButtons.find('.view_grid').click().blur();
@@ -890,18 +894,22 @@ define('jquery-nos-appdesk',
                         if (self.uiInspectorsTags.data('wijmo-wijsuperpanel')) {
                             self.uiInspectorsTags.wijsuperpanel('destroy');
                         }
-                        self.uiInspectorsTags.empty();
+                        self.uiInspectorsTags.empty().css('width', 'auto');
                         self.gridReload();
                     });
 
                 self.uiInspectorsTags.height(self.uiInputContainer.height())
-                    .width(parseInt(self.uiSearchBar.width() * 0.3))
+                    .css('width', 'auto')
                     .wijsuperpanel({
                         showRounder: false,
                         hScroller: {
                             scrollMode: 'buttons'
                         }
                     });
+
+                self.uiInputContainer.click(function() {
+                    self.uiSearchInput.focus();
+                });
 
                 var presentations = [
                         {

@@ -168,6 +168,10 @@
 	                    font-size: 0.8em;
 	                    padding: 1px 2px 1px 18px;
 	                    margin-top: -3px;
+                        display: table;
+                        border-spacing: 2px 0;
+
+                        width: 40%;
 
                         > * {
                             vertical-align: middle;
@@ -175,18 +179,19 @@
 
 	                    .nos-appdesk-search-icon {
 	                        left: 1px;
+                            display: table-cell;
 	                    }
 
                         .nos-appdesk-search-input {
                             -webkit-appearance: initial;
-                            width: 10em;
+                            width: 100%;
+                            display: table-cell;
                         }
 
                         .nos-appdesk-reset-search {
-                            display: inline-block;
+                            display: table-cell;
                             position: relative;
                             line-height: 1em;
-                            margin-left: 5px;
                             vertical-align: middle;
                             width: 16px;
                             padding : 1px 0;
@@ -201,9 +206,8 @@
                         }
 
                         .nos-appdesk-inspectorstags {
-                            display: inline-block;
+                            display: table-cell;
                             text-align: right;
-                            margin-left: 5px;
 
                             .nos-appdesk-inspectorstag {
                                 position: relative;
@@ -214,6 +218,8 @@
                                 font-weight: normal;
 
                                 a {
+                                    right: 0;
+                                  z-index: auto;
                                 }
                             }
 
