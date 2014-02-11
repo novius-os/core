@@ -49,7 +49,20 @@ class Orm_Twinnable_HasMany extends \Orm\HasMany
     public function get(\Orm\Model $from)
     {
         $class = $this->model_to;
-        return $class::findMainOrContext($from->{$this->column_context_from}, $this->conditions);
+
+        $conditions = $this->conditions;
+        $where = \Arr::get($conditions, 'where', array());
+        foreach ($this->key_from as $key) {
+            // no point running a query when a key value is null
+            if ($from->{$key} === null) {
+                return array();
+            }
+            $where[] = array(current($this->key_to) => $from->{$key});
+            next($this->key_to);
+        }
+        $conditions['where'] = $where;
+
+        return $class::findMainOrContext($from->{$this->column_context_from}, $conditions);
     }
 
     public function join($alias_from, $rel_name, $alias_to_nr, $conditions = array())
