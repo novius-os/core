@@ -117,44 +117,37 @@ class Tools_File
      */
     public static function send($file, $mime = null, $exit = true)
     {
-        $function = function () use ($file, $mime) {
-            $file = realpath($file);
+        $file = realpath($file);
 
-            if (is_file($file)) {
-                // Send Content-Type
-                if ($mime === null) {
-                    $mime = Tools_File::content_type($file);
-                }
-
-                while (ob_get_level() > 0) {
-                    ob_end_clean();
-                }
-
-                ini_get('zlib.output_compression') and ini_set('zlib.output_compression', 0);
-                !ini_get('safe_mode') and set_time_limit(0);
-
-                header('Content-Type: '.$mime);
-
-                // Check whether the file is in the data directory
-                $data_path = APPPATH.'data';
-                $xsendfile_allowed = mb_substr($file, 0, mb_strlen($data_path)) == $data_path;
-
-                // X-Sendfile is better when available
-                if (Tools_File::$use_xsendfile and $xsendfile_allowed) {
-                    header(Tools_File::$xsendfile_header.': '.$file);
-                } else {
-                    \File::download($file);
-                }
+        if (is_file($file)) {
+            // Send Content-Type
+            if ($mime === null) {
+                $mime = Tools_File::content_type($file);
             }
-        };
+
+            while (ob_get_level() > 0) {
+                ob_end_clean();
+            }
+
+            ini_get('zlib.output_compression') and ini_set('zlib.output_compression', 0);
+            !ini_get('safe_mode') and set_time_limit(0);
+
+            header('Content-Type: '.$mime);
+
+            // Check whether the file is in the data directory
+            $data_path = APPPATH.'data';
+            $xsendfile_allowed = mb_substr($file, 0, mb_strlen($data_path)) == $data_path;
+
+            // X-Sendfile is better when available
+            if (Tools_File::$use_xsendfile and $xsendfile_allowed) {
+                header(Tools_File::$xsendfile_header.': '.$file);
+            } else {
+                \File::download($file);
+            }
+        }
 
         if ($exit) {
-            \Event::register('fuel-shutdown', function () use ($function) {
-                $function();
-            });
             exit;
-        } else {
-            $function();
         }
     }
 
