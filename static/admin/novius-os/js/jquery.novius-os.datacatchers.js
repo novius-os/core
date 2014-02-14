@@ -137,11 +137,11 @@ define('jquery-nos-datacatchers',
                 $container.find('.nos-datacatchers-nugget-checkbox').each(function() {
                     $(this).change(function() {
                         if ($(this).is(':checked')) {
-                            $(this).closest('tr').find('td:eq(0) .ui-widget').each(function() {
+                            $(this).closest('tr').find('td:eq(0) :input').each(function() {
                                 var data = $(this).attr('disabled', true).data();
                             });
                         } else {
-                            $(this).closest('tr').find('td:eq(0) .ui-widget').each(function() {
+                            $(this).closest('tr').find('td:eq(0) :input').each(function() {
                                 var data = $(this).removeAttr('disabled').data();
                             });
                         }
