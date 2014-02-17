@@ -11,7 +11,7 @@
 return array(
     'name'      => 'Webpages',
     'namespace' => 'Nos\Page',
-    'version'   => '0.1',
+    'version'   => 'dubrovka',
     'provider'  => array(
         'name'  => 'Novius OS 1',
     ),
