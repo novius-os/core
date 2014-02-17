@@ -111,16 +111,18 @@ define('jquery-nos-appdesk',
 
                 self.uiSplitterVertical = $('<div></div>').addClass('nos-appdesk-splitter-v')
                     .appendTo(self.element);
-                self.uiSplitterVerticalRight = $('<div></div>').appendTo(self.uiSplitterVertical);
-                self.uiInspectorsVertical = $('<ul></ul>').addClass('nos-appdesk-inspectors nos-appdesk-inspectors-v')
-                    .appendTo(self.uiSplitterVerticalRight);
                 self.uiSplitterVerticalLeft = $('<div></div>').appendTo(self.uiSplitterVertical);
+                self.uiInspectorsVertical = $('<ul></ul>').addClass('nos-appdesk-inspectors nos-appdesk-inspectors-v')
+                    .appendTo(self.uiSplitterVerticalLeft);
+                self.uiSplitterVerticalRight = $('<div></div>').addClass('nos-appdesk-vpanel-left')
+                    .appendTo(self.uiSplitterVertical);
 
-                self.uiSplitterHorizontal = $('<div></div>').appendTo(self.uiSplitterVerticalLeft);
+                self.uiSplitterHorizontal = $('<div></div>').appendTo(self.uiSplitterVerticalRight);
                 self.uiSplitterHorizontalTop = $('<div></div>').appendTo(self.uiSplitterHorizontal);
                 self.uiInspectorsHorizontal = $('<ul></ul>').addClass('nos-appdesk-inspectors nos-appdesk-inspectors-h')
                     .appendTo(self.uiSplitterHorizontalTop);
-                self.uiSplitterHorizontalBottom = $('<div></div>').appendTo(self.uiSplitterHorizontal);
+                self.uiSplitterHorizontalBottom = $('<div></div>').addClass('nos-appdesk-hpanel-bottom')
+                    .appendTo(self.uiSplitterHorizontal);
 
                 self.uiSearchBar = $('<div><form><div></div></form></div>')
                     .addClass('nos-appdesk-searchbar-container wijmo-wijgrid ui-widget ui-widget-header ui-state-default')
@@ -203,8 +205,9 @@ define('jquery-nos-appdesk',
 
                 self._css()
                     ._uiToolbar()
+                    ._uiInspectorsPopulate()
                     ._uiSplitters()
-                    ._uiInspectors()
+                    ._uiInspectorsInit()
                     ._uiSearchBar()
                     ._uiList();
 
@@ -663,16 +666,7 @@ define('jquery-nos-appdesk',
 
             _uiSplitters : function() {
                 var self = this,
-                    refreshV = function() {
-                        self.uiSplitterHorizontal.wijsplitter("refresh");
-                        self._resizeInspectorsV(true)
-                            ._resizeInspectorsH(true)
-                            ._resizeList(true);
-                    },
-                    refreshH = function() {
-                        self._resizeInspectorsH(true)
-                            ._resizeList(true);
-                    },
+                    hasVerticalInspector = !self.uiInspectorsVertical.is(':empty'),
                     verticalSplitter = $.extend(true, {
                             orientation: "vertical",
                             splitterDistance: 200,
@@ -686,20 +680,16 @@ define('jquery-nos-appdesk',
                                 minSize : 200,
                                 scrollBars : 'none'
                             },
-                            expanded: function () {
-                                refreshV();
-                            },
-                            collapsed: function () {
-                                refreshV();
-                            },
                             sized: function () {
-                                self.resizing = true;
-                                refreshV();
+                                self._trigger('slidersChange', null, self.slidersSettings());
+                                self._resizeInspectorsV()
+                                    ._resizeInspectorsH(true)
+                                    ._resizeList(true);
                             }
                         }, self.options.splitters.vertical),
                     horizontalSplitter = $.extend(true, {
                             orientation: "horizontal",
-                            fullSplit: true,
+                            fullSplit: hasVerticalInspector,
                             splitterDistance: 200,
                             showExpander: false,
                             panel1 : {
@@ -710,34 +700,42 @@ define('jquery-nos-appdesk',
                                 minSize : 200,
                                 scrollBars : 'none'
                             },
-                            expanded: function () {
-                                refreshH();
-                            },
-                            collapsed: function () {
-                                refreshH();
-                            },
                             sized: function () {
-                                self.resizing = true;
-                                refreshH();
+                                self._trigger('slidersChange', null, self.slidersSettings());
+                                self._resizeInspectorsH()
+                                    ._resizeList(true);
                             }
                         }, self.options.splitters.horizontal);
 
-                self.uiSplitterVertical.wijsplitter(verticalSplitter)
-                    .find('.ui-resizable-handle')
-                    .mousedown(function() {
-                        self.resizing = false;
-                    });
+                if (hasVerticalInspector) {
+                    self.uiSplitterVertical.wijsplitter(verticalSplitter);
+                } else {
+                    self.uiSplitterVerticalLeft.remove();
+                    self.uiSplitterVerticalLeft.css({
+                            position: 'absolute',
+                            top: 0,
+                            bottom: 0,
+                            width: '100%'
+                        });
+                }
 
-                self.uiSplitterHorizontal.wijsplitter(horizontalSplitter)
-                    .find('.ui-resizable-handle')
-                    .mousedown(function() {
-                        self.resizing = false;
-                    });
+                if (!self.uiInspectorsHorizontal.is(':empty')) {
+                    self.uiSplitterHorizontal.wijsplitter(horizontalSplitter);
+                } else {
+                    self.uiSplitterHorizontal.add(self.uiSplitterHorizontalBottom)
+                        .css({
+                            position: 'absolute',
+                            top: 0,
+                            bottom: 0,
+                            width: '100%'
+                        });
+                    self.uiSplitterHorizontalTop.remove();
+                }
 
                 return self;
             },
 
-            _uiInspectors : function() {
+            _uiInspectorsPopulate : function() {
                 var self = this,
                     o = self.options;
 
@@ -751,14 +749,28 @@ define('jquery-nos-appdesk',
                     }
                 });
 
-                self._resizeInspectorsV(true)
-                    ._resizeInspectorsH(true);
+                return self;
+            },
 
-                self.uiInspectorsVertical.find('> li')
-                    .add(self.uiInspectorsHorizontal.find('> li'))
-                    .each(function() {
+            _uiInspectorsInit : function() {
+                var self = this,
+                    o = self.options;
+
+
+                if (self.uiSplitterVertical.data('wijmo-wijsplitter')) {
+                    self.uiInspectorsVerticalLi = self.uiInspectorsVertical.find('> li');
+                    self._resizeInspectorsV(true);
+                    self.uiInspectorsVerticalLi.each(function() {
                         self._loadInspector($(this));
                     });
+                }
+                if (self.uiInspectorsHorizontal.data('wijmo-wijsplitter')) {
+                    self.uiInspectorsHorizontalLi = self.uiInspectorsHorizontal.find('> li');
+                    self._resizeInspectorsH(true);
+                    self.uiInspectorsHorizontalLi.each(function() {
+                        self._loadInspector($(this));
+                    });
+                }
 
                 return self;
             },
@@ -1025,9 +1037,7 @@ define('jquery-nos-appdesk',
             _uiGrid : function() {
                 var self = this,
                     o = self.options,
-                    position = self.uiGrid.offset(),
-                    positionContainer = self.element.offset(),
-                    height = self.element.height() - position.top + positionContainer.top,
+                    height =  self._listHeight(self.uiGrid),
                     heights = $.grid.getHeights(),
                     grid = $.extend(true, {}, o.grid);
 
@@ -1160,9 +1170,6 @@ define('jquery-nos-appdesk',
             _uiTreeGrid : function() {
                 var self = this,
                     o = self.options,
-                    position = self.uiTreeGrid.offset(),
-                    positionContainer = self.element.offset(),
-                    height = self.element.height() - position.top + positionContainer.top,
                     grid = $.extend(true, {}, o.grid),
                     columns = $.extend({}, o.treeGrid.columns || o.grid.columns);
 
@@ -1172,7 +1179,7 @@ define('jquery-nos-appdesk',
                 self._columnsMultiContext(columns);
 
                 self.uiTreeGrid.css({
-                        height : height,
+                        height : self._listHeight(self.uiTreeGrid),
                         width : '100%'
                     }).nostreegrid($.extend(true, { // True for recursive clone
                         loadingText: o.texts.loading,
@@ -1257,12 +1264,9 @@ define('jquery-nos-appdesk',
 
             _uiThumbnail : function() {
                 var self = this,
-                    o = self.options,
-                    position = self.uiThumbnail.offset(),
-                    positionContainer = self.element.offset(),
-                    height = self.element.height() - position.top + positionContainer.top;
+                    o = self.options;
 
-                self.uiThumbnail.css('height', height)
+                self.uiThumbnail.css('height', self._listHeight(self.uiThumbnail))
                     .thumbnailsgrid($.extend({
                         texts: {
                             loading: o.texts.loading
@@ -1340,6 +1344,16 @@ define('jquery-nos-appdesk',
                 return self;
             },
 
+            _listHeight : function($grid) {
+                var self = this,
+                    position = $grid.offset(),
+                    positionContainer = self.element.offset(),
+                    borderTop = parseInt($grid.css('borderTopWidth').replace('px', '')),
+                    borderBottom = parseInt($grid.css('borderBottomWidth').replace('px', ''));
+
+                return self.element.height() - position.top + positionContainer.top - borderTop - borderBottom;
+            },
+
             _columnsMultiContext : function(columns) {
                 var self = this,
                     o = self.options;
@@ -1391,24 +1405,12 @@ define('jquery-nos-appdesk',
             _resizeInspectorsV : function(reload) {
                 var self = this;
 
-                if (self.resizing) {
-                    var inspectors = self.uiInspectorsVertical.find('.wijmo-wijsplitter-v-bar')
-                        .css({
-                            width : null,
-                            borderRightWidth : null
-                        })
-                        .end()
-                        .find('> li').css({
+                if (self.uiSplitterVertical.data('wijmo-wijsplitter')) {
+                    self.uiInspectorsVerticalLi.css({
                             width: '100%',
-                            height: 'auto'
-                        });
-
-                    if (inspectors.length) {
-                        inspectors.css('height', ( self.uiInspectorsVertical.height() / inspectors.length )  + 'px')
-                            .trigger(reload ? 'widgetReload' : 'widgetResize');
-                    } else {
-                        self._hideSplitterV();
-                    }
+                            height: (self.uiInspectorsVertical.height() / self.uiInspectorsVerticalLi.length) + 'px'
+                        })
+                        .trigger(reload ? 'widgetReload' : 'widgetResize');
                 }
 
                 return self;
@@ -1417,39 +1419,24 @@ define('jquery-nos-appdesk',
             _resizeInspectorsH : function(reload) {
                 var self = this;
 
-                if (self.resizing) {
-                    var inspectors = self.uiInspectorsHorizontal.find('.wijmo-wijsplitter-h-bar')
-                        .css({
-                            height : null,
-                            borderTopWidth : null
-                        })
-                        .end()
-                        .find('> li').css({
-                            width: 'auto',
+                if (self.uiSplitterHorizontal.data('wijmo-wijsplitter')) {
+                    self.uiInspectorsHorizontalLi.css({
+                            width: (self.uiInspectorsHorizontal.width() / self.uiInspectorsHorizontalLi.length) + 'px',
                             height: '100%'
-                        });
-
-                    if (inspectors.length) {
-                        inspectors.css('width', ( self.uiInspectorsHorizontal.width() / inspectors.length )  + 'px')
-                            .trigger(reload ? 'widgetReload' : 'widgetResize');
-                    } else {
-                        self._hideSplitterH();
-                    }
+                        })
+                        .trigger(reload ? 'widgetReload' : 'widgetResize');
                 }
-
-                self.uiSplitterVertical.wijsplitter('option', 'splitterDistance');
-
-                self._trigger('slidersChange', null, self.slidersSettings());
 
                 return self;
             },
 
             _resizeList : function(reload) {
                 var self = this,
-                    o = self.options;
+                    o = self.options,
+                    height, heights;
 
                 if (self.init) {
-                    var height = self.uiSplitterHorizontalBottom.height() - self.uiSearchBar.outerHeight(true);
+                    height = self._listHeight(self.uiSplitterHorizontalBottom.find('> .ui-widget:eq(1)'));
                     if (o.defaultView === 'thumbnails') {
                         if (reload) {
                             self._uiList();
@@ -1465,39 +1452,11 @@ define('jquery-nos-appdesk',
                     } else {
                         self.uiGrid.noslistgrid('setSize', null, height);
                         if (reload) {
-                            var heights = $.grid.getHeights();
+                            heights = $.grid.getHeights();
                             self.uiGrid.noslistgrid('option', 'pageSize', Math.floor((height - heights.footer - heights.header - (self.showFilter ? heights.filter : 0)) / heights.row));
                         }
                     }
                 }
-
-                return self;
-            },
-
-            _hideSplitterV : function() {
-                var self = this;
-
-                self.uiSplitterVertical.find('.wijmo-wijsplitter-v-bar')
-                    .css({
-                        width : '0px',
-                        borderRightWidth : '0px'
-                    })
-                    .end()
-                    .wijsplitter('option', 'panel1', {collapsed : true});
-
-                return self;
-            },
-
-            _hideSplitterH : function() {
-                var self = this;
-
-                self.uiSplitterHorizontal.find('.wijmo-wijsplitter-h-bar')
-                    .css({
-                        height : '0px',
-                        borderTopWidth : '0px'
-                    })
-                    .end()
-                    .wijsplitter('option', 'panel1', {collapsed : true});
 
                 return self;
             },
@@ -1524,7 +1483,12 @@ define('jquery-nos-appdesk',
                 var self = this,
                     o = self.options;
 
-                self.uiSplitterVertical.wijsplitter('refresh');
+                if (self.uiSplitterVertical.data('wijmo-wijsplitter')) {
+                    self.uiSplitterVertical.wijsplitter('refresh', false, false);
+                }
+                if (self.uiSplitterHorizontal.data('wijmo-wijsplitter')) {
+                    self.uiSplitterHorizontal.wijsplitter('refresh', false, false);
+                }
 
                 self._resizeInspectorsV()
                     ._resizeInspectorsH()
@@ -1534,17 +1498,23 @@ define('jquery-nos-appdesk',
             },
 
             slidersSettings : function() {
+                var self = this;
+
                 return {
                     vertical: {
-                        splitterDistance: this.uiSplitterVertical.wijsplitter('option', 'splitterDistance') / $(window).width()
+                        splitterDistance:
+                            self.uiSplitterVertical.data('wijmo-wijsplitter') ?
+                            this.uiSplitterVertical.wijsplitter('option', 'splitterDistance') / $(window).width() :
+                            0
                     },
                     horizontal: {
-                        splitterDistance: this.uiSplitterHorizontal.wijsplitter('option', 'splitterDistance') / $(window).height()
+                        splitterDistance:
+                            self.uiSplitterHorizontal.data('wijmo-wijsplitter') ?
+                            this.uiSplitterHorizontal.wijsplitter('option', 'splitterDistance') / $(window).height() :
+                            0
                     }
                 }
             }
-
-
         });
 
         $.extend({
@@ -1829,10 +1799,7 @@ define('jquery-nos-appdesk',
                                     var params = $.extend(true, {
                                         appdesk : {
                                             texts : this.i18nMessages,
-                                            splitters : {},
-                                            slidersChange : function(e, rapport) {
-                                                //$.saveUserConfiguration("'.$config['configuration_id'].'.ui.splitters", rapport)
-                                            }
+                                            splitters : {}
                                         }
                                     }, this);
 
