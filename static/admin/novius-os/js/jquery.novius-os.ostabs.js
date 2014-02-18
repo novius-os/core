@@ -1061,10 +1061,6 @@ define('jquery-nos-ostabs',
                     $li.data( 'ui-ostab', tab )
                         .attr('title', $newLi.find( '.nos-ostabs-label' ).text())
                         .addClass($newLi.attr('class'))
-                        .css({
-                            height: $newLi.css('height'),
-                            bottom: $newLi.css('bottom')
-                        })
                         .find('a')
                         .empty()
                         .append($newA.children())

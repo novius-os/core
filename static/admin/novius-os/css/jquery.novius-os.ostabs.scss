@@ -33,24 +33,54 @@ body {
         position: absolute;
     }
 
+    ul.nos-ostabs-nav, div.nos-ostabs-nav {
+        position : absolute;
+        height : 46px;
+        @include box-sizing(border-box);
+        margin: 0;
+        padding: 6px 0 0;
+    }
+
 	.nos-ostabs-header {
-		background-position : 50% 75%;
 		border : 0;
 		height : 46px;
 
-		li {
-			@include box-sizing(content-box);
-			white-space: nowrap;
-			bottom : -15px;
-			height : 24px;
-			line-height : 32px;
-			position : relative;
-			margin : 0px 2px 0 0;
-			padding : 0px;
-			list-style : none;
-			float : left;
-			border-bottom-width : 0;
+        ul {
+            @include box-sizing(border-box);
+            margin: 0;
+            padding: 6px 0 0;
+        }
 
+        li {
+            @include box-sizing(content-box);
+            white-space: nowrap;
+            top: 15px;
+            height : 23px;
+            line-height : 32px;
+            position : relative;
+            margin : 0px 2px 0 0;
+            padding : 0px;
+            list-style : none;
+            float : left;
+            border-bottom-width : 0;
+        }
+
+        li.nos-ostabs-appstab, li.nos-ostabs-newtab, li.nos-ostabs-app {
+            a {
+                .nos-ostabs-label {
+                    display : none;
+                }
+            }
+        }
+    }
+
+    div.nos-ostabs-tabs {
+        position : absolute;
+        top : 0px;
+        height : 46px;
+        z-index: 4;
+
+		li {
 			a {
 				float: left;
 				padding : 0px 5px;
@@ -96,26 +126,15 @@ body {
                 cursor: pointer;
                 display: none;
             }
-
 		}
 
         li.ui-state-active {
+            height : 24px;
+
             span.nos-ostabs-closetab {
                 display: block;
             }
         }
-
-		li.nos-ostabs-appstab {
-		    margin : 0px 30px 0 30px;
-		}
-
-		li.nos-ostabs-appstab, li.nos-ostabs-newtab, li.nos-ostabs-app {
-			a {
-				.nos-ostabs-label {
-					display : none;
-				}
-			}
-		}
 
 		li.nos-ostabs-newtab.ui-state-active {
 			a {
@@ -152,111 +171,25 @@ body {
 			}
 		}
 
-		ul.nos-ostabs-nav, div.nos-ostabs-nav {
-			position : absolute;
-			height : 46px;
-			@include box-sizing(border-box);
-			margin: 0;
-			padding: 6px 0 0;
-		}
+        .wijmo-wijsuperpanel-statecontainer {
+            overflow: visible;
+        }
+    }
 
-		ul.nos-ostabs-appstab {
-			left : 0px;
-			top : 0px;
-		}
-
-		div.nos-ostabs-tray {
-			right : 0px;
-			top : 0px;
-            font-size: 0.8em;
-            color: white;
-            z-index: 3;
-            padding-left: 36px;
-            padding-top: 0px;
-
-
-            .button {
-                overflow: hidden;
-                display: inline-block;
-                line-height: 46px;
-
-                img {
-                    vertical-align: middle;
-                }
-            }
-
-            .menu {
-                display: inline-block;
-                color: #DDD;
-                font-size: 14px;
-                font-weight: bold;
-                height: 33px;
-                vertical-align: top;
-                padding: 13px 10px 0;
-                cursor: pointer;
-
-                &:hover {
-                    color: white;
-                }
-
-                &.active {
-                    background: white;
-                    color: black;
-                }
-            }
-
-            a {
-                font-size: 1.2em;
-            }
-		}
-
-		div.nos-ostabs-tabs {
-			position : absolute;
-			top : 0px;
-			height : 46px;
-            z-index: 4;
-
-			.wijmo-wijsuperpanel-statecontainer {
-				overflow: visible;
-			}
-			/*div {
-				overflow : hidden;
-				position : relative;
-				height : 46px;
-				left : 0px;
-				top : 0px;*/
-
-				ul {
-					@include box-sizing(border-box);
-					margin: 0;
-					padding: 6px 0 0;
-				}
-			/*}
-
-			a.nos-ostabs-scroll-left, a.nos-ostabs-scroll-right {
-				margin: 20px 0 0;
-				display : none;
-				padding : 4px 2px;
-			}
-
-			a.nos-ostabs-scroll-left {
-				float : left;
-			}
-
-			a.nos-ostabs-scroll-right {
-				float : right;
-			}*/
-		}
-	}
+    div.nos-ostabs-tray {
+        right : 0px;
+        top : 0px;
+        z-index: 3;
+        padding-left: 36px;
+        padding-top: 0px;
+    }
 
 	.nos-ostabs-panel {
 		display: block;
-		border-width: 0;
-		background: none;
 		position : absolute;
 		@include box-sizing(border-box);
 		left : 0px;
-		top : 54px;
+		top : 45px;
 		bottom : 0px;
 		right : 0px;
 
@@ -280,12 +213,15 @@ body {
 		}
 
 		.nos-ostabs-actions {
-			position : absolute;
-			top : -56px;
-			width : 100%;
-			left : 0;
-			height : 54px;
-			@include box-shadow(0px 1px 7px 0px rgba(0, 0, 0, 0.3));
+			position: absolute;
+			top: -1px;
+			right: -1px;
+			left: -1px;
+			height: 1px;
+            background: #B9E0F5;
+            @include box-sizing(border-box);
+            @include box-shadow(none);
+            border-bottom-width: 0;
 
 		    .nos-ostabs-actions-links {
 				position : absolute;
@@ -334,6 +270,11 @@ body {
 .nos-ostabs-touch {
     .nos-ostabs-panel {
         top : 65px;
+
+        .nos-ostabs-actions {
+            top: -21px;
+            height: 21px;
+        }
     }
 }
 
@@ -345,22 +286,23 @@ body {
 	.nos-ostabs-header {
 		position : relative;
 		z-index : 3;
-		@include background-with-css2-fallback(linear-gradient(#222222, #111111), #222);
 
 		li.nos-ostabs-appstab {
-			margin : 0px 35px 0 0px;
+            top: 0;
 			bottom : 0 !important;
-			height : 56px !important;
+			height : 45px !important;
+            margin : 0px 20px;
 			background : none;
 			border : 0;
+            cursor: pointer;
 
 			a {
 				padding : 0;
 
 				span.nos-ostabs-icon {
-					width : 78px !important;
-					line-height : 56px !important;
-					height : 56px !important;
+					width : 48px !important;
+					line-height : 45px !important;
+					height : 45px !important;
 					background : url(../img/icons/tabs-logo-off.png) no-repeat;
 					top : 0px !important;
 				}
@@ -376,26 +318,8 @@ body {
 		}
 
 		ul.nos-ostabs-appstab {
-			height : 55px;
+			height : 47px;
 			padding: 0;
 		}
-
-		li.nos-ostabs-newtab:not(.ui-state-active) {
-			background:transparent;
-		}
    }
-
-    #noviusospanel {
-        background-image : url(../img/wallpapers/default.jpg);
-        background-size : cover;
-
-        ul.apps {
-            margin : 40px 30px 15px 60px;
-
-            li {
-                float : left;
-                margin : 0 30px 30px 0;
-            }
-        }
-    }
 }

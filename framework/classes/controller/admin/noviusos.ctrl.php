@@ -125,6 +125,11 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
         );
 
         $view->set('ostabs', \Format::forge($ostabs)->to_json(), false);
+
+        $background_id = \Arr::get($user->getConfiguration(), 'misc.display.background', \Config::get('background_id', false));
+        $background = $background_id ? Media\Model_Media::find($background_id) : false;
+        $view->set('background', $background, false);
+
         $this->template->body = $view;
 
         return $this->template;
@@ -184,17 +189,12 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
             $apps = \Arr::sort($apps, 'order', 'asc');
         }
 
-        $user = \Session::user();
-        $background_id = \Arr::get($user->getConfiguration(), 'misc.display.background', \Config::get('background_id', false));
-        $background = $background_id ? \Nos\Media\Model_Media::find($background_id) : false;
-
         $view = \View::forge(
             'admin/appstab',
             array(
                 'apps' => $apps,
             )
         );
-        $view->set('background', $background, false);
 
         return $view;
     }

@@ -58,9 +58,6 @@ define('jquery-nos-appstab',
                             }
                         });
 
-                    if (params.backgroundUrl) {
-                        $('#noviusospanel').css('background-image', 'url("' + params.backgroundUrl + '")');
-                    }
                     $panel.find('a.app').click(function(e) {
                         click.call(this, e);
                     });

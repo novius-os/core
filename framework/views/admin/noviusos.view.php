@@ -16,7 +16,12 @@ require(
     ['jquery-nos-ostabs'],
     function( $ ) {
         $(function() {
+            var backgroundUrl= <?= $background ? \Format::forge(Uri::create($background->url()))->to_json() : 'null' ?>,
+                $body = $('body').addClass('nos-background');
             $('#noviusos').nosTabs('init', <?= $ostabs ?>);
+            if (backgroundUrl) {
+                $body.css('background-image', 'url("' + backgroundUrl + '")');
+            }
         });
     });
 </script>

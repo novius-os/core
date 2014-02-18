@@ -13,12 +13,6 @@ Nos\I18n::current_dictionary('nos::common');
 $id = uniqid('temp_');
 ?>
 <div id="<?= $id ?>">
-    <div align="center">
-    <form data-ui="ajaxForm" id="search">
-        <span id="magnifier"></span>
-        <input type="search" name="search" placeholder="<?= __('Search') ?>" data-button-go="false" />
-    </form>
-    </div>
     <div id="apps">
 <?php
 foreach ($apps as $app) {
@@ -41,9 +35,7 @@ require(
     ['jquery-nos-appstab'],
     function($) {
         $(function() {
-            $('#<?= $id ?>').nosAppsTab({
-                backgroundUrl: <?= $background ? \Format::forge(Uri::create($background->url()))->to_json() : 'null' ?>
-            });
+            $('#<?= $id ?>').nosAppsTab();
         });
     });
 </script>

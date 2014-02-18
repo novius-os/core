@@ -142,6 +142,7 @@ return array(
         'jquery-nos-context-common-fields' =>
             'static/novius-os/admin/novius-os/js/views/jquery.novius-os.context-common-fields',
         'jquery-nos-appstab' => 'static/novius-os/admin/novius-os/js/views/jquery.novius-os.appstab',
+        'jquery-nos-tray' => 'static/novius-os/admin/novius-os/js/views/jquery.novius-os.tray',
         'jquery-nos-publishable' => 'static/novius-os/admin/novius-os/js/views/jquery.novius-os.publishable',
         'jquery-nos-layout-standard' => 'static/novius-os/admin/novius-os/js/views/jquery.novius-os.layout-standard',
         'jquery-nos-toolbar-crud' => 'static/novius-os/admin/novius-os/js/views/jquery.novius-os.toolbar-crud',
@@ -456,6 +457,7 @@ return array(
         'jquery-nos-context-common-fields' =>
             'static/novius-os/admin/novius-os/js/views/minified/jquery.novius-os.context-common-fields',
         'jquery-nos-appstab' => 'static/novius-os/admin/novius-os/js/views/minified/jquery.novius-os.appstab',
+        'jquery-nos-tray' => 'static/novius-os/admin/novius-os/js/views/minified/jquery.novius-os.tray',
         'jquery-nos-publishable' => 'static/novius-os/admin/novius-os/js/views/minified/jquery.novius-os.publishable',
         'jquery-nos-layout-standard' =>
             'static/novius-os/admin/novius-os/js/views/minified/jquery.novius-os.layout-standard',
