@@ -269,4 +269,24 @@ class Tools_Context
             return array_merge(array('code' => $site_code), $sites[$site_code]);
         }
     }
+    
+    /**
+     * @param null $context
+     * @return bool|mixed
+     */
+    public static function siteContextUrl($context = null)
+    {
+        if ($context === null) {
+            $context = \Nos\Nos::main_controller()->getContext();
+        }
+        $contexts = static::contexts();
+        if (isset($contexts[$context])) {
+            if (is_array($contexts[$context])) {
+                return reset($contexts[$context]);
+            } else {
+                return $contexts[$context];
+            }
+        }
+        return false;
+    }
 }
