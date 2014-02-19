@@ -120,29 +120,47 @@ class Tools_File
         $file = realpath($file);
 
         if (is_file($file)) {
-            // Send Content-Type
-            if ($mime === null) {
-                $mime = Tools_File::content_type($file);
-            }
-
             while (ob_get_level() > 0) {
                 ob_end_clean();
             }
-
-            ini_get('zlib.output_compression') and ini_set('zlib.output_compression', 0);
-            !ini_get('safe_mode') and set_time_limit(0);
-
-            header('Content-Type: '.$mime);
 
             // Check whether the file is in the data directory
             $data_path = APPPATH.'data';
             $xsendfile_allowed = mb_substr($file, 0, mb_strlen($data_path)) == $data_path;
 
             // X-Sendfile is better when available
-            if (Tools_File::$use_xsendfile and $xsendfile_allowed) {
-                header(Tools_File::$xsendfile_header.': '.$file);
+            if (static::$use_xsendfile and $xsendfile_allowed) {
+                // Send Content-Type
+                if ($mime === null) {
+                    $mime = static::content_type($file);
+                }
+
+                ini_get('zlib.output_compression') and ini_set('zlib.output_compression', 0);
+                !ini_get('safe_mode') and set_time_limit(0);
+
+                header('Content-Type: '.$mime);
+                header(static::$xsendfile_header.': '.$file);
             } else {
-                \File::download($file);
+                $info = \File::file_info($file);
+                empty($mime) or $info['mimetype'] = $mime;
+
+                \Event::register('fuel-shutdown', function () use ($info) {
+
+                    if (!$file = \File::open_file(@fopen($info['realpath'], 'rb'), LOCK_SH)) {
+                        throw new \FileAccessException('Filename given could not be opened for download.');
+                    }
+
+                    ini_get('zlib.output_compression') and ini_set('zlib.output_compression', 0);
+                    ! ini_get('safe_mode') and set_time_limit(0);
+
+                    header('Content-Type: '.$info['mimetype']);
+                    header('Content-Length: '.$info['size']);
+                    header('Content-Transfer-Encoding: binary');
+
+                    file_put_contents('php://output', $file);
+
+                    \File::close_file($file);
+                });
             }
         }
 
