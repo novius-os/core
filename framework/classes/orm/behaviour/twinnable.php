@@ -312,18 +312,31 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
         // Prevents looping in the observer
         if (!in_array($item->id, $this->_in_progress_check)) {
             $items = $this->find_other_context($item);
-            $this->_in_progress_check = array_keys($items);
 
-            foreach ($items as $it) {
-                foreach ($this->_properties['common_fields'] as $common_field) {
-                    $it->set($common_field, $item->get($common_field));
+            // check if at least one common field was modified
+            $changed = false;
+            foreach ($this->_properties['common_fields'] as $common_field) {
+                if ($item->is_changed($common_field)) {
+                    $changed = true;
+                    break;
                 }
             }
 
-            foreach ($items as $it) {
-                $it->save();
+            if ($changed) {
+                // at least one common field was modified, save all twins
+                $this->_in_progress_check = array_keys($items);
+
+                foreach ($items as $it) {
+                    foreach ($this->_properties['common_fields'] as $common_field) {
+                        $it->set($common_field, $item->get($common_field));
+                    }
+                }
+
+                foreach ($items as $it) {
+                    $it->save();
+                }
+                $this->_in_progress_check = array();
             }
-            $this->_in_progress_check = array();
         }
     }
 
@@ -355,6 +368,20 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
     {
         // This event has been sent from the tree behaviour, so we don't need to check the method exists
         $new_parent = $item->get_parent();
+
+        $parent_ids = $item->parent_relation()->key_from;
+
+        $changed = false;
+        foreach ($parent_ids as $parent_id) {
+            if ($item->is_changed($parent_id)) {
+                $changed = true;
+                break;
+            }
+        }
+        if (!$changed) {
+            // parent has not changed, no need to continue
+            return;
+        }
 
         if (!empty($new_parent)) {
             $contexts_parent = $new_parent->get_all_context();
