@@ -7,7 +7,7 @@
  * @link http://www.novius-os.org
  */
 define('jquery-nos-ostabs',
-    ['jquery', 'jquery-nos', 'jquery-ui.widget', 'jquery-nos-loadspinner', 'jquery-ui.sortable', 'wijmo.wijsuperpanel', 'wijmo.wijmenu', 'modernizr'],
+    ['jquery', 'jquery-nos', 'jquery-ui.widget', 'jquery-nos-loadspinner', 'jquery-ui.sortable', 'wijmo.wijsuperpanel', 'jquery-nos-contextmenu', 'modernizr', 'jquery.simulate'],
     function( $ ) {
         "use strict";
         var undefined = void(0),
@@ -31,7 +31,8 @@ define('jquery-nos-ostabs',
                     closeOtherTabs: 'Close all other tabs',
                     confirmCloseOtherTabs: 'Are you sure to want to close all other tabs?',
                     confirmCloseTabs: 'Are you sure to want to close all tabs?',
-                    reloadTab: 'Reload tab'
+                    reloadTab: 'Reload tab',
+                    moveTab: 'Move tab'
                 },
 
                 // callbacks
@@ -143,8 +144,6 @@ define('jquery-nos-ostabs',
                     }
                     self.uiOstabsTray.prependTo(self.uiOstabsHeader);
 
-                    self.uiOstabsTray.find("#menu").wijmenu();
-
                     if ( $.isPlainObject(o.appsTab) ) {
                         self.uiOstabsAppsTab = $( '<ul></ul>' )
                             .addClass( 'nos-ostabs-appstab  nos-ostabs-nav' )
@@ -220,41 +219,9 @@ define('jquery-nos-ostabs',
                         self._tabsWidth();
                     });
 
-                    self.uiOstabsTabs.sortable({
-                        items: 'li:not(.nos-ostabs-newtab)',
-                        appendTo: self.uiOstabsSuperPanelContent,
-                        cursor: 'move',
-                        delay: 250,
-                        scroll: false,
-                        helper: 'clone',
-                        tolerance: 'pointer',
-                        axis: 'x',
-                        zIndex : 100000,
-                        placeholder: "ui-state-highlight",
-                        forcePlaceholderSize: true,
-                        start: function() {
-                            self.sorting = true;
-                        },
-                        stop: function() {
-                            self.sorting = false;
-                        },
-                        update: function() {
-                            self._trigger( "drag", null );
-                            self.lis = self.uiOstabsAppsTab
-                                .add( self.uiOstabsTabs )
-                                .find( "li" );
-                            self.anchors = self.lis.map(function(i) {
-                                var anchor = $( "a", this )[ 0 ];
-                                self.element.find( self._sanitizeSelector( $(anchor).data('anchor.tabs') ) )
-                                    .find( '.nos-ostabs-panel-content' )
-                                    .data( 'nos-ostabs-index', i );
-                                return anchor;
-                            });
-
-                            self._tabsWidth();
-                        }
-                    });
-
+                    if (!touchDevice) {
+                        self._initSortable();
+                    }
 
                     self.tabsWidth = self.uiOstabsSuperPanelContent.width();
                     self.labelWidth = o.labelMaxWidth;
@@ -324,13 +291,12 @@ define('jquery-nos-ostabs',
                         a.href = "#" + id;
                         $panel = self.element.find( "#" + id );
                         if ( !$panel.length ) {
-                            var tab = self.lis.eq(i).data( 'ui-ostab');
                             $panel = $( '<div></div>' )
                                 .attr( "id", id )
                                 .addClass( "nos-ostabs-panel ui-widget-content ui-corner-bottom nos-ostabs-hide")
                                 .appendTo( self.element );
 
-                            self._actions($panel, i);
+                            self._contextMenu(self.lis.eq(i));
                         }
                         self.panels = self.panels.add( $panel );
                     }
@@ -590,6 +556,59 @@ define('jquery-nos-ostabs',
                 self._tabsWidth();
             },
 
+            _initSortable: function() {
+                var self = this,
+                    o = self.options;
+
+                self.uiOstabsTabs.sortable({
+                    items: 'li:not(.nos-ostabs-newtab)',
+                    appendTo: self.uiOstabsSuperPanelContent,
+                    cursor: 'move',
+                    delay: 250,
+                    scroll: false,
+                    helper: 'clone',
+                    tolerance: 'pointer',
+                    axis: 'x',
+                    zIndex : 100000,
+                    placeholder: "ui-state-highlight",
+                    forcePlaceholderSize: true,
+                    start: function() {
+                        self.sorting = true;
+                    },
+                    stop: function() {
+                        self.sorting = false;
+                    },
+                    update: function() {
+                        self._trigger( "drag", null );
+                        self.lis = self.uiOstabsAppsTab
+                            .add( self.uiOstabsTabs )
+                            .find( "li" );
+                        self.anchors = self.lis.map(function(i) {
+                            var anchor = $( "a", this )[ 0 ];
+                            self.element.find( self._sanitizeSelector( $(anchor).data('anchor.tabs') ) )
+                                .find( '.nos-ostabs-panel-content' )
+                                .data( 'nos-ostabs-index', i );
+                            return anchor;
+                        });
+
+                        self._tabsWidth();
+                    }
+                });
+
+                return self;
+            },
+
+            _refreshSortable: function() {
+                var self = this,
+                    o = self.options;
+
+                if (self.uiOstabsTabs.data('ui-sortable')) {
+                    self.uiOstabsTabs.sortable('refresh');
+                }
+
+                return self;
+            },
+
             _getIndex: function( index ) {
                 var self = this;
 
@@ -607,26 +626,23 @@ define('jquery-nos-ostabs',
                 return index;
             },
 
-            _actions: function($panel, index) {
+            _contextMenu: function(li) {
                 var self = this,
                     o = self.options,
-                    li = self.lis.eq(index),
-                    a =  self.anchors.eq(index),
                     closable = li.not( '.nos-ostabs-appstab' ).length,
-                    actions = [], $action_bar, $links;
+                    actions = [], $action_bar, $links,
+                    date,
+                    id = li.attr('id');
 
-                $panel.find('.nos-ostabs-actions').remove();
-
-                $action_bar = $( '<div></div>' )
-                    .addClass( 'nos-ostabs-actions ui-state-active' )
-                    .prependTo( $panel );
-
-                if (!touchDevice && !closable) {
-                    return;
+                if (!id) {
+                    date = new Date();
+                    id = date.getDate() + "_" + date.getHours() + "_" + date.getMinutes() + "_" + date.getSeconds() + "_" + date.getMilliseconds();
+                    li.attr('id', id);
                 }
 
                 if (closable) {
-                    actions.push({
+                    actions.push(
+                        {
                             classes: 'nos-ostabs-close',
                             click: function() {
                                 self.remove( self.lis.index(li) ); // Recalculate index if tab have been move
@@ -652,10 +668,11 @@ define('jquery-nos-ostabs',
                             label: o.texts.closeOtherTabs,
                             iconClass: 'ui-icon-closethick',
                             iconUrl: 'static/novius-os/admin/novius-os/img/16/close.png'
-                        });
+                        }
+                    );
                 }
 
-                if (!touchDevice || !closable) {
+                if (!closable) {
                     actions.push({
                         classes: 'nos-ostabs-close-all',
                         click: function() {
@@ -684,103 +701,109 @@ define('jquery-nos-ostabs',
                         iconClass: 'ui-icon-refresh',
                         iconUrl: 'static/novius-os/admin/novius-os/img/16/refresh.png'
                     });
-                }
 
-
-                if (touchDevice) {
-                    $links = $( '<div></div>' )
-                        .addClass( 'nos-ostabs-actions-links' )
-                        .prependTo( $action_bar );
-
-                    $.each(actions, function() {
-                        var action = this,
-                            link = $('<a href="#"></a>')
-                                .addClass(action.classes)
-                                .click(function() {
-                                    return action.click();
-                                })
-                                .appendTo( $links );
-                        $('<span></span>').addClass('ui-icon ' + action.iconClass)
-                            .html(action.label)
-                            .appendTo(link);
-                        $('<span></span>').html(action.label)
-                            .appendTo(link);
-                    });
-                } else {
-                    if (('HTMLMenuItemElement' in window)) {
-                        self.element.find('#' + $panel.attr('id') + '-menucontext').remove();
-
-                        $links = $('<menu></menu>')
-                            .attr({
-                                'type': 'context',
-                                id: $panel.attr('id') + '-menucontext'
-                            })
-                            .prependTo(self.element);
-
-                        $.each(actions, function() {
-                            var action = this;
-                            $('<menuitem></menuitem>')
-                                .attr({
-                                    label: 'Novius OS - ' + action.label,
-                                    icon: action.iconUrl
-                                })
-                                .click(function() {
-                                    return action.click();
-                                })
-                                .appendTo($links);
-                        });
-
-                        li.attr('contextmenu', $panel.attr('id') + '-menucontext');
-                    } else {
-                        li.off('contextmenu.nosostabs')
-                            .on('contextmenu.nosostabs', function(e) {
-                                var links;
-
-                                e.preventDefault();
-                                e.stopPropagation();
-
-                                self.element.find('ul.nos-ostabs-menuactions').remove();
-
-                                links = $( '<ul></ul>' )
-                                    .addClass( 'nos-ostabs-menuactions' )
-                                    .prependTo(self.element);
-
-                                $.each(actions, function() {
-                                    var action = this,
-                                        menu = $('<li><a href="#"></a></li>')
-                                            .appendTo(links)
-                                            .find('a')
-                                            .click(function() {
-                                                action.click();
-                                                setTimeout(function() {
-                                                    links.remove();
-                                                }, 200)
-                                                return false;
-                                            });
-                                    $('<span></span>').addClass('ui-icon wijmo-wijmenu-icon-left ' + action.iconClass)
-                                        .appendTo(menu);
-                                    $('<span></span>').addClass('wijmo-wijmenu-text')
-                                        .html(action.label)
-                                        .appendTo(menu);
-                                });
-
-                                links.wijmenu({
-                                        orientation: 'vertical'
-                                    })
-                                    .closest('.wijmo-wijmenu')
-                                    .position({
-                                        my: 'center top',
-                                        at: 'center bottom',
-                                        of: li
-                                    });
+                    if (touchDevice)  {
+                        actions.push({
+                            classes: 'nos-ostabs-move',
+                            click: function() {
+                                var offset = li.offset(),
+                                    $links = li.data('contextmenu.tabs'),
+                                    $layer = $('<div></div>');
+                                self._initSortable();
 
                                 setTimeout(function() {
-                                    $(document).on('click.nosostabs', function (e) {
-                                        $(document).off('click.nosostabs');
-                                        links.remove();
+                                    $links.noscontextmenu('destroy').remove();
+                                }, 200);
+
+                                li.simulate('mousedown', {
+                                    clientX: offset.left,
+                                    clientY: offset.top
+                                });
+
+                                $layer.css({
+                                    position: 'absolute',
+                                    left: 0,
+                                    right: 0,
+                                    top: 0,
+                                    bottom: 0,
+                                    zIndex: '100000'
+                                })
+                                    .appendTo('body')
+                                    .on('click', function(e) {
+                                        var offsettarget = $(e.target).offset();
+                                        $layer.remove();
+                                        li.simulate('mouseup', {
+                                            clientX: offsettarget.left,
+                                            clientY: offset.top
+                                        });
+                                        self.uiOstabsTabs.sortable('destroy');
+                                        li.data('createcontextmenu.tabs', false);
+                                        self._contextMenu(li);
+                                        return false;
                                     });
-                                }, 500)
+                                return false;
+                            },
+                            label: o.texts.moveTab,
+                            iconClass: 'ui-icon-arrow-4'
+                        });
+                    }
+                }
+
+                if (('HTMLMenuItemElement' in window)) {
+                    self.element.find('#' + li.attr('id') + '-menucontext').remove();
+
+                    $links = $('<menu></menu>')
+                        .attr({
+                            'type': 'context',
+                            id: li.attr('id') + '-menucontext'
+                        })
+                        .prependTo(self.element);
+
+                    $.each(actions, function() {
+                        var action = this;
+                        $('<menuitem></menuitem>')
+                            .attr({
+                                label: 'Novius OS - ' + action.label,
+                                icon: action.iconUrl
+                            })
+                            .click(function() {
+                                return action.click();
+                            })
+                            .appendTo($links);
+                    });
+
+                    li.attr('contextmenu', li.attr('id') + '-menucontext');
+                } else {
+                    if (!li.data('createcontextmenu.tabs')) {
+                        li.data('createcontextmenu.tabs', true);
+                        li.one('mouseenter', function(e) {
+                            $links = $('<ul></ul>')
+                                .addClass('nos-ostabs-menuactions')
+                                .prependTo(self.element);
+
+                            $.each(actions, function() {
+                                var action = this,
+                                    menu = $('<li><a href="#"></a></li>')
+                                        .appendTo($links)
+                                        .find('a')
+                                        .click(function(e) {
+                                            $links.noscontextmenu('hideAllMenus', e);
+                                            action.click();
+                                            return false;
+                                        });
+                                $('<span></span>').addClass('ui-icon wijmo-wijmenu-icon-left ' + action.iconClass)
+                                    .appendTo(menu);
+                                $('<span></span>').addClass('wijmo-wijmenu-text')
+                                    .html(action.label)
+                                    .appendTo(menu);
                             });
+
+                            $links.noscontextmenu({
+                                trigger: '#' + id
+                            });
+
+                            li.data('contextmenu.tabs', $links);
+                        });
                     }
                 }
             },
@@ -853,9 +876,9 @@ define('jquery-nos-ostabs',
                     $li.insertBefore( self.lis[ self.lis.length - 1 ] );
                     index = self.lis.length - 1;
                 }
-                self.uiOstabsTabs.sortable( 'refresh' );
 
-                self._tabify();
+                self._refreshSortable()
+                    ._tabify();
 
                 if ( self.anchors.length == 1 ) {
                     self.select(0);
@@ -947,7 +970,7 @@ define('jquery-nos-ostabs',
                 notSelectAfter = notSelectAfter || false;
                 index = self._getIndex( index );
                 var $li = self.lis.eq( index ),
-                    $a = self.anchors.eq( index ),
+                    $contextmenu,
                     $panel = self.element.find( self._sanitizeSelector( $(self.anchors[ index ]).data('anchor.tabs') )),
                     openIndex = 0,
                     openRank = 0;
@@ -960,6 +983,10 @@ define('jquery-nos-ostabs',
                 }
 
                 if ( $li.not( '.nos-ostabs-appstab' ).not( '.nos-ostabs-newtab' ).length ) {
+                    $contextmenu = $li.data('contextmenu.tabs');
+                    if ($contextmenu) {
+                        $contextmenu.noscontextmenu('destroy').remove();
+                    }
                     $li.remove();
                     $panel.remove();
                 } else {
@@ -986,7 +1013,7 @@ define('jquery-nos-ostabs',
                 }
 
                 if ( $li.not( '.nos-ostabs-appstab' ).not( '.nos-ostabs-newtab' ).length ) {
-                    $( '> *', $panel ).not( '.nos-ostabs-actions' ).remove();
+                    $( '> *', $panel ).remove();
                 }
                 $panel.addClass( "nos-ostabs-hide" )
                     .removeData('callbacks.ostabs');
@@ -1066,7 +1093,7 @@ define('jquery-nos-ostabs',
                         .append($newA.children())
                         .data("href.tabs", tab.url );
 
-                    self._actions($panel, index);
+                    self._contextMenu($li);
 
                     $newLi.remove();
 
@@ -1121,7 +1148,7 @@ define('jquery-nos-ostabs',
                 }
 
                 var panel = self.element.find( self._sanitizeSelector( $(a).data('anchor.tabs') )),
-                    content = $( '> *', panel ).not( '.nos-ostabs-actions' ).length;
+                    content = $( '> *', panel ).length;
 
                 if (content !== 0) {
                     self.element.dequeue( "tabs" );

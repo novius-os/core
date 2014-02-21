@@ -20,6 +20,8 @@ return array(
         'jquery' => 'static/novius-os/admin/vendor/jquery/jquery-1.10.2',
         'jquery-migrate' => 'static/novius-os/admin/vendor/jquery/jquery-migrate-1.2.1',
 
+        'jquery.simulate' => 'static/novius-os/admin/vendor/jquery/simulate/jquery.simulate',
+        'jquery.taphold' => 'static/novius-os/admin/vendor/jquery/taphold/taphold',
         'jquery.cookie' => 'static/novius-os/admin/vendor/jquery/cookie/jquery.cookie',
         'jquery.globalize' => 'static/novius-os/admin/vendor/jquery/globalize/globalize',
         'jquery.globalize.cultures' => 'static/novius-os/admin/vendor/jquery/globalize/cultures/globalize.cultures',
@@ -130,6 +132,7 @@ return array(
         'jquery-nos-validate' => 'static/novius-os/admin/novius-os/js/jquery.novius-os.validate',
         'jquery-nos-wysiwyg' => 'static/novius-os/admin/novius-os/js/jquery.novius-os.wysiwyg',
         'jquery-nos' => 'static/novius-os/admin/novius-os/js/jquery.novius-os',
+        'jquery-nos-contextmenu' => 'static/novius-os/admin/novius-os/js/jquery.novius-os.contextmenu',
         'jquery-nos-loadspinner' => 'static/novius-os/admin/novius-os/js/jquery.novius-os.loadspinner',
         'jquery-nos-ostabs' => 'static/novius-os/admin/novius-os/js/jquery.novius-os.ostabs',
         'jquery-nos-preview' => 'static/novius-os/admin/novius-os/js/jquery.novius-os.preview',
@@ -165,6 +168,8 @@ return array(
     ),
     'shim' => array(
         'jquery-migrate' => array('jquery'),
+        'jquery.simulate' => array('jquery'),
+        'jquery.taphold' => array('jquery'),
         'jquery.cookie' => array('jquery'),
         'jquery.globalize' => array('jquery'),
         'jquery.globalize.cultures' => array('jquery', 'jquery.globalize'),
@@ -330,6 +335,8 @@ return array(
         'jquery' => 'static/novius-os/admin/bundle/vendor.min',
         'jquery-migrate' => 'static/novius-os/admin/vendor/jquery/jquery-migrate-1.2.1',
 
+        'jquery.simulate' => 'static/novius-os/admin/vendor/jquery/simulate/jquery.simulate.min',
+        'jquery.taphold' => 'static/novius-os/admin/vendor/jquery/taphold/taphold.min',
         'jquery.cookie' => 'static/novius-os/admin/bundle/vendor.min',
         'jquery.globalize' => 'static/novius-os/admin/bundle/vendor.min',
         'jquery.globalize.cultures' => 'static/novius-os/admin/bundle/vendor.min',

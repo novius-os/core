@@ -452,22 +452,9 @@ body.nos-background {
     }
 }
 
-.nos-ostabs-touch {
-    #noviusospanel {
-        .nos-ostabs-actions {
-            top: -21px;
-            height: 21px;
-            border-width: 1px;
-        }
-    }
-}
-
 #noviusospanel {
     background: rgba(255, 255, 255, 0.3);
 
-    .nos-ostabs-actions {
-        border-color: #A8A8A8;
-    }
     ul.apps {
       margin : 40px 30px 15px 60px;
 

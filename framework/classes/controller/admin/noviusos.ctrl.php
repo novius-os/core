@@ -120,7 +120,8 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
                 'confirmCloseTabs' => __('Are you sure to want to close all tabs?'),
                 'confirmCloseOtherTabs' => __('Are you sure to want to close all other tabs?'),
                 'reloadTab' => __('Reload tab'),
-                'spinner' => __('Loading...')
+                'moveTab' => __('Move tab'),
+                'spinner' => __('Loading...'),
             ),
         );
 

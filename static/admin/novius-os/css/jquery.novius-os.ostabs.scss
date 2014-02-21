@@ -192,6 +192,7 @@ body {
 		top : 45px;
 		bottom : 0px;
 		right : 0px;
+        border-top: 1px solid #7096AB;
 
 		div.nos-ostabs-panel-content {
 			position : absolute;
@@ -211,73 +212,12 @@ body {
 			width : 100%;
 			height : 100%;
 		}
-
-		.nos-ostabs-actions {
-			position: absolute;
-			top: -1px;
-			right: -1px;
-			left: -1px;
-			height: 1px;
-            background: #B9E0F5;
-            @include box-sizing(border-box);
-            @include box-shadow(none);
-            border-bottom-width: 0;
-
-		    .nos-ostabs-actions-links {
-				position : absolute;
-				bottom : 0px;
-				right : 5px;
-				line-height : 18px;
-				z-index : 2;
-
-				a {
-					position : relative;
-					text-decoration : none;
-					font-size : 0.8em;
-					margin-left : 10px;
-					float : right;
-					display : block;
-
-					.ui-icon {
-						float : left;
-					}
-				}
-
-				a.nos-ostabs-unpin {
-					display : none;
-				}
-		    }
-		}
-	}
-
-	.nos-ostabs-panel.ui-state-pined {
-		.nos-ostabs-actions {
-
-			a.nos-ostabs-pin {
-				display : none;
-			}
-
-			a.nos-ostabs-unpin {
-				display : inline;
-			}
-		}
 	}
 
 	.nos-ostabs-hide {
 		display: none !important;
 	}
 }
-.nos-ostabs-touch {
-    .nos-ostabs-panel {
-        top : 65px;
-
-        .nos-ostabs-actions {
-            top: -21px;
-            height: 21px;
-        }
-    }
-}
-
 
 /* Specifique */
 .nos-ostabs {
