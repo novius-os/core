@@ -20,18 +20,15 @@ abstract class Model_DataMany extends \Nos\Orm\Model
     
     //relation names used to create the link with data between two models
     protected static $_rel_to_name = '';
-    protected static $_rel_from_name = '';
 
     protected static $_has_one = array(
-        //has one works the same way as a belongs to, it will be used to determine properties
     );
 
     protected static $_belongs_to = array(
     );
 
-    //related models (optionals)
+    //related model (optional)
     protected static $_model_to = '';
-    protected static $_model_from = '';
 
 
     public static function _init() {
@@ -39,25 +36,13 @@ abstract class Model_DataMany extends \Nos\Orm\Model
         if (empty(static::$_rel_to_name)) {
             static::$_rel_to_name = reset(array_keys(static::$_has_one));//get the first "has_one" relation and assume it's the right one
         }
-        //The set the related model
+        //Then set the related model
         if (empty(static::$_model_to)) {
             $relation_to = static::$_has_one[static::$_rel_to_name];
             if (empty($relation_to)) {
                 throw new \FuelException('A related model is needed in a has_one relation for '.get_called_class());
             }
             static::$_model_to = $relation_to['model_to'];
-        }
-
-        //Then do the same for the belongs_to model and relation name
-        if (empty(static::$_rel_from_name)) {
-            static::$_rel_from_name = reset(array_keys(static::$_belongs_to));//get the first "belongs_to" relation and assume it's the right one
-        }
-        if (empty(static::$_model_from)) {
-            $relation_from = static::$_belongs_to[static::$_rel_from_name];
-            if (empty($relation_from)) {
-                throw new \FuelException('A related model is needed in a belongs_to relation for '.get_called_class());
-            }
-            static::$_model_from = $relation_from['model_to'];
         }
     }
 
@@ -75,15 +60,10 @@ abstract class Model_DataMany extends \Nos\Orm\Model
         } catch (\OutOfBoundsException $e) {
             //if the Model_DataMany does not have such a property, try to retrieve it from the related model
             $model_to = static::$_model_to;
-            $model_from = static::$_model_from;
             if ((array_key_exists($name, $model_to::properties())
                     || array_key_exists($name, $model_to::relations()))
                 && !empty($this->{static::$_rel_to_name})) {
                 return $this->{static::$_rel_to_name}->get($name);
-            } elseif ((array_key_exists($name, $model_from::properties())
-                    || array_key_exists($name, $model_from::relations()))
-                && !empty($this->{static::$_rel_from_name})) {
-                return $this->{static::$_rel_from_name}->get($name);
             }
             throw new \OutOfBoundsException('Property "'.$name.'" not found for '.get_class($this).' or its related model.');
         }
