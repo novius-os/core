@@ -17,6 +17,10 @@ abstract class Model_DataMany extends \Nos\Orm\Model
     protected static $_properties = array(
         //the two keys above and data added to the simulated relation
     );
+    
+    //relation names used to create the link with data between two models
+    protected static $_rel_to_name = '';
+    protected static $_rel_from_name = '';
 
     protected static $_has_one = array(
         //has one works the same way as a belongs to, it will be used to determine properties
@@ -33,15 +37,19 @@ abstract class Model_DataMany extends \Nos\Orm\Model
      */
     public function & __get($name)
     {
-        $relation_to = reset(static::$_has_one);
-        $relation_to_name = reset(array_keys(static::$_has_one));
+        if (empty(static::$_rel_to_name)) {
+            static::$_rel_to_name = reset(array_keys(static::$_has_one));//get the first "has_one" relation and assume it's the right one
+        }
+        $relation_to = static::$_has_one[static::$_rel_to_name];
         if (empty($relation_to)) {
             throw new \FuelException('A related model is needed in a has_one relation for '.get_called_class());
         }
         $model_to = $relation_to['model_to'];
 
-        $relation_from = reset(static::$_belongs_to);
-        $relation_from_name = reset(array_keys(static::$_belongs_to));
+        if (empty(static::$_rel_from_name)) {
+            static::$_rel_from_name = reset(array_keys(static::$_belongs_to));//get the first "belongs_to" relation and assume it's the right one
+        }
+        $relation_from = static::$_belongs_to[static::$_rel_from_name];
         if (empty($relation_from)) {
             throw new \FuelException('A related model is needed in a belongs_to relation for '.get_called_class());
         }
@@ -50,12 +58,12 @@ abstract class Model_DataMany extends \Nos\Orm\Model
 
         if ((array_key_exists($name, $model_to::properties())
                 || array_key_exists($name, $model_to::relations()))
-            && !empty($this->{$relation_to_name})) {
-            return $this->{$relation_to_name}->get($name);
+            && !empty($this->{static::$_rel_to_name})) {
+            return $this->{static::$_rel_to_name}->get($name);
         } elseif ((array_key_exists($name, $model_from::properties())
                 || array_key_exists($name, $model_from::relations()))
-            && !empty($this->{$relation_from_name})) {
-            return $this->{$relation_from_name}->get($name);
+            && !empty($this->{static::$_rel_from_name})) {
+            return $this->{static::$_rel_from_name}->get($name);
         }
         return parent::__get($name);
     }
