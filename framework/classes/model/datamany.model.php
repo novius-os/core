@@ -70,17 +70,22 @@ abstract class Model_DataMany extends \Nos\Orm\Model
      */
     public function & __get($name)
     {
-        $model_to = static::$_model_to;
-        $model_from = static::$_model_from;
-        if ((array_key_exists($name, $model_to::properties())
-                || array_key_exists($name, $model_to::relations()))
-            && !empty($this->{static::$_rel_to_name})) {
-            return $this->{static::$_rel_to_name}->get($name);
-        } elseif ((array_key_exists($name, $model_from::properties())
-                || array_key_exists($name, $model_from::relations()))
-            && !empty($this->{static::$_rel_from_name})) {
-            return $this->{static::$_rel_from_name}->get($name);
+        try {
+            return parent::__get($name);
+        } catch (\OutOfBoundsException $e) {
+            //if the Model_DataMany does not have such a property, try to retrieve it from the related model
+            $model_to = static::$_model_to;
+            $model_from = static::$_model_from;
+            if ((array_key_exists($name, $model_to::properties())
+                    || array_key_exists($name, $model_to::relations()))
+                && !empty($this->{static::$_rel_to_name})) {
+                return $this->{static::$_rel_to_name}->get($name);
+            } elseif ((array_key_exists($name, $model_from::properties())
+                    || array_key_exists($name, $model_from::relations()))
+                && !empty($this->{static::$_rel_from_name})) {
+                return $this->{static::$_rel_from_name}->get($name);
+            }
+            throw new \OutOfBoundsException('Property "'.$name.'" not found for '.get_class($this).' or its related model.');
         }
-        return parent::__get($name);
     }
 }
