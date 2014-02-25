@@ -16,6 +16,13 @@ class Orm_Behaviour_DataMany extends Orm_Behaviour
 {
     protected static $_former_ids = array();
 
+    public function __construct($class) {
+        parent::__construct($class);
+        if (empty($this->_properties['relation'])) {
+            throw new \Exception('A relation name must be provided to use Behaviour DataMany on class '.$class);
+        }
+    }
+
     /**
      * methods below check if some keys won't be used anymore in order to delete them afterward
      */
