@@ -29,6 +29,39 @@ abstract class Model_DataMany extends \Nos\Orm\Model
     protected static $_belongs_to = array(
     );
 
+    //related models (optionals)
+    protected static $_model_to = '';
+    protected static $_model_from = '';
+
+
+    public static function _init() {
+        //First set the name of the has_one relation if needed
+        if (empty(static::$_rel_to_name)) {
+            static::$_rel_to_name = reset(array_keys(static::$_has_one));//get the first "has_one" relation and assume it's the right one
+        }
+        //The set the related model
+        if (empty(static::$_model_to)) {
+            $relation_to = static::$_has_one[static::$_rel_to_name];
+            if (empty($relation_to)) {
+                throw new \FuelException('A related model is needed in a has_one relation for '.get_called_class());
+            }
+            static::$_model_to = $relation_to['model_to'];
+        }
+
+        //Then do the same for the belongs_to model and relation name
+        if (empty(static::$_rel_from_name)) {
+            static::$_rel_from_name = reset(array_keys(static::$_belongs_to));//get the first "belongs_to" relation and assume it's the right one
+        }
+        if (empty(static::$_model_from)) {
+            $relation_from = static::$_belongs_to[static::$_rel_from_name];
+            if (empty($relation_from)) {
+                throw new \FuelException('A related model is needed in a belongs_to relation for '.get_called_class());
+            }
+            static::$_model_from = $relation_from['model_to'];
+        }
+    }
+
+
     /**
      * get on the model or on the related model
      * => when trying to have access to a related model, there's no need to use two linked relation, just one is needed
@@ -37,25 +70,8 @@ abstract class Model_DataMany extends \Nos\Orm\Model
      */
     public function & __get($name)
     {
-        if (empty(static::$_rel_to_name)) {
-            static::$_rel_to_name = reset(array_keys(static::$_has_one));//get the first "has_one" relation and assume it's the right one
-        }
-        $relation_to = static::$_has_one[static::$_rel_to_name];
-        if (empty($relation_to)) {
-            throw new \FuelException('A related model is needed in a has_one relation for '.get_called_class());
-        }
-        $model_to = $relation_to['model_to'];
-
-        if (empty(static::$_rel_from_name)) {
-            static::$_rel_from_name = reset(array_keys(static::$_belongs_to));//get the first "belongs_to" relation and assume it's the right one
-        }
-        $relation_from = static::$_belongs_to[static::$_rel_from_name];
-        if (empty($relation_from)) {
-            throw new \FuelException('A related model is needed in a belongs_to relation for '.get_called_class());
-        }
-        $model_from = $relation_from['model_to'];
-
-
+        $model_to = static::$_model_to;
+        $model_from = static::$_model_from;
         if ((array_key_exists($name, $model_to::properties())
                 || array_key_exists($name, $model_to::relations()))
             && !empty($this->{static::$_rel_to_name})) {
