@@ -32,10 +32,10 @@ class Orm_Behaviour_DataMany extends Orm_Behaviour
     }
 
     public function after_save(Model $item) {
-        $this->to_delete($item);
+        $this->toDelete($item);
     }
 
-    public function to_delete(Model $item) {
+    protected function toDelete(Model $item) {
         $class = get_class($item);
         $pk = implode('.', (array) $item->primary_key());//primary key is an array
         $former_keys = static::$_former_ids[$class.'::'.$pk];
@@ -68,6 +68,6 @@ class Orm_Behaviour_DataMany extends Orm_Behaviour
     }
 
     public function after_delete(Model $item) {
-        $this->to_delete($item);
+        $this->toDelete($item);
     }
 }
