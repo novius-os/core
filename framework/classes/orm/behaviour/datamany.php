@@ -24,8 +24,10 @@ class Orm_Behaviour_DataMany extends Orm_Behaviour
         $relation = $this->_properties['relation'];
         $diff = $item->get_diff();
         if (!empty($diff[0]) && !empty($diff[0][$relation])) {
+            $class = get_class($item);
+            $pk = implode('.', (array) $item->primary_key());//primary key is an array
             $new_keys = array_keys($item->{$relation});
-            static::$_former_ids = array_diff($diff[0][$relation], $new_keys);
+            static::$_former_ids[$class.'::'.$pk] = array_diff($diff[0][$relation], $new_keys);
         }
     }
 
@@ -34,7 +36,9 @@ class Orm_Behaviour_DataMany extends Orm_Behaviour
     }
 
     public function to_delete(Model $item) {
-        $former_keys = static::$_former_ids;
+        $class = get_class($item);
+        $pk = implode('.', (array) $item->primary_key());//primary key is an array
+        $former_keys = static::$_former_ids[$class.'::'.$pk];
         $delete = !empty($former_keys);
         if ($delete) {
             $relation_name = $this->_properties['relation'];
@@ -56,8 +60,10 @@ class Orm_Behaviour_DataMany extends Orm_Behaviour
     }
 
     public function before_delete(Model $item) {
+        $class = get_class($item);
+        $pk = implode('.', (array) $item->primary_key());//primary key is an array
         $relation = $this->_properties['relation'];
-        static::$_former_ids = array_keys($item->{$relation});
+        static::$_former_ids[$class.'::'.$pk] = array_keys($item->{$relation});
         $item->{$relation} = array();
     }
 
