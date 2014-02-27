@@ -112,9 +112,11 @@ class Orm_Behaviour_Sortable extends Orm_Behaviour
         if (isset($this->_sort_change[$item::implode_pk($item)])) {
             unset($this->_sort_change[$item::implode_pk($item)]);
             $sort_property = $this->_properties['sort_property'];
+            $sort_twins = \Arr::get($this->_properties, 'sort_twins', true);
             $twinnable = $item->behaviours('Nos\Orm_Behaviour_Twinnable');
             $contextable = $item->behaviours('Nos\Orm_Behaviour_Contextable');
-            if (!empty($twinnable) && !$item->is_main_context()) {
+
+            if ($sort_twins && !empty($twinnable) && !$item->is_main_context()) {
                 $obj_main = $item->find_main_context();
                 $obj_main->set($sort_property, $item->get($sort_property));
                 $obj_main->save();
@@ -129,7 +131,7 @@ class Orm_Behaviour_Sortable extends Orm_Behaviour
             );
             if (!empty($tree)) {
                 $parent = $item->get_parent();
-                if (!empty($twinnable)) {
+                if ($sort_twins && !empty($twinnable)) {
                     if (!empty($parent)) {
                         $parents = $item::find('all', array(
                             'where' => array(
@@ -151,20 +153,24 @@ class Orm_Behaviour_Sortable extends Orm_Behaviour
                     $params['where'] = array(array('parent', $parent));
                     if (!empty($contextable)) {
                         $params['where'][] = array($contextable['context_property'], $item->{$contextable['context_property']});
+                    } elseif (!empty($twinnable)) {
+                        $params['where'][] = array($twinnable['context_property'], $item->{$twinnable['context_property']});
                     }
                 }
             } else {
-                if (!empty($twinnable)) {
+                if ($sort_twins && !empty($twinnable)) {
                     $params['where'] = array(array($twinnable['is_main_property'], true));
                 } elseif (!empty($contextable)) {
                     $params['where'] = array(array($contextable['context_property'], $item->{$contextable['context_property']}));
+                } elseif (!empty($twinnable)) {
+                    $params['where'] = array(array($twinnable['context_property'], $item->{$twinnable['context_property']}));
                 }
             }
             $unsorted = $item::find('all', $params);
             $i = 1;
             $pk = \Arr::get($item->primary_key(), 0);
             foreach ($unsorted as $u) {
-                if (!empty($twinnable)) {
+                if ($sort_twins && !empty($twinnable)) {
                     $item::query()->set($sort_property, $i)->where($twinnable['common_id_property'], $u->{$twinnable['common_id_property']})->update();
                 } else {
                     $item::query()->set($sort_property, $i)->where($pk, $u->{$pk})->update();
