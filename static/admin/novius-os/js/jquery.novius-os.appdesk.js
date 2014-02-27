@@ -95,6 +95,7 @@ define('jquery-nos-appdesk',
             itemSelected : null,
             variantColumnsProperties: {'visible': true, 'width': true, 'showFilter': true},
             variantInspectorsProperties: {'hide': true, 'vertical': true},
+            hasInspectorHideOnMultiContext: false,
 
             _create: function() {
                 var self = this,
@@ -108,6 +109,13 @@ define('jquery-nos-appdesk',
                 }
 
                 self.element.nosToolbar('create');
+
+                self._createSplitter();
+            },
+
+            _createSplitter: function() {
+                var self = this,
+                    o = self.options;
 
                 self.uiSplitterVertical = $('<div></div>').addClass('nos-appdesk-splitter-v')
                     .appendTo(self.element);
@@ -164,6 +172,8 @@ define('jquery-nos-appdesk',
                 self.uiTreeGrid = $('<table></table>').appendTo(self.uiSplitterHorizontalBottom);
 
                 self.uiThumbnail = $('<div></div>').appendTo(self.uiSplitterHorizontalBottom);
+
+                return self;
             },
 
             _init: function() {
@@ -202,6 +212,8 @@ define('jquery-nos-appdesk',
                         o.selectedContexts.push(Object.keys(o.contexts)[0]);
                     }
                 }
+
+                self.isMultiContextSelected = o.selectedContexts.length > 1;
 
                 self._css()
                     ._uiToolbar()
@@ -435,7 +447,9 @@ define('jquery-nos-appdesk',
 
             _selectContexts : function() {
                 var self = this,
-                    o = self.options;
+                    o = self.options,
+                    isMultiContextSelected = o.selectedContexts.length > 1,
+                    appdeskChangeReloadEvent;
 
                 self.uiToolbarContextsDialog.wijdialog('close');
                 self._uiToolbarContextsButtonLabel();
@@ -447,10 +461,31 @@ define('jquery-nos-appdesk',
                     self.uiInspectorsTags.wijsuperpanel('destroy');
                 }
                 self.uiInspectorsTags.empty().css('width', 'auto');
-                self._uiList();
 
-                self.dispatcher.data('nosContext', o.selectedContexts)
-                    .trigger('contextChange');
+                self.dispatcher.data('nosContext', o.selectedContexts);
+
+                if (self.hasInspectorHideOnMultiContext && self.isMultiContextSelected != isMultiContextSelected) {
+                    self.dispatcher.off('contextChange');
+
+                    self.uiSplitterVertical.remove();
+                    self._createSplitter()
+                        ._uiInspectorsPopulate()
+                        ._uiSplitters()
+                        ._uiInspectorsInit()
+                        ._uiSearchBar()
+                        ._uiList();
+
+                    appdeskChangeReloadEvent = self.dispatcher.data('appdeskChangeReloadEvent');
+                    if ($.isFunction(appdeskChangeReloadEvent)) {
+                        self.dispatcher.on('contextChange', appdeskChangeReloadEvent);
+                    }
+                } else {
+                    self._uiList();
+
+                    self.dispatcher.trigger('contextChange')
+                }
+
+                self.isMultiContextSelected = isMultiContextSelected;
 
                 return self;
             },
@@ -740,7 +775,10 @@ define('jquery-nos-appdesk',
                     o = self.options;
 
                 $.each(o.inspectors, function() {
-                    if (!this.hide) {
+                    if (this.multiContextHide) {
+                        self.hasInspectorHideOnMultiContext = true;
+                    }
+                    if (!this.hide && (!this.multiContextHide || o.selectedContexts.length === 1)) {
                         $('<li></li>').addClass('nos-appdesk-inspector ui-widget-content')
                             .data('inspector', $.extend({
                                 loadingText: o.texts.loading
@@ -1957,34 +1995,36 @@ define('jquery-nos-appdesk',
                             params.reloadEvent = [params.reloadEvent];
                         }
                         var listenEvent = function() {
-                            var match = [];
-                            $.each(params.reloadEvent, function(i, reloadEvent) {
-                                if ($.type(reloadEvent) === 'string') {
-                                    // Reload the grid if a action on a same language's item occurs
-                                    // Or if a update or a insert on a other language's item occurs
-                                    if (dispatcher.data('nosContext')) {
-                                        match.push({
-                                            name : reloadEvent,
-                                            context : dispatcher.data('nosContext')
-                                        });
+                                var match = [];
+                                $.each(params.reloadEvent, function(i, reloadEvent) {
+                                    if ($.type(reloadEvent) === 'string') {
+                                        // Reload the grid if a action on a same language's item occurs
+                                        // Or if a update or a insert on a other language's item occurs
+                                        if (dispatcher.data('nosContext')) {
+                                            match.push({
+                                                name : reloadEvent,
+                                                context : dispatcher.data('nosContext')
+                                            });
+                                        } else {
+                                            match.push({
+                                                name : reloadEvent
+                                            });
+                                        }
                                     } else {
-                                        match.push({
-                                            name : reloadEvent
-                                        });
+                                        match.push(reloadEvent);
                                     }
-                                } else {
-                                    match.push(reloadEvent);
-                                }
-                            });
-                            dispatcher.nosListenEvent(match, function() {
-                                    div.appdesk('gridReload');
-                                }, 'appdeskContext');
-                        };
+                                });
+                                dispatcher.nosListenEvent(match, function() {
+                                        div.appdesk('gridReload');
+                                    }, 'appdeskContext');
+                            },
+                            appdeskChangeReloadEvent = function() {
+                                dispatcher.nosUnlistenEvent('appdeskContext');
+                                listenEvent();
+                            };
                         listenEvent();
-                        dispatcher.on('contextChange', function() {
-                            dispatcher.nosUnlistenEvent('appdeskContext');
-                            listenEvent();
-                        });
+                        dispatcher.data('appdeskChangeReloadEvent', appdeskChangeReloadEvent);
+                        dispatcher.on('contextChange', appdeskChangeReloadEvent);
                     }
 
                     div.bind('reloadView', function(e, newConfig) {
