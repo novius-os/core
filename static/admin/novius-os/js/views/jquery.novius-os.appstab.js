@@ -40,23 +40,122 @@ define('jquery-nos-appstab',
 
                             $launcher.nosAction(tab.action);
                         },
-                        apps = $panel.find('#apps').sortable({
-                            update: function(e, ui) {
-                                ui.item.unbind("click");
-                                ui.item.one("click", function (event) {
-                                    event.preventDefault();
-                                    event.stopImmediatePropagation();
-                                    $(this).click(function(e) {
-                                        click.call(this, e);
+                        launcherWidth = 150,
+                        maxheight = 0,
+                        positions = {},
+                        unPositioned = [],
+                        unPositionedSave = {},
+                        $apps = $panel.find('.app')
+                            .each(function() {
+                                var height = $(this).outerHeight(true);
+                                if ($(this).outerHeight(true) > maxheight) {
+                                    maxheight = height;
+                                }
+                            }),
+                        save = function() {
+                            var launchers = {};
+                            $apps.each(function() {
+                                var $launcher = $(this),
+                                    tab = $launcher.data('launcher');
+                                launchers[tab.key] = {position: tab.position};
+                            });
+                            $apps.nosSaveUserConfig('misc.apps', launchers);
+                        };
+
+                    $apps.each(function() {
+                        var $launcher = $(this),
+                            tab = $launcher.data('launcher');
+                        if (tab.position && (tab.position.left * launcherWidth + launcherWidth) < $panel.width()) {
+                            $launcher.css({
+                                left: (tab.position.left * launcherWidth) + 'px',
+                                top: (tab.position.top * maxheight) + 'px',
+                                visibility: 'visible'
+                            });
+                            positions[tab.position.left] = positions[tab.position.left] || {};
+                            positions[tab.position.left][tab.position.top] = true;
+                        } else {
+                            unPositioned.push($launcher);
+                        }
+                    });
+
+                    if (unPositioned.length) {
+                        $.each(unPositioned, function() {
+                            var $launcher = this,
+                                tab = $launcher.data('launcher'),
+                                left = 0,
+                                top = 0;
+
+                            while (1 == 1) {
+                                if (positions[left] && positions[left][top]) {
+                                    left++;
+                                    if ((left * launcherWidth + launcherWidth) > $panel.width()) {
+                                        left = 0;
+                                        top++;
+                                    }
+                                    continue;
+                                } else {
+                                    tab.position = {
+                                        left: left,
+                                        top: top
+                                    };
+                                    $launcher.css({
+                                        left: (left * launcherWidth) + 'px',
+                                        top: (top * maxheight) + 'px',
+                                        visibility: 'visible'
                                     });
-                                });
-                                var orders = {};
-                                $('.app').each(function(i) {
-                                    orders[$(this).data('launcher').key] = {order: i};
-                                });
-                                $(apps).nosSaveUserConfig('misc.apps', orders);
+                                    positions[left] = positions[left] || {};
+                                    positions[left][top] = true;
+                                    unPositionedSave[$launcher.data('launcher').key] = {
+                                        position: {
+                                            left: left,
+                                            top: top
+                                        }
+                                    };
+                                    break;
+                                }
                             }
                         });
+                        save();
+                    }
+
+                    $apps.draggable({
+                        containement: $panel,
+                        grid: [launcherWidth, maxheight],
+                        scroll: false,
+                        stop: function(e, ui) {
+                            var $item = $(this),
+                                pos = ui.position,
+                                tab = $item.data('launcher'),
+                                left = parseInt(pos.left / launcherWidth),
+                                top = parseInt(pos.top / maxheight);
+
+                            $item.unbind("click");
+                            $item.one("click", function (event) {
+                                event.preventDefault();
+                                event.stopImmediatePropagation();
+                                $(this).click(function(e) {
+                                    click.call(this, e);
+                                });
+                            });
+
+                            if ((pos.left + launcherWidth) > $panel.width() || (positions[left] && positions[left][top])) {
+                                $item.animate({
+                                    left: (tab.position.left * launcherWidth) + 'px',
+                                    top: (tab.position.top * maxheight) + 'px'
+                                }, 200);
+                            } else {
+                                positions[tab.position.left] = positions[tab.position.left] || {};
+                                positions[tab.position.left][tab.position.top] = false;
+                                tab.position = {
+                                    left: left,
+                                    top: top
+                                };
+                                positions[left] = positions[left] || {};
+                                positions[left][top] = true;
+                                save();
+                            }
+                        }
+                    });
 
                     $panel.find('a.app').click(function(e) {
                         click.call(this, e);

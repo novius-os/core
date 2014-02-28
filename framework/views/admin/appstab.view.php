@@ -12,8 +12,7 @@ Nos\I18n::current_dictionary('nos::common');
 
 $id = uniqid('temp_');
 ?>
-<div id="<?= $id ?>">
-    <div id="apps">
+<div id="<?= $id ?>" class="nos-desktop-apps">
 <?php
 foreach ($apps as $app) {
     ?>
@@ -28,7 +27,6 @@ foreach ($apps as $app) {
     <?php
 }
 ?>
-    </div>
 </div>
 <script type="text/javascript">
 require(
