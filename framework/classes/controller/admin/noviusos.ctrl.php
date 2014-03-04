@@ -52,9 +52,9 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
         $user_configuration = unserialize($user->user_configuration);
         $deep_linking_url = \Input::get('tab', null);
 
-        $osTabs = array(
+        $desktopTab = array(
             'panelId' => 'noviusospanel',
-            'url' => 'admin/nos/noviusos/appstab',
+            'url' => 'admin/nos/noviusos/desktop',
             'iconClasses' => 'nos-icon32',
             'iconSize' => 32,
             'label' => 'Novius OS',
@@ -70,7 +70,7 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
             $found = false;
 
             // Native = OS + tray
-            $nativeTabs = array($osTabs);
+            $nativeTabs = array($desktopTab);
 
             // Search native tabs
             foreach ($nativeTabs as $i => $tab) {
@@ -103,10 +103,10 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
         $ostabs = array(
             'initTabs' => array(),
             'trayView' => (string) \View::forge('nos::admin/tray'),
-            'appsTab' => $osTabs,
+            'desktopTab' => $desktopTab,
             'newTab' => array(
                 'panelId' => 'noviusospanel',
-                'url' => 'admin/nos/noviusos/appstab',
+                'url' => 'admin/nos/noviusos/desktop',
                 'iconClasses' => 'nos-icon16 nos-icon16-add',
                 'iconSize' => 16,
             ),
@@ -136,7 +136,7 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
         return $this->template;
     }
 
-    public function action_appstab()
+    public function action_desktop()
     {
         \Nos\Application::cleanApplications();
         $launchers = \Nos\Config_Data::get('launchers', array());
@@ -191,7 +191,7 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
         }
 
         $view = \View::forge(
-            'admin/appstab',
+            'admin/desktop',
             array(
                 'apps' => $apps,
             )

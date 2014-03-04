@@ -16,9 +16,9 @@ define('jquery-nos-ostabs',
         $.widget( "nos.ostabs", {
             options: {
                 initTabs: [], // e.g. [{"url":"http://www.google.com","iconUrl":"img/google-32.png","label":"Google","iconSize":32,"labelDisplay":false},{"url":"http://www.twitter.com","iconClasses":"ui-icon ui-icon-signal-diag","label":"Twitter"}]
-                newTab: 'appsTab', // e.g. {"url":"applications.htm","label":"Open a new tab","iframe":true} or "appsTab" or false
+                newTab: 'desktopTab', // e.g. {"url":"applications.htm","label":"Open a new tab","iframe":true} or "desktopTab" or false
                 trayView: [], // e.g. [{"url":"account.php","iconClasses":"ui-icon ui-icon-contact","label":"Account"},{"url":"customize.htm","iconClasses":"ui-icon ui-icon-gear","label":"Customization"}]
-                appsTab: {}, // e.g. {"panelId":"ospanel","url":"applications.htm","iconUrl":"os.png","label":"My OS","iframe":true} or false
+                desktopTab: {}, // e.g. {"panelId":"ospanel","url":"applications.htm","iconUrl":"os.png","label":"My OS","iframe":true} or false
                 fx: null, // e.g. { height: 'toggle', opacity: 'toggle', duration: 200 }
                 labelMinWidth: 100,
                 labelMaxWidth: 200,
@@ -53,7 +53,7 @@ define('jquery-nos-ostabs',
                 self._tabify( true );
 
                 $(window).resize(function() {
-                    if (o.selected) {
+                    if (o.selected !== null) {
                         self._firePanelEvent(self.panels.eq(o.selected), $.Event('resizePanel'));
                     }
                 });
@@ -144,18 +144,18 @@ define('jquery-nos-ostabs',
                     }
                     self.uiOstabsTray.prependTo(self.uiOstabsHeader);
 
-                    if ( $.isPlainObject(o.appsTab) ) {
-                        self.uiOstabsAppsTab = $( '<ul></ul>' )
-                            .addClass( 'nos-ostabs-appstab  nos-ostabs-nav' )
+                    if ( $.isPlainObject(o.desktopTab) ) {
+                        self.uiOstabsDesktopTab = $( '<ul></ul>' )
+                            .addClass( 'nos-ostabs-desktoptab  nos-ostabs-nav' )
                             .prependTo( self.uiOstabsHeader );
-                        self._add(o.appsTab, self.uiOstabsAppsTab, true)
-                            .addClass( 'nos-ostabs-appstab' )
+                        self._add(o.desktopTab, self.uiOstabsDesktopTab, true)
+                            .addClass( 'nos-ostabs-desktoptab' )
                             .removeClass( 'ui-state-default' );
                     } else {
-                        self.uiOstabsAppsTab = $( '<ul></ul>' );
+                        self.uiOstabsDesktopTab = $( '<ul></ul>' );
                     }
 
-                    self.uiOstabsSuperPanel.css( 'left', self.uiOstabsAppsTab.outerWidth( true ) + 25 )
+                    self.uiOstabsSuperPanel.css( 'left', self.uiOstabsDesktopTab.outerWidth( true ) + 25 )
                         .css( 'right', self.uiOstabsTray.outerWidth( true ) + 35 )
                         .wijsuperpanel({
                             allowResize : false,
@@ -195,8 +195,8 @@ define('jquery-nos-ostabs',
                             label: o.texts.newTab,
                             iconClasses: 'ui-icon ui-icon-circle-plus'
                         }, newTab);
-                    } else if ( newTab && $.isPlainObject(o.appsTab) ) {
-                        newTab = $.extend( {}, o.appsTab, {
+                    } else if ( newTab && $.isPlainObject(o.desktopTab) ) {
+                        newTab = $.extend( {}, o.desktopTab, {
                             label: o.texts.newTab,
                             iconClasses: 'ui-icon ui-icon-circle-plus',
                             iconUrl: '',
@@ -229,12 +229,12 @@ define('jquery-nos-ostabs',
                 }
 
                 var tabOpenRank = [];
-                self.lis = self.uiOstabsAppsTab.add(self.uiOstabsTabs).find("li")
+                self.lis = self.uiOstabsDesktopTab.add(self.uiOstabsTabs).find("li")
                     .each(function(i) {
                         var $li = $(this),
                             tab = $li.data( 'ui-ostab') || {};
 
-                        if (!$li.hasClass('nos-ostabs-appstab') && tab.openRank !== false) {
+                        if (!$li.hasClass('nos-ostabs-desktoptab') && tab.openRank !== false) {
                             tabOpenRank[tab.openRank] = $li;
                         }
                     });
@@ -309,7 +309,7 @@ define('jquery-nos-ostabs',
                 // initialization from scratch
                 if ( init ) {
                     // attach necessary classes for styling
-                    self.uiOstabsTray.add( self.uiOstabsAppsTab )
+                    self.uiOstabsTray.add( self.uiOstabsDesktopTab )
                         .addClass( "nos-ostabs-nav ui-helper-reset ui-helper-clearfix" );
                     self.lis.addClass( "ui-corner-top" );
                     self.panels.addClass( "nos-ostabs-panel ui-widget-content" );
@@ -516,7 +516,7 @@ define('jquery-nos-ostabs',
                                 });
                             }
                             self.element.queue( "tabs", function() {
-                                if (!$li.hasClass('nos-ostabs-appstab')) {
+                                if (!$li.hasClass('nos-ostabs-desktoptab')) {
                                     tab.openRank = self.openRank++;
                                 }
                                 showTab( el, $show );
@@ -541,7 +541,7 @@ define('jquery-nos-ostabs',
                         if (e.which === 2) {
                             var el = this,
                                 $li = $(el).closest( "li"),
-                                closable = $li.not( '.nos-ostabs-appstab' ).length;
+                                closable = $li.not( '.nos-ostabs-desktoptab' ).length;
                             if (closable) {
                                 self.remove( self.lis.index($li), !$li.hasClass( "nos-ostabs-selected" ) );
                             }
@@ -580,7 +580,7 @@ define('jquery-nos-ostabs',
                     },
                     update: function() {
                         self._trigger( "drag", null );
-                        self.lis = self.uiOstabsAppsTab
+                        self.lis = self.uiOstabsDesktopTab
                             .add( self.uiOstabsTabs )
                             .find( "li" );
                         self.anchors = self.lis.map(function(i) {
@@ -629,7 +629,7 @@ define('jquery-nos-ostabs',
             _contextMenu: function(li) {
                 var self = this,
                     o = self.options,
-                    closable = li.not( '.nos-ostabs-appstab' ).length,
+                    closable = li.not( '.nos-ostabs-desktoptab' ).length,
                     actions = [], $action_bar, $links,
                     date,
                     id = li.attr('id');
@@ -656,7 +656,7 @@ define('jquery-nos-ostabs',
                             classes: 'nos-ostabs-close-allothers',
                             click: function() {
                                 if (confirm($.nosCleanupTranslation(o.texts.confirmCloseOtherTabs))) {
-                                    self.lis.not( '.nos-ostabs-appstab' ).not( '.nos-ostabs-newtab' ).each(function() {
+                                    self.lis.not( '.nos-ostabs-desktoptab' ).not( '.nos-ostabs-newtab' ).each(function() {
                                         var $liTemp = this;
                                         if ($liTemp !== li[0]) {
                                             self.remove( self.lis.index($liTemp) );
@@ -677,7 +677,7 @@ define('jquery-nos-ostabs',
                         classes: 'nos-ostabs-close-all',
                         click: function() {
                             if (confirm($.nosCleanupTranslation(o.texts.confirmCloseTabs))) {
-                                self.lis.not( '.nos-ostabs-appstab' ).not( '.nos-ostabs-newtab' ).each(function() {
+                                self.lis.not( '.nos-ostabs-desktoptab' ).not( '.nos-ostabs-newtab' ).each(function() {
                                     self.remove(self.lis.index(this));
                                 });
                             }
@@ -861,7 +861,7 @@ define('jquery-nos-ostabs',
                 }
 
                 if ( index === undefined ) {
-                    if ($(self.lis.get(o.selected)).hasClass('nos-ostabs-appstab')) {
+                    if ($(self.lis.get(o.selected)).hasClass('nos-ostabs-desktoptab')) {
                         index = self.anchors.length - 1;
                     } else {
                         index = o.selected + 1;
@@ -982,7 +982,7 @@ define('jquery-nos-ostabs',
                     }
                 }
 
-                if ( $li.not( '.nos-ostabs-appstab' ).not( '.nos-ostabs-newtab' ).length ) {
+                if ( $li.not( '.nos-ostabs-desktoptab' ).not( '.nos-ostabs-newtab' ).length ) {
                     $contextmenu = $li.data('contextmenu.tabs');
                     if ($contextmenu) {
                         $contextmenu.noscontextmenu('destroy').remove();
@@ -1012,7 +1012,7 @@ define('jquery-nos-ostabs',
                     openIndex = self.anchors.eq(openIndex).data('anchor.tabs');
                 }
 
-                if ( $li.not( '.nos-ostabs-appstab' ).not( '.nos-ostabs-newtab' ).length ) {
+                if ( $li.not( '.nos-ostabs-desktoptab' ).not( '.nos-ostabs-newtab' ).length ) {
                     $( '> *', $panel ).remove();
                 }
                 $panel.addClass( "nos-ostabs-hide" )

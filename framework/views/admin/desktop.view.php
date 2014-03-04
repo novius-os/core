@@ -30,10 +30,12 @@ foreach ($apps as $app) {
 </div>
 <script type="text/javascript">
 require(
-    ['jquery-nos-appstab'],
+    ['jquery-nos-nosdesktop'],
     function($) {
         $(function() {
-            $('#<?= $id ?>').nosAppsTab();
+            $('#<?= $id ?>').nosdesktop({
+                reloadUrl: 'admin/nos/noviusos/desktop'
+            });
         });
     });
 </script>

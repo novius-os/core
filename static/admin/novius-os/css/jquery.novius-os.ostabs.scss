@@ -65,7 +65,7 @@ body {
             border-bottom-width : 0;
         }
 
-        li.nos-ostabs-appstab, li.nos-ostabs-newtab, li.nos-ostabs-app {
+        li.nos-ostabs-desktoptab, li.nos-ostabs-newtab, li.nos-ostabs-app {
             a {
                 .nos-ostabs-label {
                     display : none;
@@ -227,7 +227,7 @@ body {
 		position : relative;
 		z-index : 3;
 
-		li.nos-ostabs-appstab {
+		li.nos-ostabs-desktoptab {
             top: 0;
 			bottom : 0 !important;
 			height : 45px !important;
@@ -249,7 +249,7 @@ body {
 		    }
 		}
 
-		li.nos-ostabs-appstab.ui-state-active, li.nos-ostabs-appstab.ui-state-hover {
+		li.nos-ostabs-desktoptab.ui-state-active, li.nos-ostabs-desktoptab.ui-state-hover {
 		    @include box-shadow(none);
 
 			a span.nos-ostabs-icon {
@@ -257,7 +257,7 @@ body {
 		    }
 		}
 
-		ul.nos-ostabs-appstab {
+		ul.nos-ostabs-desktoptab {
 			height : 47px;
 			padding: 0;
 		}
