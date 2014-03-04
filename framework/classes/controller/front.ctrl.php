@@ -45,7 +45,7 @@ class Controller_Front extends Controller
     protected $_base_href = '';
     protected $_context_url = '';
     protected $_title = '';
-    protected $_h1 = '';
+    protected $h1 = '';
     protected $_meta_description = '';
     protected $_meta_keywords = '';
     protected $_meta_robots = 'index,follow';
@@ -385,19 +385,20 @@ class Controller_Front extends Controller
             'h1' => $title_item,
         ), $properties);
 
-        $replaces = array('title', 'h1', 'meta_description', 'meta_keywords');
-        foreach ($replaces as $replace) {
-            $value = \Arr::get($properties, $replace, null);
-            if (!empty($value)) {
-                call_user_func(
-                    array($this, 'set'.\Inflector::camelize($replace)),
-                    $value,
-                    \Arr::get($templates, $replace, null)
-                );
-            }
-        }
+        $this->setTitle(\Arr::get($properties, 'title'), \Arr::get($templates, 'title', null));
+        $this->setH1(\Arr::get($properties, 'h1'), \Arr::get($templates, 'h1', null));
 
-        \Event::trigger('front.setItemDisplayed', array('properties' => $properties, 'templates' => $templates));
+        $value = \Arr::get($properties, 'meta_description', null);
+        !empty($value) && $this->setMetaDescription($value, \Arr::get($templates, 'meta_description', null));
+
+        $value = \Arr::get($properties, 'meta_keywords', null);
+        !empty($value) && $this->setMetaKeywords($value, \Arr::get($templates, 'meta_keywords', null));
+
+        \Event::trigger('front.setItemDisplayed', array(
+            'item' => $item,
+            'properties' => $properties,
+            'templates' => $templates
+        ));
 
         return $this;
     }
@@ -425,10 +426,7 @@ class Controller_Front extends Controller
     public function setTitle($title, $template = null)
     {
         if (!$template) {
-            $template = \Config::get('title_template', null);
-            if (!$template) {
-                $template = ':title';
-            }
+            $template = \Config::get('title_template', ':title');
         }
 
         $this->_title = \Str::tr($template, array('title' => $title, 'page_title' => $this->_page->page_title));
@@ -449,7 +447,7 @@ class Controller_Front extends Controller
             $template = ':h1';
         }
 
-        $this->_h1 = \Str::tr($template, array('h1' => $h1));
+        $this->h1 = \Str::tr($template, array('h1' => $h1));
 
         return $this;
     }
@@ -464,10 +462,7 @@ class Controller_Front extends Controller
     public function setMetaDescription($meta_description, $template = null)
     {
         if (!$template) {
-            $template = \Config::get('meta_description_template', null);
-            if (!$template) {
-                $template = ':meta_description';
-            }
+            $template = \Config::get('meta_description_template', ':meta_description');
         }
 
         $this->_meta_description = \Str::tr($template, array(
@@ -488,10 +483,7 @@ class Controller_Front extends Controller
     public function setMetaKeywords($meta_keywords, $template = null)
     {
         if (!$template) {
-            $template = \Config::get('meta_keywords_template', null);
-            if (!$template) {
-                $template = ':meta_keywords';
-            }
+            $template = \Config::get('meta_keywords_template', ':meta_keywords');
         }
 
         $this->_meta_keywords = \Str::tr($template, array(
@@ -712,7 +704,7 @@ class Controller_Front extends Controller
         $this->_wysiwyg_name = null;
 
         $this->_view->set('wysiwyg', $wysiwyg, false);
-        $this->_view->set('title', $this->_h1, false);
+        $this->_view->set('title', $this->h1, false);
         $this->_view->set('page', $this->_page, false);
         $this->_view->set('main_controller', $this, false);
     }
