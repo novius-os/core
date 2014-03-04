@@ -25,9 +25,9 @@ if (in_array($nos_url, array(
     'humans.txt',
 ))) {
     if (is_file(DOCROOT.$nos_url)) {
-		Nos\Tools_File::send(DOCROOT.$nos_url);
-		exit();
-	}
+        Nos\Tools_File::send(DOCROOT.$nos_url);
+        exit();
+    }
 }
 
 
