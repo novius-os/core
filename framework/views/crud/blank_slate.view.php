@@ -82,7 +82,7 @@ if (!in_array($context, $possible)) {
             <ul style="margin-left:1em;">
                 <li>
                     <span style="display:inline-block; width:2em;"></span>
-                    <form action="<?= $crud['url_form'] ?>" style="display:inline-block;" class="js-create_from_id">
+                    <form action="<?= $crud['url_form'] ?>" style="display:inline-block;">
                         <?= Form::hidden('context', $context) ?>
                         <?= Form::hidden('common_id', $common_id) ?>
                         <button type="submit" class="ui-priority-primary" data-icon="plus"><?= __('Start from scratch') ?></button>
@@ -91,7 +91,7 @@ if (!in_array($context, $possible)) {
                 </li>
                 <li>
                     <span class="faded" style="display:inline-block; width:2em;"><?= __('OR') ?></span>
-                    <form action="<?= $crud['url_form'] ?>" style="display:inline-block;">
+                    <form action="<?= $crud['url_form'] ?>" style="display:inline-block;" class="js-create_from_id">
                         <?= Form::hidden('context', $context) ?>
                         <?= Form::hidden('common_id', $common_id) ?>
     <?php
