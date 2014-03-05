@@ -12,9 +12,9 @@ define('jquery-nos-nosdesktop',
         "use strict";
         var touchDevice = Modernizr.touch;
 
-
         $.widget( "nos.nosdesktop", {
             options: {
+                launchers: [],
                 reloadUrl: 'admin/nos/noviusos/desktop'
             },
             launcherWidth: 150,
@@ -58,6 +58,25 @@ define('jquery-nos-nosdesktop',
                 })
 
                 self.maxWidth = self.element.width();
+
+                $.each(o.launchers, function() {
+                    var launcher = this;
+
+                    $('<a href="#">' +
+                        '<span class="icon">' +
+                        '<img class="gloss" src="static/novius-os/admin/novius-os/img/64/gloss.png" />' +
+                        '<img width="64" />' +
+                        '</span>' +
+                        '<span class="text"></span>' +
+                        '</a>')
+                        .addClass('app')
+                        .data('launcher', launcher)
+                        .find('span.icon img:last').attr('src', launcher.icon)
+                        .end()
+                        .find('span.text').html(launcher.name)
+                        .end()
+                        .appendTo(self.element);
+                });
 
                 self.$launchers = self.element.find('.app');
 

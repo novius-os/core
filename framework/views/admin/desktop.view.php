@@ -11,31 +11,19 @@
 Nos\I18n::current_dictionary('nos::common');
 
 $id = uniqid('temp_');
-?>
-<div id="<?= $id ?>" class="nos-desktop-apps">
-<?php
-foreach ($apps as $app) {
-    ?>
-        <a class="app" href="#" data-launcher="<?= htmlspecialchars(\Format::forge($app)->to_json()) ?>">
-            <span class="icon">
-                <img class="gloss" src="static/novius-os/admin/novius-os/img/64/gloss.png" />
-                <img width="64" src="<?= $app['icon'] ?>" />
-            </span>
-            <span class="text"><?= $app['name'] ?></span>
-        </a>
 
-    <?php
-}
+$config = array(
+    'launchers' => $apps,
+    'reloadUrl' => 'admin/nos/noviusos/desktop',
+);
 ?>
-</div>
+<div id="<?= $id ?>" class="nos-desktop-apps"></div>
 <script type="text/javascript">
 require(
     ['jquery-nos-nosdesktop'],
     function($) {
         $(function() {
-            $('#<?= $id ?>').nosdesktop({
-                reloadUrl: 'admin/nos/noviusos/desktop'
-            });
+            $('#<?= $id ?>').nosdesktop(<?= \Format::forge($config)->to_json() ?>);
         });
     });
 </script>
