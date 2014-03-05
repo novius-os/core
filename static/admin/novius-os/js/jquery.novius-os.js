@@ -966,7 +966,7 @@ define('jquery-nos',
                             var $el = $(this),
                                 nb_bind = $el.data('nos-on-show') || 0;
 
-                            if ($el.is('.nos-on-show')) {
+                            if ($el.is('.nos-on-show') && $el.css('display') == 'none') {
                                 $el.css('display', 'block');
                             }
 

@@ -74,15 +74,41 @@ class Renderer_Wysiwyg extends Renderer
         }
 
         // Default options of the renderer
-        $renderer_options = Tools_Wysiwyg::jsOptions();
+        $renderer_options = static::_nosToAdvanced(Tools_Wysiwyg::jsOptions());
 
         if (!empty($renderer['renderer_options'])) {
+            $renderer['renderer_options'] = static::_nosToAdvanced($renderer['renderer_options']);
             $renderer_options = \Arr::merge($renderer_options, $renderer['renderer_options']);
         }
         $renderer_options['language'] = substr(\Session::user()->user_lang, 0, 2);
         unset($renderer['renderer_options']);
 
         return array($renderer, $renderer_options);
+    }
+
+    private static function _nosToAdvanced($options)
+    {
+        if (\Arr::get($options, 'theme') === 'advanced') {
+            \Log::deprecated(
+                'WYSIWYG theme option "advanced" are deprecated, please use theme "nos".',
+                'Dubrovka'
+            );
+            $options['theme'] = 'nos';
+        }
+        $deprecated = \Arr::filter_prefixed($options, 'theme_nos_', false);
+        if (!empty($deprecated)) {
+            \Log::deprecated(
+                'WYSIWYG options prefixed by "theme_nos_" are deprecated '.
+                '('.implode(', ', array_keys($deprecated)).'), '.
+                'please replace by prefixe "theme_advanced_".',
+                'Dubrovka'
+            );
+            foreach ($deprecated as $key => $value) {
+                $options[str_replace('theme_nos_', 'theme_advanced_', $key)] = $value;
+                unset($options[$key]);
+            }
+        }
+        return $options;
     }
 
     /**

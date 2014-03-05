@@ -29,6 +29,9 @@ define('jquery-nos-wysiwyg',
                     s[key] = value;
                 }
             });
+            if (s.theme === 'advanced') {
+                s.theme === 'nos';
+            }
 
             if (!s.theme_advanced_buttons1) {
                 s = $.extend({
