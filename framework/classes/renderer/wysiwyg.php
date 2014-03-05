@@ -91,7 +91,7 @@ class Renderer_Wysiwyg extends Renderer
         if (\Arr::get($options, 'theme') === 'advanced') {
             \Log::deprecated(
                 'WYSIWYG theme option "advanced" are deprecated, please use theme "nos".',
-                'Dubrovaka'
+                'Dubrovka'
             );
             $options['theme'] = 'nos';
         }
@@ -101,7 +101,7 @@ class Renderer_Wysiwyg extends Renderer
                 'WYSIWYG options prefixed by "theme_nos_" are deprecated '.
                 '('.implode(', ', array_keys($deprecated)).'), '.
                 'please replace by prefixe "theme_advanced_".',
-                'Dubrovaka'
+                'Dubrovka'
             );
             foreach ($deprecated as $key => $value) {
                 $options[str_replace('theme_nos_', 'theme_advanced_', $key)] = $value;
