@@ -87,8 +87,6 @@ class Tools_Enhancer
 
         $callback = array($namespace.'\\'.$controller_name, 'getUrlEnhanced');
 
-        $urlEnhanced = call_user_func($callback, $params);
-
         // Now fetch all the possible URLS
         $urls = array();
         if ($urlPath === false) {
@@ -99,6 +97,12 @@ class Tools_Enhancer
                 try {
                     $context = $item->get_context();
                 } catch (\Exception $e) {
+                }
+            }
+            if (!$preview) {
+                $published = $item::behaviours('Nos\Orm_Behaviour_Publishable');
+                if (!empty($published) && !$item->published()) {
+                    return array();
                 }
             }
 
@@ -118,14 +122,21 @@ class Tools_Enhancer
                         if (empty($urlEnhanced) && !empty($url_params['url'])) {
                             $url_params['url'] = substr($url_params['url'], 0, -1).'.html';
                         }
-                        $urls[$page_id.($key_has_url_enhanced ? '::'.$urlEnhanced : '')] =
-                            Tools_Url::context($url_params['context']).
-                            $url_params['url'].$urlEnhanced.($preview ? '?_preview=1' : '');
+                        $params['enhancer_args'] = \Arr::get($page_params, 'config', array());
+                        $urlEnhanced = call_user_func($callback, $params);
+                        if ($urlEnhanced !== false) {
+                            $urls[$page_id.($key_has_url_enhanced ? '::'.$urlEnhanced : '')] =
+                                Tools_Url::context($url_params['context']).
+                                $url_params['url'].$urlEnhanced.($preview ? '?_preview=1' : '');
+                        }
                     }
                 }
             }
         } else {
-            $urls[] = $urlPath.$urlEnhanced.($preview ? '?_preview=1' : '');
+            $urlEnhanced = call_user_func($callback, $params);
+            if ($urlEnhanced !== false) {
+                $urls[] = $urlPath.$urlEnhanced.($preview ? '?_preview=1' : '');
+            }
         }
 
         return $urls;
