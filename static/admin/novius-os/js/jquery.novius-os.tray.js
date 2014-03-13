@@ -24,9 +24,10 @@ define('jquery-nos-tray',
                     if (fullscreenEnabled) {
                         buttons.fullscreen.bind = {
                             click: function() {
-                                var element = document.documentElement;
+                                var element = document.documentElement,
+                                    fullscreenEnabled = document.fullscreen || document.mozFullScreen || document.webkitIsFullScreen;
 
-                                if (document.fullscreen || document.mozFullScreen || document.webkitFullscreen) {
+                                if (fullscreenEnabled) {
                                     if(document.exitFullscreen) {
                                         document.exitFullscreen();
                                     } else if(document.mozCancelFullScreen) {
