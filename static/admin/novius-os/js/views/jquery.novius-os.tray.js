@@ -59,6 +59,7 @@ define('jquery-nos-tray',
                     });
 
                     $div.nosFormUI().buttonset().nosOnShow();
+                    log('ici');
                     $div.find('.wijmo-wijmenu').appendTo('body');
                 });
             }

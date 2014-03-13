@@ -10,7 +10,9 @@
 
 ?>
 
-<div id="noviusos"></div>
+<div id="noviusos">
+    <div class="nos-ostabs-tray"><?= \View::forge('nos::admin/tray') ?></div>
+</div>
 <script type="text/javascript">
 require(
     ['jquery-nos-ostabs'],

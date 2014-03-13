@@ -57,7 +57,7 @@ foreach (\Config::get('novius-os.locales', array()) as $code => $locale) {
 }
 
 $buttons = array(
-    array(
+    'user' => array(
         'type' => 'button',
         'label' => \Session::user()->user_firstname,
         'icons' => array(
@@ -92,7 +92,7 @@ $buttons = array(
             ),
         ),
     ),
-    array(
+    'disconnect' => array(
         'type' => 'button',
         'label' => __('Sign out (see you!)'),
         'icons' => array(

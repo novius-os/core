@@ -17,7 +17,6 @@ define('jquery-nos-ostabs',
             options: {
                 initTabs: [], // e.g. [{"url":"http://www.google.com","iconUrl":"img/google-32.png","label":"Google","iconSize":32,"labelDisplay":false},{"url":"http://www.twitter.com","iconClasses":"ui-icon ui-icon-signal-diag","label":"Twitter"}]
                 newTab: 'desktopTab', // e.g. {"url":"applications.htm","label":"Open a new tab","iframe":true} or "desktopTab" or false
-                trayView: [], // e.g. [{"url":"account.php","iconClasses":"ui-icon ui-icon-contact","label":"Account"},{"url":"customize.htm","iconClasses":"ui-icon ui-icon-gear","label":"Customization"}]
                 desktopTab: {}, // e.g. {"panelId":"ospanel","url":"applications.htm","iconUrl":"os.png","label":"My OS","iframe":true} or false
                 fx: null, // e.g. { height: 'toggle', opacity: 'toggle', duration: 200 }
                 labelMinWidth: 100,
@@ -137,12 +136,9 @@ define('jquery-nos-ostabs',
                         .addClass('nos-ostabs-tabs')
                         .appendTo( self.uiOstabsHeader );
 
-                    self.uiOstabsTray = $( '<div></div>' )
-                        .addClass( 'nos-ostabs-tray nos-ostabs-nav' );
-                    if ( o.trayView !== null ) {
-                        self.uiOstabsTray.html(o.trayView);
-                    }
-                    self.uiOstabsTray.prependTo(self.uiOstabsHeader);
+                    self.uiOstabsTray = self.element.find('.nos-ostabs-tray')
+                        .addClass('nos-ostabs-nav')
+                        .prependTo(self.uiOstabsHeader);
 
                     if ( $.isPlainObject(o.desktopTab) ) {
                         self.uiOstabsDesktopTab = $( '<ul></ul>' )
@@ -155,8 +151,9 @@ define('jquery-nos-ostabs',
                         self.uiOstabsDesktopTab = $( '<ul></ul>' );
                     }
 
+                    log(self.uiOstabsTray.outerWidth( true ));
                     self.uiOstabsSuperPanel.css( 'left', self.uiOstabsDesktopTab.outerWidth( true ) + 25 )
-                        .css( 'right', self.uiOstabsTray.outerWidth( true ) + 35 )
+                        .css( 'right', self.uiOstabsTray.outerWidth( true ) + 25 )
                         .wijsuperpanel({
                             allowResize : false,
                             autoRefresh : true,
