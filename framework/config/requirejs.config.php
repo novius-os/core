@@ -141,11 +141,11 @@ return array(
         'jquery-nos-thumbnailsgrid' => 'static/novius-os/admin/novius-os/js/jquery.novius-os.thumbnailsgrid',
         'jquery-nos-appdesk' => 'static/novius-os/admin/novius-os/js/jquery.novius-os.appdesk',
         'jquery-nos-datacatchers' => 'static/novius-os/admin/novius-os/js/jquery.novius-os.datacatchers',
+        'jquery-nos-tray' => 'static/novius-os/admin/novius-os/js/jquery.novius-os.tray',
 
         'jquery-nos-context-common-fields' =>
             'static/novius-os/admin/novius-os/js/views/jquery.novius-os.context-common-fields',
         'jquery-nos-nosdesktop' => 'static/novius-os/admin/novius-os/js/views/jquery.novius-os.nosdesktop',
-        'jquery-nos-tray' => 'static/novius-os/admin/novius-os/js/views/jquery.novius-os.tray',
         'jquery-nos-publishable' => 'static/novius-os/admin/novius-os/js/views/jquery.novius-os.publishable',
         'jquery-nos-layout-standard' => 'static/novius-os/admin/novius-os/js/views/jquery.novius-os.layout-standard',
         'jquery-nos-toolbar-crud' => 'static/novius-os/admin/novius-os/js/views/jquery.novius-os.toolbar-crud',
@@ -460,11 +460,11 @@ return array(
         'jquery-nos-thumbnailsgrid' => 'static/novius-os/admin/bundle/nos.min',
         'jquery-nos-appdesk' => 'static/novius-os/admin/bundle/nos.min',
         'jquery-nos-datacatchers' => 'static/novius-os/admin/bundle/nos.min',
+        'jquery-nos-tray' => 'static/novius-os/admin/bundle/nos.min',
 
         'jquery-nos-context-common-fields' =>
             'static/novius-os/admin/novius-os/js/views/minified/jquery.novius-os.context-common-fields',
         'jquery-nos-nosdesktop' => 'static/novius-os/admin/novius-os/js/views/minified/jquery.novius-os.nosdesktop',
-        'jquery-nos-tray' => 'static/novius-os/admin/novius-os/js/views/minified/jquery.novius-os.tray',
         'jquery-nos-publishable' => 'static/novius-os/admin/novius-os/js/views/minified/jquery.novius-os.publishable',
         'jquery-nos-layout-standard' =>
             'static/novius-os/admin/novius-os/js/views/minified/jquery.novius-os.layout-standard',

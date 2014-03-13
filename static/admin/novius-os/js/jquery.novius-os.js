@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 define('jquery-nos',
-    ['jquery', 'jquery-nos-validate', 'jquery-form', 'jquery-ui.button', 'wijmo.wijexpander', 'wijmo.wijaccordion', 'wijmo.wijdialog'],
+    ['jquery', 'jquery-nos-validate', 'jquery-form', 'jquery-ui.button', 'wijmo.wijexpander', 'wijmo.wijaccordion', 'wijmo.wijdialog', 'wijmo.wijmenu'],
     function($) {
         "use strict";
         var undefined = void(0),

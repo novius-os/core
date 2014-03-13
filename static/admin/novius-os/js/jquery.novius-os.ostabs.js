@@ -151,7 +151,6 @@ define('jquery-nos-ostabs',
                         self.uiOstabsDesktopTab = $( '<ul></ul>' );
                     }
 
-                    log(self.uiOstabsTray.outerWidth( true ));
                     self.uiOstabsSuperPanel.css( 'left', self.uiOstabsDesktopTab.outerWidth( true ) + 25 )
                         .css( 'right', self.uiOstabsTray.outerWidth( true ) + 25 )
                         .wijsuperpanel({
