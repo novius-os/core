@@ -52,6 +52,7 @@ class Orm_Twinnable_HasMany extends \Orm\HasMany
 
         $conditions = $this->conditions;
         $where = \Arr::get($conditions, 'where', array());
+        reset($this->key_to);
         foreach ($this->key_from as $key) {
             // no point running a query when a key value is null
             if ($from->{$key} === null) {
