@@ -452,6 +452,7 @@ return array(
         'jquery-nos-validate' => 'static/novius-os/admin/bundle/nos.min',
         'jquery-nos-wysiwyg' => 'static/novius-os/admin/bundle/nos.min',
         'jquery-nos' => 'static/novius-os/admin/bundle/nos.min',
+        'jquery-nos-contextmenu' => 'static/novius-os/admin/bundle/nos.min',
         'jquery-nos-loadspinner' => 'static/novius-os/admin/bundle/nos.min',
         'jquery-nos-ostabs' => 'static/novius-os/admin/bundle/nos.min',
         'jquery-nos-preview' => 'static/novius-os/admin/bundle/nos.min',

@@ -933,7 +933,7 @@ define('jquery-nos-ostabs',
                     .data( 'ui-ostab', tab )
                     .appendTo( target );
 
-                if (!touchDevice && !notClosable) {
+                if (!notClosable) {
                     $('<span><span></span></span>').addClass('nos-ostabs-closetab')
                         .attr('title', o.texts.closeTab)
                         .click(function(e) {

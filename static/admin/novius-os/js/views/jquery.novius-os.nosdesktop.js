@@ -62,14 +62,14 @@ define('jquery-nos-nosdesktop',
                 $.each(o.launchers, function() {
                     var launcher = this;
 
-                    $('<a href="#">' +
+                    $('<a href="toto">' +
                         '<span class="icon">' +
                         '<img class="gloss" src="static/novius-os/admin/novius-os/img/64/gloss.png" />' +
                         '<img width="64" />' +
                         '</span>' +
                         '<span class="text"></span>' +
                         '</a>')
-                        .addClass('app')
+                        .addClass('app launcher-' + launcher.key)
                         .data('launcher', launcher)
                         .find('span.icon img:last').attr('src', launcher.icon)
                         .end()
@@ -87,6 +87,10 @@ define('jquery-nos-nosdesktop',
                 if (!touchDevice) {
                     self._initDrag();
                 }
+
+                self.$launchers.click(function(e) {
+                    self._launcherClick($(this), e);
+                });
 
                 self.element.closest('.nos-dispatcher').on({
                     resizePanel : function() {
@@ -205,10 +209,6 @@ define('jquery-nos-nosdesktop',
                             self.save();
                         }
                     }
-                });
-
-                self.$launchers.click(function(e) {
-                    self._launcherClick($(this), e);
                 });
 
                 return self;
