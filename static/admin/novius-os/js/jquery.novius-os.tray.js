@@ -15,7 +15,14 @@ define('jquery-nos-tray',
             nosTray : function(params) {
                 var buttons,
                     document = window.document,
-                    fullscreenEnabled = document.fullscreenEnabled || document.mozFullScreenEnabled || document.webkitFullscreenEnabled;
+                    fullscreenEnabled = document.fullscreenEnabled ||
+                        document.fullScreenEnabled ||
+                        document.mozFullscreenEnabled ||
+                        document.mozFullScreenEnabled ||
+                        document.webkitFullscreenEnabled ||
+                        document.webkitFullScreenEnabled ||
+                        document.msFullscreenEnabled ||
+                        document.msFullScreenEnabled;
                 params = params || {
                     buttons : {}
                 };
@@ -24,26 +31,51 @@ define('jquery-nos-tray',
                     if (fullscreenEnabled) {
                         buttons.fullscreen.bind = {
                             click: function() {
-                                var element = document.documentElement,
-                                    fullscreenEnabled = document.fullscreen || document.mozFullScreen || document.webkitIsFullScreen;
+                                var element = $('body')[0],
+                                    fullscreenElement = document.fullscreenElement ||
+                                        document.fullScreenElement ||
+                                        document.mozFullScreenElement ||
+                                        document.mozFullscreenElement ||
+                                        document.webkitFullScreenElement ||
+                                        document.webkitFullscreenElement ||
+                                        document.msFullScreenElement ||
+                                        document.msFullscreenElement;
 
-                                if (fullscreenEnabled) {
+                                if (fullscreenElement) {
                                     if(document.exitFullscreen) {
                                         document.exitFullscreen();
+                                    } else if(document.exitFullScreen) {
+                                        document.exitFullScreen();
+                                    } else if(document.mozExitFullscreen) {
+                                        document.mozExitFullscreen();
                                     } else if(document.mozCancelFullScreen) {
                                         document.mozCancelFullScreen();
                                     } else if(document.webkitExitFullscreen) {
                                         document.webkitExitFullscreen();
+                                    } else if(document.webkitExitFullScreen) {
+                                        document.webkitExitFullScreen();
+                                    } else if(document.msExitFullscreen) {
+                                        document.msExitFullscreen();
+                                    } else if(document.msExitFullScreen) {
+                                        document.msExitFullScreen();
                                     }
                                 } else {
                                     if(element.requestFullscreen) {
                                         element.requestFullscreen();
+                                    } else if(element.requestFullScreen) {
+                                        element.requestFullScreen();
+                                    } else if(element.mozRequestFullscreen) {
+                                        element.mozRequestFullscreen();
                                     } else if(element.mozRequestFullScreen) {
                                         element.mozRequestFullScreen();
                                     } else if(element.webkitRequestFullscreen) {
                                         element.webkitRequestFullscreen();
+                                    } else if(element.webkitRequestFullScreen) {
+                                        element.webkitRequestFullScreen();
                                     } else if(element.msRequestFullscreen) {
                                         element.msRequestFullscreen();
+                                    } else if(element.msRequestFullScreen) {
+                                        element.msRequestFullScreen();
                                     }
                                 }
                             }
