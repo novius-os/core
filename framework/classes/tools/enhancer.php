@@ -93,16 +93,18 @@ class Tools_Enhancer
 
             $item = \Arr::get($params, 'item', false);
             $context = \Arr::get($params, 'context', false);
-            if ($item && !$context) {
-                try {
-                    $context = $item->get_context();
-                } catch (\Exception $e) {
+            if ($item && is_object($item) && $item instanceof Orm\Model) {
+                if (!$context) {
+                    try {
+                        $context = $item->get_context();
+                    } catch (\Exception $e) {
+                    }
                 }
-            }
-            if (!$preview) {
-                $published = $item::behaviours('Nos\Orm_Behaviour_Publishable');
-                if (!empty($published) && !$item->published()) {
-                    return array();
+                if (!$preview) {
+                    $published = $item::behaviours('Nos\Orm_Behaviour_Publishable');
+                    if (!empty($published) && !$item->published()) {
+                        return array();
+                    }
                 }
             }
 
@@ -119,11 +121,11 @@ class Tools_Enhancer
                 if ((!$context || $page_params['context'] == $context) && ($preview || $published)) {
                     $url_params = \Arr::get($url_enhanced, $page_id, false);
                     if ($url_params) {
+                        $params['enhancer_args'] = \Arr::get($page_params, 'config', array());
+                        $urlEnhanced = call_user_func($callback, $params);
                         if (empty($urlEnhanced) && !empty($url_params['url'])) {
                             $url_params['url'] = substr($url_params['url'], 0, -1).'.html';
                         }
-                        $params['enhancer_args'] = \Arr::get($page_params, 'config', array());
-                        $urlEnhanced = call_user_func($callback, $params);
                         if ($urlEnhanced !== false) {
                             $urls[$page_id.($key_has_url_enhanced ? '::'.$urlEnhanced : '')] =
                                 Tools_Url::context($url_params['context']).
