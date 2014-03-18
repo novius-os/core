@@ -306,6 +306,7 @@ class Orm_Twinnable_ManyMany extends \Orm\ManyMany
             $query = \DB::delete($this->table_through);
 
             $query->where(reset($this->key_through_to), 'IN', $subquery);
+            $query->where(reset($this->key_through_from), '=', $model_from->{reset($this->key_from)});
 
             $query->execute(call_user_func(array($model_from, 'connection')));
         }
