@@ -470,7 +470,7 @@ define('jquery-nos',
                     // Don't select the line when clicking the "more actions" arrow dropdown
                     dropDown.appendTo(container.find('tr')).click(function(e) {
 
-                        $.each(nosItemActions, function() {
+                        $.each(nosActionsList, function() {
                             if ($(this).data('wijmo-wijmenu')) {
                                 $(this).wijmenu('hideAllMenus');
                             }
@@ -559,7 +559,7 @@ define('jquery-nos',
                                 }
                             });
 
-                            nosItemActions.push(ul);
+                            nosActionsList.push(ul);
 
                             this.created = true;
 
