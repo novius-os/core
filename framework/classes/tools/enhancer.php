@@ -107,6 +107,10 @@ class Tools_Enhancer
                     }
                 }
             }
+            $empty_params = !count(array_diff_key(
+                $params,
+                array('context' => null, 'urlPath' => null, 'preview' => null)
+            ));
 
             foreach ($page_enhanced as $page_id => $page_params) {
                 if (is_array($page_params['published'])) {
@@ -121,8 +125,14 @@ class Tools_Enhancer
                 if ((!$context || $page_params['context'] == $context) && ($preview || $published)) {
                     $url_params = \Arr::get($url_enhanced, $page_id, false);
                     if ($url_params) {
-                        $params['enhancer_args'] = \Arr::get($page_params, 'config', array());
-                        $urlEnhanced = call_user_func($callback, $params);
+                        if (!$empty_params) {
+                            $callback_params = $params;
+                            $callback_params['context'] = $page_params['context'];
+                            $callback_params['enhancer_args'] = \Arr::get($page_params, 'config', array());
+                            $urlEnhanced = call_user_func($callback, $callback_params);
+                        } else {
+                            $urlEnhanced = '';
+                        }
                         if (empty($urlEnhanced) && !empty($url_params['url'])) {
                             $url_params['url'] = substr($url_params['url'], 0, -1).'.html';
                         }
@@ -135,6 +145,7 @@ class Tools_Enhancer
                 }
             }
         } else {
+            // Called by enhancers Controller to retrieve items URL
             $urlEnhanced = call_user_func($callback, $params);
             if ($urlEnhanced !== false) {
                 $urls[] = $urlPath.$urlEnhanced.($preview ? '?_preview=1' : '');

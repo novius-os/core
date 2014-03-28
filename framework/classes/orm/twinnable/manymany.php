@@ -22,6 +22,8 @@ class Orm_Twinnable_ManyMany extends \Orm\ManyMany
 
     protected $column_context_is_main_to = 'context_is_main';
 
+    protected $delete_related_called = false;
+
     public function __construct($from, $name, array $config)
     {
         $to = array_key_exists('model_to', $config) ? $config['model_to'] : \Inflector::get_namespace($from).'Model_'.\Inflector::classify($name);
@@ -246,6 +248,13 @@ class Orm_Twinnable_ManyMany extends \Orm\ManyMany
         $original_model_ids === null and $original_model_ids = array();
         $del_rels = $original_model_ids;
 
+        if ($this->delete_related_called) {
+            // If delete_related() has been called before save(), force the call of parent delete_related()
+            // static::delete_related() does nothing if others twins exist
+            parent::delete_related($model_from);
+            $this->delete_related_called = false;
+        }
+
         foreach ($models_to as $key => $model_to) {
             if (!$model_to instanceof $this->model_to) {
                 throw new \FuelException('Invalid Model instance added to relations in this model.');
@@ -341,6 +350,8 @@ class Orm_Twinnable_ManyMany extends \Orm\ManyMany
 
     public function delete_related($model_from)
     {
+        $this->delete_related_called = true;
+
         //search for twin models
         $query = \DB::select()->from($model_from::table());
         reset($this->key_from);
