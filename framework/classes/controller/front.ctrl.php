@@ -722,6 +722,7 @@ class Controller_Front extends Controller
 
             $page = Page\Model_Page::find('first', array(
                     'where' => $where,
+                    'related' => ('template_variation'),
                 ));
         } else {
             foreach ($this->_contexts_possibles as $context => $domain) {
@@ -745,6 +746,7 @@ class Controller_Front extends Controller
 
                 $page = \Nos\Page\Model_Page::find('first', array(
                     'where' => $where,
+                    'related' => ('template_variation'),
                 ));
 
                 if (!empty($page)) {
@@ -773,16 +775,16 @@ class Controller_Front extends Controller
 
     protected function _findTemplate()
     {
-        // Find the template
-        $templates = \Nos\Config_Data::get('templates', array());
-
-        if (!isset($templates[$this->_page->page_template])) {
-            throw new \Exception('The template '.$this->_page->page_template.' is not configured.');
+        if (!isset($this->_page->template_variation)) {
+            throw new \Exception('This page have no template variation configured.');
         }
 
-        $this->_template = $templates[$this->_page->page_template];
+        $this->_template = $this->_page->template_variation->configCompiled();
         if (empty($this->_template['file'])) {
-            throw new \Exception('The template file for '. ($this->_template['title'] ?: $this->_page->page_template ).' is not defined.');
+            throw new \Exception(
+                'The template file for '.
+                ($this->_template['title'] ?: $this->_page->template_variation->tpvar_template ).' is not defined.'
+            );
         }
 
         try {

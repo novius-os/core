@@ -10,6 +10,8 @@
 
 namespace Nos\Page;
 
+use Nos\Template\Variation\Model_Template_Variation;
+
 class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
 {
     protected $page_parent = false;
@@ -57,6 +59,21 @@ class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
         }
     }
 
+    protected function init_item()
+    {
+        parent::init_item();
+
+        if (!empty($this->item->parent)) {
+            $this->item->page_template_variation_id = $this->item->parent->template_variation->tpvar_id;
+        }
+        if (empty($this->item->template_variation)) {
+            $template_variation = Model_Template_Variation::getTemplateVariationDefault($this->item->page_context);
+            if (!empty($template_variation)) {
+                $this->item->page_template_variation_id = $template_variation->tpvar_id;
+            }
+        }
+    }
+
     protected function fieldset($fieldset)
     {
         $fieldset = parent::fieldset($fieldset);
@@ -83,6 +100,22 @@ class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
         }
         $form_attributes['class'] .= ' fill-parent';
         $fieldset->set_config('form_attributes', $form_attributes);
+
+        $templates_variations = Model_Template_Variation::find('all', array(
+            'where' => array(
+                array('tpvar_context' => $this->item->page_context),
+            ),
+            'order_by' => array(
+                'tpvar_default' => 'DESC',
+                'tpvar_title',
+            ),
+        ));
+        $options = array();
+        foreach ($templates_variations as $template_variation) {
+            $options[$template_variation->tpvar_id] = $template_variation->tpvar_title;
+        }
+        $fieldset->field('page_template_variation_id')->set_options($options);
+
 
         return $fieldset;
     }

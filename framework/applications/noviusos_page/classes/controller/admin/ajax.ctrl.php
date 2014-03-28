@@ -10,26 +10,49 @@
 
 namespace Nos\Page;
 
-use Fuel\Core\Config;
+use Nos\Template\Variation\Model_Template_Variation;
+use Nos\Tools_Wysiwyg;
 
 class Controller_Admin_Ajax extends \Controller
 {
     public function action_wysiwyg($page_id = null)
     {
-        $id = $_GET['template_id'];
-        $data = \Nos\Config_Data::get('templates', array());
-        $data = $data[$id];
-
-        $data['layout'] = (array) $data['layout'];
+        $id = $_GET['tpvar_id'];
+        $tpvar = Model_Template_Variation::find($id);
+        $data = $tpvar->configCompiled();
 
         $page = empty($page_id) ? null : Model_Page::find($page_id);
         foreach ($data['layout'] as $wysiwyg => $coords) {
-            $data['content'][$wysiwyg] = empty($page) ? '' : \Nos\Tools_Wysiwyg::prepare_renderer($page->wysiwygs->{$wysiwyg});
+            \Arr::set(
+                $data,
+                'content.'.$wysiwyg,
+                empty($page) ? '' : Tools_Wysiwyg::prepare_renderer($page->wysiwygs->{$wysiwyg})
+            );
         }
 
-        // @todo replace images
-        // src="nos://media/ID" => src="http://real/url/here" data-media-id="ID"
-
         \Response::json($data);
+    }
+
+    public function action_template_variation()
+    {
+        $context = $_GET['context'];
+
+        $options = array();
+        $templates_variations = Model_Template_Variation::find('all', array(
+            'where' => array(array('tpvar_context' => $context)),
+            'order_by' => array(
+                'tpvar_default' => 'DESC',
+                'tpvar_title',
+            ),
+        ));
+        foreach ($templates_variations as $template_variation) {
+            $options[] = array(
+                'text' => $template_variation->tpvar_title,
+                'value' => $template_variation->tpvar_id,
+                'selected' => $template_variation->tpvar_default,
+            );
+        }
+
+        \Response::json($options);
     }
 }
