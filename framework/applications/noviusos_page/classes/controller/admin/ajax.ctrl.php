@@ -19,7 +19,7 @@ class Controller_Admin_Ajax extends \Controller
     public function action_wysiwyg($page_id = null)
     {
         $id = $_GET['tpvar_id'];
-        if (!is_int($id)) {
+        if (!is_numeric($id)) {
             $tpvar = Model_Template_Variation::forge();
             $tpvar->tpvar_template = $id;
         } else {

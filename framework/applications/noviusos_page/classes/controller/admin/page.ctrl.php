@@ -32,7 +32,7 @@ class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
      */
     public function before_save($page, $data)
     {
-        if (!is_int($this->item->page_template_variation_id)) {
+        if (!is_numeric($this->item->page_template_variation_id)) {
             $templates = Config_Data::get('templates', array());
             $template = \Arr::get($templates, $this->item->page_template_variation_id, array());
             $template_variation = Model_Template_Variation::forge();
