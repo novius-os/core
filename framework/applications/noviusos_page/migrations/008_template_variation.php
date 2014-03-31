@@ -19,6 +19,9 @@ class Template_Variation extends Migration
         $template_variation = \Db::list_tables('nos_template_variation');
         $template_variation_id = \Db::list_columns('nos_page', 'page_template_variation_id');
         if (!empty($template_variation) && empty($template_variation_id)) {
+            // Same request that in Template Variation migration 002_migrate_page
+            // In case this migration is run after the Template Variation migration 002_migrate_page
+            // Can be in a fresh install
             \DB::query(
                 'ALTER TABLE `nos_page` ADD `page_template_variation_id` INT UNSIGNED  '.
                 'DEFAULT NULL AFTER `page_template`'

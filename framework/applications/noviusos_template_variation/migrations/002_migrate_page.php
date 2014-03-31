@@ -32,6 +32,8 @@ class Migrate_Page extends Migration
                 $template_variation->save();
             }
 
+            // Same request that in Page migration 008_template_variation
+            // In case this migration is run after the Page migration 008_template_variation
             \DB::query(
                 'ALTER TABLE `nos_page` ADD `page_template_variation_id` INT UNSIGNED  '.
                 'DEFAULT NULL AFTER `page_template`'
