@@ -65,6 +65,7 @@ define('jquery-nos-inspector-tree-model',
                         allowColSizing : true,
                         allowColMoving : true,
                         loadingText: inspectorData.loadingText || 'Loading...',
+                        noCellsSelected: true,
                         currentCellChanged : function(e) {
                             var row = $(e.target).nostreegrid("currentCell").row(),
                                 data = row ? row.data : false;
