@@ -10,6 +10,7 @@
 
 namespace Nos\Page;
 
+use Nos\Config_Data;
 use Nos\Template\Variation\Model_Template_Variation;
 
 class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
@@ -31,6 +32,18 @@ class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
      */
     public function before_save($page, $data)
     {
+        if (!is_int($this->item->page_template_variation_id)) {
+            $templates = Config_Data::get('templates', array());
+            $template = \Arr::get($templates, $this->item->page_template_variation_id, array());
+            $template_variation = Model_Template_Variation::forge();
+            $template_variation->tpvar_template = $this->item->page_template_variation_id;
+            $template_variation->tpvar_title = \Arr::get($template, 'title', $this->item->page_template_variation_id);
+            $template_variation->tpvar_context = $this->item->page_context;
+            $template_variation->save();
+
+            $this->item->page_template_variation_id = $template_variation->tpvar_id;
+        }
+
         if ($this->item->page_entrance && !$this->item->published()) {
             $this->send_error(new \Exception(__(
                 'This page is the home page and must therefore be published. '.
@@ -111,8 +124,15 @@ class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
             ),
         ));
         $options = array();
-        foreach ($templates_variations as $template_variation) {
-            $options[$template_variation->tpvar_id] = $template_variation->tpvar_title;
+        if (!empty($templates_variations)) {
+            foreach ($templates_variations as $template_variation) {
+                $options[$template_variation->tpvar_id] = $template_variation->tpvar_title;
+            }
+        } else {
+            $templates = Config_Data::get('templates', array());
+            foreach ($templates as $template_name => $template) {
+                $options[$template_name] = $template['title'];
+            }
         }
         $fieldset->field('page_template_variation_id')->set_options($options);
 

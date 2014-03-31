@@ -10,6 +10,7 @@
 
 namespace Nos\Page;
 
+use Nos\Config_Data;
 use Nos\Template\Variation\Model_Template_Variation;
 use Nos\Tools_Wysiwyg;
 
@@ -18,7 +19,12 @@ class Controller_Admin_Ajax extends \Controller
     public function action_wysiwyg($page_id = null)
     {
         $id = $_GET['tpvar_id'];
-        $tpvar = Model_Template_Variation::find($id);
+        if (!is_int($id)) {
+            $tpvar = Model_Template_Variation::forge();
+            $tpvar->tpvar_template = $id;
+        } else {
+            $tpvar = Model_Template_Variation::find($id);
+        }
         $data = $tpvar->configCompiled();
 
         $page = empty($page_id) ? null : Model_Page::find($page_id);
@@ -45,12 +51,23 @@ class Controller_Admin_Ajax extends \Controller
                 'tpvar_title',
             ),
         ));
-        foreach ($templates_variations as $template_variation) {
-            $options[] = array(
-                'text' => $template_variation->tpvar_title,
-                'value' => $template_variation->tpvar_id,
-                'selected' => $template_variation->tpvar_default,
-            );
+        if (!empty($templates_variations)) {
+            foreach ($templates_variations as $template_variation) {
+                $options[] = array(
+                    'text' => $template_variation->tpvar_title,
+                    'value' => $template_variation->tpvar_id,
+                    'selected' => $template_variation->tpvar_default,
+                );
+            }
+        } else {
+            $templates = Config_Data::get('templates', array());
+            foreach ($templates as $template_name => $template) {
+                $options[] = array(
+                    'text' => $template['title'],
+                    'value' => $template_name,
+                    'selected' => false,
+                );
+            }
         }
 
         \Response::json($options);
