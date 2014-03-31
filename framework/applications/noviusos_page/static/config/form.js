@@ -16,7 +16,9 @@ define(
         "use strict";
         return function(wysiwyg_options) {
 
-            var $container = $(this);
+            var $container = $(this),
+                $dispatcher = $container.closest('.nos-dispatcher, body');
+
             wysiwyg_options = wysiwyg_options || {};
             if ($container.data('already-processed')) {
                 return;
@@ -45,8 +47,33 @@ define(
             var $from_id = $container.find('input[name=create_from_id]');
             var from_id = $page_id.val() || $from_id.val() || 0;
             var $template_variation_id = $container.find('select[name=page_template_variation_id]');
+            var listenEventTemplateVariation = function() {
+                var match = [
+                    {
+                        action: 'update',
+                        name : 'Nos\\Template\\Variation\\Model_Template_Variation',
+                        context : $dispatcher.data('nosContext'),
+                        id: parseInt($template_variation_id.find(':selected').val())
+                    },
+                    {
+                        name : 'Nos\\Template\\Variation\\Model_Template_Variation',
+                        context : $dispatcher.data('nosContext'),
+                    }
+                ];
+
+                $dispatcher.nosUnlistenEvent('pageCrudTemplateVariation');
+                $dispatcher.nosListenEvent({
+                    name : 'Nos\\Template\\Variation\\Model_Template_Variation',
+                    context : $dispatcher.data('nosContext'),
+                    id: parseInt($template_variation_id.find(':selected').val())
+                }, function() {
+                    $dispatcher.trigger('contextChange');
+                }, 'pageCrudTemplateVariation');
+            };
+
             $template_variation_id.bind('change', function() {
                 $container.data('already-processed', true);
+                listenEventTemplateVariation();
                 var $wysiwyg = $container.find('[data-id=wysiwyg]');
                 var save = {};
                 // tinyMCE won't be initialised until the first Wysiwyg is transformed
@@ -165,32 +192,34 @@ define(
                 }
             }).triggerHandler('change');
 
-            $container.closest('.nos-dispatcher, body').on('contextChange', function() {
-                var context = $(this).data('nosContext');
+            $dispatcher.on('contextChange', function() {
+                var context = $dispatcher.data('nosContext');
+                listenEventTemplateVariation();
                 $.ajax({
                     url: 'admin/noviusos_page/ajax/template_variation',
                     data: {
-                        context: context
+                        context: context,
+                        selected: $template_variation_id.find(':selected').val()
                     },
                     dataType: 'json',
                     success: function(data) {
                         var selected = 0;
                         $template_variation_id.empty();
-                        $.each(data, function(i) {
+                        $.each(data, function() {
                             var option = this;
                             $('<option></option>').val(option.value)
                                 .text(option.text)
                                 .appendTo($template_variation_id);
                             if (option.selected) {
-                                selected = i;
+                                selected = option.value;
                             }
                         });
-                        $template_variation_id[0].selected = selected;
+                        $template_variation_id.val(selected);
                         $template_variation_id.trigger('change');
                     }
-                })
-
-                ;
+                });
             });
+
+            listenEventTemplateVariation();
         }
     });

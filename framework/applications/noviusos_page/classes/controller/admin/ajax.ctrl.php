@@ -42,6 +42,7 @@ class Controller_Admin_Ajax extends \Controller
     public function action_template_variation()
     {
         $context = $_GET['context'];
+        $selected = $_GET['selected'];
 
         $options = array();
         $templates_variations = Model_Template_Variation::find('all', array(
@@ -56,7 +57,8 @@ class Controller_Admin_Ajax extends \Controller
                 $options[] = array(
                     'text' => $template_variation->tpvar_title,
                     'value' => $template_variation->tpvar_id,
-                    'selected' => $template_variation->tpvar_default,
+                    'selected' =>  $selected && $selected == $template_variation->tpvar_id ||
+                        !isset($templates_variations[$selected]) && $template_variation->tpvar_default,
                 );
             }
         } else {
