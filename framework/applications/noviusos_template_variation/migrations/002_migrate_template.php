@@ -29,5 +29,22 @@ class Migrate_Template extends \Nos\Migration
             $template_variation->tpvar_context = $template_context['page_context'];
             $template_variation->save();
         }
+
+        $permission = \Db::list_tables('nos_role_permission');
+        if (!empty($permission)) {
+            \DB::delete('nos_role_permission')
+                ->where('perm_category_key', '=', 'noviusos_template_variation')
+                ->execute();
+
+            $subquery = \DB::select('perm_role_id', 'perm_name', \DB::expr(\DB::quote('noviusos_template_variation')))
+                ->from('nos_role_permission')
+                ->where('perm_name', '=', 'nos::access')
+                ->where('perm_category_key', '=', 'noviusos_appmanager');
+
+            \DB::insert('nos_role_permission')
+                ->columns(array('perm_role_id', 'perm_name', 'perm_category_key'))
+                ->select($subquery)
+                ->execute();
+        }
     }
 }

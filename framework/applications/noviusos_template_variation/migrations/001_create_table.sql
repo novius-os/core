@@ -22,11 +22,3 @@ CREATE TABLE IF NOT EXISTS `nos_template_variation` (
   KEY `tpvar_template` (`tpvar_template`),
   KEY `tpvar_context` (`tpvar_context`)
 ) DEFAULT CHARSET=utf8;
-
-DELETE FROM `nos_role_permission` WHERE `perm_category_key` = 'noviusos_template_variation';
-
-INSERT INTO `nos_role_permission` (`perm_role_id`, `perm_name`, `perm_category_key`)
-SELECT `perm_role_id`, `perm_name`, 'noviusos_template_variation'
-FROM `nos_role_permission`
-WHERE `perm_name` = 'nos::access'
-AND  `perm_category_key` = 'noviusos_appmanager';
