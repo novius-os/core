@@ -32,19 +32,19 @@ class Migrate_Page extends Migration
                 $template_variation->save();
             }
 
-            \DB::delete(
+            \DB::query(
                 'ALTER TABLE `nos_page` ADD `page_template_variation_id` INT UNSIGNED  '.
                 'DEFAULT NULL AFTER `page_template`'
             )->execute();
 
-            \DB::delete(
+            \DB::query(
                 'UPDATE `nos_page`, `nos_template_variation` '.
                 'SET `page_template_variation_id` = `tpvar_id` '.
                 'WHERE `page_context` = `tpvar_context` '.
                 'AND `page_template` = `tpvar_template`'
             )->execute();
 
-            \DB::delete('ALTER TABLE `nos_page` DROP `page_template`')->execute();
+            \DB::query('ALTER TABLE `nos_page` DROP `page_template`')->execute();
         }
     }
 }

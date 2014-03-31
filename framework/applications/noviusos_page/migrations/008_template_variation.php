@@ -19,12 +19,12 @@ class Template_Variation extends Migration
         $template_variation = \Db::list_tables('nos_template_variation');
         $template_variation_id = \Db::list_columns('nos_page', 'page_template_variation_id');
         if (!empty($template_variation) && empty($template_variation_id)) {
-            \DB::delete(
+            \DB::query(
                 'ALTER TABLE `nos_page` ADD `page_template_variation_id` INT UNSIGNED  '.
                 'DEFAULT NULL AFTER `page_template`'
             )->execute();
 
-            \DB::delete('ALTER TABLE `nos_page` DROP `page_template`')->execute();
+            \DB::query('ALTER TABLE `nos_page` DROP `page_template`')->execute();
         }
     }
 }
