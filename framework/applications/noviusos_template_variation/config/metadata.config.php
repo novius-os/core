@@ -9,7 +9,7 @@
  */
 
 return array(
-    'name'      => 'Template Variation manager',
+    'name'      => 'Template variation manager',
     'namespace' => 'Nos\Template\Variation',
     'version'   => '4.1 (Dubrovka)',
     'provider'  => array(
@@ -19,7 +19,7 @@ return array(
     'permission' => array(),
     'launchers' => array(
         'noviusos_template_variation' => array(
-            'name' => 'Template Variation manager',
+            'name' => 'Template variation manager',
             'action' => array(
                 'action' => 'nosTabs',
                 'tab' => array(
