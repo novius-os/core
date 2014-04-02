@@ -7,42 +7,45 @@ namespace Nos\Menu;
  *
  * @package Nos\Menu
  */
-abstract class Driver {
+abstract class Driver
+{
 
     // The menu
-	protected $menu				= null;
-	protected $options			= null;
+    protected $menu = null;
+    protected $options = null;
 
     // Configuration
-    protected $config			= null;
+    protected $config = null;
 
     // Cached list of installed menu drivers
-    protected static $drivers   = null;
+    protected static $drivers = null;
 
     /**
      * Constructor
      *
      * @param null $menu
-	 * @param array $options
+     * @param array $options
      * @return Driver $this
      */
-	public function __construct($menu = null, $options = array()) {
+    public function __construct($menu = null, $options = array())
+    {
         // Set the menu
         $this->menu = $menu;
-		$this->options = $options;
+        $this->options = $options;
         // Load the driver configuration
         $this->config = $this->loadConfig();
-		return $this;
+        return $this;
     }
 
     /**
      * Returned a forged driver
      *
-	 * @param mixed $menu
-	 * @param array $options
-	 * @return Driver
-	 */
-	public static function forge($menu = null, $options = array()) {
+     * @param mixed $menu
+     * @param array $options
+     * @return Driver
+     */
+    public static function forge($menu = null, $options = array())
+    {
         return new static($menu, $options);
     }
 
@@ -51,7 +54,8 @@ abstract class Driver {
      *
      * @return array
      */
-    public function loadConfig() {
+    public function loadConfig()
+    {
         if (is_null($this->config)) {
             $this->config = static::getConfig();
         }
@@ -63,7 +67,8 @@ abstract class Driver {
      *
      * @return array
      */
-    public static function getConfig() {
+    public static function getConfig()
+    {
         // Get current driver configuration
         list($application_name, $config_file) = \Config::configFile(get_called_class());
         $config = \Config::loadConfiguration($application_name, $config_file);
@@ -80,7 +85,8 @@ abstract class Driver {
      *
      * @return array
      */
-    public static function getDrivers() {
+    public static function getDrivers()
+    {
         if (is_null(self::$drivers)) {
             // Set in cache
             self::$drivers = Helper::getInstalledDrivers();
@@ -93,9 +99,10 @@ abstract class Driver {
      *
      * @return mixed
      */
-    public static function getMenus() {
-		return array();
-	}
+    public static function getMenus()
+    {
+        return array();
+    }
 
     /**
      * Returns a tree of menu items forged with their driver (recursive method)

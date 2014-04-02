@@ -57,32 +57,32 @@ class Model_Menu extends \Nos\Orm\Model
         'Orm\Observer_CreatedAt' => array(
             'events' => array('before_insert'),
             'mysql_timestamp' => true,
-            'property'=>'menu_created_at'
+            'property' => 'menu_created_at'
         ),
         'Orm\Observer_UpdatedAt' => array(
             'events' => array('before_save'),
             'mysql_timestamp' => true,
-            'property'=>'menu_updated_at'
+            'property' => 'menu_updated_at'
         )
     );
 
     protected static $_behaviours = array(
         'Nos\Orm_Behaviour_Twinnable' => array(
-            'context_property'      => 'menu_context',
+            'context_property' => 'menu_context',
             'common_id_property' => 'menu_context_common_id',
             'is_main_property' => 'menu_context_is_main',
-            'common_fields'   => array(),
+            'common_fields' => array(),
         ),
     );
 
-    protected static $_belongs_to  = array();
+    protected static $_belongs_to = array();
 
     protected static $_has_many = array(
         'items' => array(
-            'key_from'       => 'menu_id',
-            'model_to'       => '\Nos\Menu\Model_Menu_Item',
-            'key_to'         => 'mitem_menu_id',
-            'cascade_save'   => true,
+            'key_from' => 'menu_id',
+            'model_to' => '\Nos\Menu\Model_Menu_Item',
+            'key_to' => 'mitem_menu_id',
+            'cascade_save' => true,
             'cascade_delete' => true,
         ),
     );
@@ -95,9 +95,10 @@ class Model_Menu extends \Nos\Orm\Model
      * @param null $parent_id
      * @return array
      */
-    public function items($parent_id = null) {
+    public function items($parent_id = null)
+    {
         // Gets the items with $parent_id as parent's item id
-        return array_filter($this->buildItemsChildren(), function($item) use($parent_id) {
+        return array_filter($this->buildItemsChildren(), function ($item) use ($parent_id) {
             return $item->mitem_parent_id == $parent_id;
         });
     }
@@ -108,13 +109,14 @@ class Model_Menu extends \Nos\Orm\Model
      * @param null $parent_id
      * @return array|null
      */
-    public function buildItemsChildren($parent_id = null) {
+    public function buildItemsChildren($parent_id = null)
+    {
         // Gets the items with $parent_id as parent's item id
-        $items = array_filter($this->items, function($item) use($parent_id) {
+        $items = array_filter($this->items, function ($item) use ($parent_id) {
             return $item->mitem_parent_id == $parent_id;
         });
         // Sort items
-        uasort($items, function($a, $b) {
+        uasort($items, function ($a, $b) {
             return strcmp($a->mitem_sort, $b->mitem_sort);
         });
         // Builds children recursively

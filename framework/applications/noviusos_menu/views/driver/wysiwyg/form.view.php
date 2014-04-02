@@ -8,10 +8,13 @@
  * @link http://www.novius-os.org
  */
 ?>
-<div class="expander fieldset" data-wijexpander-options="<?= htmlspecialchars(\Format::forge()->to_json($expander_options)); ?>">
+<div class="expander fieldset"
+     data-wijexpander-options="<?= htmlspecialchars(\Format::forge()->to_json($expander_options)); ?>">
     <h3><?= __('Wysiwyg') ?></h3>
-	<div style="overflow:visible;">
-		<?= \Nos\Renderer_Wysiwyg::renderer($renderer) ?>
-	</div>
+
+    <div style="overflow:visible;">
+        <?= \Nos\Renderer_Wysiwyg::renderer($renderer) ?>
+    </div>
 </div>
-<?= $content ?>
+<?php
+echo $content;

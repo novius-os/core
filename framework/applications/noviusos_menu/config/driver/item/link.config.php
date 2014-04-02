@@ -9,13 +9,13 @@
  */
 
 return array(
-	'name'	=> 'Link',
-	'icon'	=> 'static/apps/noviusos_menu/img/driver/link/icon.png',
-	'form'	=> array(
-		'height'	=> 450,
-	),
-	// Allowed EAV attributes
-	'attributes'	=> array(
-		'url', 'url_blank'
-	),
+    'name' => 'Link',
+    'icon' => 'static/apps/noviusos_menu/img/driver/link/icon.png',
+    'form' => array(
+        'height' => 450,
+    ),
+    // Allowed EAV attributes
+    'attributes' => array(
+        'url', 'url_blank'
+    ),
 );

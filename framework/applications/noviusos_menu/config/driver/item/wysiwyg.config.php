@@ -9,10 +9,10 @@
  */
 
 return array(
-	'name'	=> 'Wysiwyg',
-	'icon'	=> 'static/apps/noviusos_menu/img/driver/wysiwyg/icon.png',
-	'form'	=> array(
-		'width'		=> 900,
-		'height' 	=> 650,
-	),
+    'name' => 'Wysiwyg',
+    'icon' => 'static/apps/noviusos_menu/img/driver/wysiwyg/icon.png',
+    'form' => array(
+        'width' => 900,
+        'height' => 650,
+    ),
 );

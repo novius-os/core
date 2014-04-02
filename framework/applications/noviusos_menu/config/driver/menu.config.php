@@ -9,8 +9,8 @@
  */
 
 return array(
-	'name' => __('Menu'),
-	'icon' => array(
-		'16' => ''
-	),
+    'name' => __('Menu'),
+    'icon' => array(
+        '16' => ''
+    ),
 );

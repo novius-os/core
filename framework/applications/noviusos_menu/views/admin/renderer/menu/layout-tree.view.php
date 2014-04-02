@@ -9,25 +9,30 @@
  */
 ?>
 <ol>
-	<?php foreach ($items as $item) { ?>
-		<li id="list_<?= $item->mitem_id ?>" data-item-id="<?= $item->mitem_id ?>" data-item-driver="<?= $item->mitem_driver ?>">
-			<div>
+<?php
+foreach ($items as $item) {
+    ?>
+        <li id="list_<?= $item->mitem_id ?>" data-item-id="<?= $item->mitem_id ?>"
+            data-item-driver="<?= $item->mitem_driver ?>">
+            <div>
 				<span class="icon">
-					<?= \Fuel\Core\Html::img(\Arr::get($item->driver()->getConfig(), 'icon').'?temp') ?>
+					<?= \Fuel\Core\Html::img(\Arr::get($item->driver()->getConfig(), 'icon') . '?temp') ?>
 				</span>
 				<span class="label">
-					<?= !empty($item->mitem_title) ? $item->mitem_title : '<em>'.__('No title').'</em>' ?>
+					<?= !empty($item->mitem_title) ? $item->mitem_title : '<em>' . __('No title') . '</em>' ?>
 				</span>
-				<span class="buttons"></span>
-			</div>
-			<?php
-			$children = $item->children();
-			if (count($children)) {
-				echo \View::forge('noviusos_menu::admin/renderer/menu/layout-tree', array(
-					'items'	=> $children,
-				), false);
-			}
-			?>
-		</li>
-	<?php } ?>
+                <span class="buttons"></span>
+            </div>
+    <?php
+    $children = $item->children();
+    if (count($children)) {
+        echo \View::forge('noviusos_menu::admin/renderer/menu/layout-tree', array(
+            'items' => $children,
+        ), false);
+    }
+    ?>
+        </li>
+    <?php
+}
+?>
 </ol>

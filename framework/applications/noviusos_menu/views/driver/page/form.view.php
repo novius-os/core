@@ -8,11 +8,15 @@
  * @link http://www.novius-os.org
  */
 ?>
-<div class="expander fieldset" data-wijexpander-options="<?= htmlspecialchars(\Format::forge()->to_json($expander_options)); ?>">
+<div class="expander fieldset"
+     data-wijexpander-options="<?= htmlspecialchars(\Format::forge()->to_json($expander_options)); ?>">
     <h3><?= __('Page') ?></h3>
-	<div style="overflow:visible;">
-		<?= Nos\Page\Renderer_Selector::renderer($renderer);
-		?>
-	</div>
+
+    <div style="overflow:visible;">
+        <?=
+        Nos\Page\Renderer_Selector::renderer($renderer);
+        ?>
+    </div>
 </div>
-<?= $content ?>
+<?php
+echo $content;

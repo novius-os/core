@@ -15,40 +15,43 @@ namespace Nos\Menu;
  *
  * @package Nos\Menu
  */
-class Driver_Menu extends Driver {
+class Driver_Menu extends Driver
+{
 
     /**
      * Constructor
      *
-	 * @param null $menu
-	 * @param array $options
-	 *
-	 * @return Driver_Menu $this
-	 */
-	public function __construct($menu = null, $options = array()) {
-		// Finds the menu if $menu is an ID
-		if (is_numeric($menu)) {
-			$menu = Model_Menu::find($menu);
-			$context = \Arr::get($options, 'context');
-			if (!empty($context) && $context != $menu->menu_context) {
-				if ($context_menu = $menu->find_context($context)) {
-					$menu = $context_menu;
-				}
-			}
-		}
+     * @param null $menu
+     * @param array $options
+     *
+     * @return Driver_Menu $this
+     */
+    public function __construct($menu = null, $options = array())
+    {
+        // Finds the menu if $menu is an ID
+        if (is_numeric($menu)) {
+            $menu = Model_Menu::find($menu);
+            $context = \Arr::get($options, 'context');
+            if (!empty($context) && $context != $menu->menu_context) {
+                if ($context_menu = $menu->find_context($context)) {
+                    $menu = $context_menu;
+                }
+            }
+        }
         parent::__construct($menu);
-		return $this;
+        return $this;
     }
 
     /**
      * Finds the menus compatible with this driver and returns them as a list of forged menu drivers
      *
-	 * @param array $options
-	 * @return array
-	 */
-	public static function getMenus($options = array()) {
+     * @param array $options
+     * @return array
+     */
+    public static function getMenus($options = array())
+    {
         // Finds the published menus
-		$query = Model_Menu::query()->where('published', true);
+        $query = Model_Menu::query()->where('published', true);
 //		array(
 //			'where'	=> array(
 //				array('published', true),
@@ -61,10 +64,10 @@ class Driver_Menu extends Driver {
 //			),
 //		));
 
-		// Context
-		if ($context = \Arr::get($options, 'context')) {
-			$query->and_where('menu_context', '=', $context);
-		}
+        // Context
+        if ($context = \Arr::get($options, 'context')) {
+            $query->and_where('menu_context', '=', $context);
+        }
 
         // Forges them using the current driver
         $menus = array();
@@ -81,7 +84,8 @@ class Driver_Menu extends Driver {
      * @param null|int $parent_id
      * @return array
      */
-    public function getItems($parent_id = null) {
+    public function getItems($parent_id = null)
+    {
         // Get items
         $items = $this->menu->items($parent_id);
         // Forge items driver
@@ -97,7 +101,8 @@ class Driver_Menu extends Driver {
      *
      * @return mixed
      */
-    public function getTitle() {
+    public function getTitle()
+    {
         return $this->menu->menu_title;
     }
 
@@ -106,18 +111,20 @@ class Driver_Menu extends Driver {
      *
      * @return mixed
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->menu->menu_id;
     }
 
     /**
      * Returned a forged menu
      *
-	 * @param null $menu
-	 * @param array $options
-	 * @return Driver
-	 */
-	public static function forge($menu = null, $options = array()) {
+     * @param null $menu
+     * @param array $options
+     * @return Driver
+     */
+    public static function forge($menu = null, $options = array())
+    {
         // Try to build the appropriate driver (only if called statically on this class)
         if (!empty($menu) && is_object($menu) && !empty($menu->menu_driver) && get_called_class() == get_class()) {
             $driver = $menu->menu_driver;

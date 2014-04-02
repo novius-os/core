@@ -70,39 +70,39 @@ class Model_Menu_Item extends \Nos\Orm\Model
     );
 
     protected static $_eav = array(
-        'attributes' => array(		// we use the statistics relation to store the EAV data
-            'attribute' => 'miat_key',	// the key column in the related table contains the attribute
-            'value' 	=> 'miat_value',		// the value column in the related table contains the value
+        'attributes' => array( // we use the statistics relation to store the EAV data
+            'attribute' => 'miat_key', // the key column in the related table contains the attribute
+            'value' => 'miat_value', // the value column in the related table contains the value
         )
     );
 
-    protected static $_twinnable_belongs_to  = array(
+    protected static $_twinnable_belongs_to = array(
         'parent' => array(
-            'key_from'       => 'mitem_parent_id',
-            'model_to'       => '\Nos\Menu\Model_Menu_Item',
-            'key_to'         => 'mitem_id',
-            'cascade_save'   => false,
+            'key_from' => 'mitem_parent_id',
+            'model_to' => '\Nos\Menu\Model_Menu_Item',
+            'key_to' => 'mitem_id',
+            'cascade_save' => false,
             'cascade_delete' => false,
         ),
     );
 
-    protected static $_belongs_to  = array(
+    protected static $_belongs_to = array(
         'menu' => array(
-            'key_from'       => 'mitem_menu_id',
-            'model_to'       => '\Nos\Menu\Model_Menu',
-            'key_to'         => 'menu_id',
-            'cascade_save'   => false,
+            'key_from' => 'mitem_menu_id',
+            'model_to' => '\Nos\Menu\Model_Menu',
+            'key_to' => 'menu_id',
+            'cascade_save' => false,
             'cascade_delete' => false,
         ),
     );
 
-    protected static $_has_many  = array(
+    protected static $_has_many = array(
         'attributes' => array(
-            'key_from' => 'mitem_id',		// key in this model
-            'model_to'	=> '\Nos\Menu\Model_Menu_Item_Attribute',
-            'key_to' => 'miat_mitem_id',	// key in the related model
-            'cascade_save' => true,	// update the related table on save
-            'cascade_delete' => true,	// delete the related data when deleting the parent
+            'key_from' => 'mitem_id', // key in this model
+            'model_to' => '\Nos\Menu\Model_Menu_Item_Attribute',
+            'key_to' => 'miat_mitem_id', // key in the related model
+            'cascade_save' => true, // update the related table on save
+            'cascade_delete' => true, // delete the related data when deleting the parent
         )
     );
 
@@ -111,18 +111,18 @@ class Model_Menu_Item extends \Nos\Orm\Model
         'Orm\Observer_CreatedAt' => array(
             'events' => array('before_insert'),
             'mysql_timestamp' => true,
-            'property'=>'mitem_created_at'
+            'property' => 'mitem_created_at'
         ),
         'Orm\Observer_UpdatedAt' => array(
             'events' => array('before_save'),
             'mysql_timestamp' => true,
-            'property'=>'mitem_updated_at'
+            'property' => 'mitem_updated_at'
         )
     );
 
-    protected $driver	= null;
+    protected $driver = null;
 
-    public $children 	= null;
+    public $children = null;
 
     /**
      * Returns the driver
@@ -130,7 +130,8 @@ class Model_Menu_Item extends \Nos\Orm\Model
      * @param bool $cache
      * @return bool|Driver
      */
-    public function driver($cache = true) {
+    public function driver($cache = true)
+    {
         if (is_null($this->driver) || !$cache) {
             $this->driver = Driver_Item::forge($this);
         }
@@ -142,7 +143,8 @@ class Model_Menu_Item extends \Nos\Orm\Model
      *
      * @return mixed
      */
-    public function attributes() {
+    public function attributes()
+    {
         return $this->driver()->attributes();
     }
 
@@ -151,7 +153,8 @@ class Model_Menu_Item extends \Nos\Orm\Model
      *
      * @return mixed
      */
-    public function children() {
+    public function children()
+    {
         // Loads from DB if not already loaded
         if (is_null($this->children)) {
             $this->children = Model_Menu_Item::query(array(
@@ -160,7 +163,7 @@ class Model_Menu_Item extends \Nos\Orm\Model
                 ),
             ))->get();
             // Sort
-            uasort($this->children, function($a, $b) {
+            uasort($this->children, function ($a, $b) {
                 return strcmp($a->mitem_sort, $b->mitem_sort);
             });
         }
@@ -173,13 +176,18 @@ class Model_Menu_Item extends \Nos\Orm\Model
      * @param array $data
      * @return mixed
      */
-    public function populate($data = null) {
+    public function populate($data = null)
+    {
         // Populate with POST/GET if $data is empty
         $data = (!empty($data) ? (array) $data : \Input::param());
         // Populate driver first
-        uksort($data, function($a, $b) {
-            if ($a == 'mitem_driver') return -1;
-            if ($b == 'mitem_driver') return 1;
+        uksort($data, function ($a, $b) {
+            if ($a == 'mitem_driver') {
+                return -1;
+            }
+            if ($b == 'mitem_driver') {
+                return 1;
+            }
             return 0;
         });
         // Parse data
@@ -187,20 +195,18 @@ class Model_Menu_Item extends \Nos\Orm\Model
             // Property
             if (array_key_exists($property, $this->properties())) {
                 $this->$property = $value;
-            }
-            // Wysiwyg or media
-            elseif (in_array($property, array('wysiwygs', 'medias'))) {
+            } elseif (in_array($property, array('wysiwygs', 'medias'))) {
+                // Wysiwyg or media
                 foreach ($value as $name => $val) {
                     $this->$property->$name = $val;
                 }
-            }
-            //
-            // Attribute
-            elseif ($property == 'attributes') {
+
+            } elseif ($property == 'attributes') {
+                // Attribute
                 $this->setAttribute($property, $value);
-            }
-            // Dot notation
-            elseif (strpos($property, '.')) {
+
+            } elseif (strpos($property, '.')) {
+                // Dot notation
                 $parts = explode('.', $property);
                 if (count($parts) == 2) {
                     list($key, $name) = $parts;
@@ -226,7 +232,8 @@ class Model_Menu_Item extends \Nos\Orm\Model
      * @return bool|\Orm\Model
      * @throws \Exception
      */
-    public function setAttribute($key, $value) {
+    public function setAttribute($key, $value)
+    {
         if (!in_array($key, $this->attributes())) {
             // Attribute not authorized
             return false;
@@ -238,9 +245,9 @@ class Model_Menu_Item extends \Nos\Orm\Model
             }
         }
         return $this->attributes[] = Model_Menu_Item_Attribute::forge(array(
-            'miat_mitem_id'	=> $this->mitem_id,
-            'miat_key'		=> $key,
-            'miat_value'	=> $value,
+            'miat_mitem_id' => $this->mitem_id,
+            'miat_key' => $key,
+            'miat_value' => $value,
         ));
     }
 

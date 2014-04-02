@@ -10,39 +10,42 @@
 
 namespace Nos\Menu;
 
-class Driver_Item_Link extends Driver_Item {
+class Driver_Item_Link extends Driver_Item
+{
 
-	/**
-	 * Builds and returns the item edition form
-	 *
-	 * @param string $content
-	 * @param array $options
-	 * @return string
-	 */
-	public function form($content = null, $options = array()) {
-		if (is_array($content)) {
-			$options = $content;
-			$content = null;
-		}
-		return parent::form(\View::forge('noviusos_menu::driver/link/form', \Arr::merge($options, array(
-			'item'				=> $this->item,
-			'content'			=> $content,
-			'expander_options'	=> array(
-				'allowExpand'		=> false,
-				'expanded'			=> true,
-			),
-		)), false)->render());
-	}
+    /**
+     * Builds and returns the item edition form
+     *
+     * @param string $content
+     * @param array $options
+     * @return string
+     */
+    public function form($content = null, $options = array())
+    {
+        if (is_array($content)) {
+            $options = $content;
+            $content = null;
+        }
+        return parent::form(\View::forge('noviusos_menu::driver/link/form', \Arr::merge($options, array(
+            'item' => $this->item,
+            'content' => $content,
+            'expander_options' => array(
+                'allowExpand' => false,
+                'expanded' => true,
+            ),
+        )), false)->render());
+    }
 
-	/**
-	 * Displays the item
-	 *
-	 * @return string|bool
-	 */
-	public function display() {
-		if (empty($this->item->url)) {
-			return false;
-		}
+    /**
+     * Displays the item
+     *
+     * @return string|bool
+     */
+    public function display()
+    {
+        if (empty($this->item->url)) {
+            return false;
+        }
         // Blank target
         $attributes = array();
         if (!empty($this->item->url_blank)) {
@@ -50,5 +53,5 @@ class Driver_Item_Link extends Driver_Item {
         }
         // Build anchor with link
         return \Html::anchor($this->item->url, $this->title(), $attributes);
-	}
+    }
 }

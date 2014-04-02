@@ -19,7 +19,7 @@ return array(
     'permission' => array(),
     'launchers' => array(
         'noviusos_menu' => array(
-            'name'    => 'Menus manager',
+            'name' => 'Menus manager',
             'action' => array(
                 'action' => 'nosTabs',
                 'tab' => array(

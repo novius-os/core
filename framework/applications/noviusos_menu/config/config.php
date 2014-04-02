@@ -9,11 +9,11 @@
  */
 
 return array(
-	// Available drivers
-	'drivers'	=> array(
-		'Nos\Menu\Driver_Item_Text',
-		'Nos\Menu\Driver_Item_Link',
-		'Nos\Menu\Driver_Item_Page',
-		'Nos\Menu\Driver_Item_Wysiwyg',
-	),
+    // Available drivers
+    'drivers' => array(
+        'Nos\Menu\Driver_Item_Text',
+        'Nos\Menu\Driver_Item_Link',
+        'Nos\Menu\Driver_Item_Page',
+        'Nos\Menu\Driver_Item_Wysiwyg',
+    ),
 );

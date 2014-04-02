@@ -9,17 +9,17 @@
  */
 
 return array(
-	// Icon
-	'icon'			=> array(
-		'16' 			=> ''
-	),
+    // Icon
+    'icon' => array(
+        '16' => ''
+    ),
 
-	// Allowed EAV attributes
-	'attributes'	=> array(),
+    // Allowed EAV attributes
+    'attributes' => array(),
 
-	// Form options
-	'form'	=> array(
-		'width'  		=> 700,
-		'height' 		=> 400,
-	),
+    // Form options
+    'form' => array(
+        'width' => 700,
+        'height' => 400,
+    ),
 );

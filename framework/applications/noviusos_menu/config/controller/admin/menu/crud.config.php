@@ -9,9 +9,9 @@
  */
 
 return array(
-    'controller_url'  => 'admin/noviusos_menu/menu/crud',
+    'controller_url' => 'admin/noviusos_menu/menu/crud',
     'model' => 'Nos\Menu\Model_Menu',
-	'environment_relation' => 'parent',
+    'environment_relation' => 'parent',
     'layout' => array(
         'large' => true,
         'save' => 'save',
@@ -20,7 +20,7 @@ return array(
             'menu' => array(
                 'view' => 'nos::form/expander',
                 'params' => array(
-                    'title'   => __('Arborescence'),
+                    'title' => __('Arborescence'),
                     'nomargin' => true,
                     'options' => array(
                         'allowExpand' => false,
@@ -35,13 +35,12 @@ return array(
             ),
         ),
         'menu' => array(
-            __('Properties') => array(
-//				'templates',
+            __('Properties') => array(//				'templates',
             ),
         ),
     ),
     'fields' => array(
-        'menu__id' => array (
+        'menu__id' => array(
             'label' => 'ID: ',
             'form' => array(
                 'type' => 'hidden',
@@ -54,16 +53,16 @@ return array(
                 'type' => 'text',
             ),
         ),
-		'items' => array(
-			'label' => 'Arborescence',
-			'renderer' => 'Nos\Menu\Renderer_Menu',
-			'renderer_options' => array(
-				'height' => '250px',
-			),
-			'form' => array(
-				'title' => __('Items'),
-			),
-		),
+        'items' => array(
+            'label' => 'Arborescence',
+            'renderer' => 'Nos\Menu\Renderer_Menu',
+            'renderer_options' => array(
+                'height' => '250px',
+            ),
+            'form' => array(
+                'title' => __('Items'),
+            ),
+        ),
 //		'templates' => array(
 //			'label' => 'test',
 //			'renderer' => 'Nos\Menu\Renderer_Templates',
