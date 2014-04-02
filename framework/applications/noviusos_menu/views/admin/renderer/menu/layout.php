@@ -46,7 +46,7 @@ foreach ($available_drivers as $driver_class) {
 </div>
 <script type="text/javascript">
 require(
-    ['jquery-nos', 'static/apps/noviusos_menu/js/nestedSortable/jquery.mjs.nestedSortable.js'],
+    ['jquery-nos', 'jquery-ui.nestedSortable'],
     function ($) {
         $(function () {
             var context = '<?= $menu->menu_context ?>';
