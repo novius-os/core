@@ -10,7 +10,7 @@
 
 return array(
     'name' => 'Menus manager',
-    'namespace' => "Nos\Menu",
+    'namespace' => 'Nos\Menu',
     'version' => '4.1 (Dubrovka)',
     'provider' => array(
         'name' => 'Novius OS',

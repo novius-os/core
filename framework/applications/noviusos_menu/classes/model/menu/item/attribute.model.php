@@ -10,14 +10,14 @@
 
 namespace Nos\Menu;
 
-class Model_Menu_Item_Attribute extends \Orm\Model
-{
+use Orm\Model;
 
+class Model_Menu_Item_Attribute extends Model
+{
     protected static $_table_name = 'nos_menu_item_attribute';
     protected static $_primary_key = array('miat_id');
 
     protected static $_title_property = 'miat_key';
-
     protected static $_properties = array(
         'miat_id' => array(
             'default' => null,

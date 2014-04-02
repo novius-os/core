@@ -10,7 +10,9 @@
 
 namespace Nos\Menu;
 
-class Renderer_Menu extends \Nos\Renderer
+use Nos\Renderer;
+
+class Renderer_Menu extends Renderer
 {
     public function before_construct(&$attributes, &$rules)
     {

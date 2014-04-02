@@ -10,7 +10,9 @@
 
 namespace Nos\Menu;
 
-class Controller_Admin_Menu_Crud extends \Nos\Controller_Admin_Crud
+use Nos\Controller_Admin_Crud;
+
+class Controller_Admin_Menu_Crud extends Controller_Admin_Crud
 {
     /**
      * Save menu
@@ -28,23 +30,15 @@ class Controller_Admin_Menu_Crud extends \Nos\Controller_Admin_Crud
         }
 
         // Save items
-        $response = \Arr::merge($response, $this->save_items(\Input::post('update_items'), $menu));
+        $response = \Arr::merge($response, $this->saveItems(\Input::post('update_items'), $menu));
 
         // Delete items
-        $response = \Arr::merge($response, $this->delete_items(\Input::post('delete_items'), $menu));
+        $response = \Arr::merge($response, $this->deleteItems(\Input::post('delete_items'), $menu));
 
         return $response;
     }
 
-    /**
-     * Save menu items
-     *
-     * @param $items
-     * @param $menu
-     * @return array
-     * @throws \Exception
-     */
-    public function save_items($items, $menu)
+    protected function saveItems($items, $menu)
     {
         $return = array();
 
@@ -80,13 +74,12 @@ class Controller_Admin_Menu_Crud extends \Nos\Controller_Admin_Crud
 
                 // Dispatch event
                 $return['dispatchEvent'][] = array(
-                    "name" => "Nos\\Menu\\Model_Menu_Item",
-                    "action" => ($is_new ? 'insert' : 'update'),
-                    "id" => $id,
-                    "newid" => $item->mitem_id
+                    'name' => 'Nos\Menu\Model_Menu_Item',
+                    'action' => ($is_new ? 'insert' : 'update'),
+                    'id' => $id,
+                    'newid' => $item->mitem_id
                 );
             } catch (\Exception $e) {
-                // Errors on item
                 $return['errors'][] = $e->getMessage();
             }
         }
@@ -94,15 +87,7 @@ class Controller_Admin_Menu_Crud extends \Nos\Controller_Admin_Crud
         return $return;
     }
 
-    /**
-     * Save menu items
-     *
-     * @param $items
-     * @param $menu
-     * @return array
-     * @throws \Exception
-     */
-    public function delete_items($items, $menu)
+    protected function deleteItems($items, $menu)
     {
         $return = array();
 
@@ -126,7 +111,7 @@ class Controller_Admin_Menu_Crud extends \Nos\Controller_Admin_Crud
                 }
 
                 // Delete item's children
-                $deleted_ids = $this->delete_item_children($menu->items($item->mitem_id));
+                $deleted_ids = $this->deleteItemChildren($menu->items($item->mitem_id));
 
                 // Delete item
                 $item->delete();
@@ -135,9 +120,9 @@ class Controller_Admin_Menu_Crud extends \Nos\Controller_Admin_Crud
                 // Dispatch delete events
                 foreach ($deleted_ids as $deleted_id) {
                     $return['dispatchEvent'][] = array(
-                        "name" => "Nos\\Menu\\Model_Menu_Item",
-                        "action" => 'delete',
-                        "id" => $deleted_id,
+                        'name' => 'Nos\Menu\Model_Menu_Item',
+                        'action' => 'delete',
+                        'id' => $deleted_id,
                     );
                 }
             } catch (\Exception $e) {
@@ -149,17 +134,13 @@ class Controller_Admin_Menu_Crud extends \Nos\Controller_Admin_Crud
         return $return;
     }
 
-    public function delete_item($menu, $item)
-    {
-    }
-
     /**
      * Delete item's children
      *
      * @param array $tree Item's children tree
      * @return array Deleted item ids
      */
-    public function delete_item_children($tree)
+    protected function deleteItemChildren($tree)
     {
         $ids = array();
         if (empty($tree)) {
@@ -168,7 +149,7 @@ class Controller_Admin_Menu_Crud extends \Nos\Controller_Admin_Crud
         foreach ($tree as $item) {
             if (count($item->children)) {
                 // Delete the item's children
-                $ids += $this->delete_item_children($item->children);
+                $ids += $this->deleteItemChildren($item->children);
             }
             // Delete the itemx
             $item->delete();

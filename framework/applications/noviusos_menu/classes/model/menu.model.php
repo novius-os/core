@@ -10,11 +10,14 @@
 
 namespace Nos\Menu;
 
-class Model_Menu extends \Nos\Orm\Model
+use Nos\Orm\Model;
+
+class Model_Menu extends Model
 {
     protected static $_primary_key = array('menu_id');
     protected static $_table_name = 'nos_menu';
 
+    protected static $_title_property = 'menu_title';
     protected static $_properties = array(
         'menu_id' => array(
             'default' => null,
@@ -51,7 +54,23 @@ class Model_Menu extends \Nos\Orm\Model
         ),
     );
 
-    protected static $_title_property = 'menu_title';
+    protected static $_belongs_to = array();
+    protected static $_has_one = array();
+    protected static $_many_many = array();
+    protected static $_twinnable_has_one = array();
+    protected static $_twinnable_has_many = array();
+    protected static $_twinnable_belongs_to = array();
+    protected static $_twinnable_many_many = array();
+
+    protected static $_has_many = array(
+        'items' => array(
+            'key_from' => 'menu_id',
+            'model_to' => '\Nos\Menu\Model_Menu_Item',
+            'key_to' => 'mitem_menu_id',
+            'cascade_save' => true,
+            'cascade_delete' => true,
+        ),
+    );
 
     protected static $_observers = array(
         'Orm\Observer_CreatedAt' => array(
@@ -74,20 +93,6 @@ class Model_Menu extends \Nos\Orm\Model
             'common_fields' => array(),
         ),
     );
-
-    protected static $_belongs_to = array();
-
-    protected static $_has_many = array(
-        'items' => array(
-            'key_from' => 'menu_id',
-            'model_to' => '\Nos\Menu\Model_Menu_Item',
-            'key_to' => 'mitem_menu_id',
-            'cascade_save' => true,
-            'cascade_delete' => true,
-        ),
-    );
-
-    protected static $_many_many = array();
 
     /**
      * Returns items by parent item id

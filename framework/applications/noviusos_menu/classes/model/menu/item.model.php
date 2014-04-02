@@ -10,7 +10,9 @@
 
 namespace Nos\Menu;
 
-class Model_Menu_Item extends \Nos\Orm\Model
+use Nos\Orm\Model;
+
+class Model_Menu_Item extends Model
 {
     protected static $_table_name = 'nos_menu_item';
     protected static $_primary_key = array('mitem_id');
@@ -76,7 +78,14 @@ class Model_Menu_Item extends \Nos\Orm\Model
         )
     );
 
-    protected static $_twinnable_belongs_to = array(
+    protected static $_has_one = array();
+    protected static $_many_many = array();
+    protected static $_twinnable_has_one = array();
+    protected static $_twinnable_has_many = array();
+    protected static $_twinnable_belongs_to = array();
+    protected static $_twinnable_many_many = array();
+
+    protected static $_belongs_to = array(
         'parent' => array(
             'key_from' => 'mitem_parent_id',
             'model_to' => '\Nos\Menu\Model_Menu_Item',
@@ -84,9 +93,6 @@ class Model_Menu_Item extends \Nos\Orm\Model
             'cascade_save' => false,
             'cascade_delete' => false,
         ),
-    );
-
-    protected static $_belongs_to = array(
         'menu' => array(
             'key_from' => 'mitem_menu_id',
             'model_to' => '\Nos\Menu\Model_Menu',

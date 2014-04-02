@@ -40,7 +40,7 @@ return array(
         ),
     ),
     'fields' => array(
-        'menu__id' => array(
+        'menu_id' => array(
             'label' => 'ID: ',
             'form' => array(
                 'type' => 'hidden',

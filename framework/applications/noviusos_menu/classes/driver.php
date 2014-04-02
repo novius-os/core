@@ -81,20 +81,6 @@ abstract class Driver
     }
 
     /**
-     * Returns a list of installed menu drivers
-     *
-     * @return array
-     */
-    public static function getDrivers()
-    {
-        if (is_null(self::$drivers)) {
-            // Set in cache
-            self::$drivers = Helper::getInstalledDrivers();
-        }
-        return self::$drivers;
-    }
-
-    /**
      * Find the menus compatible with this driver and returns them as a list of forged menu drivers
      *
      * @return mixed
