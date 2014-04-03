@@ -16,41 +16,70 @@ class Orm_Twinnable_BelongsTo extends \Orm\BelongsTo
 {
     protected $column_context_from = 'context';
 
-    protected $column_context_to = 'context';
+    protected $column_context_to = false;
 
-    protected $column_context_is_main_to = 'context_is_main';
+    protected $column_context_is_main_to = false;
+
+    protected $cascade_delete_after_last_twin = true;
 
     public function __construct($from, $name, array $config)
     {
-        $to = array_key_exists('model_to', $config) ? $config['model_to'] : \Inflector::get_namespace($from).'Model_'.\Inflector::classify($name);
+        $to = \Arr::get($config, 'model_to', \Inflector::get_namespace($from).'Model_'.\Inflector::classify($name));
         if (!class_exists($to)) {
-            throw new \FuelException('The related model ‘'.$to.'’ cannot be found by the belongs_to relation ‘'.$name.'’.');
+            throw new \FuelException(
+                'The related model ‘'.$to.'’ cannot be found by the belongs_to relation ‘'.$name.'’.'
+            );
         }
         $to_behaviour = $to::behaviours('Nos\Orm_Behaviour_Twinnable', false);
-        if (!$to_behaviour) {
-            throw new \FuelException('The twinnable_belongs_to relation ‘'.$name.'’ of the model ‘'.$from.'’ refers to a model which doesn’t have the Twinnable behaviour.');
+        if ($to_behaviour && !array_key_exists('key_to', $config)) {
+            $config['key_to'] = $to_behaviour['common_id_property'];
         }
+
         $from_behaviour = $from::behaviours('Nos\Orm_Behaviour_Twinnable', false);
         if (!$from_behaviour) {
-            throw new \FuelException('The model ‘'.$from.'’ has a twinnable_belongs_to relation but no Twinnable behaviour. Surprising, don’t you think?');
+            throw new \FuelException(
+                'The model ‘'.$from.'’ has a twinnable_belongs_to relation '.
+                'but no Twinnable behaviour. Surprising, don’t you think?'
+            );
         }
-        $config['key_to'] = array_key_exists('key_to', $config) ? (array) $config['key_to'] : $to_behaviour['common_id_property'];
 
         parent::__construct($from, $name, $config);
 
         foreach ($this->key_from as $key_from) {
             if (!in_array($key_from, $from_behaviour['common_fields'])) {
-                throw new \FuelException('The field ‘'.$key_from.'’ of the model ‘'.$from.'’ must be declared as common in the Twinnable behaviour.');
+                throw new \FuelException(
+                    'The field ‘'.$key_from.'’ of the model ‘'.$from.
+                    '’ must be declared as common in the Twinnable behaviour.'
+                );
             }
         }
 
-        $this->column_context_from = array_key_exists('column_context_from', $config) ? $config['column_context_from'] : $from_behaviour['context_property'];
-        $this->column_context_to = array_key_exists('column_context_to', $config) ? $config['column_context_to'] : $to_behaviour['context_property'];
-        $this->column_context_is_main_to = array_key_exists('column_context_is_main_to', $config) ? $config['column_context_is_main_to'] : $to_behaviour['is_main_property'];
+        $this->column_context_from = \Arr::get($config, 'column_context_from', $from_behaviour['context_property']);
+
+        $this->column_context_to = \Arr::get(
+            $config,
+            'column_context_to',
+            $to_behaviour ? $to_behaviour['context_property'] : false
+        );
+        $this->column_context_is_main_to = \Arr::get(
+            $config,
+            'column_context_is_main_to',
+            $to_behaviour ? $to_behaviour['is_main_property'] : false
+        );
+
+        $this->cascade_delete_after_last_twin =  \Arr::get(
+            $config,
+            'cascade_delete_after_last_twin',
+            $this->cascade_delete_after_last_twin
+        );
     }
 
     public function get(\Orm\Model $from)
     {
+        if (!$this->column_context_to) {
+            return parent::get($from);
+        }
+
         $query = call_user_func(array($this->model_to, 'query'));
         reset($this->key_to);
         foreach ($this->key_from as $key) {
@@ -74,6 +103,10 @@ class Orm_Twinnable_BelongsTo extends \Orm\BelongsTo
 
     public function join($alias_from, $rel_name, $alias_to_nr, $conditions = array())
     {
+        if (!$this->column_context_to) {
+            return parent::join($alias_from, $rel_name, $alias_to_nr, $conditions);
+        }
+
         $alias_to = 't'.$alias_to_nr;
 
         $props_pks = $this->_selectFallback($alias_to, $alias_to.'_fallback');
@@ -150,5 +183,15 @@ class Orm_Twinnable_BelongsTo extends \Orm\BelongsTo
             'columns' => $properties,
             'primary_key' => $primary_key,
         );
+    }
+
+    public function delete($model_from, $models_to, $parent_deleted, $cascade)
+    {
+        // If not cascade, others twins use the relation
+        // see \Nos\Orm\Model->should_cascade_delete()
+        // prevent parent delete() to set the foreign key to null
+        if ((bool) $cascade) {
+            return parent::delete($model_from, $models_to, $parent_deleted, $cascade);
+        }
     }
 }

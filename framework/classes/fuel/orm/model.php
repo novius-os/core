@@ -480,6 +480,29 @@ class Model extends \Orm\Model
     }
 
     /**
+     * Allows subclasses to more easily define if a relation can be cascade deleted or not.
+     *
+     * @param array $rel
+     *
+     * @return bool False to stop the relation from being deleted. Works the same as the cascade_delete property
+     */
+    protected function should_cascade_delete($rel)
+    {
+        $twinnable = $this->behaviours('Nos\Orm_Behaviour_Twinnable');
+        if (!empty($twinnable) &&
+            property_exists($rel, 'cascade_delete_after_last_twin') && $rel->cascade_delete_after_last_twin) {
+            $count = static::count(array(
+                'where' => array(
+                    array($twinnable['common_id_property'], '=', $this->{$twinnable['common_id_property']}),
+                ),
+            ));
+            return $count === 0;
+        }
+
+        return true;
+    }
+
+    /**
      * Remove empty wysiwyg and medias
      */
     public function _event_before_save()
