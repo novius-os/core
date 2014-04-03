@@ -51,7 +51,6 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
             'key_to' => 'wysiwyg_foreign_context_common_id',
             'cascade_save' => true,
             'cascade_delete' => true,
-            'cascade_delete_after_last_twin' => true,
             'conditions' => array(
                 'where' => array(
                     array('wysiwyg_join_table', '=', \DB::expr(\DB::quote($class::table()))),
@@ -65,7 +64,6 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
             'key_to' => 'medil_foreign_context_common_id',
             'cascade_save' => true,
             'cascade_delete' => true,
-            'cascade_delete_after_last_twin' => true,
             'conditions' => array(
                 'where' => array(
                     array('medil_from_table', '=', \DB::expr(\DB::quote($class::table()))),
