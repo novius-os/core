@@ -187,6 +187,9 @@ class Orm_Twinnable_BelongsTo extends \Orm\BelongsTo
 
     public function delete($model_from, $models_to, $parent_deleted, $cascade)
     {
+        // If not cascade, others twins use the relation
+        // see \Nos\Orm\Model->should_cascade_delete()
+        // prevent parent delete() to set the foreign key to null
         if ((bool) $cascade) {
             return parent::delete($model_from, $models_to, $parent_deleted, $cascade);
         }
