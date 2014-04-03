@@ -45,12 +45,13 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
     {
         $class = $this->_class;
 
-        $class::addRelation('has_many', 'linked_shared_wysiwygs_context', array(
+        $class::addRelation('twinnable_has_many', 'linked_shared_wysiwygs_context', array(
             'key_from' => $this->_properties['common_id_property'],
             'model_to' => 'Nos\Model_Wysiwyg',
             'key_to' => 'wysiwyg_foreign_context_common_id',
             'cascade_save' => true,
             'cascade_delete' => true,
+            'cascade_delete_after_last_twin' => true,
             'conditions' => array(
                 'where' => array(
                     array('wysiwyg_join_table', '=', \DB::expr(\DB::quote($class::table()))),
@@ -58,12 +59,13 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
             ),
         ));
 
-        $class::addRelation('has_many', 'linked_shared_medias_context', array(
+        $class::addRelation('twinnable_has_many', 'linked_shared_medias_context', array(
             'key_from' => $this->_properties['common_id_property'],
             'model_to' => 'Nos\Media\Model_Link',
             'key_to' => 'medil_foreign_context_common_id',
             'cascade_save' => true,
             'cascade_delete' => true,
+            'cascade_delete_after_last_twin' => true,
             'conditions' => array(
                 'where' => array(
                     array('medil_from_table', '=', \DB::expr(\DB::quote($class::table()))),
