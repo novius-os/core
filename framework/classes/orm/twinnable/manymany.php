@@ -16,41 +16,71 @@ class Orm_Twinnable_ManyMany extends \Orm\ManyMany
 {
     protected $column_context_from = 'context';
 
-    protected $column_context_common_id_to = 'context_common_id';
+    protected $column_context_common_id_to = false;
 
-    protected $column_context_to = 'context';
+    protected $column_context_to = false;
 
-    protected $column_context_is_main_to = 'context_is_main';
+    protected $column_context_is_main_to = false;
+
+    protected $cascade_delete_after_last_twin = true;
 
     protected $delete_related_called = false;
 
     public function __construct($from, $name, array $config)
     {
-        $to = array_key_exists('model_to', $config) ? $config['model_to'] : \Inflector::get_namespace($from).'Model_'.\Inflector::classify($name);
+        $to = \Arr::get($config, 'model_to', \Inflector::get_namespace($from).'Model_'.\Inflector::classify($name));
         if (!class_exists($to)) {
-            throw new \FuelException('The related model ‘'.$this->model_to.'’ cannot be found by the many_many relation ‘'.$this->name.'’.');
+            throw new \FuelException(
+                'The related model ‘'.$this->model_to.'’ cannot be found by the many_many relation ‘'.$this->name.'’.'
+            );
         }
         $to_behaviour = $to::behaviours('Nos\Orm_Behaviour_Twinnable', false);
-        if (!$to_behaviour) {
-            throw new \FuelException('The twinnable_many_many relation ‘'.$name.'’ of the model ‘'.$from.'’ refers to a model which doesn’t have the Twinnable behaviour.');
+        if ($to_behaviour && !array_key_exists('key_to', $config)) {
+            $config['key_to'] = $to_behaviour['common_id_property'];
         }
+
         $from_behaviour = $from::behaviours('Nos\Orm_Behaviour_Twinnable', false);
         if (!$from_behaviour) {
-            throw new \FuelException('The model ‘'.$from.'’ has a twinnable_many_many relation but no Twinnable behaviour. How strange.');
+            throw new \FuelException(
+                'The model ‘'.$from.'’ has a twinnable_many_many relation '.
+                'but no Twinnable behaviour. How strange.'
+            );
         }
-        $config['key_from'] = array_key_exists('key_from', $config) ? (array) $config['key_from'] : $from_behaviour['common_id_property'];
-        $config['key_to'] = array_key_exists('key_to', $config) ? (array) $config['key_to'] : $to_behaviour['common_id_property'];
+        $config['key_from'] = (array) \Arr::get($config, 'key_from', $from_behaviour['common_id_property']);
 
         parent::__construct($from, $name, $config);
 
-        $this->column_context_from = array_key_exists('column_context_from', $config) ? $config['column_context_from'] : $from_behaviour['context_property'];
-        $this->column_context_common_id_to = array_key_exists('column_context_common_id_to', $config) ? $config['column_context_common_id_to'] : $to_behaviour['common_id_property'];
-        $this->column_context_to = array_key_exists('column_context_to', $config) ? $config['column_context_to'] : $to_behaviour['context_property'];
-        $this->column_context_is_main_to = array_key_exists('column_context_is_main_to', $config) ? $config['column_context_is_main_to'] : $to_behaviour['is_main_property'];
+        $this->column_context_from = \Arr::get($config, 'column_context_from', $from_behaviour['context_property']);
+
+        $this->column_context_common_id_to = \Arr::get(
+            $config,
+            'column_context_common_id_to',
+            $to_behaviour ? $to_behaviour['common_id_property'] : false
+        );
+        $this->column_context_to = \Arr::get(
+            $config,
+            'column_context_to',
+            $to_behaviour ? $to_behaviour['context_property'] : false
+        );
+        $this->column_context_is_main_to = \Arr::get(
+            $config,
+            'column_context_is_main_to',
+            $to_behaviour ? $to_behaviour['is_main_property'] : false
+        );
+
+        $this->cascade_delete_after_last_twin =  \Arr::get(
+            $config,
+            'cascade_delete_after_last_twin',
+            $this->cascade_delete_after_last_twin
+        );
     }
 
     public function get(\Orm\Model $from)
     {
+        if (!$this->column_context_to) {
+            return parent::get($from);
+        }
+
         // Create the query on the model_through
         $query = call_user_func(array($this->model_to, 'query'));
 
@@ -115,6 +145,10 @@ class Orm_Twinnable_ManyMany extends \Orm\ManyMany
 
     public function join($alias_from, $rel_name, $alias_to_nr, $conditions = array())
     {
+        if (!$this->column_context_to) {
+            return parent::join($alias_from, $rel_name, $alias_to_nr, $conditions);
+        }
+
         $alias_to = 't'.$alias_to_nr;
 
         $alias_through = array($this->table_through, $alias_to.'_through');
@@ -363,6 +397,16 @@ class Orm_Twinnable_ManyMany extends \Orm\ManyMany
         //if there's one result or more, prevent from deleting relation (still used by twin models)
         if (count($result) === 0) {
             parent::delete_related($model_from);
+        }
+    }
+
+    public function delete($model_from, $models_to, $parent_deleted, $cascade)
+    {
+        // If not cascade, others twins use the relation
+        // see \Nos\Orm\Model->should_cascade_delete()
+        // prevent parent delete() to set the foreign key to null
+        if ((bool) $cascade) {
+            return parent::delete($model_from, $models_to, $parent_deleted, $cascade);
         }
     }
 }

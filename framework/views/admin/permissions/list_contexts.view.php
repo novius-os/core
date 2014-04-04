@@ -59,10 +59,8 @@ require(['jquery-nos', 'wijmo.wijgrid'], function($) {
                 }
             }
         ],
+        noCellsSelected: true,
         cellStyleFormatter: function(args) {
-            if (args.state & $.wijmo.wijgrid.renderState.selected) {
-                args.$cell.removeClass('ui-state-highlight');
-            }
             if (args._cellIndex > 0) {
                 args.$cell.css('text-align', 'center');
                 if (args.row.dataRowIndex === -1) {

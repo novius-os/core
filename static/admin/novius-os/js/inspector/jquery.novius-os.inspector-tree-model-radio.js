@@ -70,11 +70,7 @@ define('jquery-nos-inspector-tree-model-radio',
                                 columnsAutogenerationMode : 'none',
                                 scrollMode : 'auto',
                                 loadingText: params.loadingText || 'Loading...',
-                                cellStyleFormatter: function(args) {
-                                    if (args.$cell.is('td')) {
-                                        args.$cell.removeClass("ui-state-highlight");
-                                    }
-                                },
+                                noCellsSelected: true,
                                 rowStyleFormatter : function(args) {
                                     if (args.type == $.wijmo.wijgrid.rowType.header) {
                                         args.$rows.hide();

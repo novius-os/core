@@ -12,16 +12,18 @@ define('jquery-nos-listgrid',
         "use strict";
         $.widget( "nos.noslistgrid", $.wijmo.wijgrid, {
             options: {
+                noCellsSelected: false,
                 culture: $.nosLang.substr(0, 2),
                 loadingText : 'Loading...'
             },
 
             _init: function() {
                 var self = this,
-                    o = self.options;
+                    o = self.options,
+                    old_columnResized, old_ajaxError, old_cellStyleFormatter;
 
                 if ($.isFunction(o.columnResized)) {
-                    var old_columnResized = o.columnResized;
+                    old_columnResized = o.columnResized;
                 }
                 o.columnResized = function(e, args) {
                     var columns = self.option('columns');
@@ -36,7 +38,7 @@ define('jquery-nos-listgrid',
                 };
 
                 if ($.isFunction(o.dataLoaded)) {
-                    var old_ajaxError = o.ajaxError;
+                    old_ajaxError = o.ajaxError;
                 }
                 o.ajaxError = function(e, args) {
                     var jqXHR = args.XMLHttpRequest;
@@ -47,6 +49,20 @@ define('jquery-nos-listgrid',
                         old_ajaxError.apply(this, arguments);
                     }
                 };
+
+                if (o.noCellsSelected) {
+                    if ($.isFunction(o.cellStyleFormatter)) {
+                        old_cellStyleFormatter = o.cellStyleFormatter;
+                    }
+                    o.cellStyleFormatter = function(args) {
+                        if ($.isFunction(old_cellStyleFormatter)) {
+                            old_cellStyleFormatter.apply(this, arguments);
+                        }
+                        if (args.$cell.is('td')) {
+                            args.$cell.removeClass("ui-state-highlight ui-state-default");
+                        }
+                    };
+                }
 
                 self._super();
             }

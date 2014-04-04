@@ -99,6 +99,7 @@ define('jquery-nos-inspector-model',
                                     }
                                 }
                             }),
+                            noCellsSelected: true,
                             currentCellChanged: function (e) {
                                 var row = $(e.target).noslistgrid("currentCell").row(),
                                     data = row ? row.data : false;

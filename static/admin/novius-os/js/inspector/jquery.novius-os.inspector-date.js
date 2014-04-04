@@ -115,6 +115,7 @@ define('jquery-nos-inspector-date',
                                 }
                             ],
                             data: params.content,
+                            noCellsSelected: true,
                             currentCellChanged: function (e) {
                                 var row = $(e.target).noslistgrid("currentCell").row(),
                                     data = row ? row.data : false;

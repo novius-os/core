@@ -387,7 +387,7 @@ define('jquery-nos-appdesk',
                         }
                     })
                     .nosOnShow('one', function() {
-                        $table.wijgrid({
+                        $table.noslistgrid({
                             scrollMode : "auto",
                             columns: [
                                 {
@@ -399,14 +399,12 @@ define('jquery-nos-appdesk',
                                     }
                                 }
                             ],
+                            noCellsSelected: true,
                             cellStyleFormatter: function(args) {
-                                if (args.state & $.wijmo.wijgrid.renderState.selected) {
-                                    args.$cell.removeClass('ui-state-highlight');
-                                }
                                 if (args._cellIndex > 0) {
                                     args.$cell.css('text-align', 'center');
                                     if (args.row.dataRowIndex === -1) {
-                                        var data = $table.wijgrid('data');
+                                        var data = $table.noslistgrid('data');
 
                                         args.$cell.click(function(e) {
                                             e.preventDefault();
@@ -1153,9 +1151,6 @@ define('jquery-nos-appdesk',
                             if (args.$cell.is('th')) {
                                 args.$cell.removeClass("ui-state-active");
                             }
-                            if (args.state & $.wijmo.wijgrid.renderState.selected && args.$cell.hasClass('ui-state-default')) {
-                                args.$cell.removeClass("ui-state-highlight");
-                            }
                             if (args.state & $.wijmo.wijgrid.renderState.selected) {
                                 args.$cell.removeClass("wijmo-wijgrid-current-cell");
                             }
@@ -1249,9 +1244,6 @@ define('jquery-nos-appdesk',
                         cellStyleFormatter: function(args) {
                             if (args.$cell.is('th')) {
                                 args.$cell.removeClass("ui-state-active");
-                            }
-                            if (args.state & $.wijmo.wijgrid.renderState.selected && args.$cell.hasClass('ui-state-default')) {
-                                args.$cell.removeClass("ui-state-highlight");
                             }
                             if (args.state & $.wijmo.wijgrid.renderState.selected) {
                                 args.$cell.removeClass("wijmo-wijgrid-current-cell");
