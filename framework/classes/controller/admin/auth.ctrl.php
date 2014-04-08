@@ -26,7 +26,7 @@ class Controller_Admin_Auth extends Controller
                     array(
                         'login_popup' => array(
                             'ajax' => true,
-                            'contentUrl' => '/admin/nos/login/popup',
+                            'contentUrl' => \Config::get('base_url').'admin/nos/login/popup',
                             // The title here is useless, as we can't know the lang of the user here, it will be updated in the login_popup view
                             'title' => '',
                             'width' => 350,
