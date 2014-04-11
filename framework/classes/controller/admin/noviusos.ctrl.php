@@ -188,6 +188,8 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
         $background_id = \Arr::get($user->getConfiguration(), 'misc.display.background', \Config::get('background_id', false));
         $background = $background_id ? \Nos\Media\Model_Media::find($background_id) : false;
 
+        \Event::trigger_function('admin.launchers', array(&$apps));
+
         $view = \View::forge(
             'admin/appstab',
             array(
