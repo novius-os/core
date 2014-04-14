@@ -137,6 +137,8 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
         $launchers = \Config::mergeWithUser('misc.apps', $launchers); // It retrieves order from user configuration
         unset($launchers['configuration_id']); // Configuration id is automatically added
 
+        \Event::trigger_function('admin.launchers', array(&$launchers));
+        
         $apps = array();
         foreach ($launchers as $key => $app) {
             $app['key'] = $key;
@@ -187,8 +189,6 @@ class Controller_Admin_Noviusos extends Controller_Admin_Auth
         $user = \Session::user();
         $background_id = \Arr::get($user->getConfiguration(), 'misc.display.background', \Config::get('background_id', false));
         $background = $background_id ? \Nos\Media\Model_Media::find($background_id) : false;
-
-        \Event::trigger_function('admin.launchers', array(&$apps));
 
         $view = \View::forge(
             'admin/appstab',
