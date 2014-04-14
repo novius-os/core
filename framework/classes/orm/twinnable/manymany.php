@@ -280,7 +280,18 @@ class Orm_Twinnable_ManyMany extends \Orm\ManyMany
             );
         }
         $original_model_ids === null and $original_model_ids = array();
-        $del_rels = $original_model_ids;
+
+        $common_id_property = reset($this->key_to);
+        if (!empty($original_model_ids)) {
+            $model_to_class = $this->model_to;
+            $result = \DB::select($common_id_property)->from($model_to_class::table())
+                ->where(reset($model_to_class::primary_key()), 'IN', $original_model_ids)
+                ->execute($model_to_class::connection());
+            $original_common_ids = \Arr::pluck($result->as_array(), $common_id_property);
+        } else {
+            $original_common_ids = array();
+        }
+        $del_common_ids = $original_common_ids;
 
         if ($this->delete_related_called) {
             // If delete_related() has been called before save(), force the call of parent delete_related()
@@ -316,11 +327,15 @@ class Orm_Twinnable_ManyMany extends \Orm\ManyMany
                     next($this->key_to);
                 }
 
-                \DB::insert($this->table_through)->set($ids)->execute(call_user_func(array($model_from, 'connection')));
+                if (!in_array($model_to->{$common_id_property}, $original_common_ids)) {
+                    \DB::insert($this->table_through)->set($ids)->execute(call_user_func(array($model_from, 'connection')));
+                } else {
+                    unset($del_common_ids[array_search($model_to->{$common_id_property}, $original_common_ids)]);
+                }
                 $original_model_ids[] = $current_model_id; // prevents inserting it a second time
             } else {
                 // unset current model from from array of new relations
-                unset($del_rels[array_search($current_model_id, $original_model_ids)]);
+                unset($del_common_ids[array_search($model_to->{$common_id_property}, $original_common_ids)]);
             }
 
             // ensure correct pk assignment
@@ -340,15 +355,12 @@ class Orm_Twinnable_ManyMany extends \Orm\ManyMany
         //del_rels is made of ids, contrary to the content of the "table_through", made of common ids
         //these must be replaced before deleting the relationship
 
-        $model_to = $this->model_to;
-        if (!empty($del_rels)) {
+        if (!empty($del_common_ids)) {
             //As the context_common_id property can't be an array,
             //it is assumed that each del_rels and is key is a single id
             //(could have been several)
-            $subquery = \DB::select(reset($this->key_to))->from($model_to::table())->where(reset($model_to::primary_key()), 'IN', $del_rels);
             $query = \DB::delete($this->table_through);
-
-            $query->where(reset($this->key_through_to), 'IN', $subquery);
+            $query->where(reset($this->key_through_to), 'IN', $del_common_ids);
             $query->where(reset($this->key_through_from), '=', $model_from->{reset($this->key_from)});
 
             $query->execute(call_user_func(array($model_from, 'connection')));
