@@ -280,25 +280,25 @@ class Orm_Twinnable_ManyMany extends \Orm\ManyMany
             );
         }
         $original_model_ids === null and $original_model_ids = array();
+        $original_common_ids = array();
 
         $common_id_property = reset($this->key_to);
-        if (!empty($original_model_ids)) {
-            $model_to_class = $this->model_to;
-            $result = \DB::select($common_id_property)->from($model_to_class::table())
-                ->where(reset($model_to_class::primary_key()), 'IN', $original_model_ids)
-                ->execute($model_to_class::connection());
-            $original_common_ids = \Arr::pluck($result->as_array(), $common_id_property);
-        } else {
-            $original_common_ids = array();
-        }
-        $del_common_ids = $original_common_ids;
-
         if ($this->delete_related_called) {
             // If delete_related() has been called before save(), force the call of parent delete_related()
             // static::delete_related() does nothing if others twins exist
             parent::delete_related($model_from);
             $this->delete_related_called = false;
+            $original_model_ids = array();
+        } else {
+            if (!empty($original_model_ids)) {
+                $model_to_class = $this->model_to;
+                $result = \DB::select($common_id_property)->from($model_to_class::table())
+                    ->where(reset($model_to_class::primary_key()), 'IN', $original_model_ids)
+                    ->execute($model_to_class::connection());
+                $original_common_ids = \Arr::pluck($result->as_array(), $common_id_property);
+            }
         }
+        $del_common_ids = $original_common_ids;
 
         foreach ($models_to as $key => $model_to) {
             if (!$model_to instanceof $this->model_to) {
