@@ -39,7 +39,10 @@ if ($is_media) {
     if ($is_resized) {
         $pathinfo = pathinfo($nos_url);
         // Remove 12 characteres for cache/media/
-        $media_url = \Str::sub($pathinfo['dirname'].'.'.$pathinfo['extension'], 12);
+        $media_url = \Str::sub(
+            $pathinfo['dirname'].(empty($pathinfo['extension']) ? '' : '.'.$pathinfo['extension']),
+            12
+        );
     } else {
         $media_url = str_replace('media/', '', $nos_url);
     }
