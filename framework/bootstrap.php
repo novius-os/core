@@ -23,7 +23,9 @@ if (isset($_SERVER['NOS_ROOT'])) {
 } else {
     define('NOSROOT', realpath(__DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR);
 }
-define('DOCROOT', NOSROOT.'public'.DIRECTORY_SEPARATOR);
+// Setup public diretory name
+defined('PUBLIC_DIR') or define('PUBLIC_DIR', 'public');
+define('DOCROOT', NOSROOT.PUBLIC_DIR.DIRECTORY_SEPARATOR);
 
 define('APPPATH', NOSROOT.'local'.DIRECTORY_SEPARATOR);
 define('PKGPATH', NOSROOT.'novius-os'.DIRECTORY_SEPARATOR.'packages'.DIRECTORY_SEPARATOR);
