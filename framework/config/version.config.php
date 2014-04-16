@@ -9,6 +9,6 @@
  */
 
 return array(
-    'fullname' => '4.1 (Dubrovka)',
-    'date'     => \Date::create_from_string('2014-03-06', 'mysql_date'),
+    'fullname' => '4.2 (Dubrovka)',
+    'date'     => \Date::create_from_string('2014-04-16', 'mysql_date'),
 );

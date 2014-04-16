@@ -11,7 +11,7 @@
 return array(
     'name'      => 'Applications manager',
     'namespace' => 'Nos\Appmanager',
-    'version'   => '4.1 (Dubrovka)',
+    'version'   => '4.2 (Dubrovka)',
     'provider'  => array(
         'name'  => 'Novius OS',
     ),
