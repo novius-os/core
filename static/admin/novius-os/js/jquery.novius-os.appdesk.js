@@ -1074,7 +1074,6 @@ define('jquery-nos-appdesk',
                 var self = this,
                     o = self.options,
                     height =  self._listHeight(self.uiGrid),
-                    heights = $.grid.getHeights(),
                     grid = $.extend(true, {}, o.grid);
 
                 self._columnsMultiContext(grid.columns);
@@ -1086,6 +1085,7 @@ define('jquery-nos-appdesk',
                     .noslistgrid($.extend({
                         loadingText: o.texts.loading,
                         columnsAutogenerationMode : 'none',
+                        columnsOptions: o,
                         selectionMode: 'singleRow',
                         showFilter: self.showFilter,
                         allowSorting: true,
@@ -1093,7 +1093,7 @@ define('jquery-nos-appdesk',
                         allowPaging : true,
                         culture: o.culture,
                         pageIndex : self.pageIndex,
-                        pageSize: Math.floor((height - heights.footer - heights.header - (self.showFilter ? heights.filter : 0)) / heights.row),
+                        pageSizeAuto: true,
                         allowColSizing : true,
                         allowColMoving : true,
                         data: new wijdatasource({
@@ -1222,6 +1222,7 @@ define('jquery-nos-appdesk',
                         },
                         initialDepth : o.treeGrid.initialDepth || 2,
                         columnsAutogenerationMode : 'none',
+                        columnsOptions: o,
                         selectionMode: 'singleRow',
                         allowSorting: true,
                         scrollMode : 'auto',
@@ -1390,7 +1391,7 @@ define('jquery-nos-appdesk',
 
                 if (!o.hideContexts) {
                     $.each(columns, function(i, column) {
-                        if (column.dataKey === 'context') {
+                        if (column.context) {
                             column.visible = o.selectedContexts.length > 1;
                         } else if (column.multiContextHide) {
                             column.visible = o.selectedContexts.length === 1;
@@ -1481,10 +1482,6 @@ define('jquery-nos-appdesk',
                         }
                     } else {
                         self.uiGrid.noslistgrid('setSize', null, height);
-                        if (reload) {
-                            heights = $.grid.getHeights();
-                            self.uiGrid.noslistgrid('option', 'pageSize', Math.floor((height - heights.footer - heights.header - (self.showFilter ? heights.filter : 0)) / heights.row));
-                        }
                     }
                 }
 
@@ -1580,20 +1577,6 @@ define('jquery-nos-appdesk',
                                 }
                             },
 
-                            myHtmlspecialcharsParser = {
-                                parseDOM: function (value, culture, format, nullString) {
-                                    return this.parse(value.innerHTML, culture, format, nullString);
-                                },
-                                parse: function (value, culture, format, nullString) {
-                                    if (value === null) return nullString;
-                                    return (value + '').replace(/&lt;/g, '<');
-                                },
-                                toStr: function (value, culture, format, nullString) {
-                                    if (value === null) return nullString;
-                                    return (value + '').replace(/</g, '&lt;');
-                                }
-                            },
-
                             recursive = function(object) {
                                 $.each(object, function(key, val) {
                                     // `i18n` key must not be processed. For instance, it can contain the `columns` key
@@ -1618,177 +1601,6 @@ define('jquery-nos-appdesk',
                                     // Build actions columns if any, and translate columns properties
                                     if (key === 'columns') {
                                         object[key] = keyToOrderedArray(object, key);
-                                        for (i = 0; i < object[key].length; i++) {
-                                            if (object[key][i].context) {
-                                                if (configToUse.hideContexts) {
-                                                    object[key].splice(i, 1);
-                                                    i--;
-                                                    continue;
-                                                }
-                                                nosContext = $.nosContext({
-                                                    locales: config.locales,
-                                                    sites: config.sites,
-                                                    contexts: config.contexts
-                                                });
-                                                object[key][i] = {
-                                                    headerText : nosContext.label({
-                                                        oneLocale: i18n.sites,
-                                                        oneSite: i18n.languages,
-                                                        defaultLabel: i18n.contexts || 'Contexts'
-                                                    }),
-                                                    dataKey    : 'context',
-                                                    setupkey   : 'context',
-                                                    allowSort : false,
-                                                    showFilter : false,
-                                                    cellFormatter : function(args) {
-                                                        if (args.row.type & $.wijmo.wijgrid.rowType.data) {
-                                                            args.$container.css("text-align", "center").html(args.row.data.context);
-                                                            return true;
-                                                        }
-                                                    },
-                                                    width : 1
-                                                };
-                                            } else if (object[key][i].actions) {
-                                                actions = object[key][i].actions;
-                                                var width;
-                                                var showOnlyArrow = object[key][i].showOnlyArrow ? true : false;
-
-                                                if (showOnlyArrow) {
-                                                    width = 20;
-                                                } else {
-                                                    width = $.grid.getActionWidth(actions);
-
-                                                    if (actions.length > 1) {
-                                                        // Reserve space for the dropdown actions menu
-                                                        //width -= 20;
-                                                    }
-                                                    // At least 80px wide
-                                                    //width = Math.max(width, 80);
-                                                }
-
-                                                // Make the drop-down actions columns
-                                                object[key][i] = {
-                                                    headerText : showOnlyArrow ? '' : '',
-                                                    cellFormatter : function(args) {
-                                                        var buttons;
-                                                        if ($.isPlainObject(args.row.data)) {
-
-                                                            buttons = $.appdeskActions(actions, args.row.data, {
-                                                                showOnlyArrow : showOnlyArrow
-                                                            });
-
-                                                            buttons.appendTo(args.$container);
-                                                            args.$container.parent().addClass('buttontd').css({width: width + 1});
-
-                                                            return true;
-                                                        }
-                                                    },
-                                                    allowSizing : false,
-                                                    allowSort : false,
-                                                    width : width,
-                                                    ensurePxWidth : true,
-                                                    showFilter : false,
-                                                    setupkey: 'actions'
-                                                };
-                                            } else if (object[key][i].cellFormatters) {
-                                                (function() {
-                                                    var cellFormatters = $.isPlainObject(object[key][i].cellFormatters) ? object[key][i].cellFormatters : [object[key][i].cellFormatter];
-                                                    var oldCellFormatter = object[key][i].cellFormatter;
-                                                    object[key][i] = $.extend(object[key][i], {
-                                                        cellFormatter : function(args) {
-                                                            if (args.row.type & $.wijmo.wijgrid.rowType.data) {
-                                                                args.$container.html(args.formattedValue);
-                                                                if ($.isFunction(oldCellFormatter)) {
-                                                                    oldCellFormatter.call(this, args);
-                                                                }
-                                                                $.each(cellFormatters, function(i, formatter) {
-                                                                    formatter = $.nosDataReplace($.extend(true, {}, formatter), args.row.data);
-                                                                    formatter = $.type(formatter) === 'object' ? formatter : {type: formatter};
-                                                                    if (formatter.ignore && parseInt(formatter.ignore) > 0) {
-                                                                        return;
-                                                                    }
-                                                                    if (formatter.replace) {
-                                                                        args.$container.empty();
-                                                                    }
-                                                                    switch (formatter.type) {
-                                                                        case 'bold':
-                                                                            args.$container.css('font-weight', 'bold');
-                                                                            break;
-
-                                                                        case 'css':
-                                                                            if ($.type(formatter.css) === 'object') {
-                                                                                args.$container.css(formatter.css);
-                                                                            }
-                                                                            break;
-
-                                                                        case 'icon':
-                                                                            if ($.isPlainObject(args.row.data)) {
-                                                                                var src = '';
-                                                                                formatter.column && args.row.data[formatter.column] && (src = args.row.data[formatter.column]);
-                                                                                formatter.src && (src = formatter.src);
-                                                                                $.type(formatter.mapping) === 'object' && formatter.mapping[args.formattedValue] && (src = formatter.mapping[args.formattedValue]);
-                                                                                if (!src) {
-                                                                                    break;
-                                                                                }
-                                                                                var size = (formatter.size ? ' width="' + formatter.size + '" height="' + formatter.size + '"' : '');
-                                                                                args.$container.prepend(' <img src="' + src + '" ' + size + ' style="vertical-align: middle;" /> ');
-                                                                            }
-                                                                            break;
-
-                                                                        case 'iconClasses':
-                                                                            if ($.isPlainObject(args.row.data)) {
-                                                                                if (formatter.column && !args.row.data[formatter.column]) {
-                                                                                    break;
-                                                                                }
-                                                                                args.$container.prepend(' <span class="' + (formatter.column ? args.row.data[formatter.column] : formatter.classes) + '" style="float:left;"></span> ');
-                                                                            }
-                                                                            break;
-
-                                                                        case 'link':
-                                                                            if (formatter.action === 'default' && actions.length && actions[0].action) {
-                                                                                formatter.action = actions[0].name;
-                                                                            }
-                                                                            if (formatter.action && $.type(formatter.action) !== 'object' && appdesk.actions && appdesk.actions[formatter.action]) {
-                                                                                formatter._action_name = formatter.action;
-                                                                                formatter.action = appdesk.actions[formatter.action].action;
-                                                                            }
-                                                                            if (formatter._action_name && args.row.data.actions && $.type(args.row.data.actions[formatter._action_name]) === 'string') {
-                                                                                break;
-                                                                            }
-                                                                            if ($.type(formatter.action) === 'object') {
-                                                                                args.$container.wrapInner(
-                                                                                    $('<a href="#"></a>')
-                                                                                        .click(function(e) {
-                                                                                            e.preventDefault();
-                                                                                            $(this).nosAction(formatter.action, args.row.data);
-                                                                                        })
-                                                                                );
-                                                                            }
-                                                                            break;
-
-                                                                        default:
-                                                                            if (typeof formatter.type !== 'undefined') {
-                                                                                require([formatter.type], function(ret) {
-                                                                                    ret.format(formatter, args);
-                                                                                }, function () {
-                                                                                    log('Could not load formatter: ' + formatter.type);
-                                                                                });
-                                                                            }
-                                                                    }
-                                                                });
-
-                                                                return true;
-                                                            }
-                                                        }
-                                                    });
-                                                })();
-                                            }
-
-                                            // Add a default htmlspecialchars dataParser
-                                            if (!object[key][i].dataParser && !object[key][i].isSafeHtml && !object[key][i].dataType) {
-                                                object[key][i].dataParser = myHtmlspecialcharsParser;
-                                            }
-                                        }
                                     }
                                 });
                             },
@@ -1847,6 +1659,7 @@ define('jquery-nos-appdesk',
                                     // 'actions' is an object containing all the possible actions
                                     // 'appdesk.grid.columns.actions.actions' references the actions we actually use (and are copied from 'actions')
                                     if (params.actions) {
+                                        params.appdesk.actions = params.actions;
                                         var gridActions = params.actions;
                                         if (params.appdesk.grid.columns.actions && params.appdesk.grid.columns.actions.actions) {
                                             $.each(params.appdesk.grid.columns.actions.actions, function(i, val) {
@@ -2039,300 +1852,6 @@ define('jquery-nos-appdesk',
                     });
                 } else {
                     init();
-                }
-            },
-
-            // Keep track of all created menus so we can hide them when
-            appdeskActionsList : [],
-            appdeskActions : function(actions, noParseData, options) {
-                options = options || {};
-                var container = $('<table><tr></tr></table>').addClass('buttontd wijgridtd');
-
-                var actionsPrimary = [];
-                var actionsSecondary = [];
-
-                // Possibility to always hide everyting
-                if (!options.showOnlyArrow) {
-                    $.each(actions, function() {
-                        if (this.primary) {
-                            actionsPrimary.push(this);
-                        } else {
-                            actionsSecondary.push(this);
-                        }
-                    });
-
-                    // If there is only 1 secondary action and it has an icon, don't show the dropdow, but show the action as a button
-                    if (actionsSecondary.length == 1 && (actionsSecondary[0].icon || actionsSecondary[0].iconClasses)) {
-                        actionsPrimary.push(actionsSecondary[0]);
-                    }
-
-                    $.each(actionsPrimary, function(i, action) {
-                        var iconClass = false;
-                        if (action.iconClasses) {
-                            iconClass = action.iconClasses;
-                        } else if (action.icon) {
-                            iconClass = 'ui-icon ui-icon-' + action.icon;
-                        }
-                        var uiAction = $('<th></th>')
-                            .css('white-space', 'nowrap')
-                            .addClass("ui-state-default" + (action.red ? ' ui-state-error' : ''))
-                            .attr('title', action.label)
-                            .html( (iconClass ? '<span class="' + iconClass +'"></span>' : '') + (action.text || !iconClass ? '&nbsp;' + action.label + '&nbsp;' : ''));
-
-                        var actionValue = (action.name &&
-                            noParseData &&
-                            noParseData.actions &&
-                            typeof noParseData.actions[action.name] !== 'undefined')
-                            ? noParseData.actions[action.name] : true;
-                        // Check whether action name is disabled
-                        if (actionValue !== true
-                            ) {
-                            uiAction.addClass('ui-state-disabled')
-                                .click(function(e) {
-                                    e.stopImmediatePropagation();
-                                    e.preventDefault();
-                                });
-                            if ($.type(actionValue) === 'string') {
-                                uiAction.attr('title', actionValue)
-                            }
-                        } else {
-                            uiAction.click(function(e) {
-                                    e.stopImmediatePropagation();
-                                    e.preventDefault();
-                                    uiAction.nosAction(action.action, noParseData);
-                                })
-                                .hover(
-                                    function() {
-                                        $(this).addClass("ui-state-hover");
-                                    },
-                                    function() {
-                                        $(this).removeClass("ui-state-hover");
-                                    }
-                                );
-                        }
-
-                        if (iconClass && !action.text) {
-                            uiAction.css({
-                                width : 20,
-                                textAlign : 'center'
-                            }).children().css({
-                                    margin : 'auto'
-                                });
-                        } else if (iconClass && action.text) {
-                            uiAction.find('span').css('float', 'left');
-                        }
-
-                        uiAction.appendTo(container.find('tr'));
-                    });
-                }
-
-                // Create the dropdown
-                if (options.showOnlyArrow || actionsSecondary.length >= 2 || (actionsSecondary.length == 1 && !(actionsSecondary[0].icon || actionsSecondary[0].iconClasses))) {
-
-                    var dropDown = $('<th></th>')
-                        .addClass("ui-state-default")
-                        .css({
-                            width: '20px'
-                        })
-                        .hover(
-                        function() {
-                            $(this).addClass("ui-state-hover");
-                        },
-                        function() {
-                            $(this).removeClass("ui-state-hover");
-                        }
-                    );
-
-                    $("<span></span>")
-                        .addClass("ui-icon ui-icon-triangle-1-s")
-                        .appendTo(dropDown);
-
-                    // Don't select the line when clicking the "more actions" arrow dropdown
-                    dropDown.appendTo(container.find('tr')).click(function(e) {
-
-                        $.each($.appdeskActionsList, function() {
-                            if ($(this).data('wijmo-wijmenu')) {
-                                $(this).wijmenu('hideAllMenus');
-                            }
-                        });
-
-                        if (!this.created) {
-                            var ul = $('<ul></ul>');
-                            $.each(actions, function(key, action) {
-                                var iconClass;
-                                if (action.iconClasses) {
-                                    iconClass = action.iconClasses;
-                                } else if (action.icon) {
-                                    iconClass = 'ui-icon ui-icon-' + action.icon;
-                                }
-                                var text = '<span class="' + (iconClass ? iconClass : 'nos-icon16 nos-icon16-empty') + ' wijmo-wijmenu-icon-left"></span><span class="wijmo-wijmenu-text">'+action.label+'</span>';
-                                var li = $('<li><a href="#"></a></li>')
-                                    .appendTo(ul)
-                                    .find('a')
-                                    .html(text);
-
-                                if (action.red) {
-                                    li.addClass('ui-state-error');
-                                }
-
-                                var actionValue = (action.name &&
-                                    noParseData &&
-                                    noParseData.actions &&
-                                    typeof noParseData.actions[action.name] !== 'undefined')
-                                    ? noParseData.actions[action.name] : true;
-
-                                // Check whether action name is disabled
-                                if (actionValue !== true) {
-                                    li.addClass('ui-state-disabled')
-                                        .click(function(e) {
-                                            e.stopImmediatePropagation();
-                                            e.preventDefault();
-                                        });
-                                    if ($.type(actionValue) === 'string') {
-                                        li.attr('title', actionValue)
-                                    }
-                                } else {
-                                    li.click(function(e) {
-                                        e.stopImmediatePropagation();
-                                        e.preventDefault();
-                                        // Hide me
-                                        if (ul.data('wijmo-wijmenu')) {
-                                            ul.wijmenu('hideAllMenus');
-                                        }
-                                        li.nosAction(action.action, noParseData);
-                                    });
-                                }
-                            });
-
-                            // Search the higher ancestor possible
-                            // @todo Review this, because when it's called from inspectors, the result is a <table>
-                            //       which is not convenient to add <ul>s or <div>s
-                            var containerActions = dropDown.closest('.ui-dialog-content, .nos-dispatcher, body');
-
-                            ul.appendTo(containerActions);
-
-                            ul.wijmenu({
-                                trigger : dropDown,
-                                triggerEvent : 'click',
-                                orientation : 'vertical',
-                                animation: {
-                                    animated:"slide",
-                                    option: {
-                                        direction: "up"
-                                    },
-                                    duration: 50,
-                                    easing: null
-                                },
-                                hideAnimation: {
-                                    animated:"slide",
-                                    option: {
-                                        direction: "up"
-                                    },
-                                    duration: 0,
-                                    easing: null
-                                },
-                                position : {
-                                    my        : 'right top',
-                                    at        : 'right bottom',
-                                    collision : 'flip',
-                                    offset    : '0 0'
-                                }
-                            });
-
-                            $.appdeskActionsList.push(ul);
-
-                            this.created = true;
-
-                            // Now the menu is created, trigger the event to show it
-                            dropDown.triggerHandler('click');
-                        }
-
-                    });
-                    dropDown.click(false);
-                }
-                return container;
-            },
-
-            grid : {
-                getHeights : function() {
-                    if (this.heights === undefined) {
-                        var $div = $('<div></div>')
-                            .appendTo('body');
-
-                        var table = $('<table></table>')
-                            .addClass('nos-appdesk')
-                            .appendTo($div)
-                            .noslistgrid({
-                                scrollMode : 'auto',
-                                pageSize: 1,
-                                showFilter: true,
-                                allowPaging : true,
-                                data: [ ['test'], ['test2'] ]
-                            });
-                        this.heights = {
-                            row : table.find('tr:first').height(),
-                            footer : $div.find('.wijmo-wijgrid-footer').outerHeight(),
-                            header : $div.find('.wijmo-wijgrid-headerrow').outerHeight(),
-                            filter : $div.find('.wijmo-wijgrid-filterrow').outerHeight()
-                        };
-                        table.noslistgrid('destroy');
-                        $div.remove();
-                    }
-                    return this.heights;
-                },
-                getActionWidth : function(actions) {
-
-                    /*
-                     this.cache = {};
-                     if (null != this.cache[text]) {
-                     return this.cache[text];
-                     }*/
-
-                    var $div = $('<div></div>')
-                        .appendTo('body');
-
-                    var table = $('<table></table>')
-                        .addClass('nos-appdesk')
-                        .appendTo($div)
-                        .noslistgrid({
-                            scrollMode : 'none',
-                            showFilter: true,
-                            allowPaging : true,
-                            columns : [
-                                {
-                                    headerText : '',
-                                    cellFormatter : function(args) {
-                                        if ($.isPlainObject(args.row.data)) {
-
-                                            var buttons = $.appdeskActions(actions, []);
-
-                                            buttons.appendTo(args.$container);
-                                            args.$container.parent().addClass('buttontd');
-
-                                            return true;
-                                        }
-                                    },
-                                    allowSizing : true,
-                                    showFilter : false,
-                                    ensurePxWidth : true
-                                }
-                            ],
-                            data: [
-                                {
-                                    'key' : 'value'
-                                }
-                            ]
-                        });
-                    $div.find('table.buttontd.wijgridtd').css({
-                        'font-size' : '1.05em',
-                        'width' : 'auto'
-                    });
-                    //this.cache[text] = $div.find('.buttontd .buttontd:first').outerWidth();
-                    var width = $div.find('.buttontd .buttontd:first').outerWidth();
-                    table.noslistgrid('destroy');
-                    $div.remove();
-                    return width;
-                    //return this.cache[text];
                 }
             }
         });

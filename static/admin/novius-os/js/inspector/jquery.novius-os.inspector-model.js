@@ -29,20 +29,12 @@ define('jquery-nos-inspector-model',
                                     inspector.noslistgrid('setSize', parent.width(), parent.height());
                                 },
                                 widgetReload : function() {
-                                    var size = Math.floor((parent.height() - table_heights.footer - table_heights.header - (showFilter ? table_heights.filter : 0)) / table_heights.row);
-                                    if (size != pageSize) {
-                                        pageSize = size
-                                        inspector.noslistgrid('option', 'pageSize', pageSize);
-                                    } else {
-                                        inspector.noslistgrid('ensureControl', true);
-                                    }
+                                    inspector.noslistgrid('setSize', null, parent.height());
                                 }
                             }),
                         inspectorData = parent.data('inspector'),
-                        table_heights = $.grid.getHeights(),
                         showFilter = inspectorData.grid.showFilter || false,
                         rendered = false,
-                        pageSize = Math.floor((parent.height() - table_heights.footer - table_heights.header - (showFilter ? table_heights.filter : 0)) / table_heights.row),
                         listenReloadEvent = function() {
                             if (inspectorData.reloadEvent) {
                                 inspector.nosUnlistenEvent('inspector' + id);
@@ -70,7 +62,7 @@ define('jquery-nos-inspector-model',
                             scrollMode : 'auto',
                             allowPaging : true,
                             pageIndex : 0,
-                            pageSize: pageSize,
+                            pageSizeAuto: true,
                             allowColSizing : true,
                             allowColMoving : true,
                             loadingText: inspectorData.loadingText || 'Loading...',

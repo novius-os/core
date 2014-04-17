@@ -259,7 +259,7 @@ define('jquery-nos-thumbnailsgrid',
 
                 self._itemThumbnail(imgContainer, item, index);
 
-                var buttons = $.appdeskActions(o.actions, noParseData);
+                var buttons = $.nosItemActions(o.actions, noParseData);
 
                 buttons.appendTo(container);
 

@@ -15,6 +15,7 @@ define('jquery-nos',
             $nos = window.$nos = $,
             $noviusos = undefined,
             login_popup_opened = false,
+            nosActionsList= [],
             noviusos = function() {
                     if ($noviusos === undefined) {
                         $noviusos = $('.nos-ostabs');
@@ -361,6 +362,215 @@ define('jquery-nos',
                     }
                     image.src = media.path;
                 });
+            },
+
+            nosItemActions : function(actions, noParseData, actions_options) {
+                var container = $('<table><tr></tr></table>').addClass('buttontd wijgridtd'),
+                    actionsPrimary = [],
+                    actionsSecondary = [];
+
+                actions_options = actions_options || {};
+
+                // Possibility to always hide everyting
+                if (!actions_options.showOnlyArrow) {
+                    $.each(actions, function() {
+                        if (this.primary) {
+                            actionsPrimary.push(this);
+                        } else {
+                            actionsSecondary.push(this);
+                        }
+                    });
+
+                    // If there is only 1 secondary action and it has an icon, don't show the dropdow, but show the action as a button
+                    if (actionsSecondary.length == 1 && (actionsSecondary[0].icon || actionsSecondary[0].iconClasses)) {
+                        actionsPrimary.push(actionsSecondary[0]);
+                    }
+
+                    $.each(actionsPrimary, function(i, action) {
+                        var iconClass = false;
+                        if (action.iconClasses) {
+                            iconClass = action.iconClasses;
+                        } else if (action.icon) {
+                            iconClass = 'ui-icon ui-icon-' + action.icon;
+                        }
+                        var uiAction = $('<th></th>')
+                            .css('white-space', 'nowrap')
+                            .addClass("ui-state-default" + (action.red ? ' ui-state-error' : ''))
+                            .attr('title', action.label)
+                            .html( (iconClass ? '<span class="' + iconClass +'"></span>' : '') + (action.text || !iconClass ? '&nbsp;' + action.label + '&nbsp;' : ''));
+
+                        var actionValue = (action.name &&
+                            noParseData &&
+                            noParseData.actions &&
+                            typeof noParseData.actions[action.name] !== 'undefined')
+                            ? noParseData.actions[action.name] : true;
+                        // Check whether action name is disabled
+                        if (actionValue !== true
+                            ) {
+                            uiAction.addClass('ui-state-disabled')
+                                .click(function(e) {
+                                    e.stopImmediatePropagation();
+                                    e.preventDefault();
+                                });
+                            if ($.type(actionValue) === 'string') {
+                                uiAction.attr('title', actionValue)
+                            }
+                        } else {
+                            uiAction.click(function(e) {
+                                e.stopImmediatePropagation();
+                                e.preventDefault();
+                                uiAction.nosAction(action.action, noParseData);
+                            })
+                                .hover(
+                                function() {
+                                    $(this).addClass("ui-state-hover");
+                                },
+                                function() {
+                                    $(this).removeClass("ui-state-hover");
+                                }
+                            );
+                        }
+
+                        if (iconClass && !action.text) {
+                            uiAction.css({
+                                width : 20,
+                                textAlign : 'center'
+                            }).children().css({
+                                margin : 'auto'
+                            });
+                        } else if (iconClass && action.text) {
+                            uiAction.find('span').css('float', 'left');
+                        }
+
+                        uiAction.appendTo(container.find('tr'));
+                    });
+                }
+
+                // Create the dropdown
+                if (actions_options.showOnlyArrow || actionsSecondary.length >= 2 || (actionsSecondary.length == 1 && !(actionsSecondary[0].icon || actionsSecondary[0].iconClasses))) {
+
+                    var dropDown = $('<th></th>')
+                        .addClass("ui-state-default")
+                        .css({
+                            width: '20px'
+                        })
+                        .hover(
+                        function() {
+                            $(this).addClass("ui-state-hover");
+                        },
+                        function() {
+                            $(this).removeClass("ui-state-hover");
+                        }
+                    );
+
+                    $("<span></span>")
+                        .addClass("ui-icon ui-icon-triangle-1-s")
+                        .appendTo(dropDown);
+
+                    // Don't select the line when clicking the "more actions" arrow dropdown
+                    dropDown.appendTo(container.find('tr')).click(function(e) {
+
+                        $.each(nosActionsList, function() {
+                            if ($(this).data('wijmo-wijmenu')) {
+                                $(this).wijmenu('hideAllMenus');
+                            }
+                        });
+
+                        if (!this.created) {
+                            var ul = $('<ul></ul>');
+                            $.each(actions, function(key, action) {
+                                var iconClass;
+                                if (action.iconClasses) {
+                                    iconClass = action.iconClasses;
+                                } else if (action.icon) {
+                                    iconClass = 'ui-icon ui-icon-' + action.icon;
+                                }
+                                var text = '<span class="' + (iconClass ? iconClass : 'nos-icon16 nos-icon16-empty') + ' wijmo-wijmenu-icon-left"></span><span class="wijmo-wijmenu-text">'+action.label+'</span>';
+                                var li = $('<li><a href="#"></a></li>')
+                                    .appendTo(ul)
+                                    .find('a')
+                                    .html(text);
+
+                                if (action.red) {
+                                    li.addClass('ui-state-error');
+                                }
+
+                                var actionValue = (action.name &&
+                                    noParseData &&
+                                    noParseData.actions &&
+                                    typeof noParseData.actions[action.name] !== 'undefined')
+                                    ? noParseData.actions[action.name] : true;
+
+                                // Check whether action name is disabled
+                                if (actionValue !== true) {
+                                    li.addClass('ui-state-disabled')
+                                        .click(function(e) {
+                                            e.stopImmediatePropagation();
+                                            e.preventDefault();
+                                        });
+                                    if ($.type(actionValue) === 'string') {
+                                        li.attr('title', actionValue)
+                                    }
+                                } else {
+                                    li.click(function(e) {
+                                        e.stopImmediatePropagation();
+                                        e.preventDefault();
+                                        // Hide me
+                                        if (ul.data('wijmo-wijmenu')) {
+                                            ul.wijmenu('hideAllMenus');
+                                        }
+                                        li.nosAction(action.action, noParseData);
+                                    });
+                                }
+                            });
+
+                            // Search the higher ancestor possible
+                            // @todo Review this, because when it's called from inspectors, the result is a <table>
+                            //       which is not convenient to add <ul>s or <div>s
+                            var containerActions = dropDown.closest('.ui-dialog-content, .nos-dispatcher, body');
+
+                            ul.appendTo(containerActions);
+
+                            ul.wijmenu({
+                                trigger : dropDown,
+                                triggerEvent : 'click',
+                                orientation : 'vertical',
+                                animation: {
+                                    animated:"slide",
+                                    option: {
+                                        direction: "up"
+                                    },
+                                    duration: 50,
+                                    easing: null
+                                },
+                                hideAnimation: {
+                                    animated:"slide",
+                                    option: {
+                                        direction: "up"
+                                    },
+                                    duration: 0,
+                                    easing: null
+                                },
+                                position : {
+                                    my        : 'right top',
+                                    at        : 'right bottom',
+                                    collision : 'flip',
+                                    offset    : '0 0'
+                                }
+                            });
+
+                            nosActionsList.push(ul);
+
+                            this.created = true;
+
+                            // Now the menu is created, trigger the event to show it
+                            dropDown.triggerHandler('click');
+                        }
+
+                    });
+                    dropDown.click(false);
+                }
+                return container;
             },
 
             nosUIElement : function(element, data) {
