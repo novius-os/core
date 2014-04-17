@@ -25,9 +25,15 @@ foreach ($items as $item) {
     <?php
     echo \Request::forge('noviusos_menu/admin/menu/crud/menu_item')->execute(array($item));
 
-    $children = $item->children;
+    $children = array();
+    if (!empty($menu)) {
+        $children = $menu->branch($item);
+    }
     if (count($children)) {
-        echo \View::forge('noviusos_menu::admin/renderer/menu/items-branch', array('items' => $children), false);
+        echo \View::forge('noviusos_menu::admin/renderer/menu/items-branch', array(
+            'menu' => $menu,
+            'items' => $children,
+        ), false);
     }
     ?>
         </li>

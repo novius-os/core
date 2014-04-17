@@ -21,6 +21,8 @@ return array(
         'url', 'url_blank'
     ),
 
+    'view' => 'noviusos_menu::driver/link',
+
     'admin' => array(
         'layout' => array(
             'standard' => array(

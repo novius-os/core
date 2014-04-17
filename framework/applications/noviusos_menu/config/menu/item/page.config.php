@@ -21,6 +21,8 @@ return array(
         'page_id',
     ),
 
+    'view' => 'noviusos_menu::driver/page',
+
     'admin' => array(
         'layout' => array(
             'standard' => array(
@@ -36,7 +38,7 @@ return array(
                 ),
             ),
             array(
-                'view'   => 'noviusos_menu::driver/page',
+                'view'   => 'noviusos_menu::admin/driver/page',
             ),
         ),
         'fields' => array(

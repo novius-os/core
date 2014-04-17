@@ -17,7 +17,7 @@ class Menu_Item
      *
      * @param   string|int|Model_Menu_Item $item
      * @throws \FuelException
-     * @return  Menu_Item
+     * @return  Menu_Item_Driver
      */
     public static function forge($item)
     {

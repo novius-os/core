@@ -19,6 +19,8 @@ return array(
     // Allowed EAV attributes
     'attributes' => array(),
 
+    'view' => '',
+
     'admin' => array(
         'layout' => array(
             'standard' => array(

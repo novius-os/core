@@ -70,17 +70,6 @@ class Model_Menu extends Model
             'cascade_save' => true,
             'cascade_delete' => true,
         ),
-        'root_items' => array(
-            'key_from' => 'menu_id',
-            'model_to' => '\Nos\Menu\Model_Menu_Item',
-            'key_to' => 'mitem_menu_id',
-            'conditions' => array(
-                'where' => array(array('mitem_parent_id', 'IS', null)),
-                'order_by' => array(array('mitem_sort' => 'ASC')),
-            ),
-            'cascade_save' => false,
-            'cascade_delete' => false,
-        ),
     );
 
     protected static $_observers = array(
@@ -104,4 +93,26 @@ class Model_Menu extends Model
             'common_fields' => array(),
         ),
     );
+
+    public function html(array $params = array())
+    {
+        $view = \Arr::get($params, 'view', 'noviusos_menu::menu');
+
+        return \View::forge($view, array('menu' => $this), false);
+    }
+
+    public function branch($parent = null)
+    {
+        if ($parent instanceof Model_Menu_Item) {
+            $parent = $parent->mitem_id;
+        }
+        $tree = array();
+        foreach ($this->items as $item) {
+            if ($item->mitem_parent_id == $parent) {
+                $tree[$item->mitem_sort] = $item;
+            }
+        }
+        ksort($tree);
+        return $tree;
+    }
 }

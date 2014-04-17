@@ -144,7 +144,7 @@ class Model_Menu_Item extends Model
      * Returns the menu item driver
      *
      * @param bool $reload
-     * @return Menu_Item
+     * @return Menu_Item_Driver
      */
     public function driver($reload = true)
     {
@@ -152,6 +152,11 @@ class Model_Menu_Item extends Model
             $this->menu_item_driver = Menu_Item::forge($this);
         }
         return $this->menu_item_driver;
+    }
+
+    public function html(array $params = array())
+    {
+        return $this->driver()->html($params);
     }
 
     public function & get($property, array $conditions = array())

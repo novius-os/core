@@ -21,7 +21,8 @@ $json = array(
 <?php
 $menu = \Arr::get($options, 'menu');
 echo \View::forge('noviusos_menu::admin/renderer/menu/items-branch', array(
-    'items' => $menu ? $menu->root_items : array(),
+    'menu' => $menu,
+    'items' => $menu ? $menu->branch() : array(),
 ), false);
 ?>
 </div>

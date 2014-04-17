@@ -21,6 +21,8 @@ return array(
         'text', 'is_html'
     ),
 
+    'view' => 'noviusos_menu::driver/text',
+
     'admin' => array(
         'layout' => array(
             'standard' => array(

@@ -16,6 +16,8 @@ return array(
     ),
     'icon' => 'static/apps/noviusos_menu/img/16/html.png',
 
+    'view' => 'noviusos_menu::driver/html',
+
     'admin' => array(
         'layout' => array(
             'standard' => array(

@@ -44,6 +44,23 @@ abstract class Menu_Item_Driver
     }
 
     /**
+     * @param array $params
+     * @return string The HTML representation of the item
+     */
+    public function html(array $params = array())
+    {
+        $config = static::config();
+        if (!empty($config['view'])) {
+            return \View::forge($config['view'], array('item_driver' => $this, 'params' => $params), false);
+        }
+
+        return html_tag('span', array(
+            'class' => $this->item->mitem_css_class,
+            'id' => $this->item->mitem_dom_id,
+        ), e($this->title()));
+    }
+
+    /**
      * Get the driver configuration
      *
      * @param bool $reload

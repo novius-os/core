@@ -8,21 +8,22 @@
  * @link http://www.novius-os.org
  */
 
-?>
-<div id="<?= $id = uniqid() ?>"></div>
-<script type="text/javascript">
-    require(['jquery-nos'],
-        function ($) {
-            $(function() {
-                var $div = $('#<?= $id ?>');
-                $div.nosOnShow('bind', function() {
-                    var $form = $div.parents('.renderer-menu-items-li-form')
-                        .on('selectionChanged', ':radio', function(e, data) {
-                            $form.find('.menu_item_title').attr('placeholder', data._title || '').trigger('keyup');
-                        });
-                });
-            });
+if ($item_driver->item->mitem_page_id) {
+    $page = \Nos\Page\Model_Page::find($item_driver->item->mitem_page_id);
+    if (!empty($page)) {
+        $anchor = array(
+            'class' => $item_driver->item->mitem_css_class,
+            'id' => $item_driver->item->mitem_dom_id,
+            'text' => e($item_driver->title())
+        );
+        if (\Nos\Nos::main_controller()->getUrl() === $page->url()) {
+            $anchor['class'] .= ' '.\Arr::get($params, 'active_class', 'active');
         }
-    );
-</script>
-
+        echo $page->htmlAnchor($anchor);
+        return;
+    }
+}
+echo html_tag('span', array(
+    'class' => $item_driver->item->mitem_css_class,
+    'id' => $item_driver->item->mitem_dom_id,
+), e($item_driver->title()));
