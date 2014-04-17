@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 define('jquery-nos',
-    ['jquery', 'jquery-nos-validate', 'jquery-form', 'jquery-ui.button', 'wijmo.wijexpander', 'wijmo.wijaccordion', 'wijmo.wijdialog'],
+    ['jquery', 'jquery-nos-validate', 'jquery-form', 'jquery-ui.button', 'wijmo.wijexpander', 'wijmo.wijaccordion', 'wijmo.wijdialog', 'wijmo.wijmenu'],
     function($) {
         "use strict";
         var undefined = void(0),
@@ -422,7 +422,11 @@ define('jquery-nos',
                         $element.bind(event, function(e) {
                             e.preventDefault();
                             if (!element.disabled) {
-                                $element.nosAction(action, data);
+                                if ($.isFunction(action)) {
+                                    action(e);
+                                } else {
+                                    $element.nosAction(action, data);
+                                }
                             }
                         });
                     });
@@ -432,33 +436,49 @@ define('jquery-nos',
                         id = date.getDate() + "_" + date.getHours() + "_" + date.getMinutes() + "_" + date.getSeconds() + "_" + date.getMilliseconds();
                         $element.attr('id', id)
                             .nosOnShow('one', function() {
-                                var $ul = $('<ul></ul>');
-                                $.each(element.menu.menus, function() {
-                                    var menu = this,
-                                        $a = $('<li><a></a></li>').data('action', menu.action)
-                                            .appendTo($ul)
-                                            .find('a');
+                                var $ul = $('<ul></ul>'),
+                                    submenus = false,
+                                    addMenu = function(menu, $ul) {
+                                        var $subul,
+                                            $li = $('<li><a></a></li>').appendTo($ul),
+                                            $a = $li.find('a');
 
-                                    if (menu.content) {
-                                        $a.append(menu.content);
-                                    } else {
-                                        if (menu.icon) {
-                                            $('<span></span>').addClass('ui-icon wijmo-wijmenu-icon-left ui-icon-' + menu.icon)
-                                                .appendTo($a);
-                                        } else if (menu.iconClasses) {
-                                            $('<span></span>').addClass('wijmo-wijmenu-icon-left ' + menu.iconClasses)
-                                                .appendTo($a);
-                                        } else if (menu.iconUrl) {
-                                            $('<span></span>').addClass('wijmo-wijmenu-icon-left  nos-icon16')
-                                                .css('backgroundImage', 'url(' + menu.iconUrl + ')')
-                                                .appendTo($a);
+                                        if (menu.action) {
+                                            $li.data('action', menu.action)
                                         }
-                                        if (menu.label) {
-                                            $('<span></span>').addClass('wijmo-wijmenu-text')
-                                                .html(menu.label)
-                                                .appendTo($a);
+                                        if (menu.content) {
+                                            $a.append(menu.content);
+                                        } else {
+                                            if (menu.icon) {
+                                                $('<span></span>').addClass('ui-icon wijmo-wijmenu-icon-left ui-icon-' + menu.icon)
+                                                    .appendTo($a);
+                                            } else if (menu.iconClasses) {
+                                                $('<span></span>').addClass('wijmo-wijmenu-icon-left ' + menu.iconClasses)
+                                                    .appendTo($a);
+                                            } else if (menu.iconUrl) {
+                                                $('<span></span>').addClass('wijmo-wijmenu-icon-left  nos-icon16')
+                                                    .css('backgroundImage', 'url(' + menu.iconUrl + ')')
+                                                    .appendTo($a);
+                                            }
+                                            if (menu.label) {
+                                                $('<span></span>').addClass('wijmo-wijmenu-text')
+                                                    .html(menu.label)
+                                                    .appendTo($a);
+                                            }
                                         }
-                                    }
+
+                                        if (menu.menus) {
+                                            submenus = true;
+                                            $subul = $('<ul></ul>');
+                                            $.each(menu.menus, function() {
+                                                addMenu(this, $subul);
+                                            });
+                                            $subul.insertAfter($a)
+                                        }
+                                    };
+
+                                $.each(element.menu.menus, function() {
+                                    addMenu(this, $ul);
                                 });
 
                                 $ul.insertAfter($element)
@@ -482,21 +502,26 @@ define('jquery-nos',
                                             },
                                             shown: function (event, item) {
                                                 var $contextMenu = $(item.element);
-                                                $contextMenu.parent()
-                                                    .css({
-                                                        maxHeight: '200px',
-                                                        width: $contextMenu.outerWidth(true) + 20,
-                                                        overflowY: 'auto',
-                                                        overflowX: 'hidden'
-                                                    })
+                                                if (!submenus) {
+                                                    $contextMenu.parent()
+                                                        .css({
+                                                            maxHeight: '200px',
+                                                            width: $contextMenu.outerWidth(true) + 20,
+                                                            overflowY: 'auto',
+                                                            overflowX: 'hidden'
+                                                        });
+                                                }
                                             }
                                         },
                                         element.menu.options || {},
                                         {
                                             trigger: '#' + id,
                                             select: function(e, data) {
-                                                var $li = $(data.item.element);
-                                                $li.nosAction($li.data('action'));
+                                                var $li = $(data.item.element),
+                                                    action = $li.data('action');
+                                                if (action) {
+                                                    $li.nosAction(action);
+                                                }
                                             }
                                         }
                                     ));
@@ -1424,11 +1449,11 @@ define('jquery-nos',
                                 .nosFormUI();
 
                             $target.css({
-                                top : $toolbar.outerHeight(),
-                                bottom : 0,
+                                bottom: $toolbar.outerHeight(),
+                                top: 0,
                                 height : 'auto'
                             }).closest('.nos-dispatcher').on('showPanel', function() {
-                                $target.css('top', $toolbar.outerHeight());
+                                $target.css('bottom', $toolbar.outerHeight());
                             });
 
                             return $tool;

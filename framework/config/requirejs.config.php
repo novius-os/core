@@ -20,6 +20,8 @@ return array(
         'jquery' => 'static/novius-os/admin/vendor/jquery/jquery-1.10.2',
         'jquery-migrate' => 'static/novius-os/admin/vendor/jquery/jquery-migrate-1.2.1',
 
+        'jquery.simulate' => 'static/novius-os/admin/vendor/jquery/simulate/jquery.simulate',
+        'jquery.taphold' => 'static/novius-os/admin/vendor/jquery/taphold/taphold',
         'jquery.cookie' => 'static/novius-os/admin/vendor/jquery/cookie/jquery.cookie',
         'jquery.globalize' => 'static/novius-os/admin/vendor/jquery/globalize/globalize',
         'jquery.globalize.cultures' => 'static/novius-os/admin/vendor/jquery/globalize/cultures/globalize.cultures',
@@ -130,6 +132,7 @@ return array(
         'jquery-nos-validate' => 'static/novius-os/admin/novius-os/js/jquery.novius-os.validate',
         'jquery-nos-wysiwyg' => 'static/novius-os/admin/novius-os/js/jquery.novius-os.wysiwyg',
         'jquery-nos' => 'static/novius-os/admin/novius-os/js/jquery.novius-os',
+        'jquery-nos-contextmenu' => 'static/novius-os/admin/novius-os/js/jquery.novius-os.contextmenu',
         'jquery-nos-loadspinner' => 'static/novius-os/admin/novius-os/js/jquery.novius-os.loadspinner',
         'jquery-nos-ostabs' => 'static/novius-os/admin/novius-os/js/jquery.novius-os.ostabs',
         'jquery-nos-preview' => 'static/novius-os/admin/novius-os/js/jquery.novius-os.preview',
@@ -138,10 +141,11 @@ return array(
         'jquery-nos-thumbnailsgrid' => 'static/novius-os/admin/novius-os/js/jquery.novius-os.thumbnailsgrid',
         'jquery-nos-appdesk' => 'static/novius-os/admin/novius-os/js/jquery.novius-os.appdesk',
         'jquery-nos-datacatchers' => 'static/novius-os/admin/novius-os/js/jquery.novius-os.datacatchers',
+        'jquery-nos-tray' => 'static/novius-os/admin/novius-os/js/jquery.novius-os.tray',
 
         'jquery-nos-context-common-fields' =>
             'static/novius-os/admin/novius-os/js/views/jquery.novius-os.context-common-fields',
-        'jquery-nos-appstab' => 'static/novius-os/admin/novius-os/js/views/jquery.novius-os.appstab',
+        'jquery-nos-nosdesktop' => 'static/novius-os/admin/novius-os/js/views/jquery.novius-os.nosdesktop',
         'jquery-nos-publishable' => 'static/novius-os/admin/novius-os/js/views/jquery.novius-os.publishable',
         'jquery-nos-layout-standard' => 'static/novius-os/admin/novius-os/js/views/jquery.novius-os.layout-standard',
         'jquery-nos-toolbar-crud' => 'static/novius-os/admin/novius-os/js/views/jquery.novius-os.toolbar-crud',
@@ -164,6 +168,8 @@ return array(
     ),
     'shim' => array(
         'jquery-migrate' => array('jquery'),
+        'jquery.simulate' => array('jquery'),
+        'jquery.taphold' => array('jquery'),
         'jquery.cookie' => array('jquery'),
         'jquery.globalize' => array('jquery'),
         'jquery.globalize.cultures' => array('jquery', 'jquery.globalize'),
@@ -329,6 +335,8 @@ return array(
         'jquery' => 'static/novius-os/admin/bundle/vendor.min',
         'jquery-migrate' => 'static/novius-os/admin/vendor/jquery/jquery-migrate-1.2.1',
 
+        'jquery.simulate' => 'static/novius-os/admin/vendor/jquery/simulate/jquery.simulate.min',
+        'jquery.taphold' => 'static/novius-os/admin/vendor/jquery/taphold/taphold.min',
         'jquery.cookie' => 'static/novius-os/admin/bundle/vendor.min',
         'jquery.globalize' => 'static/novius-os/admin/bundle/vendor.min',
         'jquery.globalize.cultures' => 'static/novius-os/admin/bundle/vendor.min',
@@ -444,6 +452,7 @@ return array(
         'jquery-nos-validate' => 'static/novius-os/admin/bundle/nos.min',
         'jquery-nos-wysiwyg' => 'static/novius-os/admin/bundle/nos.min',
         'jquery-nos' => 'static/novius-os/admin/bundle/nos.min',
+        'jquery-nos-contextmenu' => 'static/novius-os/admin/bundle/nos.min',
         'jquery-nos-loadspinner' => 'static/novius-os/admin/bundle/nos.min',
         'jquery-nos-ostabs' => 'static/novius-os/admin/bundle/nos.min',
         'jquery-nos-preview' => 'static/novius-os/admin/bundle/nos.min',
@@ -452,10 +461,11 @@ return array(
         'jquery-nos-thumbnailsgrid' => 'static/novius-os/admin/bundle/nos.min',
         'jquery-nos-appdesk' => 'static/novius-os/admin/bundle/nos.min',
         'jquery-nos-datacatchers' => 'static/novius-os/admin/bundle/nos.min',
+        'jquery-nos-tray' => 'static/novius-os/admin/bundle/nos.min',
 
         'jquery-nos-context-common-fields' =>
             'static/novius-os/admin/novius-os/js/views/minified/jquery.novius-os.context-common-fields',
-        'jquery-nos-appstab' => 'static/novius-os/admin/novius-os/js/views/minified/jquery.novius-os.appstab',
+        'jquery-nos-nosdesktop' => 'static/novius-os/admin/novius-os/js/views/minified/jquery.novius-os.nosdesktop',
         'jquery-nos-publishable' => 'static/novius-os/admin/novius-os/js/views/minified/jquery.novius-os.publishable',
         'jquery-nos-layout-standard' =>
             'static/novius-os/admin/novius-os/js/views/minified/jquery.novius-os.layout-standard',
