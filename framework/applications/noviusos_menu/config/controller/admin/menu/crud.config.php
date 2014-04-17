@@ -11,31 +11,17 @@
 return array(
     'controller_url' => 'admin/noviusos_menu/menu/crud',
     'model' => 'Nos\Menu\Model_Menu',
-    'environment_relation' => 'parent',
     'layout' => array(
         'large' => true,
-        'save' => 'save',
         'title' => 'menu_title',
         'content' => array(
-            'menu' => array(
-                'view' => 'nos::form/expander',
+            'menu_items' => array(
+                'view' => 'nos::form/fields',
                 'params' => array(
-                    'title' => __('Arborescence'),
-                    'nomargin' => true,
-                    'options' => array(
-                        'allowExpand' => false,
-                    ),
-                    'content' => array(
-                        'view' => 'nos::form/fields',
-                        'params' => array(
-                            'fields' => array('items'),
-                        ),
-                    ),
+                    'begin' => '<div>',
+                    'end' => '</div>',
+                    'fields' => array('items'),
                 ),
-            ),
-        ),
-        'menu' => array(
-            __('Properties') => array(//				'templates',
             ),
         ),
     ),
@@ -54,35 +40,8 @@ return array(
             ),
         ),
         'items' => array(
-            'label' => 'Arborescence',
-            'renderer' => 'Nos\Menu\Renderer_Menu',
-            'renderer_options' => array(
-                'height' => '250px',
-            ),
-            'form' => array(
-                'title' => __('Items'),
-            ),
-        ),
-//		'templates' => array(
-//			'label' => 'test',
-//			'renderer' => 'Nos\Menu\Renderer_Templates',
-//			'renderer_options' => array(
-//				'height' => '250px',
-//			),
-//			'form' => array(
-//				'title' => __('Items'),
-//			),
-//		),
-        'save' => array(
-            'label' => '',
-            'form' => array(
-                'type' => 'submit',
-                'tag' => 'button',
-                // Note to translator: This is a submit button
-                'value' => __('Save'),
-                'class' => 'primary',
-                'data-icon' => 'check',
-            ),
+            'renderer' => 'Nos\Menu\Renderer_Menu_Items',
+            'template' => '{field}',
         ),
     ),
     /* UI texts sample */

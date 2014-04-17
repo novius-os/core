@@ -11,149 +11,93 @@
 namespace Nos\Menu;
 
 use Nos\Controller_Admin_Crud;
+use Nos\Tools_Context;
 
 class Controller_Admin_Menu_Crud extends Controller_Admin_Crud
 {
-    /**
-     * Save menu
-     *
-     * @param $menu
-     * @param $data
-     * @return array
-     */
-    public function save($menu, $data)
+
+    protected $menu_items = array();
+
+    public function before_save($menu, $data)
     {
-        // Save menu
-        $response = parent::save($menu, $data);
-        if (empty($menu->menu_id)) {
-            return $response;
+        $items_data = \Input::post('item', array());
+
+        $menu->items = array();
+
+        foreach ($items_data as $mitem_id => $item_data) {
+            if (\Str::sub($mitem_id, 0, 1) === 't') {
+                $item = Model_Menu_Item::forge();
+                $item->mitem_driver = \Arr::get($item_data, 'mitem_driver', 'Nos\Menu\Menu_Item_Link');
+            } else {
+                $item = Model_Menu_Item::find($mitem_id);
+            }
+            $this->menu_items[$mitem_id] = $item;
+            $config = $item->driver()->config();
+            $fields = \Arr::get($config, 'admin.fields', array());
+
+            $fieldset = \Fieldset::build_from_config($fields, array('save' => false));
+            $fieldset->validation()->run($item_data);
+            $fieldset->triggerComplete($item, $fieldset->validated());
+            $menu->items[] = $item;
         }
-
-        // Save items
-        $response = \Arr::merge($response, $this->saveItems(\Input::post('update_items'), $menu));
-
-        // Delete items
-        $response = \Arr::merge($response, $this->deleteItems(\Input::post('delete_items'), $menu));
-
-        return $response;
     }
 
-    protected function saveItems($items, $menu)
+    public function save($item, $data)
     {
-        $return = array();
+        $return = parent::save($item, $data);
 
-        if (empty($items)) {
-            return $return;
-        }
-
-        foreach ($items as $id => $properties) {
-
-            try {
-                // New item or existing one ?
-                $is_new = (empty($id) || !is_numeric($id));
-
-                // Get or create the item
-                $item = $is_new ? Model_Menu_Item::forge() : Model_Menu_Item::find($id);
-
-                if (empty($item)) {
-                    // Item not found
-                    throw new \Exception(__('Sorry, can\'t find this item. Perhaps it has already been deleted?'));
-                }
-
-                if (!$is_new && $item->mitem_context != $menu->menu_context) {
-                    // If not the right context, clone the item
-                    $item = clone $item;
-                }
-                $item->mitem_context = $menu->menu_context;
-
-                // Populate the item with the submitted data
-                $item->populate(\Arr::merge($properties, array('mitem_menu_id' => $menu->menu_id)));
-
-                // Save item
-                $item->save();
-
-                // Dispatch event
-                $return['dispatchEvent'][] = array(
-                    'name' => 'Nos\Menu\Model_Menu_Item',
-                    'action' => ($is_new ? 'insert' : 'update'),
-                    'id' => $id,
-                    'newid' => $item->mitem_id
-                );
-            } catch (\Exception $e) {
-                $return['errors'][] = $e->getMessage();
-            }
-        }
+        $hierarchy = \Input::post('hierarchy', '');
+        $hierarchy = (array) json_decode($hierarchy);
+        $this->hierarchy($hierarchy);
 
         return $return;
     }
 
-    protected function deleteItems($items, $menu)
+    protected function hierarchy($nodes, $parent = null)
     {
-        $return = array();
+        foreach ($nodes as $i => $node) {
+            $node = (array) $node;
+            $id = \Arr::get($node, 'id', 0);
+            $children = \Arr::get($node, 'children', array());
+            $item = $this->menu_items[$id];
+            $item->mitem_parent_id = $parent;
+            $item->mitem_sort = $i;
+            $item->save();
 
-        if (empty($items)) {
-            return $return;
+            $this->hierarchy($children, $item->mitem_id);
         }
-
-        foreach ($items as $id => $value) {
-
-            try {
-                // New item or existing one ?
-                if (empty($id) || !is_numeric($id)) {
-                    continue;
-                }
-
-                // Get or create the item
-                $item = Model_Menu_Item::find($id);
-                if (empty($item)) {
-                    // Item not found
-                    throw new \Exception(__('Sorry, can\'t find this item. Perhaps it has already been deleted?'));
-                }
-
-                // Delete item's children
-                $deleted_ids = $this->deleteItemChildren($menu->items($item->mitem_id));
-
-                // Delete item
-                $item->delete();
-                $deleted_ids += array($id);
-
-                // Dispatch delete events
-                foreach ($deleted_ids as $deleted_id) {
-                    $return['dispatchEvent'][] = array(
-                        'name' => 'Nos\Menu\Model_Menu_Item',
-                        'action' => 'delete',
-                        'id' => $deleted_id,
-                    );
-                }
-            } catch (\Exception $e) {
-                // Errors on item
-                $return['errors'][] = $e->getMessage();
-            }
-        }
-
-        return $return;
     }
 
-    /**
-     * Delete item's children
-     *
-     * @param array $tree Item's children tree
-     * @return array Deleted item ids
-     */
-    protected function deleteItemChildren($tree)
+    public function action_menu_item($item = null)
     {
-        $ids = array();
-        if (empty($tree)) {
-            return $ids;
+        if (empty($item)) {
+            $item = Model_Menu_Item::forge();
+            $item->mitem_driver = \Input::get('driver', 'Nos\Menu\Menu_Item_Link');
+            $item->mitem_id = \Input::get('id');
         }
-        foreach ($tree as $item) {
-            if (count($item->children)) {
-                // Delete the item's children
-                $ids += $this->deleteItemChildren($item->children);
-            }
-            // Delete the itemx
-            $item->delete();
+
+        $config = $item->driver()->config();
+        $fields = \Arr::get($config, 'admin.fields', array());
+        if (empty($item->mitem_title)) {
+            \Arr::set($fields, 'mitem_title.form.placeholder', $item->driver()->title());
         }
-        return array_keys($tree) + $ids;
+        $fieldset = \Fieldset::build_from_config($fields, $item, array('save' => false, 'auto_id' => false));
+
+        $image_view_params = array(
+            'fieldset' => $fieldset,
+            'layout' => \Arr::get($config, 'admin.layout', array()),
+        );
+        $image_view_params['view_params'] = &$image_view_params;
+
+
+        // Replace name with item[12345][name]
+        $replaces = array();
+        foreach ($fields as $name => $field_config) {
+            $replaces[$name] = 'item['.$item->mitem_id.']['.$name.']';
+        }
+        $return = (string) \View::forge('noviusos_menu::admin/renderer/menu/item', $image_view_params, false)
+                ->render().$fieldset->build_append();
+
+        return strtr($return, $replaces);
     }
 }

@@ -23,13 +23,13 @@ CREATE TABLE IF NOT EXISTS `nos_menu` (
 
 CREATE TABLE IF NOT EXISTS `nos_menu_item` (
   `mitem_id`         INT(11) UNSIGNED    NOT NULL AUTO_INCREMENT,
-  `mitem_context`    VARCHAR(25)         NOT NULL,
   `mitem_menu_id`    INT(11)             NOT NULL,
   `mitem_parent_id`  INT(11) UNSIGNED DEFAULT NULL,
   `mitem_sort`       TINYINT(3) UNSIGNED NOT NULL DEFAULT '0',
-  `mitem_title`      VARCHAR(255)        NOT NULL,
+  `mitem_driver`     VARCHAR(512)        NOT NULL,
+  `mitem_title`      VARCHAR(255) DEFAULT NULL,
+  `mitem_dom_id`     VARCHAR(512) DEFAULT NULL,
   `mitem_css_class`  VARCHAR(512) DEFAULT NULL,
-  `mitem_driver`     VARCHAR(512) DEFAULT NULL,
   `mitem_created_at` TIMESTAMP           NOT NULL DEFAULT '0000-00-00 00:00:00',
   `mitem_updated_at` TIMESTAMP           NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`mitem_id`),

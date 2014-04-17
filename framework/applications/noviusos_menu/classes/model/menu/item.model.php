@@ -24,11 +24,6 @@ class Model_Menu_Item extends Model
             'data_type' => 'int',
             'null' => false,
         ),
-        'mitem_context' => array(
-            'default' => null,
-            'data_type' => 'varchar',
-            'null' => false,
-        ),
         'mitem_menu_id' => array(
             'default' => null,
             'data_type' => 'int',
@@ -40,26 +35,33 @@ class Model_Menu_Item extends Model
             'null' => true,
             'convert_empty_to_null' => true,
         ),
-        'mitem_sort' => array(
-            'default' => 0,
-            'data_type' => 'int',
+        'mitem_driver' => array(
+            'default' => null,
+            'data_type' => 'varchar',
             'null' => false,
         ),
         'mitem_title' => array(
             'default' => '',
             'data_type' => 'varchar',
-            'null' => false,
+            'null' => true,
+            'convert_empty_to_null' => true,
+        ),
+        'mitem_dom_id' => array(
+            'default' => '',
+            'data_type' => 'varchar',
+            'null' => true,
+            'convert_empty_to_null' => true,
         ),
         'mitem_css_class' => array(
             'default' => '',
             'data_type' => 'varchar',
-            'null' => false,
-        ),
-        'mitem_driver' => array(
-            'default' => null,
-            'data_type' => 'varchar',
             'null' => true,
             'convert_empty_to_null' => true,
+        ),
+        'mitem_sort' => array(
+            'default' => 0,
+            'data_type' => 'int',
+            'null' => false,
         ),
         'mitem_created_at' => array(
             'data_type' => 'timestamp',
@@ -109,7 +111,17 @@ class Model_Menu_Item extends Model
             'key_to' => 'miat_mitem_id', // key in the related model
             'cascade_save' => true, // update the related table on save
             'cascade_delete' => true, // delete the related data when deleting the parent
-        )
+        ),
+        'children' => array(
+            'key_from' => 'mitem_id',
+            'model_to' => '\Nos\Menu\Model_Menu_Item',
+            'key_to' => 'mitem_parent_id',
+            'conditions' => array(
+                'order_by' => array(array('mitem_sort' => 'ASC')),
+            ),
+            'cascade_save' => false,
+            'cascade_delete' => false,
+        ),
     );
 
     protected static $_observers = array(
@@ -126,149 +138,37 @@ class Model_Menu_Item extends Model
         )
     );
 
-    protected $driver = null;
-
-    public $children = null;
+    protected $menu_item_driver = null;
 
     /**
-     * Returns the driver
+     * Returns the menu item driver
      *
-     * @param bool $cache
-     * @return bool|Driver
+     * @param bool $reload
+     * @return Menu_Item
      */
-    public function driver($cache = true)
+    public function driver($reload = true)
     {
-        if (is_null($this->driver) || !$cache) {
-            $this->driver = Driver_Item::forge($this);
+        if (is_null($this->menu_item_driver) || $reload) {
+            $this->menu_item_driver = Menu_Item::forge($this);
         }
-        return $this->driver;
+        return $this->menu_item_driver;
     }
 
-    /**
-     * Returns the EAV attribute keys
-     *
-     * @return mixed
-     */
-    public function attributes()
+    public function & get($property, array $conditions = array())
     {
-        return $this->driver()->attributes();
-    }
-
-    /**
-     * Returns item's children
-     *
-     * @return mixed
-     */
-    public function children()
-    {
-        // Loads from DB if not already loaded
-        if (is_null($this->children)) {
-            $this->children = Model_Menu_Item::query(array(
-                'where' => array(
-                    array('mitem_parent_id', '=', $this->mitem_id)
-                ),
-            ))->get();
-            // Sort
-            uasort($this->children, function ($a, $b) {
-                return strcmp($a->mitem_sort, $b->mitem_sort);
-            });
-        }
-        return $this->children;
-    }
-
-    /**
-     * Safely populate the item with $data or GET/POST
-     *
-     * @param array $data
-     * @return mixed
-     */
-    public function populate($data = null)
-    {
-        // Populate with POST/GET if $data is empty
-        $data = (!empty($data) ? (array) $data : \Input::param());
-        // Populate driver first
-        uksort($data, function ($a, $b) {
-            if ($a == 'mitem_driver') {
-                return -1;
-            }
-            if ($b == 'mitem_driver') {
-                return 1;
-            }
-            return 0;
-        });
-        // Parse data
-        foreach ($data as $property => $value) {
-            // Property
-            if (array_key_exists($property, $this->properties())) {
-                $this->$property = $value;
-            } elseif (in_array($property, array('wysiwygs', 'medias'))) {
-                // Wysiwyg or media
-                foreach ($value as $name => $val) {
-                    $this->$property->$name = $val;
-                }
-
-            } elseif ($property == 'attributes') {
-                // Attribute
-                $this->setAttribute($property, $value);
-
-            } elseif (strpos($property, '.')) {
-                // Dot notation
-                $parts = explode('.', $property);
-                if (count($parts) == 2) {
-                    list($key, $name) = $parts;
-                    // Wysiwyg or media
-                    if (in_array($key, array('wysiwygs', 'medias'))) {
-                        $this->$key->$name = $value;
-                    }
-                    // Attribute
-                    if ($key == 'attributes') {
-                        $this->setAttribute($name, $value);
-                    }
+        try {
+            return parent::get($property, $conditions);
+        } catch (\OutOfBoundsException $e) {
+            if ($this->is_new()) {
+                $attributes = \Arr::get($this->driver()->config(), 'attributes');
+                if (in_array($property, $attributes) ||
+                    (\Str::starts_with($property, 'mitem_') &&
+                        in_array(str_replace('mitem_', '', $property), $attributes))) {
+                    $result = null;
+                    return $result;
                 }
             }
+            throw $e;
         }
-        return $this;
-    }
-
-    /**
-     * Set an attribute (checks if authorized)
-     *
-     * @param $key
-     * @param $value
-     * @return bool|\Orm\Model
-     * @throws \Exception
-     */
-    public function setAttribute($key, $value)
-    {
-        if (!in_array($key, $this->attributes())) {
-            // Attribute not authorized
-            return false;
-        }
-        foreach ($this->attributes as $attribute) {
-            if ($attribute->miat_key == $key) {
-                $attribute->miat_value = $value;
-                return $attribute;
-            }
-        }
-        return $this->attributes[] = Model_Menu_Item_Attribute::forge(array(
-            'miat_mitem_id' => $this->mitem_id,
-            'miat_key' => $key,
-            'miat_value' => $value,
-        ));
-    }
-
-    /**
-     * Find with order_by default sort
-     *
-     * @param null $id
-     * @param array $options
-     * @return \Orm\Model|\Orm\Model[]
-     */
-    public static function find($id = null, array $options = array())
-    {
-        if (array_key_exists('order_by', $options)) {
-            isset($options['order_by']['mitem_sort']) or $options['order_by']['mitem_sort'] = 'ASC';
-        }
-        return parent::find($id, $options);
     }
 }

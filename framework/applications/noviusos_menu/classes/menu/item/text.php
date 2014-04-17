@@ -8,12 +8,8 @@
  * @link http://www.novius-os.org
  */
 
-return array(
-    // Available drivers
-    'drivers' => array(
-        'Nos\Menu\Menu_Item_Text',
-        'Nos\Menu\Menu_Item_Link',
-        'Nos\Menu\Menu_Item_Page',
-        'Nos\Menu\Menu_Item_Html',
-    ),
-);
+namespace Nos\Menu;
+
+class Menu_Item_Text extends Menu_Item_Driver
+{
+}

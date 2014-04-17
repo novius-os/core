@@ -70,6 +70,17 @@ class Model_Menu extends Model
             'cascade_save' => true,
             'cascade_delete' => true,
         ),
+        'root_items' => array(
+            'key_from' => 'menu_id',
+            'model_to' => '\Nos\Menu\Model_Menu_Item',
+            'key_to' => 'mitem_menu_id',
+            'conditions' => array(
+                'where' => array(array('mitem_parent_id', 'IS', null)),
+                'order_by' => array(array('mitem_sort' => 'ASC')),
+            ),
+            'cascade_save' => false,
+            'cascade_delete' => false,
+        ),
     );
 
     protected static $_observers = array(
@@ -93,43 +104,4 @@ class Model_Menu extends Model
             'common_fields' => array(),
         ),
     );
-
-    /**
-     * Returns items by parent item id
-     *
-     * @param null $parent_id
-     * @return array
-     */
-    public function items($parent_id = null)
-    {
-        // Gets the items with $parent_id as parent's item id
-        return array_filter($this->buildItemsChildren(), function ($item) use ($parent_id) {
-            return $item->mitem_parent_id == $parent_id;
-        });
-    }
-
-    /**
-     * Builds items children recursively (without any sql query)
-     *
-     * @param null $parent_id
-     * @return array|null
-     */
-    public function buildItemsChildren($parent_id = null)
-    {
-        // Gets the items with $parent_id as parent's item id
-        $items = array_filter($this->items, function ($item) use ($parent_id) {
-            return $item->mitem_parent_id == $parent_id;
-        });
-        // Sort items
-        uasort($items, function ($a, $b) {
-            return strcmp($a->mitem_sort, $b->mitem_sort);
-        });
-        // Builds children recursively
-        foreach ($items as $item) {
-            if (is_null($item->children)) {
-                $item->children = $this->buildItemsChildren($item->mitem_id);
-            }
-        }
-        return $items;
-    }
 }
