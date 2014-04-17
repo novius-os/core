@@ -16,7 +16,9 @@ define(
         "use strict";
         return function(wysiwyg_options) {
 
-            var $container = $(this);
+            var $container = $(this),
+                $dispatcher = $container.closest('.nos-dispatcher, body');
+
             wysiwyg_options = wysiwyg_options || {};
             if ($container.data('already-processed')) {
                 return;
@@ -44,8 +46,34 @@ define(
             var $page_id = $container.find('input[name=page_id]');
             var $from_id = $container.find('input[name=create_from_id]');
             var from_id = $page_id.val() || $from_id.val() || 0;
-            $container.find('select[name=page_template]').bind('change', function() {
+            var $template_variation_id = $container.find('select[name=page_template_variation_id]');
+            var listenEventTemplateVariation = function() {
+                var match = [
+                    {
+                        action: 'update',
+                        name : 'Nos\\Template\\Variation\\Model_Template_Variation',
+                        context : $dispatcher.data('nosContext'),
+                        id: parseInt($template_variation_id.find(':selected').val())
+                    },
+                    {
+                        name : 'Nos\\Template\\Variation\\Model_Template_Variation',
+                        context : $dispatcher.data('nosContext'),
+                    }
+                ];
+
+                $dispatcher.nosUnlistenEvent('pageCrudTemplateVariation');
+                $dispatcher.nosListenEvent({
+                    name : 'Nos\\Template\\Variation\\Model_Template_Variation',
+                    context : $dispatcher.data('nosContext'),
+                    id: parseInt($template_variation_id.find(':selected').val())
+                }, function() {
+                    $dispatcher.trigger('contextChange');
+                }, 'pageCrudTemplateVariation');
+            };
+
+            $template_variation_id.bind('change', function() {
                 $container.data('already-processed', true);
+                listenEventTemplateVariation();
                 var $wysiwyg = $container.find('[data-id=wysiwyg]');
                 var save = {};
                 // tinyMCE won't be initialised until the first Wysiwyg is transformed
@@ -60,7 +88,7 @@ define(
                 $.ajax({
                     url: 'admin/noviusos_page/ajax/wysiwyg/' + from_id,
                     data: {
-                        template_id: $(this).val()
+                        tpvar_id: $(this).val()
                     },
                     dataType: 'json',
                     success: function(data) {
@@ -100,14 +128,14 @@ define(
                             });
                         });
                     }
-                })
+                });
             });
 
             var $page_virtual_name_container = $container.find('input[name=page_virtual_name]').closest('.wijmo-wijaccordion-content');
             var $page_meta_title_container = $container.find('input[name=page_meta_noindex]').closest('.wijmo-wijaccordion-content');
             var $accordion = $container.find('.accordion');
 
-            var $template_unit = $container.find('select[name=page_template]').closest('td');
+            var $template_unit = $template_variation_id.closest('td');
             $container.find('select[name=page_type]').change(function() {
                 var val = $(this).val();
                 var $wysiwyg = $container.find('[data-id=wysiwyg]');
@@ -163,5 +191,35 @@ define(
                     $menu_title.removeAttr('readonly').removeClass('ui-state-disabled');
                 }
             }).triggerHandler('change');
+
+            $dispatcher.on('contextChange', function() {
+                var context = $dispatcher.data('nosContext');
+                listenEventTemplateVariation();
+                $.ajax({
+                    url: 'admin/noviusos_page/ajax/template_variation',
+                    data: {
+                        context: context,
+                        selected: $template_variation_id.find(':selected').val()
+                    },
+                    dataType: 'json',
+                    success: function(data) {
+                        var selected = 0;
+                        $template_variation_id.empty();
+                        $.each(data, function() {
+                            var option = this;
+                            $('<option></option>').val(option.value)
+                                .text(option.text)
+                                .appendTo($template_variation_id);
+                            if (option.selected) {
+                                selected = option.value;
+                            }
+                        });
+                        $template_variation_id.val(selected);
+                        $template_variation_id.trigger('change');
+                    }
+                });
+            });
+
+            listenEventTemplateVariation();
         }
     });

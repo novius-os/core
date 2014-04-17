@@ -502,15 +502,23 @@ class Application
 
         if (!empty($removed['templates'])) {
             // Check template usage in the page
-            $pages = \Nos\Page\Model_Page::find('all', array('where' => array(array('page_template', 'IN', array_keys($removed['templates'])))));
+            $pages = \Nos\Page\Model_Page::find('all', array(
+                'where' => array(
+                    array('template_variation.tpvar_template', 'IN', array_keys($removed['templates']))
+                ),
+                'related' => array('template_variation')
+            ));
             if (count($pages) > 0) {
                 $usedTemplates = array();
                 $pageTitles = array();
                 foreach ($pages as $page) {
-                    $usedTemplates[$page->page_template] = true;
+                    $usedTemplates[$page->template_variation->tpvar_template] = true;
                     $pageTitles[] = $page->page_id; // page_title? too long...
                 }
-                throw new \Exception(count($pages).' pages use a template from this application. Used templates are: '.implode(', ', array_keys($usedTemplates)).'. Pages ids are: '.implode(', ', $pageTitles));
+                throw new \Exception(
+                    count($pages).' pages use a template from this application. Used templates are: '.
+                    implode(', ', array_keys($usedTemplates)).'. Pages ids are: '.implode(', ', $pageTitles)
+                );
             }
         }
 

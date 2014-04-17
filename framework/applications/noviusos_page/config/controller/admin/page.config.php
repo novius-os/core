@@ -8,11 +8,6 @@
  * @link http://www.novius-os.org
  */
 
-$templates = array();
-foreach (\Nos\Config_Data::get('templates', array()) as $tpl_key => $template) {
-    $templates[$tpl_key] = $template['title'];
-}
-
 Nos\I18n::current_dictionary(array('noviusos_page::common', 'nos::common'));
 
 return array(
@@ -33,7 +28,7 @@ return array(
                 'title' => 'page_title',
                 'medias' => array(),
                 'large' => true,
-                'subtitle' => array('page_type', 'page_template'),
+                'subtitle' => array('page_type', 'page_template_variation_id'),
                 'content' => array(
                     'content' => array(
                         'view' => 'nos::form/expander',
@@ -104,12 +99,10 @@ return array(
             'label' => __('Location:'),
             'form' => array(),
         ),
-        'page_template' => array(
-            'label' => __('Template:'),
+        'page_template_variation_id' => array(
+            'label' => __('Template variation:'),
             'form' => array(
                 'type' => 'select',
-                'options' => $templates,
-                'style' => 'width: 300px;',
             ),
         ),
         'page_virtual_name' => array(

@@ -10,26 +10,68 @@
 
 namespace Nos\Page;
 
-use Fuel\Core\Config;
+use Nos\Config_Data;
+use Nos\Template\Variation\Model_Template_Variation;
+use Nos\Tools_Wysiwyg;
 
 class Controller_Admin_Ajax extends \Controller
 {
     public function action_wysiwyg($page_id = null)
     {
-        $id = $_GET['template_id'];
-        $data = \Nos\Config_Data::get('templates', array());
-        $data = $data[$id];
-
-        $data['layout'] = (array) $data['layout'];
+        $id = $_GET['tpvar_id'];
+        if (!is_numeric($id)) {
+            $tpvar = Model_Template_Variation::forge();
+            $tpvar->tpvar_template = $id;
+        } else {
+            $tpvar = Model_Template_Variation::find($id);
+        }
+        $data = $tpvar->configCompiled();
 
         $page = empty($page_id) ? null : Model_Page::find($page_id);
         foreach ($data['layout'] as $wysiwyg => $coords) {
-            $data['content'][$wysiwyg] = empty($page) ? '' : \Nos\Tools_Wysiwyg::prepare_renderer($page->wysiwygs->{$wysiwyg});
+            \Arr::set(
+                $data,
+                'content.'.$wysiwyg,
+                empty($page) ? '' : Tools_Wysiwyg::prepare_renderer($page->wysiwygs->{$wysiwyg})
+            );
         }
 
-        // @todo replace images
-        // src="nos://media/ID" => src="http://real/url/here" data-media-id="ID"
-
         \Response::json($data);
+    }
+
+    public function action_template_variation()
+    {
+        $context = $_GET['context'];
+        $selected = $_GET['selected'];
+
+        $options = array();
+        $templates_variations = Model_Template_Variation::find('all', array(
+            'where' => array(array('tpvar_context' => $context)),
+            'order_by' => array(
+                'tpvar_default' => 'DESC',
+                'tpvar_title',
+            ),
+        ));
+        if (!empty($templates_variations)) {
+            foreach ($templates_variations as $template_variation) {
+                $options[] = array(
+                    'text' => $template_variation->tpvar_title,
+                    'value' => $template_variation->tpvar_id,
+                    'selected' =>  $selected && $selected == $template_variation->tpvar_id ||
+                        !isset($templates_variations[$selected]) && $template_variation->tpvar_default,
+                );
+            }
+        } else {
+            $templates = Config_Data::get('templates', array());
+            foreach ($templates as $template_name => $template) {
+                $options[] = array(
+                    'text' => $template['title'],
+                    'value' => $template_name,
+                    'selected' => false,
+                );
+            }
+        }
+
+        \Response::json($options);
     }
 }
