@@ -333,7 +333,7 @@ return array(
     #: config/controller/admin/appdesk.config.php:101
     '1 media file' => array(
         0 => '1 média',
-        1 => '{{x}} médias',
+        1 => '{{count}} médias',
     ),
 
     #: config/controller/admin/appdesk.config.php:105

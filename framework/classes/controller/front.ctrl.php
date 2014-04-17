@@ -45,6 +45,7 @@ class Controller_Front extends Controller
     protected $_base_href = '';
     protected $_context_url = '';
     protected $_title = '';
+    protected $h1 = '';
     protected $_meta_description = '';
     protected $_meta_keywords = '';
     protected $_meta_robots = 'index,follow';
@@ -52,6 +53,7 @@ class Controller_Front extends Controller
 
     protected $_page;
     protected $_page_id;
+    protected $item_displayed;
 
     protected $_wysiwyg_name = null;
 
@@ -197,8 +199,8 @@ class Controller_Front extends Controller
                     $this->_content = $this->_view->render();
 
                     $this->_handleHead();
-                    \Event::trigger_function('front.display', array(&$this->_content));
 
+                    \Event::trigger_function('front.display', array(&$this->_content));
                     echo $this->_content;
 
                     $this->_cache->save(!$this->_use_cache ? -1 : $this->_cache_duration, $this);
@@ -214,7 +216,7 @@ class Controller_Front extends Controller
                     break;
                 } catch (NotFoundException $e) {
                     $_404 = true;
-                    $this->_page = null;
+                    $this->setPage();
                     $this->_enhanced_url_path = false;
                     $this->_enhancer_url = false;
                     continue;
@@ -287,6 +289,38 @@ class Controller_Front extends Controller
         return $this->_page;
     }
 
+    protected function setPage(Page\Model_Page $page = null)
+    {
+        $this->_page = $page;
+        if (!empty($this->_page)) {
+
+            if ($this->_page->page_meta_noindex) {
+                $replaces = array();
+                $this->setMetaRobots('noindex');
+            } else {
+                $replaces = array(
+                   'title' => !empty($this->_page->page_meta_title) ? $this->_page->page_meta_title : $this->_page->page_title,
+                   'meta_description' => $this->_page->page_meta_description,
+                   'meta_keywords' => $this->_page->page_meta_keywords,
+                );
+            }
+            $this->setItemDisplayed($this->_page, $replaces);
+
+            $this->_context = $this->_page->get_context();
+            $this->_context_url = $this->_contexts_possibles[$this->_context];
+            I18n::setLocale(Tools_Context::localeCode($this->_context));
+
+            \Fuel::$profiling && \Profiler::console('page_id = ' . $this->_page->page_id);
+
+            if (!empty($this->_page->page_cache_duration)) {
+                $this->_cache_duration = $this->_page->page_cache_duration;
+                \FrontCache::$cache_duration = $this->_cache_duration;
+            }
+        }
+
+        return $this;
+    }
+
     /**
      * @return mixed Current wysiwyg ID processed.
      */
@@ -328,6 +362,48 @@ class Controller_Front extends Controller
     }
 
     /**
+     * @return \Nos\Orm\Model Current Model instance displayed.
+     */
+    public function getItemDisplayed()
+    {
+        return $this->item_displayed;
+    }
+
+    /**
+     * @param Orm\Model $item The current Model instance displayed.
+     * @param array $properties Array of properties
+     * @param array $templates Array of templates use to set properties
+     * @return Controller_Front
+     */
+    public function setItemDisplayed(Orm\Model $item, array $properties = array(), array $templates = array())
+    {
+        $this->item_displayed = $item;
+
+        $title_item = \Arr::get($properties, 'title_item', $item->title_item());
+        $properties = array_merge(array(
+            'title' => $title_item,
+            'h1' => $title_item,
+        ), $properties);
+
+        $this->setTitle(\Arr::get($properties, 'title'), \Arr::get($templates, 'title', null));
+        $this->setH1(\Arr::get($properties, 'h1'), \Arr::get($templates, 'h1', null));
+
+        $value = \Arr::get($properties, 'meta_description', null);
+        !empty($value) && $this->setMetaDescription($value, \Arr::get($templates, 'meta_description', null));
+
+        $value = \Arr::get($properties, 'meta_keywords', null);
+        !empty($value) && $this->setMetaKeywords($value, \Arr::get($templates, 'meta_keywords', null));
+
+        \Event::trigger('front.setItemDisplayed', array(
+            'item' => $item,
+            'properties' => $properties,
+            'templates' => $templates
+        ));
+
+        return $this;
+    }
+
+    /**
      * Sets a new <base href=""> for the current HTML output.
      *
      * @param string $base_href The new <base href="">.
@@ -344,19 +420,34 @@ class Controller_Front extends Controller
      * Set a new title for the current HTML.
      *
      * @param string    $title      The new title.
-     * @param string    $template   If set, use it to calculate the title. Placeholder :title will be replaced by $title.
+     * @param string    $template   If set, use it to calculate the title. Placeholder :title will be replaced by $title and :page_title by the page title.
      * @return Controller_Front
      */
     public function setTitle($title, $template = null)
     {
         if (!$template) {
-            $template = \Config::get('title_template', null);
-            if (!$template) {
-                $template = ':title';
-            }
+            $template = \Config::get('title_template', ':title');
         }
 
-        $this->_title = \Str::tr($template, array('title' => $title));
+        $this->_title = \Str::tr($template, array('title' => $title, 'page_title' => $this->_page->page_title));
+
+        return $this;
+    }
+
+    /**
+     * Set a new h1 for the current HTML.
+     *
+     * @param string $h1        The new h1.
+     * @param string $template  If set, use it to calculate the title. Placeholder :h1 will be replaced by $h1.
+     * @return Controller_Front
+     */
+    public function setH1($h1, $template = null)
+    {
+        if (!$template) {
+            $template = ':h1';
+        }
+
+        $this->h1 = \Str::tr($template, array('h1' => $h1));
 
         return $this;
     }
@@ -365,11 +456,19 @@ class Controller_Front extends Controller
      * Set a meta description for the current HTML output.
      *
      * @param string $meta_description The new meta description.
+     * @param string $template         If set, use it to calculate the meta description. Placeholder :meta_description will be replaced by $meta_description and :page_meta_description by the page meta description.
      * @return Controller_Front
      */
-    public function setMetaDescription($meta_description)
+    public function setMetaDescription($meta_description, $template = null)
     {
-        $this->_meta_description = $meta_description;
+        if (!$template) {
+            $template = \Config::get('meta_description_template', ':meta_description');
+        }
+
+        $this->_meta_description = \Str::tr($template, array(
+            'meta_description' => $meta_description,
+            'page_meta_description' => $this->_page->page_meta_description,
+        ));
 
         return $this;
     }
@@ -378,11 +477,19 @@ class Controller_Front extends Controller
      * Set a meta keywords for the current HTML output.
      *
      * @param string $meta_keywords The new meta keywords.
+     * @param string $template      If set, use it to calculate the meta description. Placeholder :meta_description will be replaced by $meta_description and :page_meta_description by the page meta description.
      * @return Controller_Front
      */
-    public function setMetaKeywords($meta_keywords)
+    public function setMetaKeywords($meta_keywords, $template = null)
     {
-        $this->_meta_keywords = $meta_keywords;
+        if (!$template) {
+            $template = \Config::get('meta_keywords_template', ':meta_keywords');
+        }
+
+        $this->_meta_keywords = \Str::tr($template, array(
+            'meta_keywords' => $meta_keywords,
+            'page_meta_keywords' => $this->_page->page_meta_keywords,
+        ));
 
         return $this;
     }
@@ -552,7 +659,7 @@ class Controller_Front extends Controller
         $this->_js_header = array_unique($this->_js_header, SORT_REGULAR);
         foreach ($this->_js_header as $js) {
             if (is_array($js) && isset($js['inline']) && $js['inline'] && isset($js['js'])) {
-                $head[] = '<script type="text/javascript">'.$js['js'].'</script>';
+                $head[] = \Str::starts_with($js['js'], '<script ') ? $js['js'] : '<script type="text/javascript">'.$js['js'].'</script>';
             } elseif (is_string($js) || (is_array($js) && isset($js['js']))) {
                 $head[] = '<script src="'.(is_string($js) ? $js : $js['js']).'" type="text/javascript"></script>';
             }
@@ -565,7 +672,7 @@ class Controller_Front extends Controller
         $this->_js_footer = array_unique($this->_js_footer, SORT_REGULAR);
         foreach ($this->_js_footer as $js) {
             if (is_array($js) && isset($js['inline']) && $js['inline'] && isset($js['js'])) {
-                $footer[] = \Str::sub($js['js'], 0, 8) === '<script ' ? $js['js'] : '<script type="text/javascript">'.$js['js'].'</script>';
+                $footer[] = \Str::starts_with($js['js'], '<script ') ? $js['js'] : '<script type="text/javascript">'.$js['js'].'</script>';
             } elseif (is_string($js) || (is_array($js) && isset($js['js']))) {
                 $js = is_string($js) ? $js : $js['js'];
                 if (in_array($js, $this->_js_header)) {
@@ -597,7 +704,7 @@ class Controller_Front extends Controller
         $this->_wysiwyg_name = null;
 
         $this->_view->set('wysiwyg', $wysiwyg, false);
-        $this->_view->set('title', $this->_page->page_title, false);
+        $this->_view->set('title', $this->h1, false);
         $this->_view->set('page', $this->_page, false);
         $this->_view->set('main_controller', $this, false);
     }
@@ -616,10 +723,6 @@ class Controller_Front extends Controller
             $page = Page\Model_Page::find('first', array(
                     'where' => $where,
                 ));
-
-            if (!empty($page)) {
-                $this->_page = $page;
-            }
         } else {
             foreach ($this->_contexts_possibles as $context => $domain) {
                 $url = mb_substr(\Uri::base(false).$this->_page_url, mb_strlen($domain));
@@ -645,46 +748,27 @@ class Controller_Front extends Controller
                 ));
 
                 if (!empty($page)) {
-                    $this->_page = $page;
-                    $this->_page_url = $url;
-
                     if ($page->page_entrance && !empty($url)) {
                         \Response::redirect($domain, 'location', 301);
                         exit();
                     }
+
+                    $this->_page_url = $url;
                     break;
                 }
             }
         }
 
-        if (empty($this->_page)) {
+        if (empty($page)) {
             throw new NotFoundException('The requested page was not found.');
         }
 
-        if ($this->_page->page_type == \Nos\Page\Model_Page::TYPE_EXTERNAL_LINK) {
-            \Response::redirect($this->_page->page_external_link, 'location', 301);
+        if ($page->page_type == \Nos\Page\Model_Page::TYPE_EXTERNAL_LINK) {
+            \Response::redirect($page->page_external_link, 'location', 301);
             exit();
         }
 
-        $this->_context = $this->_page->get_context();
-        $this->_context_url = $this->_contexts_possibles[$this->_context];
-        \Nos\I18n::setLocale(\Nos\Tools_Context::localeCode($this->_context));
-
-        \Fuel::$profiling && \Profiler::console('page_id = ' . $this->_page->page_id);
-
-        if ($this->_page->page_meta_noindex) {
-            $this->setTitle($this->_page->page_title);
-            $this->setMetaRobots('noindex');
-        } else {
-            $this->setTitle(!empty($this->_page->page_meta_title) ? $this->_page->page_meta_title : $this->_page->page_title);
-            $this->setMetaDescription($this->_page->page_meta_description);
-            $this->setMetaKeywords($this->_page->page_meta_keywords);
-        }
-
-        if (!empty($this->_page->page_cache_duration)) {
-            $this->_cache_duration = $this->_page->page_cache_duration;
-            \Nos\FrontCache::$cache_duration = $this->_cache_duration;
-        }
+        $this->setPage($page);
     }
 
     protected function _findTemplate()

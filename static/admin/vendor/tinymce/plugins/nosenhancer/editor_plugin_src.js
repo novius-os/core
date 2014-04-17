@@ -13,7 +13,7 @@
 
     tinymce.create('tinymce.plugins.NosEnhancerPlugin', {
         init : function(ed, url) {
-            var self = this, mediaCached = {};
+            var self = this;
 
             self.editor = ed;
             self.url = url;
@@ -74,67 +74,11 @@
                 });
             }
 
-            function mediaTransformSrcIntoNos(content) {
-                content.find('img').each(function() {
-                    var $img = $(this);
-                    var media_id = $img.attr('data-media-id');
-                    if (!media_id) {
-                        return;
-                    }
-                    var origSrc = $img.attr('src');
-                    if (origSrc.substr(0, 6) !== 'nos://') {
-                        var src = 'nos://media/' + media_id;
-                        var width = $img.attr('width');
-                        var height = $img.attr('height');
-
-                        if (width && height) {
-                            src += '/' + width + '/' + height;
-                            var resolution = width * height;
-                        } else {
-                            resolution = 0;
-                        }
-
-                        // Store src in the cache when: 1. it doesn't exists yet or 2. the resolution is higher than the stored one
-                        // resolution == 0 means it's the larger possible size
-                        if (resolution == 0 || !mediaCached[media_id] || resolution > mediaCached[media_id].resolution) {
-                            mediaCached[media_id] = {
-                                attrs : {
-                                    src: $img.attr('src'),
-                                    'data-media-id' : media_id
-                                },
-                                resolution: resolution
-                            };
-                        }
-
-                        $img.attr({
-                            src: src
-                        }).removeClass('nosMedia').removeAttr('data-media').removeAttr('data-media-id');
-                    }
-                    $img.removeData().attr('data-mce-src', origSrc).removeAttr('data-mce-src');
-                });
-            }
-
-            function mediaRestoreSrc(content) {
-                content.find('img').each(function() {
-                    var $img = $(this);
-                    $img.removeData().removeAttr('data-mce-src');
-                    var origSrc = $img.attr('src');
-                    if (origSrc.substr(0, 6) == 'nos://') {
-                        // remove 'nos://media/'
-                        var media_id = origSrc.substr(12).split('/')[0];
-                        if (media_id && mediaCached[media_id]) {
-                            $img.attr(mediaCached[media_id]['attrs']).addClass('nosMedia');
-                        }
-                    }
-                });
-            }
-
             // When editing HTML content, we clean up enhancer preview, we'll make them nice again after
             ed.onGetContent.add(function(ed, o) {
                 var content = $(o.content);
                 // Empty enhancer previews (data and useful informations are stored as html attributes on the higest div)
                 enhancerEmptyPreview(content);
-                mediaTransformSrcIntoNos(content);
                 o.content = $('<div></div>').append(content).html();
             });
 
@@ -142,7 +86,6 @@
                 setTimeout(function() {
                     var content = $(ed.getBody());
                     enhancerRestorePreview(content);
-                    mediaRestoreSrc(content);
                 }, 1);
             });
 

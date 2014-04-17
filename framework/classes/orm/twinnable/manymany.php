@@ -16,39 +16,71 @@ class Orm_Twinnable_ManyMany extends \Orm\ManyMany
 {
     protected $column_context_from = 'context';
 
-    protected $column_context_common_id_to = 'context_common_id';
+    protected $column_context_common_id_to = false;
 
-    protected $column_context_to = 'context';
+    protected $column_context_to = false;
 
-    protected $column_context_is_main_to = 'context_is_main';
+    protected $column_context_is_main_to = false;
+
+    protected $cascade_delete_after_last_twin = true;
+
+    protected $delete_related_called = false;
 
     public function __construct($from, $name, array $config)
     {
-        $to = array_key_exists('model_to', $config) ? $config['model_to'] : \Inflector::get_namespace($from).'Model_'.\Inflector::classify($name);
+        $to = \Arr::get($config, 'model_to', \Inflector::get_namespace($from).'Model_'.\Inflector::classify($name));
         if (!class_exists($to)) {
-            throw new \FuelException('The related model ‘'.$this->model_to.'’ cannot be found by the many_many relation ‘'.$this->name.'’.');
+            throw new \FuelException(
+                'The related model ‘'.$this->model_to.'’ cannot be found by the many_many relation ‘'.$this->name.'’.'
+            );
         }
         $to_behaviour = $to::behaviours('Nos\Orm_Behaviour_Twinnable', false);
-        if (!$to_behaviour) {
-            throw new \FuelException('The twinnable_many_many relation ‘'.$name.'’ of the model ‘'.$from.'’ refers to a model which doesn’t have the Twinnable behaviour.');
+        if ($to_behaviour && !array_key_exists('key_to', $config)) {
+            $config['key_to'] = $to_behaviour['common_id_property'];
         }
+
         $from_behaviour = $from::behaviours('Nos\Orm_Behaviour_Twinnable', false);
         if (!$from_behaviour) {
-            throw new \FuelException('The model ‘'.$from.'’ has a twinnable_many_many relation but no Twinnable behaviour. How strange.');
+            throw new \FuelException(
+                'The model ‘'.$from.'’ has a twinnable_many_many relation '.
+                'but no Twinnable behaviour. How strange.'
+            );
         }
-        $config['key_from'] = array_key_exists('key_from', $config) ? (array) $config['key_from'] : $from_behaviour['common_id_property'];
-        $config['key_to'] = array_key_exists('key_to', $config) ? (array) $config['key_to'] : $to_behaviour['common_id_property'];
+        $config['key_from'] = (array) \Arr::get($config, 'key_from', $from_behaviour['common_id_property']);
 
         parent::__construct($from, $name, $config);
 
-        $this->column_context_from = array_key_exists('column_context_from', $config) ? $config['column_context_from'] : $from_behaviour['context_property'];
-        $this->column_context_common_id_to = array_key_exists('column_context_common_id_to', $config) ? $config['column_context_common_id_to'] : $to_behaviour['common_id_property'];
-        $this->column_context_to = array_key_exists('column_context_to', $config) ? $config['column_context_to'] : $to_behaviour['context_property'];
-        $this->column_context_is_main_to = array_key_exists('column_context_is_main_to', $config) ? $config['column_context_is_main_to'] : $to_behaviour['is_main_property'];
+        $this->column_context_from = \Arr::get($config, 'column_context_from', $from_behaviour['context_property']);
+
+        $this->column_context_common_id_to = \Arr::get(
+            $config,
+            'column_context_common_id_to',
+            $to_behaviour ? $to_behaviour['common_id_property'] : false
+        );
+        $this->column_context_to = \Arr::get(
+            $config,
+            'column_context_to',
+            $to_behaviour ? $to_behaviour['context_property'] : false
+        );
+        $this->column_context_is_main_to = \Arr::get(
+            $config,
+            'column_context_is_main_to',
+            $to_behaviour ? $to_behaviour['is_main_property'] : false
+        );
+
+        $this->cascade_delete_after_last_twin =  \Arr::get(
+            $config,
+            'cascade_delete_after_last_twin',
+            $this->cascade_delete_after_last_twin
+        );
     }
 
     public function get(\Orm\Model $from)
     {
+        if (!$this->column_context_to) {
+            return parent::get($from);
+        }
+
         // Create the query on the model_through
         $query = call_user_func(array($this->model_to, 'query'));
 
@@ -113,12 +145,26 @@ class Orm_Twinnable_ManyMany extends \Orm\ManyMany
 
     public function join($alias_from, $rel_name, $alias_to_nr, $conditions = array())
     {
+        if (!$this->column_context_to) {
+            return parent::join($alias_from, $rel_name, $alias_to_nr, $conditions);
+        }
+
         $alias_to = 't'.$alias_to_nr;
 
         $alias_through = array($this->table_through, $alias_to.'_through');
-        $alias_to_table = array(call_user_func(array($this->model_to, 'table')), $alias_to);
 
-        $props_pks = $this->_selectFallback($alias_to, $alias_to.'_fallback');
+        $main_context = \Arr::get($conditions, 'main_context', true);
+        if ($main_context) {
+            $rel_name_main = $rel_name;
+            $alias_to_main = $alias_to;
+            $rel_name_context = $rel_name.'_context';
+            $alias_to_context = $alias_to.'_context';
+        } else {
+            $rel_name_main = $rel_name.'_main';
+            $alias_to_main = $alias_to.'_main';
+            $rel_name_context = $rel_name;
+            $alias_to_context = $alias_to;
+        }
 
         $models = array(
             $rel_name.'_through' => array(
@@ -132,27 +178,27 @@ class Orm_Twinnable_ManyMany extends \Orm\ManyMany
                 'rel_name'     => $this->model_through,
                 'relation'     => $this
             ),
-            $rel_name => array(
+            $rel_name_main => array(
                 'model'        => $this->model_to,
                 'connection'   => call_user_func(array($this->model_to, 'connection')),
-                'table'        => $alias_to_table,
-                'primary_key'  => $props_pks['primary_key'],
+                'table'        => array(call_user_func(array($this->model_to, 'table')), $alias_to_main),
+                'primary_key'  => null,
                 'join_type'    => \Arr::get($conditions, 'join_type') ?: \Arr::get($this->conditions, 'join_type', 'left'),
                 'join_on'      => array(),
-                'columns'      => $props_pks['columns'],
-                'rel_name'     => strpos($rel_name, '.') ? substr($rel_name, strrpos($rel_name, '.') + 1) : $rel_name,
+                'columns'      => array(),
+                'rel_name'     => strpos($rel_name_main, '.') ? substr($rel_name_main, strrpos($rel_name_main, '.') + 1) : $rel_name_main,
                 'relation'     => $this,
                 'where'        => \Arr::get($conditions, 'where', array()),
             ),
-            $rel_name.'_fallback' => array(
-                'model'       => null,
+            $rel_name_context => array(
+                'model'       => $main_context ? null : $this->model_to,
                 'connection'  => call_user_func(array($this->model_to, 'connection')),
-                'table'       => array(call_user_func(array($this->model_to, 'table')), $alias_to.'_fallback'),
+                'table'       => array(call_user_func(array($this->model_to, 'table')), $alias_to_context),
                 'primary_key' => null,
                 'join_type'   => \Arr::get($conditions, 'join_type') ? : \Arr::get($this->conditions, 'join_type', 'left'),
                 'join_on'     => array(),
                 'columns'     => array(),
-                'rel_name'    => (strpos($rel_name, '.') ? substr($rel_name, strrpos($rel_name, '.') + 1) : $rel_name).'_fallback',
+                'rel_name'    => (strpos($rel_name_context, '.') ? substr($rel_name_context, strrpos($rel_name_context, '.') + 1) : $rel_name_context),
                 'relation'    => $this,
                 'where'       => \Arr::get($conditions, 'where', array()),
             ),
@@ -166,37 +212,56 @@ class Orm_Twinnable_ManyMany extends \Orm\ManyMany
 
         reset($this->key_to);
         foreach ($this->key_through_to as $key) {
-            $models[$rel_name]['join_on'][] = array($alias_to.'_through.'.$key, '=', $alias_to.'.'.current($this->key_to));
-            $models[$rel_name.'_fallback']['join_on'][] = array($alias_to.'_through.'.$key, '=', $alias_to.'_fallback'.'.'.current($this->key_to));
+            $models[$rel_name_main]['join_on'][] = array($alias_to.'_through.'.$key, '=', $alias_to_main.'.'.current($this->key_to));
+            $models[$rel_name_context]['join_on'][] = array($alias_to.'_through.'.$key, '=', $alias_to_context.'.'.current($this->key_to));
             next($this->key_to);
         }
-        $models[$rel_name]['join_on'][] = array($alias_to.'.'.$this->column_context_is_main_to, '=', DB::expr(1));
-        $models[$rel_name.'_fallback']['join_on'][] = array($alias_from.'.'.$this->column_context_from, '=', $alias_to.'_fallback'.'.'.$this->column_context_to);
+        $models[$rel_name_main]['join_on'][] = array($alias_to_main.'.'.$this->column_context_is_main_to, '=', DB::expr(1));
+        $models[$rel_name_context]['join_on'][] = array($alias_from.'.'.$this->column_context_from, '=', $alias_to_context.'.'.$this->column_context_to);
 
         foreach (array(\Arr::get($this->conditions, 'where', array()), \Arr::get($conditions, 'join_on', array())) as $c) {
             foreach ($c as $key => $condition) {
                 ! is_array($condition) and $condition = array($key, '=', $condition);
                 is_string($condition[2]) and $condition[2] = \Db::quote($condition[2], $models[$rel_name]['connection']);
-                $condition_fallback = $condition;
+                $condition_context = $condition;
                 if (!$condition[0] instanceof \Fuel\Core\Database_Expression and strpos($condition[0], '.') === false) {
-                    $condition[0] = $alias_to.'.'.$condition[0];
-                    $condition_fallback[0] = $alias_to.'_through.'.$condition_fallback[0];
+                    $condition[0] = $alias_to_main.'.'.$condition[0];
+                    $condition_context[0] = $alias_to_context.'.'.$condition_context[0];
                 }
 
-                $models[$rel_name]['join_on'][] = $condition;
-                $models[$rel_name.'_fallback']['join_on'][] = $condition_fallback;
+                $models[$rel_name_main]['join_on'][] = $condition;
+                $models[$rel_name_context]['join_on'][] = $condition_context;
             }
         }
 
+        $alias_to_table = array(call_user_func(array($this->model_to, 'table')), $alias_to);
         $order_by = \Arr::get($conditions, 'order_by') ?: \Arr::get($this->conditions, 'order_by', array());
         foreach ($order_by as $key => $direction) {
             if (!$key instanceof \Fuel\Core\Database_Expression and strpos($key, '.') === false) {
-                $key = $alias_to.'.'.$key;
+                if ($main_context) {
+                    $key = \DB::expr('COALESCE('.$alias_to_context.'.'.$key.','.$alias_to_main.'.'.$key.')');
+                } else {
+                    $key = $alias_to_context.'.'.$key;
+                }
             } else {
-                $key = str_replace(array($alias_through[0],$alias_to_table[0]), array($alias_through[1],$alias_to_table[1]), $key);
+                $key = str_replace(
+                    array($alias_through[0], $alias_to_table[0]),
+                    array($alias_through[1], $alias_to_table[1]),
+                    $key
+                );
             }
-            $models[$rel_name]['order_by'][$key] = $direction;
-            $models[$rel_name.'_fallback']['order_by'][$key] = $direction;
+            $models[$rel_name_main]['order_by'][$key] = $direction;
+            $models[$rel_name_context]['order_by'][$key] = $direction;
+        }
+
+        if ($main_context) {
+            $props_pks = $this->_selectFallback($alias_to_main, $alias_to_context);
+            $models[$rel_name_main]['primary_key'] = $props_pks['primary_key'];
+            $models[$rel_name_main]['columns'] = $props_pks['columns'];
+        } else {
+            unset($models[$rel_name_main]);
+            $models[$rel_name_context]['primary_key'] = call_user_func(array($this->model_to, 'primary_key'));
+            $models[$rel_name_context]['columns'] = $this->select($alias_to_context);
         }
 
         return $models;
@@ -215,7 +280,25 @@ class Orm_Twinnable_ManyMany extends \Orm\ManyMany
             );
         }
         $original_model_ids === null and $original_model_ids = array();
-        $del_rels = $original_model_ids;
+        $original_common_ids = array();
+
+        $common_id_property = reset($this->key_to);
+        if ($this->delete_related_called) {
+            // If delete_related() has been called before save(), force the call of parent delete_related()
+            // static::delete_related() does nothing if others twins exist
+            parent::delete_related($model_from);
+            $this->delete_related_called = false;
+            $original_model_ids = array();
+        } else {
+            if (!empty($original_model_ids)) {
+                $model_to_class = $this->model_to;
+                $result = \DB::select($common_id_property)->from($model_to_class::table())
+                    ->where(reset($model_to_class::primary_key()), 'IN', $original_model_ids)
+                    ->execute($model_to_class::connection());
+                $original_common_ids = \Arr::pluck($result->as_array(), $common_id_property);
+            }
+        }
+        $del_common_ids = $original_common_ids;
 
         foreach ($models_to as $key => $model_to) {
             if (!$model_to instanceof $this->model_to) {
@@ -244,11 +327,15 @@ class Orm_Twinnable_ManyMany extends \Orm\ManyMany
                     next($this->key_to);
                 }
 
-                \DB::insert($this->table_through)->set($ids)->execute(call_user_func(array($model_from, 'connection')));
+                if (!in_array($model_to->{$common_id_property}, $original_common_ids)) {
+                    \DB::insert($this->table_through)->set($ids)->execute(call_user_func(array($model_from, 'connection')));
+                } else {
+                    unset($del_common_ids[array_search($model_to->{$common_id_property}, $original_common_ids)]);
+                }
                 $original_model_ids[] = $current_model_id; // prevents inserting it a second time
             } else {
                 // unset current model from from array of new relations
-                unset($del_rels[array_search($current_model_id, $original_model_ids)]);
+                unset($del_common_ids[array_search($model_to->{$common_id_property}, $original_common_ids)]);
             }
 
             // ensure correct pk assignment
@@ -268,15 +355,13 @@ class Orm_Twinnable_ManyMany extends \Orm\ManyMany
         //del_rels is made of ids, contrary to the content of the "table_through", made of common ids
         //these must be replaced before deleting the relationship
 
-        $model_to = $this->model_to;
-        if (!empty($del_rels)) {
+        if (!empty($del_common_ids)) {
             //As the context_common_id property can't be an array,
             //it is assumed that each del_rels and is key is a single id
             //(could have been several)
-            $subquery = \DB::select(reset($this->key_to))->from($model_to::table())->where(reset($model_to::primary_key()), 'IN', $del_rels);
             $query = \DB::delete($this->table_through);
-
-            $query->where(reset($this->key_through_to), 'IN', $subquery);
+            $query->where(reset($this->key_through_to), 'IN', $del_common_ids);
+            $query->where(reset($this->key_through_from), '=', $model_from->{reset($this->key_from)});
 
             $query->execute(call_user_func(array($model_from, 'connection')));
         }
@@ -311,18 +396,29 @@ class Orm_Twinnable_ManyMany extends \Orm\ManyMany
 
     public function delete_related($model_from)
     {
+        $this->delete_related_called = true;
+
         //search for twin models
-        $query = \DB::select()->from($this->table_through);
+        $query = \DB::select()->from($model_from::table());
         reset($this->key_from);
-        foreach ($this->key_through_from as $key) {
+        foreach ($this->key_from as $key) {
             $query->where($key, '=', $model_from->{current($this->key_from)});
             next($this->key_from);
         }
         $result = $query->execute(call_user_func(array($model_from, 'connection')));
-        //if there's more than one result, prevent from deleting relation (still used by twin models)
-        //otherwise, the current model is the last to use te relation and relation can be destroyed
-        if (count($result) === 1) {
+        //if there's one result or more, prevent from deleting relation (still used by twin models)
+        if (count($result) === 0) {
             parent::delete_related($model_from);
+        }
+    }
+
+    public function delete($model_from, $models_to, $parent_deleted, $cascade)
+    {
+        // If not cascade, others twins use the relation
+        // see \Nos\Orm\Model->should_cascade_delete()
+        // prevent parent delete() to set the foreign key to null
+        if ((bool) $cascade) {
+            return parent::delete($model_from, $models_to, $parent_deleted, $cascade);
         }
     }
 }

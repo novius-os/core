@@ -38,6 +38,7 @@ define('jquery-nos-inspector-plain-data',
                             allowColMoving : false,
                             columns : inspectorData.grid.columns,
                             data: params,
+                            noCellsSelected: true,
                             currentCellChanged: function (e) {
                                 var row = $(e.target).noslistgrid("currentCell").row(),
                                     data = row ? row.data : false;

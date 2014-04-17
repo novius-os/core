@@ -11,7 +11,7 @@
 return array(
     'name'      => 'Users',
     'namespace' => 'Nos\User',
-    'version'   => '0.1',
+    'version'   => '4.2 (Dubrovka)',
     'provider'  => array(
         'name'  => 'Novius OS',
     ),

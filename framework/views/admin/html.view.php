@@ -10,7 +10,7 @@
 
 Nos\I18n::current_dictionary('nos::common');
 
-$requirejs_config = \Config::load('requirejs');
+$requirejs_config = \Config::load('requirejs', true);
 
 $assets_minified = \Config::get('novius-os.assets_minified', true);
 

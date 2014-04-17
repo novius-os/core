@@ -22,7 +22,7 @@
             init : function(ed, url) {
                 var t = this, s = {};
 
-                ed.settings.popup_css = "skins/" + s.skin + "/dialog.css";
+                ed.settings.popup_css = ed.baseURI.toAbsolute("themes/advanced/skins/" + ed.settings.skin + "/dialog.css");
 
                 t.controls = extend(t.controls, {
                     cut : ['cut_desc', 'nosCut'],

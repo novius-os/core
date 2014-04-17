@@ -91,7 +91,7 @@ if (!in_array($context, $possible)) {
                 </li>
                 <li>
                     <span class="faded" style="display:inline-block; width:2em;"><?= __('OR') ?></span>
-                    <form action="<?= $crud['url_form'] ?>" style="display:inline-block;">
+                    <form action="<?= $crud['url_form'] ?>" style="display:inline-block;" class="js-create_from_id">
                         <?= Form::hidden('context', $context) ?>
                         <?= Form::hidden('common_id', $common_id) ?>
     <?php
@@ -108,7 +108,7 @@ if (!in_array($context, $possible)) {
 
         echo '<ul class="wijmenu">';
         foreach ($labels as $context => $label) {
-            echo '<li data-create_from_id="'.htmlspecialchars($context).'"><a>'.$label.'</a></li>';
+            echo '<li data-create_from_id="'.htmlspecialchars($context).'"><a href="#">'.$label.'</a></li>';
         }
         echo '</ul>';
     }
@@ -162,7 +162,7 @@ require(['jquery-nos'], function ($) {
                 },
                 select: function(e, data) {
                     $('#<?= $uniqid_create_from_id ?>').val($(data.item.element).data('create_from_id'));
-                    $container.find('form').submit();
+                    $container.find('form.js-create_from_id').submit();
                 }
             });
         $container.find('form').submit(function(e) {

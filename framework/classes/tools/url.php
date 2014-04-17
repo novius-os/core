@@ -72,8 +72,8 @@ class Tools_Url
         if (isset($parse['path'])) {
             $path = explode('/', $parse['path']);
             foreach ($path as $i => $segment) {
-                if (urldecode($segment) === $segment) {
-                    $path[$i] = urlencode($segment);
+                if (rawurldecode($segment) === $segment) {
+                    $path[$i] = rawurlencode($segment);
                 }
             }
             $parse['path'] = implode('/', $path);
