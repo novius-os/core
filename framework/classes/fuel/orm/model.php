@@ -16,6 +16,10 @@ class UnknownBehaviourException extends \Exception
 {
 }
 
+class InvalidProviderException extends \Exception
+{
+}
+
 use Arr;
 
 class Model extends \Orm\Model
@@ -40,6 +44,11 @@ class Model extends \Orm\Model
     protected static $_attachment = array();
 
     /**
+     * @var  array  cached providers
+     */
+    protected static $_providers_cached = array();
+
+    /**
      * @var  array  cached behaviours
      */
     protected static $_behaviours_cached = array();
@@ -50,6 +59,8 @@ class Model extends \Orm\Model
     protected static $_title_property_cached = array();
 
     protected static $_prefix = null;
+
+    protected $providers = array();
 
     public $medias;
     public $wysiwygs;
@@ -383,6 +394,114 @@ class Model extends \Orm\Model
         return static::$_behaviours_cached[$class];
     }
 
+    /**
+     * Get the class's providers and what they provide
+     *
+     * @param string $specific Provider to retrieve info of, allows direct param access by using dot notation
+     * @param mixed $default Return value when specific key wasn't found
+     * @throws UnknownProviderException
+     * @return array The specific provider if it exist and is requested or the defaut value. Else, array of all providers.
+     */
+    public static function providers($specific = null, $default = null)
+    {
+        $class = get_called_class();
+
+        if (!array_key_exists($class, static::$_providers_cached)) {
+            $providers = array();
+            $_providers = array();
+
+            if (property_exists($class, '_providers')) {
+                $_providers = static::$_providers;
+            }
+
+            $config = static::configModel();
+            if (!empty($config) && !empty($config['providers'])) {
+                $_providers = \Arr::merge($_providers, $config['providers']);
+            }
+
+            foreach ($_providers as $provider_name => $provider_v) {
+                $providers[$provider_name] = static::parseProvider($provider_name, $provider_v);
+            }
+
+            static::$_providers_cached[$class] = $providers;
+        }
+
+        if ($specific) {
+            return \Arr::get(static::$_providers_cached[$class], $specific, $default);
+        }
+
+        return static::$_providers_cached[$class];
+    }
+
+    /**
+     * Add a provider to model
+     *
+     * @param string $name The provider name
+     * @param array $properties The provider properties
+     * @throws \UnknownProviderException If provider is not valid.
+     */
+    public static function addProvider($name, array $properties)
+    {
+        $properties = static::parseProvider($name, $properties);
+
+        $class = get_called_class();
+        if (array_key_exists($class, static::$_providers_cached)) {
+            static::$_providers_cached[$class] = static::providers() + array($name => $properties);
+        } elseif (property_exists($class, '_providers')) {
+            static::$_providers = static::$_providers + array($name => $properties);
+        } else {
+            static::$_providers = array($name => $properties);
+        }
+    }
+
+    protected static function parseProvider($name, array $properties)
+    {
+        if (empty($properties['relation'])) {
+            throw new InvalidProviderException('The provider '.$name.' have no relation');
+        }
+        $relation = static::relations($properties['relation'], false);
+        if (!$relation) {
+            throw new InvalidProviderException(
+                'The relation '.$properties['relation'].' of provider '.$name.' does not exist'
+            );
+        }
+        if ($relation->singular) {
+            throw new InvalidProviderException(
+                'The relation '.$properties['relation'].' of provider '.$name.' is not a multiple relation'
+            );
+        }
+        if (!$relation->cascade_save) {
+            throw new InvalidProviderException(
+                'The relation '.$properties['relation'].' of provider '.$name.' must use cascade save'
+            );
+        }
+        if (!empty($properties['value_relation'])) {
+            $model_to = $relation->model_to;
+            $relation = $model_to::relations($properties['value_relation'], false);
+            if (!$relation) {
+                throw new InvalidProviderException(
+                    'The value relation '.$properties['value_relation'].' of provider '.$name.' does not exist'
+                );
+            }
+            if (!$relation->singular) {
+                throw new InvalidProviderException(
+                    'The value relation '.$properties['value_relation'].' of provider '.
+                    $name.' is not a singular relation'
+                );
+            }
+        }
+
+        $properties['name'] = $name;
+        if (empty($properties['value_property'])) {
+            $properties['value_property'] = 'value';
+        }
+        if (empty($properties['key_property'])) {
+            $properties['key_property'] = 'key';
+        }
+
+        return $properties;
+    }
+
     protected static $_configs = array();
 
     /**
@@ -508,6 +627,21 @@ class Model extends \Orm\Model
     public function _event_before_save()
     {
         $class = get_called_class();
+
+        foreach ($this->providers() as $provider) {
+            $relation = $this->relations($provider['relation']);
+            if (isset($this->_data_relations[$relation->name])) {
+                $w_keys = array_keys($this->{$relation->name});
+                foreach ($w_keys as $i) {
+                    // Remove empty
+                    if (empty($this->{$relation->name}[$i]->{$provider['value_property']})) {
+                        $this->{$relation->name}[$i]->delete();
+                        unset($this->{$relation->name}[$i]);
+                    }
+                }
+            }
+        }
+
         if (static::canHaveLinkedWysiwygs()) {
             $w_keys = array_keys($this->linked_wysiwygs);
             foreach ($w_keys as $i) {
@@ -666,6 +800,42 @@ class Model extends \Orm\Model
 
         if (count($arr_name) > 1) {
             $class = get_called_class();
+            if ($provider = static::providers($arr_name[0])) {
+                $key = $arr_name[1];
+                $relation = $this->relations($provider['relation']);
+                foreach ($this->get($relation->name) as $linked_item) {
+                    if ($linked_item->get($provider['key_property']) == $key) {
+                        array_splice($arr_name, 0, 2);
+                        if (empty($arr_name)) {
+                            return $linked_item;
+                        }
+
+                        return $linked_item->set(implode('->', $arr_name), $value);
+                    }
+                }
+
+                // Create a new relation if it doesn't exist yet
+                if (!empty($value)) {
+                    $model = $relation->model_to;
+                    $item = new $model();
+                    $item->set($provider['value_property'], $value);
+                    $item->set($provider['key_property'], $key);
+                    if (!empty($provider['table_name_property'])) {
+                        $item->set($provider['table_name_property'], static::$_table_name);
+                    }
+                    reset($relation->key_to);
+                    foreach ($relation->key_from as $pk) {
+                        $item->{current($relation->key_to)} = $this->{$pk};
+                        next($relation->key_to);
+                    }
+                    // Don't save the link here, it's done with cascade_save = true
+                    //$wysiwyg->save();
+                    $this->{$relation->name}[] = $item;
+                }
+
+                return $this;
+            }
+
             if (static::canHaveLinkedWysiwygs() && $arr_name[0] == 'wysiwygs') {
                 $key = $arr_name[1];
                 $linked_wysiwygs = $this->getLinkedWysiwygs();
@@ -789,12 +959,22 @@ class Model extends \Orm\Model
                 try {
                     return parent::get($property);
                 } catch (\OutOfBoundsException $e) {
+                    if ($provider = static::providers($property)) {
+                        return $this->providers[$provider];
+                    }
                     static::properties(true);
                 }
             }
         }
 
-        return parent::get($property, $conditions);
+        try {
+            return parent::get($property, $conditions);
+        } catch (\OutOfBoundsException $e) {
+            if (static::providers($property)) {
+                return $this->providers[$property];
+            }
+            throw $e;
+        }
     }
 
     public function & __get($name)
@@ -802,6 +982,24 @@ class Model extends \Orm\Model
         $arr_name = explode('->', $name);
         if (count($arr_name) > 1) {
             $class = get_called_class();
+
+            if ($provider = static::providers($arr_name[0])) {
+                $key = $arr_name[1];
+                $relation = $this->relations($provider['relation']);
+                foreach ($this->get($relation->name) as $linked_item) {
+                    if ($linked_item->get($provider['key_property']) == $key) {
+                        array_splice($arr_name, 0, 2);
+                        if (empty($arr_name)) {
+                            return $linked_item;
+                        }
+
+                        return $linked_item->__get(implode('->', $arr_name));
+                    }
+                }
+                $ref = null;
+                return $ref;
+            }
+
             if (static::canHaveLinkedWysiwygs() && $arr_name[0] == 'wysiwygs') {
                 $key = $arr_name[1];
                 $linked_wysiwygs = $this->getLinkedWysiwygs();
@@ -948,6 +1146,17 @@ class Model extends \Orm\Model
         parent::__clone();
         $wysiwygs = array();
         $medias = array();
+        $providers = array();
+
+        foreach ($this->providers() as $name => $provider) {
+            $providers[$name] = array();
+            foreach ($this->{$name} as $key => $item) {
+                if (!empty($item)) {
+                    $providers[$name][$key] = $item;
+                }
+            }
+        }
+
         // Don't copy empty wysiwygs and medias
         foreach ($this->wysiwygs as $key => $wysiwyg) {
             if (!empty($wysiwyg)) {
@@ -960,6 +1169,13 @@ class Model extends \Orm\Model
             }
         }
         $this->initProviders();
+
+        foreach ($providers as $name => $provider) {
+            foreach ($provider as $key => $item) {
+                $this->{$name}->{$key} = $item;
+            }
+        }
+
         foreach ($wysiwygs as $key => $wysiwyg) {
             $this->wysiwygs->{$key} = $wysiwyg;
         }
@@ -971,6 +1187,10 @@ class Model extends \Orm\Model
 
     protected function initProviders()
     {
+        foreach ($this->providers() as $name => $provider) {
+            $this->providers[$name] = new Model_Provider($this, $provider);
+        }
+
         $this->medias = new Model_Media_Provider($this);
         $this->wysiwygs = new Model_Wysiwyg_Provider($this);
     }
@@ -986,6 +1206,124 @@ class Model extends \Orm\Model
     }
 }
 
+class Model_Provider implements \Iterator
+{
+    protected $parent;
+    protected $provider;
+    protected $iterator = array();
+
+    public function __construct($parent, $provider)
+    {
+        $this->parent = $parent;
+        $this->provider = $provider;
+    }
+
+    public function & __get($value)
+    {
+        // Reuse the getter and fetch the media directly
+        $item = $this->parent->{$this->provider['name'].'->'.$value};
+        if ($item === null) {
+            // Don't return null, we need a reference here
+            return $item;
+        }
+
+        if (!empty($provider['value_relation'])) {
+            return $item->get($provider['value_relation']);
+        }
+        return $item->get($provider['value_property']);
+    }
+
+    public function __set($property, $value)
+    {
+        $relation = $this->parent->relations($this->provider['relation']);
+        $model_to = $relation->model_to;
+
+        if (!empty($provider['value_relation'])) {
+            $value_relation = $model_to::relations($this->provider['value_relation']);
+            $value_model_to = $value_relation->model_to;
+
+            $value = (string) ($value instanceof $value_model_to ? $value->{$value_relation->key_to[0]} : $value);
+
+            // Check existence of the item, the ORM will throw an exception anyway upon save if it doesn't exists
+            if (!empty($value)) {
+                $item = $value_model_to::find($value);
+                if (is_null($item)) {
+                    $pk = $this->parent->primary_key();
+                    throw new \Exception(
+                        'The '.$this->provider['name'].' with ID '.$value.' doesn\'t exists, cannot assign it as "'.
+                        $property.'" for '.\Inflector::denamespace(
+                            get_class($this->parent)
+                        ).'('.$this->parent->{$pk[0]}.')'
+                    );
+                }
+            }
+        } else {
+            $value = (string) ($value instanceof $model_to ? $value->{$this->provider['value_property']} : $value);
+        }
+
+        // Reuse the getter
+        $item_link = $this->parent->{$this->provider['name'].'->'.$property};
+
+        // Create the new relation if it doesn't exists yet
+        if (is_null($item_link)) {
+            $this->parent->{$this->provider['name'].'->'.$property} = $value;
+            return;
+        }
+
+        // Update an existing relation
+        $item_link->set($this->provider['value_property'], $value);
+
+        // Don't save the link here, it's done with cascade_save = true
+    }
+
+    public function __isset($value)
+    {
+        $value = $this->__get($value);
+        return (!empty($value));
+    }
+
+    public function __unset($name)
+    {
+        $this->__set($name, null);
+    }
+
+    public function rewind()
+    {
+        $keys = array();
+        foreach ($this->parent->{$this->provider['relation']} as $item) {
+            if ($this->__get($item->{$this->provider['key_property']}) !== null) {
+                $keys[] = $item->{$this->provider['key_property']};
+            }
+        }
+        $this->iterator = $keys;
+        reset($keys);
+    }
+
+    public function current()
+    {
+        return $this->__get(current($this->iterator));
+    }
+
+    public function key()
+    {
+        return current($this->iterator);
+    }
+
+    public function next()
+    {
+        next($this->iterator);
+    }
+
+    public function valid()
+    {
+        return false !== current($this->iterator);
+    }
+
+    public function setParent($obj)
+    {
+        $this->parent = $obj;
+    }
+}
 
 class Model_Media_Provider implements \Iterator
 {
@@ -1087,7 +1425,6 @@ class Model_Media_Provider implements \Iterator
         $this->parent = $obj;
     }
 }
-
 
 class Model_Wysiwyg_Provider implements \Iterator
 {
