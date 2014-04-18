@@ -67,7 +67,7 @@ return array(
                             false;
                     },
                     'check_used' => function ($tpvar) {
-                        if (!\Nos\Page\Model_Page::count(array(
+                        if (\Nos\Page\Model_Page::count(array(
                                 'where' => array(array('page_template_variation_id' => $tpvar->tpvar_id)),
                             ))) {
                             return __('This template variation is used by pages.');
