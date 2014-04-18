@@ -823,10 +823,11 @@ class Model extends \Orm\Model
                     if (!empty($provider['table_name_property'])) {
                         $item->set($provider['table_name_property'], static::$_table_name);
                     }
-                    reset($relation->key_to);
+                    $key_to = $relation->key_to;
+                    reset($key_to);
                     foreach ($relation->key_from as $pk) {
-                        $item->{current($relation->key_to)} = $this->{$pk};
-                        next($relation->key_to);
+                        $item->{current($key_to)} = $this->{$pk};
+                        next($key_to);
                     }
                     // Don't save the link here, it's done with cascade_save = true
                     //$wysiwyg->save();
@@ -1227,10 +1228,10 @@ class Model_Provider implements \Iterator
             return $item;
         }
 
-        if (!empty($provider['value_relation'])) {
-            return $item->get($provider['value_relation']);
+        if (!empty($this->provider['value_relation'])) {
+            return $item->get($this->provider['value_relation']);
         }
-        return $item->get($provider['value_property']);
+        return $item->get($this->provider['value_property']);
     }
 
     public function __set($property, $value)
