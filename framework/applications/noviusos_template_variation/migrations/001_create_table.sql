@@ -22,3 +22,13 @@ CREATE TABLE IF NOT EXISTS `nos_template_variation` (
   KEY `tpvar_template` (`tpvar_template`),
   KEY `tpvar_context` (`tpvar_context`)
 ) DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `nos_template_variation_menu` (
+  `tvme_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `tvme_tpvar_id` int(10) unsigned NOT NULL,
+  `tvme_key` varchar(30) NOT NULL,
+  `tvme_menu_id` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`tvme_id`),
+  KEY `tvme_menu_id` (`tvme_menu_id`),
+  KEY `tvme_tpvar_id` (`tvme_tpvar_id`)
+) CHARSET=utf8;

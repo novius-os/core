@@ -81,6 +81,13 @@ class Model_Template_Variation extends \Nos\Orm\Model
             'cascade_save'   => false,
             'cascade_delete' => false,
         ),
+        'linked_menus' => array(
+            'key_from'       => 'tpvar_id',
+            'model_to'       => '\Nos\Template\Variation\Model_Template_Variation_Menu',
+            'key_to'         => 'tvme_tpvar_id',
+            'cascade_save'   => true,
+            'cascade_delete' => true,
+        ),
     );
 
     protected static $_has_one = array();
@@ -110,6 +117,15 @@ class Model_Template_Variation extends \Nos\Orm\Model
         'Nos\Orm_Behaviour_Author' => array(
             'created_by_property' => 'tpvar_created_by_id',
             'updated_by_property' => 'tpvar_updated_by_id',
+        ),
+    );
+
+    protected static $_providers = array(
+        'menus' => array(
+            'relation' => 'linked_menus',
+            'key_property' => 'tvme_key',
+            'value_property' => 'tvme_menu_id',
+            'value_relation' => 'menu',
         ),
     );
 

@@ -746,7 +746,7 @@ class Controller_Front extends Controller
 
                 $page = \Nos\Page\Model_Page::find('first', array(
                     'where' => $where,
-                    'related' => ('template_variation'),
+                    'related' => array('template_variation' => array('related' => 'linked_menus')),
                 ));
 
                 if (!empty($page)) {
