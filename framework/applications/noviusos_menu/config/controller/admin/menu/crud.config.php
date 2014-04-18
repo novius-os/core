@@ -38,6 +38,10 @@ return array(
             'form' => array(
                 'type' => 'text',
             ),
+            'validation' => array(
+                'required',
+                'min_length' => array(2),
+            ),
         ),
         'items' => array(
             'renderer' => 'Nos\Menu\Renderer_Menu_Items',
