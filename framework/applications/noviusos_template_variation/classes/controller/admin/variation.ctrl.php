@@ -102,7 +102,9 @@ class Controller_Admin_Variation extends Controller_Admin_Crud
 
             $fields = \Arr::get($template_config, 'admin.fields', array());
             foreach ($fields as $field_id => $field) {
-                $fields[$field_id] = array_merge($field, array('dont_save' => true));
+                if (!strpos($field_id, '->')) {
+                    $fields[$field_id] = array_merge($field, array('dont_save' => true));
+                }
             }
             $this->config['fields'] = array_merge(
                 $fields,
@@ -158,7 +160,7 @@ class Controller_Admin_Variation extends Controller_Admin_Crud
         $item->tpvar_data = array();
         $properties = array_keys($item::properties());
         foreach ($this->config['fields'] as $field_name => $field) {
-            if (!in_array($field_name, $properties)) {
+            if (!in_array($field_name, $properties) && !strpos($field_name, '->')) {
                 $item->tpvar_data[$field_name] = $data[$field_name];
             }
         }
