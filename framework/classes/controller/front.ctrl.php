@@ -322,6 +322,14 @@ class Controller_Front extends Controller
     }
 
     /**
+     * @return \Nos\Template\Variation\Model_Template_Variation Current Model_Template_Variation displayed.
+     */
+    public function getTemplateVariation()
+    {
+        return $this->_page->template_variation;
+    }
+
+    /**
      * @return mixed Current wysiwyg ID processed.
      */
     public function getWysiwygName()
