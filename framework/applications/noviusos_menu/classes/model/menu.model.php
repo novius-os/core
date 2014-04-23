@@ -11,6 +11,7 @@
 namespace Nos\Menu;
 
 use Nos\Orm\Model;
+use Nos\Page\Model_Page;
 
 class Model_Menu extends Model
 {
@@ -114,5 +115,42 @@ class Model_Menu extends Model
         }
         ksort($tree);
         return $tree;
+    }
+
+    public static function buildFromPages($context, $page_id = null, $depth = -1)
+    {
+        if ($page_id instanceof Model_Page) {
+            $page_id = $page_id->page_id;
+        }
+        $menu = static::forge();
+        $menu->items = static::addPagesItems($context, $page_id, $depth);
+        return $menu;
+    }
+
+    private static function addPagesItems($context, $idParent, $depth)
+    {
+        $pages = Model_Page::find('all', array(
+            'where'             => array(
+                'page_parent_id' => $idParent,
+                'published'      => 1,
+                'page_menu'      => 1,
+                'page_context'   => $context,
+            ),
+            'order_by'          => array('page_sort' => 'asc')
+        ));
+        $items = array();
+        $i = 0;
+        foreach ($pages as $p) {
+            $item = Model_Menu_Item::forge();
+            $item->mitem_driver = \Input::get('driver', 'Nos\Menu\Menu_Item_Page');
+            $item->mitem_id = $p->page_id;
+            $item->mitem_page_id = $p->page_id;
+            $item->mitem_sort = $i++;
+            $items[] = $item;
+            if ($depth != 0) {
+                $items = $items + static::addPagesItems($context, $p->page_id, $depth - 1);
+            }
+        }
+        return $items;
     }
 }
