@@ -15,6 +15,7 @@ class Renderer_Select_Model extends Renderer
     protected static $DEFAULT_RENDERER_OPTIONS = array(
         'multiple' => false,
         'model' => '',
+        'chooseLabel' => '',
         //'context' => null,
         //'item' => null,
     );
@@ -46,6 +47,10 @@ class Renderer_Select_Model extends Renderer
         $pk = $model::primary_key();
         $items = $model::find('all', $conditions);
         $options = array();
+        $chooseLabel = \Arr::get($this->renderer_options, 'chooseLabel');
+        if ($chooseLabel !== false) {
+            $options[''] = $chooseLabel;
+        }
         foreach ($items as $item) {
             $options[$item->{$pk[0]}] = $item->title_item();
         }
