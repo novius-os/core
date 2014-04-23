@@ -20,8 +20,9 @@ require(
                     $.ajax({
                         url: 'admin/nos/renderer/select/model',
                         data: {
-                            context: context,
-                            model: <?= \Format::forge($renderer_options['model'])->to_json() ?>
+                            options: $.extend(<?= \Format::forge($renderer_options)->to_json() ?>, {
+                                context: context
+                            })
                         },
                         dataType: 'json',
                         success: function(data) {

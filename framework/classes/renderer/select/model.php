@@ -15,7 +15,8 @@ class Renderer_Select_Model extends Renderer
     protected static $DEFAULT_RENDERER_OPTIONS = array(
         'multiple' => false,
         'model' => '',
-        'chooseLabel' => '',
+        'empty_option' => true,
+        'choose_label' => '',
         //'context' => null,
         //'item' => null,
     );
@@ -28,8 +29,25 @@ class Renderer_Select_Model extends Renderer
     public function build()
     {
         $item = \Arr::get($this->renderer_options, 'item', $this->fieldset()->getInstance());
+        $options = static::getOptions($this->renderer_options, $item);
+        $this->set_options(\Arr::pluck($options, 'text', 'value'));
 
-        $model = $this->renderer_options['model'];
+        parent::build();
+
+        if (!empty($this->renderer_options['context'])) {
+            $this->fieldset()->append(static::js_init($this->get_attribute('id'), $this->renderer_options));
+        }
+        return (string) parent::build();
+    }
+
+    /**
+     * @param  array $renderer_options
+     * @param  \Nos\Orm\Model $item
+     * @return array
+     */
+    public static function getOptions(&$renderer_options, $item = null)
+    {
+        $model = $renderer_options['model'];
         $contextable = $model::behaviours(
             'Nos\Orm_Behaviour_Contextable',
             $model::behaviours('Nos\Orm_Behaviour_Twinnable', array())
@@ -37,31 +55,32 @@ class Renderer_Select_Model extends Renderer
 
         $conditions = array('where' => array());
         if (!empty($contextable)) {
-            $context = \Arr::get($this->renderer_options, 'context', !empty($item) ? $item->get_context() : null);
+            $context = \Arr::get($renderer_options, 'context', !empty($item) ? $item->get_context() : null);
             if (!empty($context)) {
-                $this->renderer_options['context'] = $context;
+                $renderer_options['context'] = $context;
                 $conditions['where'][] = array($contextable['context_property'] => $context);
             }
+        }
+        if (empty($context)) {
+            \Arr::delete($renderer_options, 'context');
         }
 
         $pk = $model::primary_key();
         $items = $model::find('all', $conditions);
         $options = array();
-        $chooseLabel = \Arr::get($this->renderer_options, 'chooseLabel');
-        if ($chooseLabel !== false) {
-            $options[''] = $chooseLabel;
+        if (\Arr::get($renderer_options, 'empty_option', true)) {
+            $options[] = array(
+                'text' => \Arr::get($renderer_options, 'choose_label'),
+                'value' => '',
+            );
         }
         foreach ($items as $item) {
-            $options[$item->{$pk[0]}] = $item->title_item();
+            $options[] = array(
+                'text' => $item->title_item(),
+                'value' => $item->{$pk[0]},
+            );
         }
-        $this->set_options($options);
-
-        parent::build();
-
-        if (!empty($contextable) && !empty($context)) {
-            $this->fieldset()->append(static::js_init($this->get_attribute('id'), $this->renderer_options));
-        }
-        return (string) parent::build();
+        return $options;
     }
 
     /**

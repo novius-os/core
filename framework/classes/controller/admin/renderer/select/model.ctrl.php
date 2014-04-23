@@ -14,27 +14,7 @@ class Controller_Admin_Renderer_Select_Model extends \Controller
 {
     public function action_index()
     {
-        $context = $_GET['context'];
-        $model = $_GET['model'];
-
-        $contextable = $model::behaviours(
-            'Nos\Orm_Behaviour_Contextable',
-            $model::behaviours('Nos\Orm_Behaviour_Twinnable', array())
-        );
-        $conditions = array('where' => array());
-        if (!empty($contextable)) {
-            $conditions['where'][] = array($contextable['context_property'] => $context);
-        }
-
-        $pk = $model::primary_key();
-        $items = $model::find('all', $conditions);
-        $options = array();
-        foreach ($items as $item) {
-            $options[] = array(
-                'text' => $item->title_item(),
-                'value' => $item->{$pk[0]},
-            );
-        }
-        \Response::json($options);
+        $renderer_options = $_GET['options'];
+        \Response::json(Renderer_Select_Model::getOptions($renderer_options));
     }
 }
