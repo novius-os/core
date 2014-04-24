@@ -389,6 +389,7 @@ class Fieldset extends \Fuel\Core\Fieldset
         $options['instance'] = $instance;
 
         $options = \Arr::merge(array(
+            'csrf' => true,
             'save' => \Input::method() == 'POST',
         ), $options);
 
@@ -408,6 +409,32 @@ class Fieldset extends \Fuel\Core\Fieldset
         if (isset($instance)) {
             // Let behaviours do their job (publication for example)
             $instance->event('form_fieldset_fields', array(&$config));
+        }
+
+        if (!empty($options['csrf'])) {
+
+            if ($options['csrf'] === true) {
+                $options['csrf'] = array();
+            }
+
+            $user = \Session::user();
+            $options['csrf'] += array(
+                'value' => sha1($user->user_md5),
+                'callback' => function($data, $good_csrf, $fieldset) {
+                    return !empty($data['_csrf']) && $data['_csrf'] === $good_csrf;
+                },
+                'error' => __('Invalid request, you may have been victim of hacking. Did you click any suspicious link?'),
+            );
+
+            if (!empty($options['csrf']['value'])) {
+                $config['_csrf'] = array(
+                    'form' => array(
+                        'type' => 'hidden',
+                        // If the fieldset is being saved, don't fill in the csrf field (or it will always validate, even when it's NOT included in the POST data)
+                        'value' => $options['save'] ? '' : $options['csrf']['value'],
+                    ),
+                );
+            }
         }
 
         $fieldset->add_renderers($config, $options);
@@ -438,6 +465,27 @@ class Fieldset extends \Fuel\Core\Fieldset
 
     public function triggerComplete($item, $data, $options = array())
     {
+        if (isset($options['csrf']) && !empty($options['csrf']['callback']) && is_callable($options['csrf']['callback'])) {
+            // What's done when $csrf_passed equals:
+            // true             : it's OK
+            // (string)         : use this string as error message
+            // (anythng else)   : use the default error message
+            $csrf_passed = call_user_func($options['csrf']['callback'], $data, $options['csrf']['value'], $this);
+            $csrf_error_message = is_string($csrf_passed) ? $csrf_passed : $options['csrf']['error'];
+            // Allow to override the validation result & message globally
+            if ($csrf_passed !== true) {
+                \Event::trigger_function('admin.csrfFail', array(array(
+                    'fieldset' => $this,
+                    'passed' => &$csrf_passed,
+                    'error_message' => &$csrf_error_message,
+                )));
+            }
+            if ($csrf_passed !== true) {
+                return array(
+                    'error' => $csrf_error_message,
+                );
+            }
+        }
         $options['fieldset'] = $this;
         if (!empty($options['complete']) && is_callable($options['complete'])) {
             return call_user_func($options['complete'], $data, $item, $this->config_used, $options);
