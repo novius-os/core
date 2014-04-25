@@ -67,6 +67,8 @@ class Controller_Front extends Controller
     protected $_custom_data_cached = array();
     protected static $_properties_cached = array('_page', '_context_url', '_page_url', '_url', '_status', '_headers');
 
+    protected $pageFoundAlreadyTriggered = false;
+
     public function before()
     {
         parent::before();
@@ -193,6 +195,7 @@ class Controller_Front extends Controller
                     $this->_findPage();
 
                     \Event::trigger('front.pageFound', array('page' => $this->getPage()));
+                    $this->pageFoundAlreadyTriggered = true;
 
                     $this->_generateCache();
 
@@ -817,7 +820,9 @@ class Controller_Front extends Controller
             }
         }
 
-        \Event::trigger('front.pageFound', array('page' => $this->getPage()));
+        if (!$this->pageFoundAlreadyTriggered) {
+            \Event::trigger('front.pageFound', array('page' => $this->getPage()));
+        }
     }
 
     /**
