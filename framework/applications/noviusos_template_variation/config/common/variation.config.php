@@ -75,6 +75,25 @@ return array(
                     },
                 ),
             ),
+            'visualise' => array(
+                'label' => __('Visualise'),
+                'primary' => true,
+                'iconClasses' => 'nos-icon16 nos-icon16-eye',
+                'action' => array(
+                    'action' => 'window.open',
+                    'url' => 'admin/noviusos_template_variation/visualise?tpvar_id={{_id}}',
+                ),
+                'disabled' => false,
+                'targets' => array(
+                    'grid' => true,
+                    'toolbar-edit' => true,
+                ),
+                'visible' => array(
+                    'is_new' => function ($params) {
+                        return !isset($params['item']) || !$params['item']->is_new();
+                    },
+                ),
+            ),
             'set_default' => array(
                 'label' => __('Set as default template variation'),
                 'primary' => false,
