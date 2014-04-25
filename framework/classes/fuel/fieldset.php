@@ -433,6 +433,8 @@ class Fieldset extends \Fuel\Core\Fieldset
                         // If the fieldset is being saved, don't fill in the csrf field (or it will always validate, even when it's NOT included in the POST data)
                         'value' => $options['save'] ? '' : $options['csrf']['value'],
                     ),
+                    'dont_save' => true,
+                    'dont_populate' => true,
                 );
             }
         }
