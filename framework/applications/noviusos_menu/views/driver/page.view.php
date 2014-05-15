@@ -23,7 +23,7 @@ if ($item_driver->item->mitem_page_id) {
         return;
     }
 }
-echo html_tag('div', array(
+echo html_tag('div', array_merge(array(
     'class' => $item_driver->item->mitem_css_class,
     'id' => $item_driver->item->mitem_dom_id,
-), e($item_driver->title()));
+), $params), e($item_driver->title()));

@@ -54,10 +54,10 @@ abstract class Menu_Item_Driver
             return \View::forge($config['view'], array('item_driver' => $this, 'params' => $params), false);
         }
 
-        return html_tag('div', array(
+        return html_tag('div', array_merge(array(
             'class' => $this->item->mitem_css_class,
             'id' => $this->item->mitem_dom_id,
-        ), e($this->title()));
+        ), $params), e($this->title()));
     }
 
     /**

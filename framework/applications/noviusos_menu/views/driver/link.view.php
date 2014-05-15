@@ -15,4 +15,4 @@ $attributes = array(
 if ($item_driver->item->mitem_url_blank) {
     $attributes['target'] = '_blank';
 }
-echo \Html::anchor($item_driver->item->mitem_url, e($item_driver->title()), $attributes);
+echo \Html::anchor($item_driver->item->mitem_url, e($item_driver->title()), array_merge($attributes, $params));
