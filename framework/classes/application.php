@@ -10,6 +10,8 @@
 
 namespace Nos;
 
+use Nos\Template\Variation\Model_Template_Variation;
+
 class Application
 {
     protected static $repositories;
@@ -496,28 +498,43 @@ class Application
         if (!empty($added['templates'])) {
             $duplicates = array_intersect_key($config['templates'], $added['templates']);
             if (count($duplicates) > 0) {
-                throw new \Exception(count($duplicates).' templates from this application have the same name that in your local configuration: '.implode(', ', array_keys($duplicates)));
+                throw new \Exception(
+                    strtr(
+                        n__(
+                            'A template from this application have the same name that in your local configuration:',
+                            '{nb} templates from this application have the same name that in your local configuration:',
+                            count($duplicates)
+                        ),
+                        array('{{nb}}' => count($duplicates))
+                    )."\n".implode(', ', array_keys($duplicates))
+                );
             }
         }
 
         if (!empty($removed['templates'])) {
             // Check template usage in the page
-            $pages = \Nos\Page\Model_Page::find('all', array(
+            $tpvars = Model_Template_Variation::find('all', array(
                 'where' => array(
-                    array('template_variation.tpvar_template', 'IN', array_keys($removed['templates']))
+                    array('tpvar_template', 'IN', array_keys($removed['templates']))
                 ),
-                'related' => array('template_variation')
             ));
-            if (count($pages) > 0) {
+            if (count($tpvars) > 0) {
                 $usedTemplates = array();
-                $pageTitles = array();
-                foreach ($pages as $page) {
-                    $usedTemplates[$page->template_variation->tpvar_template] = true;
-                    $pageTitles[] = $page->page_id; // page_title? too long...
+                $tpvarTitles = array();
+                foreach ($tpvars as $tpvar) {
+                    $usedTemplates[$tpvar->tpvar_template] = true;
+                    $tpvarTitles[] = $tpvar->tpvar_title;
                 }
+
                 throw new \Exception(
-                    count($pages).' pages use a template from this application. Used templates are: '.
-                    implode(', ', array_keys($usedTemplates)).'. Pages ids are: '.implode(', ', $pageTitles)
+                    strtr(
+                        n__(
+                            'A template from this application is used in templates variations',
+                            '{nb} templates from this application is used in templates variations',
+                            count($usedTemplates)
+                        ),
+                        array('{{nb}}' => count($usedTemplates))
+                    )."\n\n".__('Templates variations are:')."\n- ".implode("\n- ", $tpvarTitles)
                 );
             }
         }
@@ -526,7 +543,16 @@ class Application
         if (!empty($added['launchers'])) {
             $duplicates = array_intersect_key($config['launchers'], $added['launchers']);
             if (count($duplicates) > 0) {
-                throw new \Exception(count($duplicates).' launchers from this application have the same name that in your local configuration: '.implode(', ', array_keys($duplicates)));
+                throw new \Exception(
+                    strtr(
+                        n__(
+                            'A launcher from this application have the same name that in your local configuration:',
+                            '{nb} launchers from this application have the same name that in your local configuration:',
+                            count($duplicates)
+                        ),
+                        array('{{nb}}' => count($duplicates))
+                    )."\n".implode(', ', array_keys($duplicates))
+                );
             }
         }
 
@@ -534,7 +560,16 @@ class Application
         if (!empty($added['enhancers'])) {
             $duplicates = array_intersect_key($config['enhancers'], $added['enhancers']);
             if (count($duplicates) > 0) {
-                throw new \Exception(count($duplicates).' enhancers from this application have the same name that in your local configuration: '.implode(', ', array_keys($duplicates)));
+                throw new \Exception(
+                    strtr(
+                        n__(
+                            'A enhancer from this application have the same name that in your local configuration:',
+                            '{nb} enhancers from this application have the same name that in your local configuration:',
+                            count($duplicates)
+                        ),
+                        array('{{nb}}' => count($duplicates))
+                    )."\n".implode(', ', array_keys($duplicates))
+                );
             }
         }
 
@@ -542,7 +577,17 @@ class Application
         if (!empty($added['data_catchers'])) {
             $duplicates = array_intersect_key($config['data_catchers'], $added['data_catchers']);
             if (count($duplicates) > 0) {
-                throw new \Exception(count($duplicates).' data catchers from this application have the same name that in your local configuration: '.implode(', ', array_keys($duplicates)));
+                throw new \Exception(
+                    strtr(
+                        n__(
+                            'A data catcher from this application have the same name that in your local configuration:',
+                            '{nb} data catchers from this application have the same name '.
+                            'that in your local configuration:',
+                            count($duplicates)
+                        ),
+                        array('{{nb}}' => count($duplicates))
+                    )."\n".implode(', ', array_keys($duplicates))
+                );
             }
         }
 

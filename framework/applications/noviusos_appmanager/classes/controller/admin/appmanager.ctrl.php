@@ -66,7 +66,7 @@ class Controller_Admin_Appmanager extends \Nos\Controller_Admin_Application
         } catch (\Exception $e) {
             $this->response(
                 array(
-                    'error' => $e->getMessage(),
+                    'error' => nl2br($e->getMessage()),
                 )
             );
 
@@ -91,7 +91,7 @@ class Controller_Admin_Appmanager extends \Nos\Controller_Admin_Application
         } catch (\Exception $e) {
             $this->response(
                 array(
-                    'error' => $e->getMessage(),
+                    'error' => nl2br($e->getMessage()),
                 )
             );
 
