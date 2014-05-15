@@ -8,4 +8,4 @@
  * @link http://www.novius-os.org
  */
 
-echo html_tag('div', $params, \Nos\Nos::parse_wysiwyg($item_driver->item->wysiwygs->content));
+echo html_tag('div', $params, \Nos\Tools_Wysiwyg::parse_wysiwyg($item_driver->item->wysiwygs->content));
