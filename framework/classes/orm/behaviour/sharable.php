@@ -122,7 +122,7 @@ class Orm_Behaviour_Sharable extends Orm_Behaviour
 
         \Nos\Config_Data::load('enhancers');
         foreach ($item->wysiwygs as $wysiwyg) {
-            Tools_Wysiwyg::parse_enhancers(
+            Tools_Wysiwyg::parseEnhancers(
                 $wysiwyg,
                 function ($enhancer) use (&$catchers, $data_catchers, $set_data_catcher) {
                     $params = \Nos\Config_Data::get('enhancers.'.$enhancer, false);

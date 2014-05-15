@@ -439,7 +439,7 @@ class Model_Page extends \Nos\Orm\Model
         static::_remove_page_enhanced($this->page_id);
 
         $page = $this;
-        Tools_Wysiwyg::parse_enhancers(
+        Tools_Wysiwyg::parseEnhancers(
             $content,
             function ($enhancer, $data_config, $tag) use ($page) {
                 $config = \Nos\Config_Data::get('enhancers.'.$enhancer, false);
