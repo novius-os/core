@@ -168,4 +168,46 @@ class Tools_Enhancer
         $urls = static::urls($enhancer_name, $params);
         return reset($urls) ?: null;
     }
+
+    /**
+     * Get an enhancer content
+     *
+     * @param string $enhancer The enhancer name
+     * @param array $args Parameters for the enhancer
+     * @return string The enhancer content
+     */
+    public static function content($enhancer, $args)
+    {
+        $args = json_decode(
+            htmlspecialchars_decode(
+                $args
+            ),
+            true
+        );
+
+        $config = Config_Data::get('enhancers.'.$enhancer, false);
+
+        $found = $config !== false;
+
+        false && \Fuel::$profiling && \Profiler::console(
+            array(
+                'enhancer' => $enhancer,
+            )
+        );
+
+        if ($found) {
+            $function_content = Nos::hmvc(
+                (!empty($config['urlEnhancer']) ? $config['urlEnhancer'] : $config['enhancer']),
+                array($args)
+            );
+            if (empty($function_content) && \Fuel::$env == \Fuel::DEVELOPMENT) {
+                $function_content = 'Enhancer '.$enhancer.' ('.$config['enhancer'].') returned empty content.';
+            }
+        } else {
+            $function_content = \Fuel::$env == \Fuel::DEVELOPMENT ? 'Enhancer '.$enhancer.' not found.' : '';
+            \Fuel::$profiling && \Console::logError(new \Exception(), 'Enhancer'.$enhancer.' not found.');
+        }
+
+        return $function_content;
+    }
 }
