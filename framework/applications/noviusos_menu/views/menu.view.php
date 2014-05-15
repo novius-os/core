@@ -8,18 +8,16 @@
  * @link http://www.novius-os.org
  */
 
-$display_branch = function () {
-
-};
-$display_branch = function ($items) use ($menu, $display_branch) {
-    if (count($items)) {
+!isset($depth) && $depth = 3;
+$display_branch = function ($items, $depth) use ($menu, &$display_branch) {
+    if (count($items) && $depth > 0) {
         echo '<ul>';
         foreach ($items as $item) {
             echo '<li>', $item->html();
-            echo $display_branch($menu->branch($item));
+            echo $display_branch($menu->branch($item), $depth - 1);
             echo '</li>';
         }
         echo '</ul>';
     }
 };
-echo $display_branch($menu->branch());
+echo $display_branch($menu->branch(), $depth);

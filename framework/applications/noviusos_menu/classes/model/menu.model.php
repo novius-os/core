@@ -98,8 +98,10 @@ class Model_Menu extends Model
     public function html(array $params = array())
     {
         $view = \Arr::get($params, 'view', 'noviusos_menu::menu');
+        \Arr::delete($params, 'view');
+        \Arr::set($params, 'menu', $this);
 
-        return \View::forge($view, array('menu' => $this), false);
+        return \View::forge($view, $params, false);
     }
 
     public function branch($parent = null)
