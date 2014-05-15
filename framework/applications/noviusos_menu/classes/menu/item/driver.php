@@ -50,14 +50,17 @@ abstract class Menu_Item_Driver
     public function html(array $params = array())
     {
         $config = static::config();
+        if ($this->item->mitem_dom_id) {
+            $params['id'] = $this->item->mitem_dom_id;
+        }
+        if ($this->item->mitem_css_class) {
+            $params['class'] = $this->item->mitem_css_class.(isset($params['class']) ? ' '.$params['class'] : '');
+        }
         if (!empty($config['view'])) {
             return \View::forge($config['view'], array('item_driver' => $this, 'params' => $params), false);
         }
 
-        return html_tag('div', array_merge(array(
-            'class' => $this->item->mitem_css_class,
-            'id' => $this->item->mitem_dom_id,
-        ), $params), e($this->title()));
+        return html_tag('div', $params, e($this->title()));
     }
 
     /**

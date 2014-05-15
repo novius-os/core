@@ -8,7 +8,4 @@
  * @link http://www.novius-os.org
  */
 
-echo html_tag('div', array_merge(array(
-    'class' => $item_driver->item->mitem_css_class,
-    'id' => $item_driver->item->mitem_dom_id,
-), $params), \Nos\Nos::parse_wysiwyg($item_driver->item->wysiwygs->content));
+echo html_tag('div', $params, \Nos\Nos::parse_wysiwyg($item_driver->item->wysiwygs->content));

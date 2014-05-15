@@ -15,7 +15,4 @@ if (empty($content)) {
 if (!$item_driver->item->mitem_is_html) {
     $content = e($content);
 }
-echo html_tag('div', array_merge(array(
-    'class' => $item_driver->item->mitem_css_class,
-    'id' => $item_driver->item->mitem_dom_id,
-), $params), $content);
+echo html_tag('div', $params, $content);
