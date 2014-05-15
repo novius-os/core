@@ -11,15 +11,11 @@
 if ($item_driver->item->mitem_page_id) {
     $page = \Nos\Page\Model_Page::find($item_driver->item->mitem_page_id);
     if (!empty($page)) {
-        $anchor = array(
-            'class' => $item_driver->item->mitem_css_class,
-            'id' => $item_driver->item->mitem_dom_id,
-            'text' => e($item_driver->title())
-        );
+        $params['text'] = e($item_driver->title());
         if (\Nos\Nos::main_controller()->getUrl() === $page->url()) {
-            $anchor['class'] .= ' '.\Arr::get($params, 'active_class', 'active');
+            $params['class'] .= ' '.\Arr::get($params, 'active_class', 'active');
         }
-        echo $page->htmlAnchor($anchor);
+        echo $page->htmlAnchor($params);
         return;
     }
 }
