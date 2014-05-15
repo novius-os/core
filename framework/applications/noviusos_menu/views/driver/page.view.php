@@ -13,6 +13,7 @@ if ($item_driver->item->mitem_page_id) {
     if (!empty($page)) {
         $params['text'] = e($item_driver->title());
         if (\Nos\Nos::main_controller()->getUrl() === $page->url()) {
+            !isset($params['class']) && $params['class'] = '';
             $params['class'] .= ' '.\Arr::get($params, 'active_class', 'active');
         }
         echo $page->htmlAnchor($params);
