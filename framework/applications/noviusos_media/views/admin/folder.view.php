@@ -30,10 +30,8 @@ foreach ($fieldset->field() as $field) {
         $fieldset->set_config('form_attributes', $form_attributes);
     }
 }
-if (!$item->is_new()) {
-    echo $fieldset->field('medif_id')->build();
-}
 ?>
+<?= $fieldset->build_hidden_fields(); ?>
     <table class="fieldset">
         <tr class="title">
             <th></th>
