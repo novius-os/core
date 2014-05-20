@@ -379,7 +379,7 @@ return array(
     #: config/common/folder.config.php:39
     'Yes, delete this folder' => array(
         0 => 'Oui, supprimer ce dossier',
-        1 => '',
+        1 => 'Oui, supprimer ces {{count}} dossiers',
     ),
 
     #: config/common/folder.config.php:56
