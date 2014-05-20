@@ -39,7 +39,7 @@ class Permission
     public static function isMediaInRestrictedFolder($media)
     {
 
-        return $media->folder->medif_id == 1 ? false : static::isFolderRestricted($media->folder);
+        return !$media->folder || $media->folder->medif_id == 1 ? false : static::isFolderRestricted($media->folder);
     }
 
     public static function isFolderRestricted($folder)
