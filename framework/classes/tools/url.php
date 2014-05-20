@@ -68,6 +68,9 @@ class Tools_Url
      */
     public static function encodePath($url)
     {
+        if (empty($url)) {
+            return $url;
+        }
         $parse = parse_url($url);
         if (isset($parse['path'])) {
             $path = explode('/', $parse['path']);

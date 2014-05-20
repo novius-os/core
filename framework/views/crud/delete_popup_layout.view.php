@@ -53,10 +53,12 @@ if (!is_array($crud['config']['i18n']['deleting button N items'])) {
                             sum += parseInt($(this).data('count'));
                         });
                         $confirmButton[sum == 0 ? 'addClass' : 'removeClass']('ui-state-disabled');
+                        console.log((sum > 1 ? '+' : sum).toString());
                         $confirmButton.find('.ui-button-text').text(
-                            $.nosDataReplace($confirmButton.data('texts')[(sum > 1 ? '+' : sum).toString()], {
-                                'count': sum.toString()
-                            })
+                            $.nosDataReplace(
+                                $.nosI18nPlural($confirmButton.data('texts'), sum),
+                                {'count': sum.toString()}
+                            )
                         );
                     };
 

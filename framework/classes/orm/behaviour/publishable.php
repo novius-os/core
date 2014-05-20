@@ -119,6 +119,7 @@ class Orm_Behaviour_Publishable extends Orm_Behaviour
 
             return array($where);
         };
+        $options['before_order_by']['published'] = $_properties['publication_state_property'];
     }
 
     public function form_processing(Orm\Model $item, $data, $response_json)

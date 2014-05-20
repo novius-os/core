@@ -89,66 +89,67 @@ class Tools_Enhancer
 
         // Now fetch all the possible URLS
         $urls = array();
-        if ($urlPath === false) {
-
-            $item = \Arr::get($params, 'item', false);
-            $context = \Arr::get($params, 'context', false);
-            if ($item && is_object($item) && $item instanceof Orm\Model) {
-                if (!$context) {
-                    try {
-                        $context = $item->get_context();
-                    } catch (\Exception $e) {
-                    }
-                }
-                if (!$preview) {
-                    $published = $item::behaviours('Nos\Orm_Behaviour_Publishable');
-                    if (!empty($published) && !$item->published()) {
-                        return array();
-                    }
-                }
-            }
-            $empty_params = !count(array_diff_key(
-                $params,
-                array('context' => null, 'urlPath' => null, 'preview' => null)
-            ));
-
-            foreach ($page_enhanced as $page_id => $page_params) {
-                if (is_array($page_params['published'])) {
-                    $now = \Date::forge()->format('mysql');
-                    $published = (empty($page_params['published']['start']) ||
-                            $page_params['published']['start'] < $now) &&
-                        (empty($page_params['published']['end']) ||
-                            $now < $page_params['published']['end']);
-                } else {
-                    $published = $page_params['published'] == true;
-                }
-                if ((!$context || $page_params['context'] == $context) && ($preview || $published)) {
-                    $url_params = \Arr::get($url_enhanced, $page_id, false);
-                    if ($url_params) {
-                        if (!$empty_params) {
-                            $callback_params = $params;
-                            $callback_params['context'] = $page_params['context'];
-                            $callback_params['enhancer_args'] = \Arr::get($page_params, 'config', array());
-                            $urlEnhanced = call_user_func($callback, $callback_params);
-                        } else {
-                            $urlEnhanced = '';
-                        }
-                        if (empty($urlEnhanced) && !empty($url_params['url'])) {
-                            $url_params['url'] = substr($url_params['url'], 0, -1).'.html';
-                        }
-                        if ($urlEnhanced !== false) {
-                            $urls[$page_id.($key_has_url_enhanced ? '::'.$urlEnhanced : '')] =
-                                Tools_Url::context($url_params['context']).
-                                $url_params['url'].$urlEnhanced.($preview ? '?_preview=1' : '');
-                        }
-                    }
-                }
-            }
-        } else {
+        if ($urlPath !== false) {
             // Called by enhancers Controller to retrieve items URL
             $urlEnhanced = call_user_func($callback, $params);
             if ($urlEnhanced !== false) {
                 $urls[] = $urlPath.$urlEnhanced.($preview ? '?_preview=1' : '');
+                return $urls;
+            }
+            \Arr::delete($params, array('urlPath', 'enhancer_args'));
+        }
+
+        $item = \Arr::get($params, 'item', false);
+        $context = \Arr::get($params, 'context', false);
+        if ($item && is_object($item) && $item instanceof Orm\Model) {
+            if (!$context) {
+                try {
+                    $context = $item->get_context();
+                } catch (\Exception $e) {
+                }
+            }
+            if (!$preview) {
+                $published = $item::behaviours('Nos\Orm_Behaviour_Publishable');
+                if (!empty($published) && !$item->published()) {
+                    return array();
+                }
+            }
+        }
+        $empty_params = !count(array_diff_key(
+            $params,
+            array('context' => null, 'urlPath' => null, 'preview' => null)
+        ));
+
+        foreach ($page_enhanced as $page_id => $page_params) {
+            if (is_array($page_params['published'])) {
+                $now = \Date::forge()->format('mysql');
+                $published = (empty($page_params['published']['start']) ||
+                        $page_params['published']['start'] < $now) &&
+                    (empty($page_params['published']['end']) ||
+                        $now < $page_params['published']['end']);
+            } else {
+                $published = $page_params['published'] == true;
+            }
+            if ((!$context || $page_params['context'] == $context) && ($preview || $published)) {
+                $url_params = \Arr::get($url_enhanced, $page_id, false);
+                if ($url_params) {
+                    if (!$empty_params) {
+                        $callback_params = $params;
+                        $callback_params['context'] = $page_params['context'];
+                        $callback_params['enhancer_args'] = \Arr::get($page_params, 'config', array());
+                        $urlEnhanced = call_user_func($callback, $callback_params);
+                    } else {
+                        $urlEnhanced = '';
+                    }
+                    if (empty($urlEnhanced) && !empty($url_params['url'])) {
+                        $url_params['url'] = substr($url_params['url'], 0, -1).'.html';
+                    }
+                    if ($urlEnhanced !== false) {
+                        $urls[$page_id.($key_has_url_enhanced ? '::'.$urlEnhanced : '')] =
+                            Tools_Url::context($url_params['context']).
+                            $url_params['url'].$urlEnhanced.($preview ? '?_preview=1' : '');
+                    }
+                }
             }
         }
 
