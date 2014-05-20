@@ -288,7 +288,9 @@ class Model_Folder extends \Nos\Orm\Model
         }
         // Cleanup empty values
         $escaped_folder_ids = array_filter($escaped_folder_ids);
-        $escaped_folder_ids = implode(',', $escaped_folder_ids);
+        // Add 0, all direct children and medias from relations have a folder_id to 0
+        // because of the cascade_delete false
+        $escaped_folder_ids = '0,'.implode(',', $escaped_folder_ids);
 
         $table_folder = Model_Folder::table();
         $table_media  = Model_Media::table();
