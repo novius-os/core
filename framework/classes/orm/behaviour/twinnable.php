@@ -73,76 +73,26 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
     }
 
     /**
-     * Add linked wysiwygs shared by twin contexts in linked wysiwygs array
-     *
-     * @param \Nos\Orm\Model $item
-     * @param array $linked_wysiwygs Array of linked wysiwygs, Passed by reference.
+     * Add providers for linked media and wysiwyg shared with other context
      */
-    public function getLinkedWysiwygs(Orm\Model $item, &$linked_wysiwygs)
-    {
-        $linked_wysiwygs = $linked_wysiwygs + $item->linked_shared_wysiwygs_context;
-    }
-
-    /**
-     * Add linked medias shared by twin contexts in linked medias array
-     *
-     * @param \Nos\Orm\Model $item
-     * @param array $linked_medias Array of linked medias, Passed by reference.
-     */
-    public function getLinkedMedias(Orm\Model $item, &$linked_medias)
-    {
-        $linked_medias = $linked_medias + $item->linked_shared_medias_context;
-    }
-
-    /**
-     * Add linked wysiwyg to the item if is shared by twin contexts
-     *
-     * @param \Nos\Orm\Model $item
-     * @param bool $added Passed by reference. Set to true if the wysiwyg is a linked wysiwyg shared by context.
-     * @param string $name Name of the linked wysiwyg,
-     * @param string $value Content of the wysiwyg.
-     */
-    public function addLinkedWysiwyg(Orm\Model $item, &$added, $name, $value)
+    public function buildProviders()
     {
         $class = $this->_class;
 
-        if (in_array($name, static::sharedWysiwygsContext($class))) {
-            $wysiwyg = new \Nos\Model_Wysiwyg();
-            $wysiwyg->wysiwyg_text = $value;
-            $wysiwyg->wysiwyg_join_table = $class::table();
-            $wysiwyg->wysiwyg_key = $name;
-            $wysiwyg->wysiwyg_foreign_context_common_id = $item->{$this->_properties['common_id_property']};
-            // Don't save the link here, it's done with cascade_save = true
-            //$wysiwyg->save();
-            $this->linked_shared_wysiwygs_context[] = $wysiwyg;
+        $class::addProvider('shared_wysiwygs_context', array(
+            'relation' => 'linked_shared_wysiwygs_context',
+            'key_property' => 'wysiwyg_key',
+            'value_property' => 'wysiwyg_text',
+            'table_name_property' => 'wysiwyg_join_table',
+        ));
 
-            $added = true;
-        }
-    }
-
-    /**
-     * Add linked media to the item if is shared by twin contexts
-     *
-     * @param \Nos\Orm\Model $item
-     * @param bool $added Passed by reference. Set to true if the media is a linked media shared by context.
-     * @param string $name Name of the linked media,
-     * @param int $value Id of the media.
-     */
-    public function addLinkedMedia(Orm\Model $item, &$added, $name, $value)
-    {
-        $class = $this->_class;
-
-        if (in_array($name, static::sharedMediaContext($class))) {
-            $medil = new \Nos\Media\Model_Link();
-            $medil->medil_from_table = $class::table();
-            $medil->medil_key = $name;
-            $medil->medil_foreign_context_common_id = $item->{$this->_properties['common_id_property']};
-            $medil->medil_media_id = $value;
-            // Don't save the link here, it's done with cascade_save = true
-            $item->linked_shared_medias_context[] = $medil;
-
-            $added = true;
-        }
+        $class::addProvider('shared_medias_context', array(
+            'relation' => 'linked_shared_medias_context',
+            'key_property' => 'medil_key',
+            'value_property' => 'medil_media_id',
+            'value_relation' => 'media',
+            'table_name_property' => 'medil_from_table',
+        ));
     }
 
     /**
@@ -151,9 +101,7 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
     public function hasCommonFields()
     {
         $class = $this->_class;
-        return count($this->_properties['common_fields']) > 0 ||
-            static::sharedWysiwygsContext($class) > 0 ||
-            static::sharedMediaContext($class) > 0;
+        return count($this->_properties['common_fields']) > 0;
     }
 
     /**
@@ -166,66 +114,10 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
             return true;
         }
         $arr_name = explode('->', $name);
-        if (count($arr_name) > 1) {
-            $class = $this->_class;
-            if ($arr_name[0] == 'wysiwygs' && in_array($arr_name[1], static::sharedWysiwygsContext($class))) {
-                return true;
-            }
-            if ($arr_name[0] == 'medias' && in_array($arr_name[1], static::sharedMediaContext($class))) {
-                return true;
-            }
+        if (count($arr_name) > 1 && in_array($arr_name[0], array('shared_wysiwygs_context', 'shared_medias_context'))) {
+            return true;
         }
         return false;
-    }
-
-    /**
-     * @param $model Model name
-     * @return array Array of wysiwyg keys which is common to all contexts
-     */
-    public static function sharedWysiwygsContext($model)
-    {
-        $init = array_key_exists($model, static::$_shared_wysiwygs_context_cached);
-
-        if (!$init) {
-            $shared_wysiwygs_context = array();
-            if (property_exists($model, 'shared_wysiwygs_context')) {
-                $shared_wysiwygs_context = $model::${'shared_wysiwygs_context'};
-            }
-
-            $config = $model::configModel();
-            if (!empty($config) && !empty($config['shared_wysiwygs_context'])) {
-                $shared_wysiwygs_context = array_merge($shared_wysiwygs_context, $config['shared_wysiwygs_context']);
-            }
-
-            static::$_shared_wysiwygs_context_cached[$model] = $shared_wysiwygs_context;
-        }
-
-        return static::$_shared_wysiwygs_context_cached[$model];
-    }
-
-    /**
-     * @param $model Model name
-     * @return array Array of media keys which is common to all contexts for the model
-     */
-    public static function sharedMediaContext($model)
-    {
-        $init = array_key_exists($model, static::$_shared_medias_context_cached);
-
-        if (!$init) {
-            $shared_medias_context = array();
-            if (property_exists($model, 'shared_medias_context')) {
-                $shared_medias_context = $model::${'shared_medias_context'};
-            }
-
-            $config = $model::configModel();
-            if (!empty($config) && !empty($config['shared_medias_context'])) {
-                $shared_medias_context = array_merge($shared_medias_context, $config['shared_medias_context']);
-            }
-
-            static::$_shared_medias_context_cached[$model] = $shared_medias_context;
-        }
-
-        return static::$_shared_medias_context_cached[$model];
     }
 
     /**
@@ -316,7 +208,8 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
             // check if at least one common field was modified
             $changed = false;
             foreach ($this->_properties['common_fields'] as $common_field) {
-                if ($item->is_changed($common_field)) {
+                if (!in_array($common_field, array('shared_wysiwygs_context', 'shared_medias_context')) &&
+                    $item->is_changed($common_field)) {
                     $changed = true;
                     break;
                 }
