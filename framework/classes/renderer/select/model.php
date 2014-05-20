@@ -48,17 +48,22 @@ class Renderer_Select_Model extends Renderer
     public static function getOptions(&$renderer_options, $item = null)
     {
         $model = $renderer_options['model'];
-        $contextable = $model::behaviours(
-            'Nos\Orm_Behaviour_Contextable',
-            $model::behaviours('Nos\Orm_Behaviour_Twinnable', array())
-        );
+        $twinnable = $model::behaviours('Nos\Orm_Behaviour_Twinnable', array());
+        $contextable = $model::behaviours('Nos\Orm_Behaviour_Contextable', $twinnable);
 
-        $conditions = array('where' => array());
+        $shared_context = false;
         if (!empty($contextable)) {
             $context = \Arr::get($renderer_options, 'context', !empty($item) ? $item->get_context() : null);
             if (!empty($context)) {
-                $renderer_options['context'] = $context;
-                $conditions['where'][] = array($contextable['context_property'] => $context);
+                $shared_context = \Arr::get($renderer_options, 'shared_context', false);
+                if (!empty($twinnable) && $shared_context) {
+                    $items = $model::findMainOrContext($context);
+                } else {
+                    $renderer_options['context'] = $context;
+                    $items = $model::find('all', array('where' => array(
+                        array($contextable['context_property'] => $context),
+                    )));
+                }
             }
         }
         if (empty($context)) {
@@ -66,7 +71,9 @@ class Renderer_Select_Model extends Renderer
         }
 
         $pk = $model::primary_key();
-        $items = $model::find('all', $conditions);
+        if (!isset($items)) {
+            $items = $model::find('all');
+        }
         $options = array();
         if (\Arr::get($renderer_options, 'empty_option', true)) {
             $options[] = array(
@@ -77,7 +84,7 @@ class Renderer_Select_Model extends Renderer
         foreach ($items as $item) {
             $options[] = array(
                 'text' => $item->title_item(),
-                'value' => $item->{$pk[0]},
+                'value' => $shared_context ? $item->{$twinnable['common_id_property']} : $item->{$pk[0]},
             );
         }
         return $options;
