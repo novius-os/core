@@ -73,6 +73,14 @@ return array(
         'jquery-ui.effects.slide' => 'static/novius-os/admin/vendor/jquery-ui/jquery.ui.effect-slide',
         'jquery-ui.effects.transfer' => 'static/novius-os/admin/vendor/jquery-ui/jquery.ui.effect-transfer',
 
+        'pnotify' => 'static/novius-os/admin/vendor/jquery/pnotify/pnotify.custom',
+        'pnotify.nonblock' => 'static/novius-os/admin/vendor/jquery/pnotify/pnotify.custom',
+        'pnotify.buttons' => 'static/novius-os/admin/vendor/jquery/pnotify/pnotify.custom',
+        'pnotify.callbacks' => 'static/novius-os/admin/vendor/jquery/pnotify/pnotify.custom',
+        'pnotify.confirm' => 'static/novius-os/admin/vendor/jquery/pnotify/pnotify.custom',
+        'pnotify.desktop' => 'static/novius-os/admin/vendor/jquery/pnotify/pnotify.custom',
+        'pnotify.history' => 'static/novius-os/admin/vendor/jquery/pnotify/pnotify.custom',
+
         'wijmo.widget' => 'static/novius-os/admin/vendor/wijmo/js/Base/jquery.wijmo.widget',
         'wijmo.data' => 'static/novius-os/admin/vendor/wijmo/js/data/wijmo.data',
         'wijmo.data.wijdatasource' => 'static/novius-os/admin/vendor/wijmo/js/data/wijmo.data.wijdatasource',
@@ -232,6 +240,8 @@ return array(
         'jquery-ui.effects.shake' => array('jquery', 'jquery-ui.effects.core'),
         'jquery-ui.effects.slide' => array('jquery', 'jquery-ui.effects.core'),
         'jquery-ui.effects.transfer' => array('jquery', 'jquery-ui.effects.core'),
+
+        'pnotify' => array('jquery'),
 
         'wijmo.widget' => array('jquery', 'jquery-ui.core', 'jquery-ui.widget', 'wijmo.wijutil'),
         'wijmo.data' => array('jquery'),
@@ -399,6 +409,14 @@ return array(
         'jquery-ui.effects.shake' => 'static/novius-os/admin/vendor/jquery-ui/minified/jquery.ui.effects.shake.min',
         'jquery-ui.effects.slide' => 'static/novius-os/admin/bundle/vendor.min',
         'jquery-ui.effects.transfer' => 'static/novius-os/admin/bundle/vendor.min',
+
+        'pnotify' => 'static/novius-os/admin/vendor/jquery/pnotify/pnotify.custom.min',
+        'pnotify.nonblock' => 'static/novius-os/admin/vendor/jquery/pnotify/pnotify.custom.min',
+        'pnotify.buttons' => 'static/novius-os/admin/vendor/jquery/pnotify/pnotify.custom.min',
+        'pnotify.callbacks' => 'static/novius-os/admin/vendor/jquery/pnotify/pnotify.custom.min',
+        'pnotify.confirm' => 'static/novius-os/admin/vendor/jquery/pnotify/pnotify.custom.min',
+        'pnotify.desktop' => 'static/novius-os/admin/vendor/jquery/pnotify/pnotify.custom.min',
+        'pnotify.history' => 'static/novius-os/admin/vendor/jquery/pnotify/pnotify.custom.min',
 
         'wijmo.widget' => 'static/novius-os/admin/bundle/vendor.min',
         'wijmo.data' => 'static/novius-os/admin/bundle/vendor.min',

@@ -284,14 +284,26 @@ define('jquery-nos',
                 }
                 if ( $.isPlainObject( options ) ) {
                     require([
-                        'link!static/novius-os/admin/vendor/jquery/pnotify/jquery.pnotify.default.css',
-                        'static/novius-os/admin/vendor/jquery/pnotify/jquery.pnotify'
-                    ], function() {
-                        return $.pnotify( $.extend({
-                            styling: "jqueryui",
-                            history : false,
-                            addclass : 'nos-notification'
-                        }, options) );
+                        'pnotify',
+                        'pnotify.nonblock',
+                        'pnotify.buttons',
+                        'pnotify.callbacks',
+                        'pnotify.confirm',
+                        'pnotify.desktop',
+                        'pnotify.history',
+                        'link!static/novius-os/admin/vendor/jquery/pnotify/pnotify.custom.min.css'
+                    ], function(PNotify) {
+                        return new PNotify($.extend({
+                            styling: 'jqueryui',
+                            addclass : 'nos-notification',
+                            nonblock: {
+                                nonblock: true,
+                                nonblock_opacity: .2
+                            },
+                            history: {
+                                history: false
+                            }
+                        }, options));
                     });
                 }
                 return false;
