@@ -124,6 +124,7 @@
 
                     if (!container.hasClass(_class) && level in settings.texts)
                     {
+                        // NoviusOS use html() instead of text
                         container.html(settings.texts[level]).attr('class', 'password_strength ' + _class);
                     }
                     if ($bar && !$bar.hasClass(_barClass))
