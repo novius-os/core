@@ -1,9 +1,11 @@
 /*
  * jquery.simulate - simulate browser mouse and keyboard events
  *
- * Copyright (c) 2010 AUTHORS.txt (http://jqueryui.com/about)
- * Dual licensed under the MIT (MIT-LICENSE.txt)
- * and GPL (GPL-LICENSE.txt) licenses.
+ * Copyright (c) 2009 Eduardo Lundgren (eduardolundgren@gmail.com)
+ * and Richard D. Worth (rdworth@gmail.com)
+ *
+ * Dual licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) 
+ * and GPL (http://www.opensource.org/licenses/gpl-license.php) licenses.
  *
  */
 
@@ -27,7 +29,7 @@ $.simulate = function(el, type, options) {
 	} else {
 		this.simulateEvent(el, type, options);
 	}
-}
+};
 
 $.extend($.simulate.prototype, {
 	simulateEvent: function(el, type, options) {
@@ -92,7 +94,7 @@ $.extend($.simulate.prototype, {
 			evt = document.createEventObject();
 			$.extend(evt, e);
 		}
-		if ($.browser.msie || $.browser.opera) {
+		if (($.browser !== undefined) && ($.browser.msie || $.browser.opera)) {
 			evt.keyCode = (e.charCode > 0) ? e.charCode : e.keyCode;
 			evt.charCode = undefined;
 		}
