@@ -17,7 +17,7 @@ return array(
         'modernizr' => 'static/novius-os/admin/vendor/modernizr',
         'raphael' => 'static/novius-os/admin/vendor/raphael/raphael-min',
 
-        'jquery' => 'static/novius-os/admin/vendor/jquery/jquery-1.10.2',
+        'jquery' => 'static/novius-os/admin/vendor/jquery/jquery-1.11.1',
         'jquery-migrate' => 'static/novius-os/admin/vendor/jquery/jquery-migrate-1.2.1',
 
         'jquery.simulate' => 'static/novius-os/admin/vendor/jquery/simulate/jquery.simulate',
