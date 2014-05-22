@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20133.20
+ * Wijmo Library 3.20141.34
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -8,7 +8,6 @@
  * Licensed under the Wijmo Commercial License. Also available under the GNU GPL Version 3 license.
  * licensing@wijmo.com
  * http://wijmo.com/widgets/license/
- *
  *
  */
 var __extends = this.__extends || function (d, b) {
@@ -570,10 +569,12 @@ var wijmo;
                     return;
                 }
                 //end for 18157
+                self.wijeditor();
                 //if place two editors, it will be mess in ui and function
                 self.id_prefix = "wijeditor-" + self.element.attr("id") + "-";
                 self.$ribbon = undefined;
                 self.$modes = undefined;
+                self._isIE11 = $.browser.msie && $.browser.version && parseFloat($.browser.version) >= 11;
                 self._editorify();
                 self._initElements();
                 wijWindow.setTimeout(function () {
@@ -822,82 +823,10 @@ var wijmo;
                         }
                         break;
                     case cmd_fontname:
-                        button = self._createDropdownButton("Font Name", cmd_fontname, "Font Name", [
-                            {
-                                tip: "Arial",
-                                name: "fn1",
-                                text: "Arial"
-                            }, 
-                            {
-                                tip: "Courier New",
-                                name: "fn2",
-                                text: "Courier New"
-                            }, 
-                            {
-                                tip: "Garamond",
-                                name: "fn3",
-                                text: "Garamond"
-                            }, 
-                            {
-                                tip: "Tahoma",
-                                name: "fn4",
-                                text: "Tahoma"
-                            }, 
-                            {
-                                tip: "Times New Roman",
-                                name: "fn5",
-                                text: "Times New Roman"
-                            }, 
-                            {
-                                tip: "Verdana",
-                                name: "fn6",
-                                text: "Verdana"
-                            }, 
-                            {
-                                tip: "Wingdings",
-                                name: "fn7",
-                                text: "Wingdings"
-                            }
-                        ], self.id_prefix);
+                        button = self._createDropdownButton("Font Name", cmd_fontname, "Font Name", self.options.fontNames || [], self.id_prefix);
                         break;
                     case cmd_fontsize:
-                        button = self._createDropdownButton("Font Size", cmd_fontsize, "Font Size", [
-                            {
-                                tip: "VerySmall",
-                                name: "xx-small",
-                                text: "VerySmall"
-                            }, 
-                            {
-                                tip: "Smaller",
-                                name: "x-small",
-                                text: "Smaller"
-                            }, 
-                            {
-                                tip: "Small",
-                                name: "small",
-                                text: "Small"
-                            }, 
-                            {
-                                tip: "Medium",
-                                name: "medium",
-                                text: "Medium"
-                            }, 
-                            {
-                                tip: "Large",
-                                name: "large",
-                                text: "Large"
-                            }, 
-                            {
-                                tip: "Larger",
-                                name: "x-large",
-                                text: "Larger"
-                            }, 
-                            {
-                                tip: "VeryLarge",
-                                name: "xx-large",
-                                text: "VeryLarge"
-                            }
-                        ], self.id_prefix);
+                        button = self._createDropdownButton("Font Size", cmd_fontsize, "Font Size", self.options.fontSizes || [], self.id_prefix);
                         break;
                     case cmd_spelling:
                         break;
@@ -1373,23 +1302,24 @@ var wijmo;
                 });
             };
             wijeditor.prototype._setOption = function (key, value) {
-                var self = this, o = self.options, oldMode = o.mode, ribbonParent = self.$ribbon.parent(), oldCustomContextMenu = o.customContextMenu;
+                var self = this, o = self.options, oldMode = o.mode, oldEditorMode = o.editorMode, ribbonParent = self.$ribbon.parent(), oldFullScreenMode = o.fullScreenMode, oldCustomContextMenu = o.customContextMenu;
                 $.Widget.prototype._setOption.apply(self, arguments);
                 if(key === "fullScreenMode") {
-                    o.fullScreenMode = value;
-                    self._setFullScreen(value);
+                    if(value !== oldFullScreenMode) {
+                        self._setFullScreen(value);
+                    }
                 } else if(key === "showPathSelector") {
-                    o.showPathSelector = value;
                     if(value) {
                         self._getPathSelector().show();
                     } else {
                         self._getPathSelector().hide();
                     }
-                } else if(key === "editorMode") {
-                    o.editorMode = value;
+                } else if(key === "editorMode" && oldEditorMode !== value) {
                     self._ribbonCommand(value);
+                    if(self.$modes.data("wijmo-wijribbon")) {
+                        self.$modes.wijribbon(setButtonChecked, oldEditorMode, false);
+                    }
                 } else if(key === "fullScreenContainerSelector") {
-                    o.fullScreenContainerSelector = value;
                     if(self.options.fullScreenMode) {
                         self._setFullScreen(true);
                     }
@@ -1408,7 +1338,6 @@ var wijmo;
                 } else if(key === "commandButtonClick") {
                     o.commandButtonClick = value;
                 } else if(key === "text") {
-                    o.text = value;
                     self.setText(value);
                 } else if(key === "customContextMenu") {
                     //fixed bug for customContextMenu
@@ -1425,24 +1354,30 @@ var wijmo;
                         self.contextMenu = undefined;
                     }
                 } else if(key === "mode" && value !== oldMode) {
-                    self.$ribbon.wijribbon("destroy");
-                    self.$ribbon.remove();
-                    if(value === "ribbon") {
-                        self.$ribbon = $(self._getDefaultRibbonMarkup());
-                    } else if(value === "bbcode") {
-                        self.$ribbon = $(self._getSimpleToolBar(defaultBBCodeModeCommands));
-                    } else {
-                        self.$ribbon = $(self._getSimpleToolBar(defaultSimpleModeCommands));
-                    }
-                    ribbonParent.append(self.$ribbon);
-                    self.$ribbon.wijribbon({
-                        click: function (e, data) {
-                            self._ribbonCommand(data.commandName, data.name);
-                            self._trigger('commandButtonClick', e, data);
-                        }
-                    });
+                    self._recreateRibbon(value);
                     self._ribbonCommand(o.editorMode);
+                } else if(key === "fontNames" || key === "fontSizes") {
+                    self._recreateRibbon(self.options.mode);
                 }
+            };
+            wijeditor.prototype._recreateRibbon = function (mode) {
+                var self = this, ribbonParent = self.$ribbon.parent();
+                self.$ribbon.wijribbon("destroy");
+                self.$ribbon.remove();
+                if(mode === "ribbon") {
+                    self.$ribbon = $(self._getDefaultRibbonMarkup());
+                } else if(mode === "bbcode") {
+                    self.$ribbon = $(self._getSimpleToolBar(defaultBBCodeModeCommands));
+                } else {
+                    self.$ribbon = $(self._getSimpleToolBar(defaultSimpleModeCommands));
+                }
+                ribbonParent.append(self.$ribbon);
+                self.$ribbon.wijribbon({
+                    click: function (e, data) {
+                        self._ribbonCommand(data.commandName, data.name);
+                        self._trigger('commandButtonClick', e, data);
+                    }
+                });
             };
             wijeditor.prototype._getHeader = function () {
                 return $("." + css_editor_header, this.editor);
@@ -1509,7 +1444,7 @@ var wijmo;
                     text = self._convertBBCodeToHtml($.trim(text));
                 }
                 doc.open();
-                doc.write("<html style=\"width:100%;height:100%;" + (self.options.enabled ? "cursor:text;" : "") + "\"><head><title></title><style id=\"__wijStyle\" " + " type=\"text/css\" >table,td,tr{border: 1px #acacac dashed;}" + "</style></head><body>" + text + "</body></html>");
+                doc.write("<html style=\"width:100%;height:100%;" + (self.options.enabled ? "cursor:text;" : "") + "\"><head><title></title><style id=\"__wijStyle\" " + " type=\"text/css\" >table,td,tr{border: 1px #acacac dashed;}" + "</style></head><body style=\"word-wrap:break-word\">" + text + "</body></html>");
                 doc.close();
                 //update for 24254 issue
                 if(!tblBorderShowing) {
@@ -1527,6 +1462,12 @@ var wijmo;
                 var self = this, win = self._getDesignViewWindow(), doc = win.document;
                 self._initContentDocument();
                 self._loadDesignView();
+                //before lose focus, save the selection in ie.
+                if($.browser.msie) {
+                    $(doc).unbind("beforedeactivate").bind("beforedeactivate", function () {
+                        self._saveSelectionForIE();
+                    });
+                }
             };
             wijeditor.prototype._loadDesignView = function () {
                 var self = this, win = self._getDesignViewWindow(), doc = win.document;
@@ -1623,6 +1564,9 @@ var wijmo;
                 } else {
                     self.element.attr("style", self._oriStyle);
                 }
+                if(self.dialog) {
+                    self.dialog.remove();
+                }
                 //self.editor.replaceWith(self.element);
                 self.element.insertBefore(self.editor);
                 self.element.unbind('.' + self.widgetName);
@@ -1706,6 +1650,7 @@ var wijmo;
                         arg = 7;
                         break;
                 }
+                self._setIEFocus();
                 //Add comments by RyanWu@20110915.
                 //For implementing the font-size
                 //support px/pt etc other than only small/x-small/x-large/large...
@@ -1718,17 +1663,8 @@ var wijmo;
                     } else {
                         doc.execCommand("FontSize", false, arg);
                     }
-                } else if($.browser.msie) {
-                    self._formatFontSpan(doc, fontSize, cmd);
                 } else {
-                    //Here we set fontsize to 4(temp value) because we just use
-                    //execCommand to separate the html correctly
-                    //and we will set the correct fontsize value to the replaced span.
-                    doc.execCommand("FontSize", false, arg);
-                    $.each($("font[size]", doc), function (idx, fs) {
-                        $spans.push(self._replaceFontWithSpan($(fs), "size", fontSize, cmd));
-                    });
-                    self._setSelection($spans);
+                    self._formatFontSpan(doc, fontSize, cmd);
                 }
                 //end by RyanwWu@20110915.
                 if(self.options.mode === "bbcode" && !($.browser.msie)) {
@@ -1748,6 +1684,7 @@ var wijmo;
                         return false;
                     }
                 });
+                self._setIEFocus();
                 //Add comments by RyanWu@20110915.
                 //For implementing the font-size
                 //support px/pt etc other than only small/smaller/larger/large...
@@ -1802,48 +1739,6 @@ var wijmo;
                     });
                 });
                 self._setSelection($spans);
-            };
-            wijeditor.prototype._setSelection = function ($nodes, start, length) {
-                var win = this._getDesignViewWindow(), doc = win.document, range, startNode, endNode, selection, len = 0;
-                try  {
-                    if($.browser.msie) {
-                        //				range.moveStart("character", -text.length);
-                        //				range.moveEnd("character", -text.length);
-                        //				range.collapse(true);
-                        //				range.moveStart("character", start);
-                        //				range.moveEnd("character", length);
-                        //range.moveStart("textedit", -1);
-                        //				range.moveStart("textedit", -1);
-                        //				range.collapse(true);
-                        //				range.moveStart("character", start);
-                        //				range.moveEnd("character", length);
-                        range = doc.selection.createRange();
-                        if($nodes) {
-                            $.each($nodes, function (idx, $node) {
-                                len += $node.text().length;
-                            });
-                            range.moveToElementText($nodes[0][0]);
-                            range.collapse(true);
-                            range.moveEnd("character", len);
-                        } else {
-                            range.moveStart("textedit", -1);
-                            range.collapse(true);
-                            range.moveStart("character", start);
-                            range.moveEnd("character", length);
-                        }
-                        range.select();
-                    } else {
-                        selection = win.getSelection();
-                        range = doc.createRange();
-                        startNode = $nodes[0][0];
-                        endNode = $nodes[$nodes.length - 1][0];
-                        range.setStart(startNode, 0);
-                        range.setEnd(endNode, endNode.childNodes.length);
-                        selection.removeAllRanges();
-                        selection.addRange(range);
-                    }
-                } catch (e) {
-                }
             };
             wijeditor.prototype._replaceFontWithSpan = function ($fn, attrName, cssName, cssValue) {
                 $fn.wrap("<span class = '" + css_formatspan + "' style='" + cssName + ":" + cssValue + "'></span>");
@@ -2039,10 +1934,14 @@ var wijmo;
                 //update for fixing bug 20695
                 if($.browser.msie) {
                     window.setTimeout(function () {
+                        var doc = self._getDesignViewDocument();
                         if(self.options.mode === "bbcode") {
                             oriHtml = self._convertHtmlToBBCode($.trim(oriHtml));
                         }
                         self._setDesignViewText(oriHtml);
+                        if(doc && doc.body) {
+                            self._restoreSelectionForIE();
+                        }
                         //for case 20731 fixing at 2012/4/23
                         if(wijParseInt($.browser.version) >= 9) {
                             self.sourceView.val(oriHtml);
@@ -2050,7 +1949,9 @@ var wijmo;
                     }, 40);
                 }
                 //update fullScreenButton UI
-                self.$modes.wijribbon(setButtonChecked, cmd_fullscreen, fullScreenMode);
+                if(self.$modes.data("wijmo-wijribbon")) {
+                    self.$modes.wijribbon(setButtonChecked, cmd_fullscreen, fullScreenMode);
+                }
             };
             wijeditor.prototype._createWijMenu = //fixed bug for customContextMenu
             function () {
@@ -2063,7 +1964,7 @@ var wijmo;
                         showing: function (e, sublist) {
                             //update for fixing issue 20382 by wh at 2012/3/12
                             if($.browser.msie) {
-                                rangeSelection = doc.selection.createRange();
+                                self._saveSelectionForIE();
                             }
                             //end for 20382 issue.
                             //sublist.element.show();
@@ -2098,7 +1999,10 @@ var wijmo;
                     height: fHeight
                 });
                 contentHeight = self.editor.height() - header.height() - footer.height();
-                content.height(contentHeight).wijsplitter("refresh");
+                content.height(contentHeight);
+                if(content.data("wijmo-wijsplitter")) {
+                    content.wijsplitter("refresh");
+                }
                 //TODO
                 //$ribbon.wijribbon("updateRibbonSize");
                             };
@@ -2109,7 +2013,7 @@ var wijmo;
             function () {
             };
             wijeditor.prototype._ribbonCommand = function (cmd, parentCmd, isInit) {
-                var self = this, doc = self._getDesignViewDocument(), content = self._getContent(), distance = content.height() / 2, elementName, selectedHtml, range;
+                var self = this, disabled = self.options.disabled, doc = self._getDesignViewDocument(), content = self._getContent(), selection, distance = content.height() / 2, elementName, selectedHtml, range;
                 if(parentCmd === cmd_fontname) {
                     self._fontNameCommand(cmd);
                     //add for any change happens, the text would be saved by wh at 2011/12/07
@@ -2125,7 +2029,7 @@ var wijmo;
                     return;
                 }
                 //for case: 35318 issue 2013/3/28
-                if(!self.editor.hasClass("ui-helper-hidden-accessible")) {
+                if(!self.editor.hasClass("ui-helper-hidden-accessible") && !disabled) {
                     // when the editor is place another container widget, such as accordion, and the container is invisible after
                     // the container widget init. if firstly create the editor widget, and then create the container widget,
                     // the iframe will be focusd in ie9, and in the container widget, it looks like someting can edit.
@@ -2134,7 +2038,11 @@ var wijmo;
                             self._setIEFocus();
                         }, 0);
                     } else {
-                        self._setIEFocus();
+                        // when the design view losefocus, the last selection will lost;
+                        // so use focus method to set last selection.
+                        if($.browser.msie) {
+                            self.focus();
+                        }
                     }
                 }
                 switch(cmd) {
@@ -2143,8 +2051,15 @@ var wijmo;
                             // we first change the block into <ADDRESS> tags,
                             // using the FormatBlock functionality of the execCommand
                             doc.execCommand("FormatBlock", false, "<ADDRESS>");
-                            range = doc.selection.createRange();
-                            range = $(range.parentElement()).closest("address");
+                            if(self._isIE11 && doc.getSelection) {
+                                selection = doc.getSelection();
+                                if(selection && selection.anchorNode) {
+                                    range = $(selection.anchorNode).closest("address");
+                                }
+                            } else {
+                                range = doc.selection.createRange();
+                                range = $(range.parentElement()).closest("address");
+                            }
                             if(range.length) {
                                 // then sneakily we use regex's to replace
                                 // <ADDRESS> tags with <BLOCKQUOTE> tags
@@ -2275,6 +2190,7 @@ var wijmo;
                         self._setFocusNotIE();
                         break;
                     case cmd_fullscreen:
+                        self._storeSelectionForIE();
                         self._toggleFullScreen();
                         break;
                     case cmd_undo:
@@ -2300,7 +2216,7 @@ var wijmo;
                         self._setFocusNotIE();
                         break;
                     case cmd_designview:
-                        if(self.$modes.data("wijmoWijribbon")) {
+                        if(self.$modes.data("wijmo-wijribbon")) {
                             self.$modes.wijribbon(setButtonDisabled, cmd_wordwrap, true).wijribbon(setButtonChecked, cmd_designview, true);
                         }
                         self.$ribbon.wijribbon("option", "disabled", false);
@@ -2313,9 +2229,10 @@ var wijmo;
                         content.wijsplitter("option", "panel2", {
                             collapsed: true
                         });
+                        self._restoreSelectionForIE();
                         break;
                     case cmd_splitview:
-                        if(self.$modes.data("wijmoWijribbon")) {
+                        if(self.$modes.data("wijmo-wijribbon")) {
                             self.$modes.wijribbon(setButtonDisabled, cmd_wordwrap, true).wijribbon(setButtonChecked, cmd_splitview, true);
                         }
                         self.$ribbon.wijribbon("option", "disabled", false);
@@ -2330,9 +2247,10 @@ var wijmo;
                         });
                         break;
                     case cmd_sourceview:
-                        if(self.$modes.data("wijmoWijribbon")) {
+                        if(self.$modes.data("wijmo-wijribbon")) {
                             self.$modes.wijribbon(setButtonDisabled, cmd_wordwrap, false).wijribbon(setButtonChecked, cmd_sourceview, true);
                         }
+                        self._storeSelectionForIE();
                         self.$ribbon.wijribbon("option", "disabled", true);
                         //TODO:maybe need to add the code block
                         //update for bbcode
@@ -2343,7 +2261,7 @@ var wijmo;
                         content.wijsplitter("option", "panel1", {
                             collapsed: true
                         });
-                        if($.browser.msie) {
+                        if($.browser.msie && !disabled) {
                             self.sourceView.focus();
                         }
                         break;
@@ -2399,7 +2317,7 @@ var wijmo;
                         self._createDialog(this.localizeString("imageEditorDialogImageBrowser", "Image Browser"), self._getDialogRes_ImageBrowser(), self.initImageBrowserDialog);
                         break;
                     case cmd_link:
-                        self._saveSelectionForIE();
+                        self._storeSelectionForIE();
                         self._createDialog(this.localizeString("hyperLinkDialogInserthyperLink", "Insert hyperLink"), self._getDialogRes_Link(), self.initHyperLinkDialog);
                         break;
                     case cmd_insertcode:
@@ -2443,13 +2361,6 @@ var wijmo;
                 self._onDesignViewBlur(null);
                 //end for change happens
                             };
-            wijeditor.prototype._saveSelectionForIE = function () {
-                var cWin = this._getDesignViewWindow(), selection;
-                if($.browser.msie) {
-                    selection = cWin.document.selection;
-                    rangeSelection = selection.createRange();
-                }
-            };
             wijeditor.prototype._createDialog = //added by Ryanwu@20110512.
             function (title, content, callback) {
                 var self = this, dialogOpts, $dlg = self.dialog;
@@ -2484,7 +2395,7 @@ var wijmo;
                     }
                 };
                 //end for 20444 issue
-                if(!$dlg.data("wijmoWijdialog")) {
+                if(!$dlg.data("wijmo-wijdialog")) {
                     if($.browser.msie && wijParseInt($.browser.version) === 6) {
                         window.setTimeout(function () {
                             $dlg.wijdialog(dialogOpts);
@@ -2508,7 +2419,7 @@ var wijmo;
             };
             wijeditor.prototype._adjustDialogLayoutForIE7 = function () {
                 var $dlg = this.dialog;
-                if($.browser.msie && /^7\.[0-9]+/.test($.browser.version)) {
+                if($.browser.msie && (/^7\.[0-9]+/.test($.browser.version) || document.documentMode === 7)) {
                     $dlg.wijdialog('option', 'width', $dlg.parent().width());
                 }
             };
@@ -3266,6 +3177,9 @@ var wijmo;
             /** @ignore */
             function () {
                 var self = this, $dlg = self.dialog, address = self.getLinkHrefField(), $imageContainer = $("." + css_linkdlg_imagecontainer, $dlg), iconTypeIsImg, linkInnerHtml, $img, $address = $("." + css_linkdlg_address + " input", $dlg);
+                $dlg.one("wijdialogclose", function () {
+                    self._restoreSelectionForIE();
+                });
                 $dlg.delegate(selector_dlg_ok, "click." + self.widgetName, function (e) {
                     self.submitHyperLinkDialog();
                     //add for any change happens,
@@ -3294,37 +3208,37 @@ var wijmo;
                     linkInnerHtml = self._getLinkInnerHTML();
                 } catch (e) {
                 }
-                $img = $(linkInnerHtml);
                 if(linkInnerHtml && linkInnerHtml.substring(0, 3) === '<img') {
                     iconTypeIsImg = true;
+                    $img = $(linkInnerHtml);
                 } else {
                     iconTypeIsImg = false;
                 }
                 if(!iconTypeIsImg) {
-                    $("." + css_linkdlg_text + " input", $dlg).show();
+                    $("." + css_linkdlg_text + " textarea", $dlg).show();
                     $imageContainer.hide();
-                    $("." + css_linkdlg_text + " input", $dlg).val(linkInnerHtml);
+                    $("." + css_linkdlg_text + " textarea", $dlg).val(linkInnerHtml);
                 } else {
                     $imageContainer.show();
-                    $("." + css_linkdlg_text + " input", $dlg).hide();
+                    $("." + css_linkdlg_text + " textarea", $dlg).hide();
                     $("." + css_linkdlg_url + " input", $dlg).val($img.attr("src"));
                     $("." + css_linkdlg_width + " input", $dlg).val($img.attr("width"));
                     $("." + css_linkdlg_height + " input", $dlg).val($img.attr("heigth"));
                 }
                 $("." + css_linkdlg_css + " input", $dlg).val(self._getLinkCssField());
                 $("." + css_linkdlg_target + " select", $dlg).val(self._getLinkTarget());
-                $("#radAnchor", $dlg).attr("checked", "checked");
-                $("#radLinkTypeIsText", $dlg).attr("checked", "checked");
+                $("#radAnchor", $dlg).prop("checked", true);
+                $("#radLinkTypeIsText", $dlg).prop("checked", true);
                 if(address.length > 6) {
                     if(address.substring(0, 4) === 'http') {
-                        $("#radUrl", $dlg).attr("checked", "checked");
+                        $("#radUrl", $dlg).prop("checked", true);
                     } else if(address.substring(0, 6) === 'mailto') {
-                        $("#radMail", $dlg).attr("checked", "checked");
+                        $("#radMail", $dlg).prop("checked", true);
                     } else {
                         if(address.substring(0, 1) === '#') {
-                            $("#radAnchor", $dlg).attr("checked", "checked");
+                            $("#radAnchor", $dlg).prop("checked", true);
                         } else {
-                            $("#radFile", $dlg).attr("checked", "checked");
+                            $("#radFile", $dlg).prop("checked", true);
                         }
                     }
                 }
@@ -3335,6 +3249,7 @@ var wijmo;
                 self.focus();
                 inspElem = self._getInspectElement();
                 try  {
+                    inspElem = self._getHyperLinkElement(inspElem);
                     if(inspElem && inspElem.tagName === 'A') {
                         return inspElem.innerHTML || '';
                     }
@@ -3349,6 +3264,7 @@ var wijmo;
                 self.focus();
                 inspElem = self._getInspectElement();
                 try  {
+                    inspElem = self._getHyperLinkElement(inspElem);
                     if(inspElem && inspElem.tagName === 'A') {
                         return self.fixAbsoluteUrlsIfNeeded(inspElem.href || '');
                     }
@@ -3361,6 +3277,7 @@ var wijmo;
                 self.focus();
                 inspElem = self._getInspectElement();
                 try  {
+                    inspElem = self._getHyperLinkElement(inspElem);
                     if(inspElem && inspElem.tagName === 'A') {
                         return inspElem.target || '';
                     }
@@ -3373,6 +3290,7 @@ var wijmo;
                 self.focus();
                 inspElem = self._getInspectElement();
                 try  {
+                    inspElem = self._getHyperLinkElement(inspElem);
                     if(inspElem && inspElem.tagName === 'A') {
                         return inspElem.style.cssText || '';
                     }
@@ -3382,7 +3300,7 @@ var wijmo;
             };
             wijeditor.prototype.submitHyperLinkDialog = /** @ignore */
             function () {
-                var self = this, $dlg = self.dialog, $radMail = $("#radMail", $dlg), $address = $("." + css_linkdlg_address + " input", $dlg), $text = $("." + css_linkdlg_text + " input", $dlg), $css = $("." + css_linkdlg_css + " input", $dlg), $target = $("." + css_linkdlg_target + " select", $dlg), address = $address.val(), text = $text.val(), target = $target.val(), $radImage = $("#radLinkTypeIsImage", $dlg), imageChecked = $radImage.prop("checked"), imageUrl = $("." + css_linkdlg_url + " input", $dlg).val(), imageWidth = $("." + css_linkdlg_width + " input", $dlg).val(), imageHeight = $("." + css_linkdlg_height + " input", $dlg).val(), css = $css.val();
+                var self = this, $dlg = self.dialog, $radUrl = $("#radUrl", $dlg), $radAnchor = $("#radAnchor", $dlg), $radMail = $("#radMail", $dlg), $address = $("." + css_linkdlg_address + " input", $dlg), $text = $("." + css_linkdlg_text + " textarea", $dlg), $css = $("." + css_linkdlg_css + " input", $dlg), $target = $("." + css_linkdlg_target + " select", $dlg), address = $address.val(), text = $text.val(), target = $target.val(), $radImage = $("#radLinkTypeIsImage", $dlg), imageChecked = $radImage.prop("checked"), imageUrl = $("." + css_linkdlg_url + " input", $dlg).val(), imageWidth = $("." + css_linkdlg_width + " input", $dlg).val(), imageHeight = $("." + css_linkdlg_height + " input", $dlg).val(), css = $css.val();
                 if(address === '') {
                     wijAlert(this.localizeString("errorMessageAddressError", "Please input address!"));
                     return;
@@ -3403,7 +3321,15 @@ var wijmo;
                     wijAlert(this.localizeString("errorMessageHyperLinkImageHeightError", "Please input correct image height!"));
                     return;
                 }
-                if($radMail.attr("checked") && !self._isEmail(address)) {
+                if($radUrl.prop("checked") && !self._isUrl(address)) {
+                    wijAlert(this.localizeString("errorMessageHyperLinkUrl", "Please input correct url!"));
+                    return;
+                }
+                if($radAnchor.prop("checked") && !self._isAnchor(address)) {
+                    wijAlert(this.localizeString("errorMessageHyperLinkAnchor", "Please input correct anchor!"));
+                    return;
+                }
+                if($radMail.prop("checked") && !self._isEmail(address)) {
                     wijAlert(this.localizeString("errorMessageHyperLinkEmail", "Please input correct email!"));
                     return;
                 }
@@ -3411,14 +3337,15 @@ var wijmo;
                     text = '<img src="' + imageUrl + '" width="' + imageWidth + '" height="' + imageHeight;
                     text += '"/>';
                 }
-                self._editLink(text, address, css, target);
                 self._closeDialog();
+                self._editLink(text, address, css, target);
             };
             wijeditor.prototype._editLink = function (text, href, css, target) {
-                var self = this, inspElem, html = '';
+                var self = this, html = '', inspElem;
                 self.focus();
                 inspElem = self._getInspectElement();
                 try  {
+                    inspElem = self._getHyperLinkElement(inspElem);
                     if(inspElem && inspElem.tagName === 'A') {
                         inspElem.innerHTML = text;
                         inspElem.href = href;
@@ -3437,7 +3364,6 @@ var wijmo;
                     html += ' style="' + css + '"';
                 }
                 html += '>' + text + '</a>';
-                self._setIESelection();
                 self.insertHTML(html);
             };
             wijeditor.prototype.anchorListOnChanged = /** @ignore */
@@ -3691,7 +3617,7 @@ var wijmo;
             };
             wijeditor.prototype.setColor = /** @ignore */
             function (cmdID, color) {
-                var self = this, doc = self._getDesignViewDocument(), win = self._getDesignViewWindow(), selection;
+                var self = this, htmlText, doc = self._getDesignViewDocument(), win = self._getDesignViewWindow(), selection;
                 self._setIESelection();
                 if($.browser.mozilla && cmdID === 'BackColor') {
                     selection = win.getSelection();
@@ -3700,7 +3626,7 @@ var wijmo;
                     doc.execCommand(cmdID, false, color);
                     // For case 41717. Make <U> and <STRIKE> tag wrapped in <FONT>. Just in IE.
                     if($.browser.msie) {
-                        var htmlText = doc.selection.createRange().htmlText;
+                        htmlText = self._getHtmlTextInIE(doc);
                         if(htmlText.indexOf("<U>") >= 0 && htmlText.indexOf("</U>") >= 0) {
                             doc.execCommand("Underline", false, false);
                             doc.execCommand("Underline");
@@ -4581,16 +4507,20 @@ var wijmo;
                 }
             };
             wijeditor.prototype._getSelectedCells = function (inspEl) {
-                var win = this._getDesignViewWindow(), doc = win.document, cells = [], range, parent, selection, idx, rangeCount, sContainer, nodeName, offset;
+                var self = this, win = this._getDesignViewWindow(), doc = win.document, cells = [], range, parent, selection, idx, rangeCount, sContainer, nodeName, offset;
                 if($.browser.msie) {
-                    range = doc.selection.createRange();
                     parent = $(inspEl).closest("tr")[0];
                     if(parent) {
+                        range = self._getIESelectionRange();
                         $.each(parent.cells, function (idx, cell) {
-                            var cellRange = doc.selection.createRange(), cep = "compareEndPoints";
-                            cellRange.moveToElementText(cell);
-                            if(range.inRange(cellRange) || (range[cep]('StartToStart', cellRange) >= 0 && range[cep]('StartToEnd', cellRange) <= 0) || (range[cep]('EndToStart', cellRange) >= 0 && range[cep]('EndToEnd', cellRange) <= 0)) {
-                                cells.push(cell);
+                            if(self._isIE11) {
+                                if(self._checkSelectionIncludeNodeForIE11(win, range, cell)) {
+                                    cells.push(cell);
+                                }
+                            } else {
+                                if(self._checkSelectionIncludeNodeExceptIE11(win, range, cell)) {
+                                    cells.push(cell);
+                                }
                             }
                         });
                     }
@@ -4653,45 +4583,49 @@ var wijmo;
                 var self = this, doc = self._getDesignViewDocument(), range;
                 try  {
                     if($.browser.msie) {
-                        range = doc.selection.createRange();
-                        range.pasteHTML(htmlText);
-                        range.collapse(false);
-                        range.select();
+                        if(self._isIE11 && doc.getSelection) {
+                            range = self._getRangeForInsertHTML(doc, htmlText);
+                        } else {
+                            range = doc.selection.createRange();
+                            range.pasteHTML(htmlText);
+                            range.collapse(false);
+                        }
+                        self._setIESelection(range, true);
                     } else {
                         doc.execCommand('insertHTML', false, htmlText);
                     }
                 } catch (e) {
+                    //Condition: insert element after inserting hidden input element
+                    //Result: IE8 and IE11 are ok; but IE9 and IE10 exception throws
+                    if($.browser.msie && $.browser.version && parseFloat($.browser.version) >= 9 && parseFloat($.browser.version) <= 10 && rangeSelection) {
+                        range = rangeSelection;
+                        range.pasteHTML(htmlText);
+                        range.collapse(false);
+                        self._setIESelection(range, true);
+                    }
                 }
                 self._addtoUndoBuffer();
                 self._setSaveBtnEnabled();
             };
-            wijeditor.prototype._getSelectedContent = //end of insert html text to the document.
-            //get selected content.
-            function () {
-                var win = this._getDesignViewWindow(), doc = win.document, selectedContent = "", cloneContents = "cloneContents", range, contents, helperDiv;
-                if(!doc.selection) {
-                    range = win.getSelection().getRangeAt(0);
-                    if(range) {
-                        if(range[cloneContents]) {
-                            contents = range[cloneContents]();
-                            helperDiv = document.createElement('div');
-                            helperDiv.appendChild(contents);
-                            selectedContent = helperDiv.innerHTML;
-                            helperDiv = null;
-                        }
+            wijeditor.prototype._getRangeForInsertHTML = //end of insert html text to the document.
+            function (doc, htmlText) {
+                var sel, range, frag;
+                if(doc.getSelection) {
+                    sel = doc.getSelection();
+                    if(rangeSelection) {
+                        range = rangeSelection;
+                        rangeSelection = null;
+                    } else if(sel.getRangeAt && sel.rangeCount) {
+                        range = sel.getRangeAt(0);
                     }
-                } else {
-                    range = doc.selection.createRange();
-                    return range.htmlText;
+                    if(range) {
+                        range.deleteContents();
+                        frag = range.createContextualFragment(htmlText);
+                        range.insertNode(frag);
+                        range.collapse(false);
+                    }
                 }
-                return selectedContent || "";
-            };
-            wijeditor.prototype._setIESelection = //end of get selected content.
-            //focus related methods in ie.
-            function () {
-                if($.browser.msie && rangeSelection) {
-                    rangeSelection.select();
-                }
+                return range;
             };
             wijeditor.prototype._setIEFocus = function () {
                 var doc = this._getDesignViewDocument();
@@ -4719,7 +4653,7 @@ var wijmo;
                             };
                         }
                     } else {
-                        rangeSelection.select();
+                        this._setIESelection();
                     }
                 } else {
                     win.focus();
@@ -4740,15 +4674,7 @@ var wijmo;
                     win.focus();
                 }
             };
-            wijeditor.prototype._getInspectElement = //gets inspect element.
-            function () {
-                return inspectElement || this._getSelectedElement();
-            };
-            wijeditor.prototype._getSelectedElement = function () {
-                return this._getParentElement(this._getDesignViewWindow());
-            };
-            wijeditor.prototype._createElement = //end of gets inspect element.
-            function (tagName, innerText, attribs) {
+            wijeditor.prototype._createElement = function (tagName, innerText, attribs) {
                 return new HtmlElement(tagName, innerText, attribs);
             };
             wijeditor.prototype._createDiv = function (className, title) {
@@ -4849,6 +4775,15 @@ var wijmo;
                 }
                 return ele;
             };
+            wijeditor.prototype._createTextAreaField = function (label, className, defaultValue, text) {
+                var ele = this._createDiv(className);
+                ele.add(this._createSpan(css_dlg_text, label));
+                ele.add(this._createElement("textarea", defaultValue));
+                if(text) {
+                    ele.add(new TextElement(text));
+                }
+                return ele;
+            };
             wijeditor.prototype._createSeparator = function () {
                 var self = this, hrdiv = self._createDiv(css_dlg_hr);
                 hrdiv.add(self._createElement("hr"));
@@ -4927,8 +4862,11 @@ var wijmo;
                 dialog.add(content);
                 return dialog.render();
             };
-            wijeditor.prototype._getDialogRes_Link = function () {
-                var self = this, dialog = self._createDiv(css_linkdlg), address = self._createTextField(this.localizeString("hyperLinkDialogAddress", "Address :"), css_linkdlg_address), linktype = self._createDiv(css_linkdlg_linktype + " ui-helper-clearfix"), linktypecontainer = self._createElement("div"), imageContainer = self._createDiv(css_linkdlg_imagecontainer), linkIconTypeOuterContainer = self._createDiv(css_linkdlg_linkicontype), linkIconTypeContainer = self._createElement("div"), radioArr = [
+            wijeditor.prototype._getDialogRes_link_address = function () {
+                return this._createTextField(this.localizeString("hyperLinkDialogAddress", "Address :"), css_linkdlg_address);
+            };
+            wijeditor.prototype._getDialogRes_link_linkType_options = function () {
+                return [
                     {
                         id: "radUrl",
                         value: "url",
@@ -4945,7 +4883,25 @@ var wijmo;
                         value: "email",
                         text: this.localizeString("hyperLinkDialogEmail", "email")
                     }
-                ], linkIconType = [
+                ];
+            };
+            wijeditor.prototype._getDialogRes_link_linkType = function () {
+                var _this = this;
+                var linkType = this._createDiv(css_linkdlg_linktype + " ui-helper-clearfix"), linktypecontainer = this._createElement("div"), linkTypeOptions = [], idx;
+                linkType.add(linktypecontainer);
+                $.each(this._getDialogRes_link_linkType_options(), function (idx, radio) {
+                    linktypecontainer.add(_this._createRadio(radio.id, "radioList", radio.value));
+                    linktypecontainer.add(_this._createLabel(radio.text, radio.id));
+                });
+                for(idx = 1; idx < 8; idx++) {
+                    linkTypeOptions.push("#anchor" + idx.toString());
+                }
+                linkType.add(this._createSelect(css_linkdlg_anchor, linkTypeOptions));
+                return linkType;
+            };
+            wijeditor.prototype._getDialogRes_Link_linkIconType = function () {
+                var _this = this;
+                var linkIconTypeOuterContainer = this._createDiv(css_linkdlg_linkicontype), linkIconTypeContainer = this._createElement("div"), inconTypeSpan = this._createSpan(css_dlg_text, this.localizeString("hyperLinkDialogIconType", "Icon Type :")), linkIconType = [
                     {
                         id: "radLinkTypeIsText",
                         value: "text",
@@ -4957,7 +4913,27 @@ var wijmo;
                         value: "image",
                         text: this.localizeString("hyperLinkDialogImage", "image")
                     }
-                ], linkTypeOptions = [], text = self._createTextField(this.localizeString("hyperLinkDialogTextToDisplay", "Text to display :"), css_linkdlg_text), inconTypeSpan = self._createSpan(css_dlg_text, this.localizeString("hyperLinkDialogIconType", "Icon Type :")), target = self._createDiv(css_linkdlg_target), targetSpan = self._createSpan(css_dlg_text, this.localizeString("hyperLinkDialogTarget", "Target :")), targetOption = [
+                ];
+                $.each(linkIconType, function (idx, radio) {
+                    linkIconTypeContainer.add(_this._createRadio(radio.id, "linkIconRadioList", radio.value));
+                    linkIconTypeContainer.add(_this._createLabel(radio.text, radio.id));
+                });
+                linkIconTypeOuterContainer.add(linkIconTypeContainer);
+                linkIconTypeContainer.add(inconTypeSpan);
+                return linkIconTypeOuterContainer;
+            };
+            wijeditor.prototype._getDialogRes_Link_text = function () {
+                return this._createTextAreaField(this.localizeString("hyperLinkDialogTextToDisplay", "Text to display :"), css_linkdlg_text);
+            };
+            wijeditor.prototype._getDialogRes_Link_image = function () {
+                var imageContainer = this._createDiv(css_linkdlg_imagecontainer);
+                imageContainer.add(this._createTextField(this.localizeString("imageEditorDialogImageSrc", "Image Src:"), css_linkdlg_url));
+                imageContainer.add(this._createTextField(this.localizeString("imageEditorDialogImageWidth", "Image width:"), css_linkdlg_width, this.localizeString("dialogPixel", "px")));
+                imageContainer.add(this._createTextField(this.localizeString("imageEditorDialogImageHeight", "Image height:"), css_linkdlg_height, this.localizeString("dialogPixel", "px")));
+                return imageContainer;
+            };
+            wijeditor.prototype._getDialogRes_link_target = function () {
+                var target = this._createDiv(css_linkdlg_target), targetSpan = this._createSpan(css_dlg_text, this.localizeString("hyperLinkDialogTarget", "Target :")), targetOption = [
                     {
                         text: "_blank",
                         selected: true
@@ -4965,35 +4941,24 @@ var wijmo;
                     "_parent", 
                     "_self", 
                     "_top"
-                ], targetSelect = self._createSelect(css_linkdlg_target, targetOption), css = self._createTextField(this.localizeString("hyperLinkDialogCss", "Css :"), css_linkdlg_css), idx;
-                imageContainer.add(self._createTextField(this.localizeString("imageEditorDialogImageSrc", "Image Src:"), css_linkdlg_url));
-                imageContainer.add(self._createTextField(this.localizeString("imageEditorDialogImageWidth", "Image width:"), css_linkdlg_width, this.localizeString("dialogPixel", "px")));
-                imageContainer.add(self._createTextField(this.localizeString("imageEditorDialogImageHeight", "Image height:"), css_linkdlg_height, this.localizeString("dialogPixel", "px")));
-                dialog.add(address);
-                dialog.add(linktype);
-                linktype.add(linktypecontainer);
-                linkIconTypeOuterContainer.add(linkIconTypeContainer);
-                linkIconTypeContainer.add(inconTypeSpan);
-                $.each(radioArr, function (idx, radio) {
-                    linktypecontainer.add(self._createRadio(radio.id, "radioList", radio.value));
-                    linktypecontainer.add(self._createLabel(radio.text, radio.id));
-                });
-                $.each(linkIconType, function (idx, radio) {
-                    linkIconTypeContainer.add(self._createRadio(radio.id, "linkIconRadioList", radio.value));
-                    linkIconTypeContainer.add(self._createLabel(radio.text, radio.id));
-                });
-                for(idx = 1; idx < 8; idx++) {
-                    linkTypeOptions.push("#anchor" + idx.toString());
-                }
-                linktype.add(self._createSelect(css_linkdlg_anchor, linkTypeOptions));
-                dialog.add(self._createSeparator());
-                dialog.add(linkIconTypeOuterContainer);
-                dialog.add(text);
-                dialog.add(imageContainer);
-                dialog.add(target);
+                ], targetSelect = this._createSelect(css_linkdlg_target, targetOption);
                 target.add(targetSpan);
                 target.add(targetSelect);
-                dialog.add(css);
+                return target;
+            };
+            wijeditor.prototype._getDialogRes_Link_Css = function () {
+                return this._createTextField(this.localizeString("hyperLinkDialogCss", "Css :"), css_linkdlg_css);
+            };
+            wijeditor.prototype._getDialogRes_Link = function () {
+                var self = this, dialog = self._createDiv(css_linkdlg);
+                dialog.add(self._getDialogRes_link_address());
+                dialog.add(self._getDialogRes_link_linkType());
+                dialog.add(self._createSeparator());
+                dialog.add(self._getDialogRes_Link_linkIconType());
+                dialog.add(self._getDialogRes_Link_text());
+                dialog.add(self._getDialogRes_Link_image());
+                dialog.add(self._getDialogRes_link_target());
+                dialog.add(self._getDialogRes_Link_Css());
                 dialog.add(self._createSeparator());
                 dialog.add(self._createOKCancelButtons());
                 return dialog.render();
@@ -5782,60 +5747,6 @@ var wijmo;
                 ];
                 return attrs;
             };
-            wijeditor.prototype._getParentElement = function (contentWin) {
-                var self = this, range = self._getRange(contentWin), selection, startContainer, endContainer, startOffset, endOffset;
-                if(!range) {
-                    return null;
-                }
-                if(range.commonAncestorContainer) {
-                    selection = contentWin.getSelection();
-                    startContainer = range.startContainer || selection.baseNode;
-                    endContainer = range.endContainer || selection.extentNode;
-                    startOffset = range.startOffset;
-                    if(startOffset === null) {
-                        startOffset = selection.baseOffset;
-                    }
-                    endOffset = range.endOffset;
-                    if(endOffset === null) {
-                        endOffset = selection.extentOffset;
-                    }
-                    if(startContainer === endContainer && (endOffset - startOffset) === 1) {
-                        return selection.anchorNode.childNodes[selection.anchorOffset];
-                    }
-                    if(!range.commonAncestorContainer.tagName) {
-                        if(contentWin.document === range.commonAncestorContainer && selection.baseNode) {
-                            return selection.baseNode.parentNode;
-                        }
-                        return range.commonAncestorContainer.parentNode;
-                    }
-                    return range.commonAncestorContainer;
-                }
-                if(range.length) {
-                    return range.item(0);
-                }
-                if(range.parentElement) {
-                    return range.parentElement();
-                }
-                return null;
-            };
-            wijeditor.prototype._getRange = function (contentWin) {
-                var selection, range;
-                if(contentWin.document.selection && !wijWindow.opera) {
-                    return contentWin.document.selection.createRange();
-                }
-                if(contentWin.getSelection) {
-                    selection = contentWin.getSelection();
-                    if(!selection || selection.rangeCount < 1) {
-                        return null;
-                    }
-                    if(selection.getRangeAt) {
-                        range = selection.getRangeAt(0);
-                    } else {
-                        range = contentWin.document.createRange();
-                    }
-                    return range;
-                }
-            };
             wijeditor.prototype._generateUniqueName = function (prefix) {
                 var idx = uniqueIds[prefix];
                 if(!idx) {
@@ -5901,9 +5812,9 @@ var wijmo;
             };
             wijeditor.prototype._prepareLiteralRegexText = function (s1) {
                 var ret = s1;
-                ret = ret.replace('\\', '\\\\');
-                ret = ret.replace('.', '\\.');
-                ret = ret.replace('?', '\\?');
+                ret = ret.replace(/\\/g, '\\\\');
+                ret = ret.replace(/\./g, '\\.');
+                ret = ret.replace(/\?/g, '\\?');
                 return ret;
             };
             wijeditor.prototype._isNumeric = function (str) {
@@ -5915,6 +5826,15 @@ var wijmo;
             wijeditor.prototype._isUrl = function (str) {
                 return new RegExp('[a-zA-z]+://[^s]+').test(str);
             };
+            wijeditor.prototype._isAnchor = function (str) {
+                if(new RegExp('#[^s]+').test(str)) {
+                    return true;
+                } else if(new RegExp('[a-zA-z]+://[^s]+#[^s]+').test(str)) {
+                    return true;
+                } else {
+                    return false;
+                }
+            };
             wijeditor.prototype.refresh = /** Adjust the editor layout.*/
             function () {
                 var self = this, doc = self._getDesignViewDocument(), element = self.element, header = self._getHeader(), footer = self._getFooter(), width = self._oriEleWidth, height = self._oriEleHeight, content = self._getContent(), contentHeight;
@@ -5925,7 +5845,7 @@ var wijmo;
                 window.setTimeout(function () {
                     contentHeight = self.editor.height() - header.outerHeight(true) - footer.outerHeight(true);
                     content.height(contentHeight);
-                    if(content.data("wijmoWijsplitter")) {
+                    if(content.data("wijmo-wijsplitter")) {
                         content.wijsplitter("refresh");
                     }
                 }, 0);
@@ -5961,10 +5881,284 @@ var wijmo;
                 }
                 return defaultValue;
             };
+            wijeditor.prototype._getParentElement = //end of public method
+            /** dom operation*/
+            function (contentWin) {
+                var self = this, range = self._getRange(contentWin), selection, startContainer, endContainer, startOffset, endOffset;
+                if(!range) {
+                    return null;
+                }
+                if(range.commonAncestorContainer) {
+                    selection = contentWin.getSelection();
+                    startContainer = range.startContainer || selection.baseNode;
+                    endContainer = range.endContainer || selection.extentNode;
+                    startOffset = range.startOffset;
+                    if(startOffset === null) {
+                        startOffset = selection.baseOffset;
+                    }
+                    endOffset = range.endOffset;
+                    if(endOffset === null) {
+                        endOffset = selection.extentOffset;
+                    }
+                    if(startContainer === endContainer && (endOffset - startOffset) === 1) {
+                        return selection.anchorNode.childNodes[selection.anchorOffset];
+                    }
+                    if(!range.commonAncestorContainer.tagName) {
+                        if(contentWin.document === range.commonAncestorContainer && selection.baseNode) {
+                            return selection.baseNode.parentNode;
+                        }
+                        return range.commonAncestorContainer.parentNode;
+                    }
+                    return range.commonAncestorContainer;
+                }
+                if(range.length) {
+                    return range.item(0);
+                }
+                if(range.parentElement) {
+                    return range.parentElement();
+                }
+                return null;
+            };
+            wijeditor.prototype._getRange = function (contentWin) {
+                var selection, range;
+                if(contentWin.document.selection && !wijWindow.opera) {
+                    return contentWin.document.selection.createRange();
+                }
+                if(contentWin.getSelection) {
+                    selection = contentWin.getSelection();
+                    if(!selection || selection.rangeCount < 1) {
+                        return null;
+                    }
+                    if(selection.getRangeAt) {
+                        range = selection.getRangeAt(0);
+                    } else {
+                        range = contentWin.document.createRange();
+                    }
+                    return range;
+                }
+            };
+            wijeditor.prototype._getInspectElement = //gets inspect element.
+            function () {
+                return inspectElement || this._getSelectedElement();
+            };
+            wijeditor.prototype._getSelectedElement = function () {
+                return this._getParentElement(this._getDesignViewWindow());
+            };
+            wijeditor.prototype._checkSelectionIncludeNodeForIE11 = //end of gets inspect element.
+            function (win, range, nodeEle) {
+                var doc = win.document, newRange;
+                if(range) {
+                    newRange = doc.createRange();
+                    newRange.selectNode(nodeEle);
+                    if(range.compareBoundaryPoints(Range.START_TO_END, newRange) <= 0 || range.compareBoundaryPoints(Range.END_TO_START, newRange) >= 0) {
+                        return false;
+                    }
+                }
+                return true;
+            };
+            wijeditor.prototype._checkSelectionIncludeNodeExceptIE11 = function (win, range, nodeEle) {
+                var doc = win.document, newRange = doc.selection.createRange(), cep = "compareEndPoints";
+                if(range) {
+                    newRange.moveToElementText(nodeEle);
+                    if(range.inRange(newRange) || (range[cep]('StartToStart', newRange) >= 0 && range[cep]('StartToEnd', newRange) <= 0) || (range[cep]('EndToStart', newRange) >= 0 && range[cep]('EndToEnd', newRange) <= 0)) {
+                        return true;
+                    }
+                }
+                return false;
+            };
+            wijeditor.prototype._getIESelectionRange = function () {
+                var self = this, win = this._getDesignViewWindow(), doc = win.document, selection, range;
+                if(self._isIE11) {
+                    selection = win.getSelection();
+                    if(selection && selection.rangeCount > 0) {
+                        range = selection.getRangeAt(0);
+                    }
+                } else {
+                    range = doc.selection.createRange();
+                }
+                return range;
+            };
+            wijeditor.prototype._setIESelection = //focus related methods in ie.
+            function (range, notUseDefaultValue) {
+                var doc = this._getDesignViewDocument();
+                if(!range && !notUseDefaultValue) {
+                    range = rangeSelection;
+                }
+                if($.browser.msie && range) {
+                    try  {
+                        if(this._isIE11 && doc.getSelection) {
+                            doc.getSelection().addRange(range);
+                        } else {
+                            range.select();
+                        }
+                    } catch (e) {
+                    }
+                }
+            };
+            wijeditor.prototype._getSelectedContent = //get selected content.
+            function () {
+                var win = this._getDesignViewWindow(), doc = win.document, selectedContent = "", cloneContents = "cloneContents", range, contents, helperDiv;
+                if(!doc.selection) {
+                    range = win.getSelection().getRangeAt(0);
+                    if(range) {
+                        if(range[cloneContents]) {
+                            contents = range[cloneContents]();
+                            helperDiv = document.createElement('div');
+                            helperDiv.appendChild(contents);
+                            selectedContent = helperDiv.innerHTML;
+                            helperDiv = null;
+                        }
+                    }
+                } else {
+                    range = doc.selection.createRange();
+                    return range.htmlText;
+                }
+                return selectedContent || "";
+            };
+            wijeditor.prototype._getHtmlTextInIE = //end of get selected content.
+            function (doc) {
+                if(!$.browser.msie || !doc) {
+                    return "";
+                }
+                var htmlText = "", selection;
+                if(this._isIE11 && doc.getSelection) {
+                    selection = doc.getSelection();
+                    htmlText = selection.getRangeAt && selection.rangeCount ? selection.getRangeAt(0).toString() : "";
+                } else {
+                    htmlText = doc.selection.createRange().htmlText;
+                }
+                return htmlText;
+            };
+            wijeditor.prototype._saveSelectionForIE = function () {
+                var doc = this._getDesignViewWindow().document, selection;
+                if(!$.browser.msie) {
+                    return;
+                }
+                if(this._isIE11 && doc.getSelection) {
+                    selection = doc.getSelection();
+                    rangeSelection = selection.getRangeAt && selection.rangeCount ? selection.getRangeAt(0) : null;
+                    return;
+                }
+                selection = doc.selection;
+                rangeSelection = selection.createRange();
+            };
+            wijeditor.prototype._storeSelectionForIE = function () {
+                var doc = this._getDesignViewWindow().document, range, preSelectionRange, start;
+                if(!$.browser.msie) {
+                    return;
+                }
+                if(doc.selection) {
+                    range = doc.selection.createRange();
+                    this.bookmark = range.getBookmark();
+                } else if(doc.getSelection) {
+                    if(doc.getSelection().rangeCount) {
+                        range = doc.getSelection().getRangeAt(0);
+                        preSelectionRange = range.cloneRange();
+                        preSelectionRange.selectNode(doc.body);
+                        preSelectionRange.setEnd(range.startContainer, range.startOffset);
+                        start = preSelectionRange.toString().length;
+                        this.bookmark = {
+                            startContainerText: // When call range.deleteContents, the start container will changed to it's parent node(the node type is not text).
+                            // So here use jQuery to get the text of this node.
+                            $(range.startContainer).text(),
+                            start: start,
+                            end: start + range.toString().length
+                        };
+                    }
+                }
+            };
+            wijeditor.prototype._restoreSelectionForIE = function () {
+                var win = this._getDesignViewWindow(), doc = win.document, range, start, startContainerText, nodeStack, isStop, node, charIndex, nextCharIndex, foundStart, end, sel, i;
+                if(!this.bookmark || !$.browser.msie) {
+                    return;
+                }
+                if(doc.selection) {
+                    range = doc.body.createTextRange();
+                    range.moveToBookmark(this.bookmark);
+                    range.select();
+                } else if(doc.getSelection) {
+                    start = this.bookmark.start;
+                    end = this.bookmark.end;
+                    startContainerText = this.bookmark.startContainerText;
+                    range = doc.createRange();
+                    range.setStart(doc.body, 0);
+                    nodeStack = [
+                        doc.body
+                    ];
+                    charIndex = 0;
+                    while(!isStop && (node = nodeStack.pop())) {
+                        if(node.nodeType == 3) {
+                            nextCharIndex = charIndex + node.length;
+                            if(!foundStart && node.nodeValue === startContainerText && start >= charIndex && start <= nextCharIndex) {
+                                range.setStart(node, start - charIndex);
+                                foundStart = true;
+                            }
+                            if(foundStart && end >= charIndex && end <= nextCharIndex) {
+                                range.setEnd(node, end - charIndex);
+                                isStop = true;
+                            }
+                            charIndex = nextCharIndex;
+                        } else {
+                            i = node.childNodes.length;
+                            while(i--) {
+                                nodeStack.push(node.childNodes[i]);
+                            }
+                        }
+                    }
+                    sel = win.getSelection();
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                    rangeSelection = null;
+                }
+                this.bookmark = null;
+            };
+            wijeditor.prototype._setSelection = function ($nodes, start, length) {
+                var win = this._getDesignViewWindow(), doc = win.document, range, startNode, endNode, selection, len = 0;
+                try  {
+                    if(window.getSelection) {
+                        // all browsers, except IE before version 9
+                        selection = win.getSelection();
+                        range = doc.createRange();
+                        startNode = $nodes[0][0];
+                        endNode = $nodes[$nodes.length - 1][0];
+                        range.setStart(startNode, 0);
+                        range.setEnd(endNode, endNode.childNodes.length);
+                        selection.removeAllRanges();
+                        selection.addRange(range);
+                    } else {
+                        // Internet Explorer before version 9
+                        range = doc.selection.createRange();
+                        if($nodes) {
+                            $.each($nodes, function (idx, $node) {
+                                len += $node.text().length;
+                            });
+                            range.moveToElementText($nodes[0][0]);
+                            range.collapse(true);
+                            range.moveEnd("character", len);
+                        } else {
+                            range.moveStart("textedit", -1);
+                            range.collapse(true);
+                            range.moveStart("character", start);
+                            range.moveEnd("character", length);
+                        }
+                        range.select();
+                    }
+                } catch (e) {
+                }
+            };
+            wijeditor.prototype._getHyperLinkElement = function (inspElem) {
+                while(inspElem && inspElem.tagName !== 'A') {
+                    if(inspElem.tagName === 'BODY' || inspElem.tagName === 'HTML') {
+                        break;
+                    }
+                    inspElem = inspElem.parentElement;
+                }
+                return inspElem;
+            };
             return wijeditor;
         })(wijmo.wijmoWidget);
         editor.wijeditor = wijeditor;        
-        //end of public method
+        /** end dom operation*/
         var wijeditor_options = (function () {
             function wijeditor_options() {
                 /** Selector option for auto self initialization. This option is internal.
@@ -5995,6 +6189,173 @@ var wijmo;
                 *       using the button at the bottom right of the editor.
                 */
                 this.fullScreenMode = false;
+                /**
+                * The fontSizes option specifies the list of font size
+                * which will be shown in the font size drop down list.
+                * Use the option to customize font sizes.
+                * @remarks
+                * Each item includes:
+                * tip: the dropdown item’s tip.
+                * name: the really fontsize's value that apply.
+                * text: the font size text that show on dropdown item.
+                *   the default value is:
+                *         [{
+                *                tip: "VerySmall",
+                *                name: "xx-small",
+                *                text: "VerySmall"
+                *            }, {
+                *                tip: "Smaller",
+                *                name: "x-small",
+                *                text: "Smaller"
+                *            }, {
+                *                tip: "Small",
+                *                name: "small",
+                *                text: "Small"
+                *            }, {
+                *                tip: "Medium",
+                *                name: "medium",
+                *                text: "Medium"
+                *            }, {
+                *                tip: "Large",
+                *                name: "large",
+                *                text: "Large"
+                *            }, {
+                *                tip: "Larger",
+                *                name: "x-large",
+                *                text: "Larger"
+                *            }, {
+                *                tip: "VeryLarge",
+                *                name: "xx-large",
+                *                text: "VeryLarge"
+                *            }]
+                *
+                * Note: The following Font size’ value is built-in font size, and
+                * please refer https://dvcs.w3.org/hg/editing/raw-file/tip/editing.html#the-fontsize-command
+                *     1: x-small
+                *     2: small
+                *     3: medium
+                *     4: large
+                *     5: x-large
+                *     6: xx-large
+                *     7: xxx-large
+                * Except these values, user can set the "pt" and "px" value to "name".
+                */
+                this.fontSizes = [
+                    {
+                        tip: "VerySmall",
+                        name: "xx-small",
+                        text: "VerySmall"
+                    }, 
+                    {
+                        tip: "Smaller",
+                        name: "x-small",
+                        text: "Smaller"
+                    }, 
+                    {
+                        tip: "Small",
+                        name: "small",
+                        text: "Small"
+                    }, 
+                    {
+                        tip: "Medium",
+                        name: "medium",
+                        text: "Medium"
+                    }, 
+                    {
+                        tip: "Large",
+                        name: "large",
+                        text: "Large"
+                    }, 
+                    {
+                        tip: "Larger",
+                        name: "x-large",
+                        text: "Larger"
+                    }, 
+                    {
+                        tip: "VeryLarge",
+                        name: "xx-large",
+                        text: "VeryLarge"
+                    }
+                ];
+                /**
+                * The fontNames option specifies the list of font name
+                * which will be shown in the font name drop down list.
+                * Use the option to customize font names.
+                * @remarks
+                * Each item includes:
+                * tip: the dropdown item’s tip.
+                * name: the really fontname's value that apply.
+                * text: the font name text that show on dropdown item.
+                *   the default value is:
+                *           [{
+                *                tip: "Arial",
+                *                 name: "fn1",
+                *             text: "Arial"
+                *           }, {
+                *              tip: "Courier New",
+                *                name: "fn2",
+                *                text: "Courier New"
+                *            }, {
+                *                tip: "Garamond",
+                *                name: "fn3",
+                *                text: "Garamond"
+                *            }, {
+                *                tip: "Tahoma",
+                *                name: "fn4",
+                *                text: "Tahoma"
+                *            }, {
+                *                tip: "Times New Roman",
+                *                name: "fn5",
+                *                text: "Times New Roman"
+                *            }, {
+                *                tip: "Verdana",
+                *                name: "fn6",
+                *                text: "Verdana"
+                *            }, {
+                *                tip: "Wingdings",
+                *                name: "fn7",
+                *                text: "Wingdings"
+                *            }]
+                * Note: The "fn1, fn2,..., fn7" are wijmo built-in font size, indicate the safe web font family,
+                * user can set others font family like css.
+                */
+                this.fontNames = [
+                    {
+                        tip: "Arial",
+                        name: "fn1",
+                        text: "Arial"
+                    }, 
+                    {
+                        tip: "Courier New",
+                        name: "fn2",
+                        text: "Courier New"
+                    }, 
+                    {
+                        tip: "Garamond",
+                        name: "fn3",
+                        text: "Garamond"
+                    }, 
+                    {
+                        tip: "Tahoma",
+                        name: "fn4",
+                        text: "Tahoma"
+                    }, 
+                    {
+                        tip: "Times New Roman",
+                        name: "fn5",
+                        text: "Times New Roman"
+                    }, 
+                    {
+                        tip: "Verdana",
+                        name: "fn6",
+                        text: "Verdana"
+                    }, 
+                    {
+                        tip: "Wingdings",
+                        name: "fn7",
+                        text: "Wingdings"
+                    }
+                ];
                 /** Select whether to show the path selector in the left side of the footer.
                 * @remarks
                 *       When you click in the content of the design view, the path selector shows HTML tags

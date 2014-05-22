@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20133.20
+ * Wijmo Library 3.20141.34
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -8,7 +8,6 @@
  * Licensed under the Wijmo Commercial License. Also available under the GNU GPL Version 3 license.
  * licensing@wijmo.com
  * http://wijmo.com/widgets/license/
- *
  *
  */
 var __extends = this.__extends || function (d, b) {
@@ -274,7 +273,9 @@ var wijmo;
                     // 2)Thinking of "forceSelectionText" option, so move the "textChange"
                     // event to _change method
                     // self._setInputText(input.val());
-                    self._change();
+                    if(!self._inputBlurCausedByListItemClick) {
+                        self._change();
+                    }
                 });
                 //fixed the issue 40441
                 if($.browser.msie && parseInt($.browser.version) > 9) {
@@ -376,17 +377,12 @@ var wijmo;
                                             return;
                                         }
                                         self._setInputText(item.label);
-                                        if(oldItem !== null) {
+                                        if(oldItem) {
                                             oldItem.selected = false;
                                         }
                                         self.selectedItem = item;
                                         o.selectedIndex = newIndex;
                                         o.selectedValue = self.selectedItem.value;
-                                        // fire select change event
-                                        if(self._select !== undefined) {
-                                            self._select[0].selectedIndex = o.selectedIndex;
-                                            self._select.trigger("change");
-                                        }
                                         o.inputTextInDropDownList = true;
                                         //o.text = self._input.val();for #33666 issue
                                         // fixed the issue 41831
@@ -457,6 +453,7 @@ var wijmo;
                             self.close(event);
                             self._input.focus();
                         }
+                        self._inputBlurCausedByListItemClick = false;
                     },
                     blur: function (e, item) {
                         var d = item.element;
@@ -464,6 +461,9 @@ var wijmo;
                             d.find(".wijmo-wijcombobox-row>.wijmo-wijcombobox-cell").removeClass(wijCSS.stateHover);
                             d.prev().removeClass("wijmo-wijcombobox-active-prev");
                         }
+                    },
+                    mouseDown: function (event) {
+                        self._inputBlurCausedByListItemClick = true;
                     },
                     itemRendering: function (event, data) {
                         var item = data, css = "";
@@ -509,6 +509,9 @@ var wijmo;
                             }
                             self.selectedItem = self.items[selecedIndex];
                             self._setInputText(self.selectedItem.label, true);
+                            if(selecedIndex >= -1) {
+                                o.selectedIndex = selecedIndex;
+                            }
                         } else if(selectedItems && selectedItems.length > 0) {
                             selecedIndex = [];
                             items = [];
@@ -521,9 +524,9 @@ var wijmo;
                                 items.push(self.items[index]);
                             });
                             self._selectedItemsToInputVal(items);
-                        }
-                        if(selecedIndex >= -1) {
-                            o.selectedIndex = selecedIndex;
+                            if(selecedIndex.length >= 0) {
+                                o.selectedIndex = selecedIndex;
+                            }
                         }
                     },
                     superPanelOptions: {
@@ -543,7 +546,7 @@ var wijmo;
                     zIndex: zIndex + 1,
                     top: 0,
                     left: 0
-                }).hide().data("wijmoWijlist");
+                }).hide().data("wijmo-wijlist");
                 self._createDropDownList();
                 self._menuUL = self.menu.ul;
             };
@@ -561,6 +564,11 @@ var wijmo;
             };
             wijcombobox.prototype._triggerSelectedIndexChanged = function (oldItem, newItem, oldIndex, newIndex) {
                 var o = this.options, curSelectedIdx;
+                // fire select change event
+                if(this._select !== undefined) {
+                    this._select[0].selectedIndex = o.selectedIndex;
+                    this._select.trigger("change");
+                }
                 if(o.selectionMode === "single") {
                     this._trigger("selectedIndexChanged", null, {
                         oldItem: oldItem,
@@ -729,14 +737,15 @@ var wijmo;
                     });
                 }
                 if(self.options.disabledState === true || self.options.disabled === true) {
+                    self._comboElement.addClass("wijmo-wijcombobox-disabled " + wijCSS.stateDisabled);
                     input.attr("disabled", "disabled");
                 }
-                comboElement.bind("mouseenter", function () {
+                comboElement.bind("mouseenter.wijcombobox", function () {
                     if(self.options.disabledState === true || self.options.disabled) {
                         return;
                     }
                     self._addInputFocus(true, wijCSS.stateHover);
-                }).bind("mouseleave", function () {
+                }).bind("mouseleave.wijcombobox", function () {
                     self._addInputFocus(false, wijCSS.stateHover);
                 });
             };
@@ -761,7 +770,7 @@ var wijmo;
                 return this._comboElement;
             };
             wijcombobox.prototype._showTrigger = function () {
-                var self = this, o, input, inputWrapper, comboElement, wijCSS = this.options.wijCSS, selectClone, selectWidth = 0, trigger, label, sp, padding, labelPadding, triggerPadding, labelHTML = "<label class='wijmo-wijcombobox-label " + wijCSS.content + "'></label>", triggerHTML = "<div class='" + wijCSS.comboboxTriggerCss + " " + wijCSS.stateDefault + " " + wijCSS.cornerRight + "'>" + "<span class='" + wijCSS.icon + " " + wijCSS.iconArrowDown + "'></span>" + "</div>";
+                var self = this, o, input, inputWrapper, comboElement, wijCSS = this.options.wijCSS, selectClone, selectWidth = 0, trigger, label, sp, padding, labelPadding, triggerPadding, asideBorder, labelHTML = "<label class='wijmo-wijcombobox-label " + wijCSS.content + "'></label>", triggerHTML = "<div class='" + wijCSS.comboboxTriggerCss + " " + wijCSS.stateDefault + " " + wijCSS.cornerRight + "'>" + "<span class='" + wijCSS.icon + " " + wijCSS.iconArrowDown + "'></span>" + "</div>";
                 o = self.options;
                 input = self._input;
                 inputWrapper = input.parent();
@@ -858,15 +867,14 @@ var wijmo;
                 // padding
                 padding = labelPadding = triggerPadding = 0;
                 if(label !== undefined) {
-                    labelPadding += label[0].offsetWidth;
+                    labelPadding += label.outerWidth(true);
                 }
+                asideBorder = o.triggerPosition === "left" ? inputWrapper.leftBorderWidth() : inputWrapper.rightBorderWidth();
                 if(trigger !== undefined) {
-                    //triggerPadding = trigger[0].offsetWidth;
-                    // for fix the issue 40774
-                    triggerPadding = trigger.width();
+                    triggerPadding = trigger.outerWidth(true) - asideBorder;
                 }
                 padding = labelPadding + triggerPadding;
-                input.setOutWidth(inputWrapper.innerWidth() - padding);
+                input.setOutWidth(inputWrapper.width() - padding);
                 padding = padding === 0 ? "" : padding;
                 if(o.triggerPosition === "right") {
                     input.css("margin-left", "");
@@ -905,6 +913,15 @@ var wijmo;
                 if(self.options.isEditable === false) {
                     ele.removeAttr("readonly");
                 }
+                if(self._input) {
+                    self._input.unbind(".wijcombobox");
+                }
+                if(self._comboElement) {
+                    self._comboElement.unbind(".wijcombobox");
+                }
+                if(self._triggerArrow) {
+                    self._triggerArrow.unbind(".triggerevent");
+                }
                 if(self._select !== undefined) {
                     self._select.removeClass(wijCSS.widget);
                     self._select.show();
@@ -927,16 +944,20 @@ var wijmo;
                 $.wijmo.widget.prototype.destroy.call(self);
             };
             wijcombobox.prototype._setOption = function (key, value) {
-                var self = this, ele, input, items, inputWrapper, cancelSelect, wijCSS = this.options.wijCSS, label = self._label, triggerPadding, oldSelectedIndex, newSelectedItem, oldSelectedItem = null, triggerWidth = 0, labelHTML = "<label class='wijmo-wijcombobox-label " + wijCSS.content + "'></label>", o = self.options;
+                var self = this, ele, input, items, inputWrapper, cancelSelect, wijCSS = this.options.wijCSS, label = self._label, triggerPadding, oldSelectedIndex, newSelectedItem, oldDisabled, oldSelectedItem = null, triggerWidth = 0, labelHTML = "<label class='wijmo-wijcombobox-label " + wijCSS.content + "'></label>", o = self.options;
                 ele = self._comboElement;
                 input = self.element;
                 inputWrapper = input.parent();
                 oldSelectedIndex = o.selectedIndex;
+                oldDisabled = o.disabled;
                 if(self._triggerArrow) {
                     triggerWidth = self._triggerArrow.outerWidth();
                 }
                 $.wijmo.widget.prototype._setOption.apply(self, arguments);
                 if(key === "disabled") {
+                    if(oldDisabled === value) {
+                        return;
+                    }
                     if(value) {
                         ele.addClass("wijmo-wijcombobox-disabled " + wijCSS.stateDisabled);
                         //update for 27917
@@ -1139,13 +1160,18 @@ var wijmo;
                         });
                     }
                 } else if(key === "selectedValue") {
+                    items = self.items;
+                    if(!items) {
+                        items = self.innerData;
+                    }
+                    if(o.selectionMode === "single") {
+                        oldSelectedItem = items ? items[oldSelectedIndex] : null;
+                    } else {
+                        oldSelectedIndex = null;
+                    }
                     if(value) {
                         if(self.selectedItem && self.selectedItem.selected !== undefined) {
                             self.selectedItem.selected = false;
-                        }
-                        items = self.items;
-                        if(!items) {
-                            items = self.innerData;
                         }
                         if(items) {
                             if(this.options.selectedIndex > -1 && items.length > this.options.selectedIndex && items[this.options.selectedIndex]) {
@@ -1178,6 +1204,12 @@ var wijmo;
                         o.inputTextInDropDownList = false;
                         self._clearSelection();
                     }
+                    self._trigger("changed", null, {
+                        oldItem: oldSelectedItem,
+                        selectedItem: o.selectionMode === "single" ? self.selectedItem : self.selectedItems,
+                        newIndex: o.selectedIndex,
+                        oldIndex: oldSelectedIndex
+                    });
                 } else if(key === "text") {
                     if(o.forceSelectionText && self._checkTextInItems(value) === -1) {
                         return;
@@ -1374,7 +1406,7 @@ var wijmo;
                 ele = self._input;
                 o = self.options;
                 searchTerm = data.value;
-                if(datasource === null) {
+                if(!datasource) {
                     items = null;
                 } else {
                     items = $.isArray(datasource) ? datasource : datasource.items;
@@ -1420,10 +1452,11 @@ var wijmo;
                 }
                 if((itemsToRender && itemsToRender.length > 0) || self._comboDiv) {
                     // open dropdown list
-                    self._openlist(itemsToRender, data, searchTerm);
-                    // move the trigger dropdown open event to openlist.
-                    //self._trigger("open");
-                    self._addInputFocus(true, wijCSS.stateFocus);
+                    if(self._openlist(itemsToRender, data, searchTerm)) {
+                        // move the trigger dropdown open event to openlist.
+                        //self._trigger("open");
+                        self._addInputFocus(true, wijCSS.stateFocus);
+                    }
                 } else {
                     self.close(null, true);
                 }
@@ -1469,23 +1502,16 @@ var wijmo;
                     self._addInputFocus(false, wijCSS.stateFocus);
                     //$(document).unbind("click", self.closeOnClick);
                     $(document).unbind("mouseup", self.closeOnClick);
+                    self._inputBlurCausedByListItemClick = false;
                 }
             };
             wijcombobox.prototype._change = function () {
                 // TODO: finish _change event.
-                                var self = this, o, f, m, ele, t, itm, items, oldIndex, innerData, inputIndex = -1;
-                o = self.options;
-                f = o.forceSelectionText;
-                m = o.selectionMode;
-                ele = self._input;
-                t = ele.val();
-                itm = self.selectedItem;
-                items = self.selectedItems;
+                                var self = this, o = self.options, f = o.forceSelectionText, m = o.selectionMode, ele = self._input, t = ele.val(), itm = self.selectedItem, items = self.selectedItems, oldIndex, innerData = self.innerData, inputIndex = -1;
                 oldIndex = (o.selectedIndex || o.selectedIndex > -1) ? o.selectedIndex : -1;
-                innerData = self.innerData;
                 if(f) {
                     if(m === "single") {
-                        if(itm !== null) {
+                        if(itm !== null && itm !== undefined) {
                             if(itm.label !== t) {
                                 //ele.val(itm.label);
                                 self._setInputText(itm.label);
@@ -1500,12 +1526,13 @@ var wijmo;
                     //update selected index and selected value
                     if(m === "single") {
                         var labelNotEqualsT = false;
-                        if(itm !== null) {
+                        if(itm !== null && itm !== undefined) {
                             labelNotEqualsT = (itm.label) ? (itm.label.toString() !== t) : ("" !== t);
                         }
                         if((!itm && t !== "") || labelNotEqualsT) {
                             if(self.selectedItem !== null) {
                                 self.selectedItem.selected = false;
+                                self.menu.unselectItems(o.selectedIndex);
                             }
                             inputIndex = self._checkTextInItems(t);
                             if(inputIndex === -1) {
@@ -1515,6 +1542,7 @@ var wijmo;
                                 o.inputTextInDropDownList = false;
                             } else {
                                 if(innerData) {
+                                    innerData = $.isArray(innerData) ? innerData : innerData.items;
                                     self.selectedItem = innerData[inputIndex];
                                     o.selectedIndex = inputIndex;
                                     o.selectedValue = self.selectedItem.value;
@@ -1532,6 +1560,8 @@ var wijmo;
                             if(oldIndex !== inputIndex) {
                                 self._triggerSelectedIndexChanged(itm, self.selectedItem, oldIndex, o.selectedIndex);
                             }
+                        } else {
+                            self._setInputText(t);
                         }
                     }
                 }
@@ -1551,8 +1581,8 @@ var wijmo;
                 }
             };
             wijcombobox.prototype._checkTextInItems = function (text) {
-                var index = -1, data = this.items;
-                if(text) {
+                var data = this.items, index = -1;
+                if(text && !!data && !!data.length) {
                     $.each(data, function (i, item) {
                         if(item && item.label && item.label.toString() === text) {
                             index = i;
@@ -1563,7 +1593,7 @@ var wijmo;
                 return index;
             };
             wijcombobox.prototype._openlist = function (items, data, searchTerm) {
-                var self = data.self, eventObj = data.e, keypress, textWidth, menuElement, o, oldPadding, verticalBorder = 2, headerHeight = 0, dropDownHeight, origCloseOnClick, h, showingAnimation, showingStyle, showingSize, inputValueLength = $.trim(self._input.val()).length, keyCode = wijmo.getKeyCodeEnum(), zIndex, needHighlightMatching = false;
+                var self = data.self, eventObj = data.e, keypress, textWidth, menuElement, o, oldPadding, verticalBorder = 2, headerHeight = 0, dropDownHeight, origCloseOnClick, h, showingAnimation, showingStyle, showingSize, inputValueLength = $.trim(self._input.val()).length, keyCode = wijmo.getKeyCodeEnum(), zIndex, needHighlightMatching = false, innerData;
                 keypress = self._keypress = !!eventObj;
                 o = self.options;
                 menuElement = self.menu.element;
@@ -1579,6 +1609,16 @@ var wijmo;
                 //update for 32309 issue
                 if(!self.listHasCreated) {
                     self._createDropDownList();
+                }
+                if(self.innerData) {
+                    if($.isArray(self.innerData)) {
+                        innerData = self.innerData;
+                    } else {
+                        innerData = self.innerData.items;
+                    }
+                }
+                if(!innerData || innerData.length === 0) {
+                    return false;
                 }
                 /* for improving performance
                 if (self._comboDiv) {
@@ -1682,6 +1722,12 @@ var wijmo;
                     };
                 }
                 self._trigger("open");
+                if(o.ensureDropDownOnBody) {
+                    self.menu.element.bind("mouseup.wijcombobox", self, function (e) {
+                        self.closeOnClick(e);
+                        e.stopPropagation();
+                    });
+                }
                 //update for issue 2012/6/14: place combobox in expander
                 //open the dropdown, then collapse the expander
                 //the dropdown is still open
@@ -1703,6 +1749,9 @@ var wijmo;
                     }
                     $("." + wijCSS.comboboxWrapperCss, self._comboElement[0]).removeClass(wijCSS.stateHover).removeClass(wijCSS.stateFocus);
                     $("." + wijCSS.comboboxTriggerCss, self._comboElement[0]).removeClass(wijCSS.stateHover).removeClass(wijCSS.stateFocus);
+                }
+                if(self.options.ensureDropDownOnBody) {
+                    self.menu.element.unbind("mouseup.wijcombobox");
                 }
             };
             wijcombobox.prototype._positionList = function () {

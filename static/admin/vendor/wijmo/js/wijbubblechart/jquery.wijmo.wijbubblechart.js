@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20133.20
+ * Wijmo Library 3.20141.34
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -8,7 +8,6 @@
  * Licensed under the Wijmo Commercial License. Also available under the GNU GPL Version 3 license.
  * licensing@wijmo.com
  * http://wijmo.com/widgets/license/
- *
  *
  */
 var __extends = this.__extends || function (d, b) {
@@ -31,6 +30,175 @@ var wijmo;
     */
     (function (chart) {
         var maxSize = 10000;
+        /* @ignore **/
+        var BubbleAxisAdjust = (function () {
+            function BubbleAxisAdjust(widget) {
+                this.bubMax = 0;
+                this.bubMin = 0;
+                this.bubDiff = 0;
+                this.y1Array = [];
+                this.y1ValueGroup = {
+                };
+                this.bubbleRadius = {
+                };
+                this.chartDatas = [];
+                var o = widget.options;
+                this.widget = widget;
+                this.seriesList = o.seriesList;
+                this.maximumSize = o.maximumSize || 20;
+                this.minimumSize = o.minimumSize || 5;
+                this.sizingMethod = o.sizingMethod || "diameter";
+                this._init();
+                this._calculateMaxMin();
+            }
+            BubbleAxisAdjust.prototype._init = function () {
+                var _this = this;
+                var data, markers, markerType;
+                $.each(this.seriesList, function (i, n) {
+                    markers = n.markers || {
+                    } , markerType = markers.type || "circle";
+                    data = n.data;
+                    if(data && data.y1 && data.x && data.y) {
+                        $.each(data.y1, function (j, m) {
+                            _this.y1Array.push(m);
+                            if(!_this.y1ValueGroup[markerType]) {
+                                _this.y1ValueGroup[markerType] = [];
+                            }
+                            _this.y1ValueGroup[markerType].push(m);
+                            _this.chartDatas.push({
+                                x: data.x[j],
+                                y: data.y[j],
+                                y1: data.y1[j]
+                            });
+                        });
+                    }
+                });
+            };
+            BubbleAxisAdjust.prototype._calculateMaxMin = function () {
+                this.bubMax = Math.max.apply(null, this.y1Array);
+                this.bubMin = Math.min.apply(null, this.y1Array);
+                this.bubDiff = this.bubMax - this.bubMin;
+            };
+            BubbleAxisAdjust.prototype._calculateRadius = function (yval, maxSize, minSize, bounds, bubMax, bubDiff, sizingMethod, markerType) {
+                var yscale, val = yval, bubSizeDiff = maxSize - minSize, width = bounds.endX - bounds.startX, height = bounds.endY - bounds.startY;
+                if(val < 0) {
+                    val = 0;
+                }
+                if(bubDiff === 0) {
+                    val = 1;
+                } else {
+                    val /= bubMax;
+                }
+                val = this._calculateRadiusByArea(val, sizingMethod, markerType);
+                val *= bubSizeDiff;
+                val += minSize;
+                yscale = Math.min(width, height);
+                val *= yscale / 200.0;
+                return val;
+            };
+            BubbleAxisAdjust.prototype._calculateRadiusByArea = function (yval, sizingMethod, markerType) {
+                var val = yval;
+                if(sizingMethod === "area") {
+                    switch(markerType) {
+                        case "circle":
+                            val = Math.sqrt(val / Math.PI);
+                            break;
+                        case "tri":
+                        case "invertedTri":
+                            val = Math.sqrt(val / (3 * Math.sin(Math.PI / 6) * Math.cos(Math.PI / 6)));
+                            break;
+                        case "box":
+                            val = Math.sqrt(val / 2);
+                            break;
+                        case "diamond":
+                        case "cross":
+                            val = Math.sqrt(val / 2);
+                            break;
+                        default:
+                            val = Math.sqrt(4 * val / Math.PI);
+                            break;
+                    }
+                }
+                return val;
+            };
+            BubbleAxisAdjust.prototype.calculateRadius = function () {
+                var _this = this;
+                var bounds = this.widget.canvasBounds;
+                this.bubbleRadius = {
+                };
+                $.each(this.y1ValueGroup, function (type, values) {
+                    $.each(values, function (i, value) {
+                        _this.bubbleRadius[value] = _this._calculateRadius(value, _this.maximumSize, _this.minimumSize, bounds, _this.bubMax, _this.bubDiff, _this.sizingMethod, type);
+                    });
+                });
+            };
+            BubbleAxisAdjust.prototype.getAdjust = function (axisInfo, options) {
+                var _this = this;
+                var bounds = this.widget.canvasBounds, max = axisInfo.max, min = axisInfo.min, minPoint = [], maxPoint = [], diff = 0, unitMinor = options.unitMinor, origin = options.origin, width = bounds.endX - bounds.startX, height = bounds.endY - bounds.startY, omax, omin, length, xStrings = [], xHash = {
+                };
+                this.calculateRadius();
+                // if the x value is string. get the string index in seriesList.
+                $.each(this.chartDatas, function (i, data) {
+                    var x = data.x;
+                    if(isNaN(x) && !_this.widget._isDate(x) && $.inArray(x, xStrings) === -1) {
+                        xStrings.push(x);
+                    }
+                });
+                $.each(xStrings, function (i, x) {
+                    xHash[x] = i;
+                });
+                $.each(this.chartDatas, function (i, data) {
+                    var x = data.x, y = data.y, y1 = data.y1, r = _this.bubbleRadius[y1];
+                    if(_this.widget._isDate(x)) {
+                        x = $.toOADate(x);
+                    } else if(isNaN(x)) {
+                        x = xHash[x];
+                    }
+                    if(_this.widget._isDate(y)) {
+                        y = $.toOADate(y);
+                    }
+                    if(axisInfo.id === "x") {
+                        length = width;
+                        diff = r * (max - min) / length;
+                        minPoint.push(x - diff);
+                        maxPoint.push(x + diff);
+                    } else {
+                        length = height;
+                        diff = r * (max - min) / length;
+                        minPoint.push(y - diff);
+                        maxPoint.push(y + diff);
+                    }
+                });
+                omax = Math.max.apply(null, maxPoint);
+                omin = Math.min.apply(null, minPoint);
+                if((omax - min) * length / (max - min) > length) {
+                    max += Math.ceil((omax - max) / unitMinor) * unitMinor;
+                }
+                if(omin < min) {
+                    min -= Math.ceil((min - omin) / unitMinor) * unitMinor;
+                }
+                // Fixed an issue that if the origin is less than the min value and more than the max value,
+                // the axis will adjust wrong value.
+                if(origin !== null && origin !== undefined) {
+                    if(origin < min) {
+                        min = origin;
+                    } else if(origin > max) {
+                        max = origin;
+                    }
+                }
+                return {
+                    max: max,
+                    min: min
+                };
+            };
+            BubbleAxisAdjust.prototype.dispose = function () {
+                this.y1Array = [];
+                this.bubbleRadius = null;
+                this.y1ValueGroup = null;
+            };
+            return BubbleAxisAdjust;
+        })();
+        chart.BubbleAxisAdjust = BubbleAxisAdjust;        
         /**
         * @widget
         */
@@ -39,9 +207,6 @@ var wijmo;
             function wijbubblechart() {
                 _super.apply(this, arguments);
 
-                this.bubMax = 0;
-                this.bubMin = 0;
-                this.bubDiff = 0;
             }
             wijbubblechart.prototype._setOption = function (key, value) {
                 var self = this, o = self.options;
@@ -67,7 +232,6 @@ var wijmo;
                 }
                 if(key === "seriesList") {
                     self.indexs = null;
-                    self.bubbleRadius = null;
                 }
             };
             wijbubblechart.prototype._create = function () {
@@ -81,6 +245,27 @@ var wijmo;
                 self._setLabelOption();
                 _super.prototype._create.call(this);
                 self.chartElement.addClass(o.wijCSS.bubbleChart);
+            };
+            wijbubblechart.prototype._paintChartArea = function () {
+                if(this.bubbleAxisAdjust) {
+                    this.bubbleAxisAdjust.dispose();
+                }
+                this.bubbleAxisAdjust = new BubbleAxisAdjust(this);
+                _super.prototype._paintChartArea.call(this);
+            };
+            wijbubblechart.prototype._bindSeriesData = function (ds, series, sharedXList) {
+                var data = series.data, dataY1 = data.y1;
+                _super.prototype._bindSeriesData.call(this, ds, series, sharedXList);
+                if(dataY1 && dataY1.bind) {
+                    data.y1 = this._getBindData(ds, dataY1.bind);
+                }
+            };
+            wijbubblechart.prototype._checkSeriesDataEmpty = function (series) {
+                var data = series.data;
+                if(!data || this._checkEmptyData(data.y1)) {
+                    return true;
+                }
+                return _super.prototype._checkSeriesDataEmpty.call(this, series);
             };
             wijbubblechart.prototype._setLabelOption = function () {
                 var o = this.options;
@@ -124,6 +309,10 @@ var wijmo;
                 var self = this;
                 self.chartElement.removeClass(self.options.wijCSS.bubbleChart + " ui-helper-reset");
                 self._destroyEles();
+                if(this.bubbleAxisAdjust) {
+                    this.bubbleAxisAdjust.dispose();
+                    this.bubbleAxisAdjust = null;
+                }
                 _super.prototype.destroy.call(this);
             };
             wijbubblechart.prototype.getBubble = /**
@@ -136,7 +325,6 @@ var wijmo;
             };
             wijbubblechart.prototype.redraw = /** @ignore*/
             function (ifNeed) {
-                this.bubbleRadius = null;
                 _super.prototype.redraw.call(this, ifNeed);
             };
             wijbubblechart.prototype._destroyEles = function () {
@@ -152,7 +340,6 @@ var wijmo;
                                     }
                 ele.removeData("fields");
                 //self.bubbles = [];
-                self.bubbleRadius = [];
                 //self.seriesEles = [];
                 //self.tooltipbubbles = [];
                             };
@@ -176,7 +363,8 @@ var wijmo;
                 }
                 //self._paintcircles(seriesList, seriesStyles, seriesHoverStyles,
                 //	xaxis, yaxis, width, height, startLocation);
-                self._prepBubbleData();
+                // call this method again for if the axis's max and min are set by manual.
+                this.bubbleAxisAdjust.calculateRadius();
                 this.bubbleChartRender = new BubbleChartRender(this.chartElement, {
                     seriesList: seriesList,
                     seriesStyles: seriesStyles,
@@ -189,7 +377,7 @@ var wijmo;
                     textStyle: o.textStyle,
                     chartLabelStyle: o.chartLabelStyle,
                     chartLabelFormatString: o.chartLabelFormatString,
-                    bubbleRadius: self.bubbleRadius,
+                    bubbleRadius: self.bubbleAxisAdjust.bubbleRadius,
                     animation: o.animation,
                     seriesTransition: o.seriesTransition,
                     sizingMethod: o.sizingMethod,
@@ -244,165 +432,25 @@ var wijmo;
                 $.wijraphael.addClass($(icon.node), legendCss);
                 return icon;
             };
-            wijbubblechart.prototype._getbubbleIndexs = function (width, height) {
-                var self = this, o = self.options, xmax = o.axis.x.max, xmin = o.axis.x.min, ymin = o.axis.y.min, ymax = o.axis.y.max, xsub = //width = self.element.width(),
-                //height = self.element.height(),
-                [], ysub = [], xadd = [], yadd = [], datax = [], datay = [], xminIndex = -1, yminIndex = -1, xmaxIndex = -1, ymaxIndex = -1;
-                self.bubbleRadius = [];
-                self._prepBubbleData();
-                $.each(o.seriesList, function (idx, series) {
-                    var data = series.data, markers = series.markers || {
-                    }, markerType = markers.type || "circle";
-                    if(data.y1 === undefined) {
-                        return true;
-                    }
-                    $.each(data.y1, function (i, yval) {
-                        var r = wijbubblechart.transform(yval, o.maximumSize, o.minimumSize, self.canvasBounds, self.bubMax, self.bubDiff, o.sizingMethod, markerType), x, y;
-                        if(self._isDate(data.x[i])) {
-                            x = $.toOADate(data.x[i]);
-                        } else if(isNaN(data.x[i])) {
-                            x = i;
-                        } else {
-                            x = data.x[i];
-                        }
-                        y = data.y[i];
-                        if(self._isDate(y)) {
-                            y = $.toOADate(y);
-                        }
-                        xsub.push(x - r * (xmax - xmin) / width);
-                        ysub.push(y - r * (ymax - ymin) / height);
-                        xadd.push(x + r * (xmax - xmin) / width);
-                        yadd.push(y + r * (ymax - ymin) / height);
-                        datax.push(x);
-                        datay.push(y);
-                        self.bubbleRadius.push(r);
-                    });
-                });
-                xminIndex = self._getMinIndex(xsub);
-                yminIndex = self._getMinIndex(ysub);
-                xmaxIndex = self._getMaxIndex(xadd);
-                ymaxIndex = self._getMaxIndex(yadd);
-                self.indexs = {
-                    xMin: {
-                        x: datax[xminIndex],
-                        y: datay[xminIndex],
-                        r: self.bubbleRadius[xminIndex]
-                    },
-                    xMax: {
-                        x: datax[xmaxIndex],
-                        y: datay[xmaxIndex],
-                        r: self.bubbleRadius[xmaxIndex]
-                    },
-                    yMin: {
-                        x: datax[yminIndex],
-                        y: datay[yminIndex],
-                        r: self.bubbleRadius[yminIndex]
-                    },
-                    yMax: {
-                        x: datax[ymaxIndex],
-                        y: datay[ymaxIndex],
-                        r: self.bubbleRadius[ymaxIndex]
-                    }
-                };
-            };
             wijbubblechart.prototype._calculateParameters = function (axisInfo, options) {
                 _super.prototype._calculateParameters.call(this, axisInfo, options);
-                var self = this;
                 if(!options.autoMax && !options.autoMin) {
                     return;
                 }
-                self._adjust(options, axisInfo);
+                this._adjust(options, axisInfo);
             };
             wijbubblechart.prototype._adjust = function (options, axisInfo) {
                 var unitMinor = options.unitMinor, self = this, autoMin = options.autoMin, autoMax = options.autoMax, canvasBounds = self.canvasBounds, startLocation = {
                     x: canvasBounds.startX,
                     y: canvasBounds.startY
-                }, width = canvasBounds.endX - startLocation.x, height = canvasBounds.endY - startLocation.y, omax = axisInfo.max, omin = axisInfo.min, origin = options.origin;
-                if(!self.indexs) {
-                    self._getbubbleIndexs(width, height);
-                }
-                if(axisInfo.id === "x") {
-                    if(autoMin) {
-                        omin = self._getMinTick(self.indexs.xMin.x, self.indexs.xMin.r, omin, omax, width, unitMinor);
-                    }
-                    if(autoMax) {
-                        omax = self._getMaxTick(self.indexs.xMax.x, self.indexs.xMax.r, omin, omax, width, unitMinor);
-                    }
-                } else {
-                    if(autoMin) {
-                        omin = self._getMinTick(self.indexs.yMin.y, self.indexs.yMin.r, omin, omax, height, unitMinor);
-                    }
-                    if(autoMax) {
-                        omax = self._getMaxTick(self.indexs.yMax.y, self.indexs.yMax.r, omin, omax, height, unitMinor);
-                    }
-                }
+                }, width = canvasBounds.endX - startLocation.x, height = canvasBounds.endY - startLocation.y, omax = axisInfo.max, omin = axisInfo.min, origin = options.origin, adjust = this.bubbleAxisAdjust.getAdjust(axisInfo, options);
+                omax = adjust.max;
+                omin = adjust.min;
                 if(omax !== axisInfo.max || omin !== axisInfo.min) {
-                    // Fixed an issue that if the origin is less than the min value and more than the max value,
-                    // the axis will adjust wrong value.
-                    if(origin !== null && origin !== undefined) {
-                        if(origin < omin) {
-                            omin = origin;
-                        } else if(origin > omax) {
-                            omax = origin;
-                        }
-                    }
                     axisInfo.min = omin;
                     axisInfo.max = omax;
                     this._calculateMajorMinor(options, axisInfo);
-                    self._adjust(options, axisInfo);
                 }
-            };
-            wijbubblechart.prototype._getMinTick = function (val, r, min, max, length, unitMinor) {
-                if((val - min) * length / (max - min) < r) {
-                    return min - unitMinor;
-                } else {
-                    return min;
-                }
-            };
-            wijbubblechart.prototype._getMaxTick = function (val, r, min, max, length, unitMinor) {
-                if((val - min) * length / (max - min) + r > length) {
-                    return max + unitMinor;
-                } else {
-                    return max;
-                }
-            };
-            wijbubblechart.prototype._getMinIndex = function (arr) {
-                var index = -1, min = 0;
-                $.each(arr, function (i, n) {
-                    if(i === 0) {
-                        min = n;
-                    } else {
-                        if(n < min) {
-                            min = n;
-                        }
-                    }
-                });
-                $.each(arr, function (i, n) {
-                    if(n === min) {
-                        index = i;
-                        return false;
-                    }
-                });
-                return index;
-            };
-            wijbubblechart.prototype._getMaxIndex = function (arr) {
-                var index = -1, max = 0;
-                $.each(arr, function (i, n) {
-                    if(i === 0) {
-                        max = n;
-                    } else {
-                        if(n > max) {
-                            max = n;
-                        }
-                    }
-                });
-                $.each(arr, function (i, n) {
-                    if(n === max) {
-                        index = i;
-                        return false;
-                    }
-                });
-                return index;
             };
             wijbubblechart.prototype._showSerieEles = function (seriesEle) {
                 $.each(seriesEle, function (i, bubbleInfo) {
@@ -554,73 +602,6 @@ var wijmo;
                     y1: dataObj.y1
                 };
                 return $.proxy(fmt, obj)();
-            };
-            wijbubblechart.prototype._prepBubbleData = function () {
-                var self = this, seriesList = self.options.seriesList, ymax = -Number.MAX_VALUE, ymin = Number.MAX_VALUE, data;
-                $.each(seriesList, function (i, n) {
-                    data = n.data;
-                    if(data && data.y1) {
-                        $.each(data.y1, function (j, m) {
-                            ymax = Math.max(ymax, m);
-                            ymin = Math.min(ymin, m);
-                        });
-                    }
-                });
-                this.bubMax = ymax;
-                this.bubMin = ymin;
-                this.bubDiff = ymax - ymin;
-            };
-            wijbubblechart.transform = /**
-            * @ignore
-            */
-            function transform(yval, maxSize, minSize, bounds, bubMax, bubDiff, sizingMethod, markerType) {
-                var yscale, val = yval, bubSizeDiff = maxSize - minSize, width = bounds.endX - bounds.startX, height = bounds.endY - bounds.startY;
-                // adjust the bubble size calculate.
-                //val -= bubMin;
-                if(val < 0) {
-                    val = 0;
-                }
-                if(bubDiff === 0) {
-                    val = 1;
-                } else {
-                    val /= bubMax;
-                }
-                val = wijbubblechart.transformByArea(val, sizingMethod, markerType);
-                val *= bubSizeDiff;
-                val += minSize;
-                yscale = Math.min(width, height);
-                val *= yscale / 200.0;
-                //val = $.wijbubble.transformByArea(val,sizingMethod, markerType)
-                return val;
-                //return Math.round(val);
-                            };
-            wijbubblechart.transformByArea = /**
-            * @ignore
-            */
-            function transformByArea(yval, sizingMethod, markerType) {
-                var val = yval;
-                if(sizingMethod === "area") {
-                    switch(markerType) {
-                        case "circle":
-                            val = Math.sqrt(val / Math.PI);
-                            break;
-                        case "tri":
-                        case "invertedTri":
-                            val = Math.sqrt(val / (3 * Math.sin(Math.PI / 6) * Math.cos(Math.PI / 6)));
-                            break;
-                        case "box":
-                            val = Math.sqrt(val / 2);
-                            break;
-                        case "diamond":
-                        case "cross":
-                            val = Math.sqrt(val / 2);
-                            break;
-                        default:
-                            val = Math.sqrt(4 * val / Math.PI);
-                            break;
-                    }
-                }
-                return val;
             };
             return wijbubblechart;
         })(chart.wijchartcore);
@@ -948,7 +929,6 @@ var wijmo;
                 this.bubbles = [];
                 this.bubbleInfos = [];
                 this.trackers = this.canvas.set();
-                this.currentIndex = 0;
             };
             BubbleChartRender.prototype.initAnimationState = function (bubbleInfo, bounds) {
                 var bubble = bubbleInfo.bubble, symbol = bubbleInfo.symbol, bbox;
@@ -1057,7 +1037,7 @@ var wijmo;
             BubbleChartRender.prototype.getSymbol = function (symbols, index) {
                 var symbol;
                 $.each(symbols, function (i, n) {
-                    if(i === index) {
+                    if(n.index === index) {
                         symbol = n;
                         return false;
                     }
@@ -1126,13 +1106,7 @@ var wijmo;
                         return true;
                     }
                     var x = data.x[i], y = data.y[i], markers = series.markers || {
-                    }, markerType = markers.type || "circle", symbols = markers.symbol, invisibleMarkLabels = series.invisibleMarkLabels || [], rf, bubbleInfo, wijchartDataObj, bubble, sX, sY, symbol, symbolEl, r, tracker;
-                    if(bubbleRadius) {
-                        r = bubbleRadius[self.currentIndex];
-                        self.currentIndex++;
-                    } else {
-                        r = wijbubblechart.transform(y1, o.maximumSize, o.minimumSize, o.bounds, self.options.widget.bubMax, self.options.widget.bubDiff, o.sizingMethod, markerType);
-                    }
+                    }, markerType = markers.type || "circle", symbols = markers.symbol, invisibleMarkLabels = series.invisibleMarkLabels || [], r = bubbleRadius[y1], rf, bubbleInfo, wijchartDataObj, bubble, sX, sY, symbol, symbolEl, tracker;
                     if(xAxisInfo.isTime) {
                         x = $.toOADate(x);
                     } else if(isNaN(x)) {

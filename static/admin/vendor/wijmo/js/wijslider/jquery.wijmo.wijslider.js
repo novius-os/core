@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20133.20
+ * Wijmo Library 3.20141.34
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -8,7 +8,8 @@
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * licensing@wijmo.com
  * http://wijmo.com/widgets/license/
- *
+ * ----
+ * Credits: Wijmo includes some MIT-licensed software, see copyright notices below.
  */
 var __extends = this.__extends || function (d, b) {
     function __() { this.constructor = d; }
@@ -319,10 +320,10 @@ var wijmo;
                 // it's hard to adjust the position and size, so first destroy then
                 // recreate
                 //this._refresh();
-                                var widgetObject = this.element.data("wijslider"), wijmoWidgetObject = this.element.data("wijmoWijslider");
+                                var widgetObject = this.element.data("wijslider"), wijmoWidgetObject = this.element.data("wijmo-wijslider");
                 this.destroy();
                 this.element.data("wijslider", widgetObject);
-                this.element.data("wijmoWijslider", wijmoWidgetObject);
+                this.element.data("wijmo-wijslider", wijmoWidgetObject);
                 this._create();
             };
             wijslider.prototype._refreshSlider = function () {
@@ -441,9 +442,6 @@ var wijmo;
                 increBtn.bind('mousedown.' + self.widgetName, self, self._increBtnMouseDown);
                 increBtn.bind('mouseup.' + self.widgetName, self, self._increBtnMouseUp);
                 ele.bind('mouseup.' + self.widgetName, self, self._elementMouseupEvent);
-                if($.support.isTouchEnabled && $.support.isTouchEnabled()) {
-                    ele.bind('wijmousedown.' + self.widgetName, $.proxy(self._touchStart, self)).bind('wijmousemove.' + self.widgetName, $.proxy(self._touchMove, self)).bind('wijmouseup.' + self.widgetName, $.proxy(self._touchEnd, self));
-                }
             };
             wijslider.prototype._decreBtnMouseOver = function (e) {
                 var self = e.data, data, decreBtn;
@@ -735,70 +733,6 @@ var wijmo;
                     this._resetStateForDragFill();
                 }
                 return returnVal;
-            };
-            wijslider.prototype._touchStart = function (event) {
-                var index, distance, normValue, position, closestHandle, that = this, o = this.options;
-                if(!this.elementSize) {
-                    this.elementSize = {
-                        width: this.element.outerWidth(),
-                        height: this.element.outerHeight()
-                    };
-                }
-                if(!this.elementOffset) {
-                    this.elementOffset = this.element.offset();
-                }
-                if(this.options.dragFill) {
-                    if(event.originalEvent.target) {
-                        if(this._isUISlider(event.target)) {
-                            this._setStateForDragFill(event);
-                            return true;
-                        }
-                    }
-                }
-                this._dragFillTarget = false;
-                position = {
-                    x: event.pageX,
-                    y: event.pageY
-                };
-                normValue = _super.prototype._normValueFromMouse.call(this, position);
-                distance = _super.prototype._valueMax.call(this) - this._valueMin() + 1;
-                this.handles.each(function (i) {
-                    var thisDistance = Math.abs(normValue - that.values(i));
-                    if((distance > thisDistance) || (distance === thisDistance && (i === that._lastChangedValue || that.values(i) === o.min))) {
-                        distance = thisDistance;
-                        closestHandle = $(this);
-                        index = i;
-                    }
-                });
-                this._handleIndex = index;
-                closestHandle.addClass(o.wijCSS.stateActive);
-            };
-            wijslider.prototype._touchMove = function (event) {
-                var position, normValue;
-                if($.browser.msie && event.pointerType === event.MSPOINTER_TYPE_TOUCH) {
-                    return false;
-                }
-                event.preventDefault();
-                event.stopPropagation();
-                if(this.options.dragFill) {
-                    if(this._processDragFill(event)) {
-                        return false;
-                    }
-                }
-                position = {
-                    x: event.pageX,
-                    y: event.pageY
-                };
-                normValue = _super.prototype._normValueFromMouse.call(this, position);
-                this._slide(event, this._handleIndex, normValue);
-                return false;
-            };
-            wijslider.prototype._touchEnd = function (event) {
-                this.handles.removeClass(this.options.wijCSS.stateActive);
-                this._lastChangedValue = this._handleIndex;
-                if(this.options.dragFill) {
-                    this._resetStateForDragFill();
-                }
             };
             wijslider.prototype._setStateForDragFill = function (event) {
                 this._dragFillTarget = true;

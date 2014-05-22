@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20133.20
+ * Wijmo Library 3.20141.34
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -8,7 +8,6 @@
  * Licensed under the Wijmo Commercial License. Also available under the GNU GPL Version 3 license.
  * licensing@wijmo.com
  * http://wijmo.com/widgets/license/
- *
  *
  */
 var __extends = this.__extends || function (d, b) {
@@ -18,29 +17,31 @@ var __extends = this.__extends || function (d, b) {
 };
 var wijmo;
 (function (wijmo) {
+    /// <reference path="jquery.wijmo.wijstringinfo.ts"/>
     /// <reference path="jquery.wijmo.wijinputcore.ts"/>
+    /// <reference path="jquery.wijmo.wijinputtextformat.ts"/>
+    /// <reference path="../wijtooltip/jquery.wijmo.wijtooltip.ts"/>
     /*globals jQuery */
     /*
     * Depends:
     *	jquery-1.4.2.js
     *	jquery.ui.core.js
     *	jquery.ui.widget.js
+    *	jquery.wijmo.wijcharex.js
+    *	jquery.wijmo.wijstringinfo.js
     *	jquery.wijmo.wijinputcore.js
     *
     */
     (function (input) {
         "use strict";
         var $ = jQuery, widgetName = "wijinputtext";
-        var EllipsisMode;
-        (function (EllipsisMode) {
-            EllipsisMode._map = [];
-            EllipsisMode._map[0] = "None";
-            EllipsisMode.None = 0;
-            EllipsisMode._map[1] = "EllipsisEnd";
-            EllipsisMode.EllipsisEnd = 1;
-            EllipsisMode._map[2] = "EllipsisPath";
-            EllipsisMode.EllipsisPath = 2;
-        })(EllipsisMode || (EllipsisMode = {}));
+        var EllipsisMode = (function () {
+            function EllipsisMode() { }
+            EllipsisMode.None = "none";
+            EllipsisMode.EllipsisEnd = "ellipsisEnd";
+            EllipsisMode.EllipsisPath = "ellipsisPath";
+            return EllipsisMode;
+        })();        
         var OutputMode;
         (function (OutputMode) {
             OutputMode._map = [];
@@ -93,27 +94,29 @@ var wijmo;
                 this.imtextbox.SetExitOnLastChar(this.options.blurOnLastChar);
                 this.imtextbox.SetExitOnLeftRightKey(this.options.blurOnLeftRightKey);
                 this.imtextbox.SetFormat(this.options.format);
-                this.imtextbox.SetLengthAsByte(this.options.lengthAsByte);
                 this.imtextbox.SetMaxLength(this.options.maxLength);
+                this.imtextbox.SetHighlightText(this.options.highlightText);
+                this.imtextbox.SetOverflowTip(this.options.showOverflowTip);
                 this.imtextbox.SetMaxLineCount(this.options.maxLineCount);
                 this.imtextbox.SetCountWrappedLine(this.options.countWrappedLine);
                 //if (this.options.passwordChar === null) {
                 //    this.options.passwordChar = this.imtextbox.SystemPasswordChar();
                 //}
                 //this.imtextbox.SetPasswordChar(this.options.passwordChar);
-                if(this.options.text === null) {
-                    this.options.text = this.getText();
-                }
-                this.setText(this.options.text);
                 if(this.options.invalidInput !== null) {
                     this.imtextbox.OnInvalidInput(this.options.invalidInput);
+                }
+                if(this.options.keyExit !== null) {
+                    this.imtextbox.OnKeyExit(this.options.keyExit);
                 }
                 //if (this.options.textChanged !== null) {
                 //    this.imtextbox.OnTextChanged(this.options.textChanged);
                 //}
                 this.imtextbox.TextChangedEvent = function (e, data) {
                     self.options.text = data;
-                    self._trigger('textChanged', null, data);
+                    self._trigger('textChanged', null, {
+                        text: data
+                    });
                 };
                 var e = this.element, wijCSS = this.options.wijCSS, allowedNodes = {
                     'input': true,
@@ -149,6 +152,15 @@ var wijmo;
                 } else if(nodeName === 'textarea') {
                     this.imtextbox.SetMultiLine(true);
                 }
+                this.imtextbox.SetLengthAsByte(this.options.lengthAsByte);
+                if(this.options.text === null) {
+                    this.options.text = this.getText();
+                }
+                if(!(this.options.text === this.imtextbox.placeHolder && this.imtextbox.isNullText)) {
+                    this.setText(this.options.text);
+                }
+                this.imtextbox.SetEllipsisString(this.options.ellipsisString);
+                this.imtextbox.SetEllipsis(this.options.ellipsis);
                 //for case 20899
                 if(e.is(":disabled")) {
                     this._setOption("disabled", true);
@@ -171,6 +183,11 @@ var wijmo;
                 self.element.off('.imtextbox');
                 _super.prototype.destroy.call(this);
             };
+            wijinputtext.prototype.getSelectedText = /** Gets the selected text.
+            */
+            function () {
+                return this.imtextbox.GetSelectedText();
+            };
             wijinputtext.prototype._setOption = function (key, value) {
                 switch(key) {
                     case 'nullText':
@@ -188,6 +205,22 @@ var wijmo;
                         break;
                     case 'blurOnLeftRightKey':
                         this.imtextbox.SetExitOnLeftRightKey(value);
+                        break;
+                    case 'showDropDownButton':
+                        var ellipsis = this.imtextbox.GetEllipsis();
+                        this.imtextbox.SetEllipsis(ellipsis);
+                        break;
+                    case 'ellipsis':
+                        this.imtextbox.SetEllipsis(value);
+                        break;
+                    case 'ellipsisString':
+                        this.imtextbox.SetEllipsisString(value);
+                        break;
+                    case 'highlightText':
+                        this.imtextbox.SetHighlightText(value);
+                        break;
+                    case 'showOverflowTip':
+                        this.imtextbox.SetOverflowTip(value);
                         break;
                     case 'format':
                         this.imtextbox.SetFormat(value);
@@ -223,12 +256,12 @@ var wijmo;
                     case 'invalidInput':
                         this.imtextbox.OnInvalidInput(value);
                         break;
+                    case 'keyExit':
+                        this.imtextbox.OnKeyExit(value);
+                        break;
                     case '':
                         break;
                 }
-            };
-            wijinputtext.prototype._raiseTextChanged = // Fire the event by IMTextBox.
-            function () {
             };
             wijinputtext.prototype._updateTextOnLostFocus = // Stop binding event handler in wijinputcore
             //_onFocus(e) {
@@ -297,8 +330,8 @@ var wijmo;
             * @param {Number} start Start of the range.
             * @param {Number} end End of the range.
             * @example
-            * // Select first two symbols in a wijinputcore
-            * $(".selector").wijinputcore("selectText", 0, 2);
+            * // Select first two symbols in a wijinputtext
+            * $(".selector").wijinputtext("selectText", 0, 2);
             */
             function (start, end) {
                 if (typeof start === "undefined") { start = 0; }
@@ -348,39 +381,62 @@ var wijmo;
                 * tab ordering control when pressing the left, right arrow keys.
                 */
                 this.blurOnLeftRightKey = 'none';
-                /**  Determines the format string that defines the type of text
-                *  allowed for input in the control.
-                *  The following key words are supported.
-                *  DBCS Keywords:
-                *    Ａ Upper case DBCS alphabet (A-Z).
-                *    ａ Lower case DBCS alphabet (a-z).
-                *    Ｋ DBCS Katakana.
-                *    ９ DBCS Numbers (0-9).
-                *    ＃ DBCS numbers and number related symbols (0-9, +-$%\,.).
-                *    ＠ DBCS symbols.
-                *    Ｊ Hiragana.
-                *    Ｚ All DBCS characters without Space.
-                *  SBCS Keywords:
-                *    A Upper case alphabet (A-Z).
-                *    a Lower case alphabet (a-z).
-                *    K Katakana.
-                *    9 Numbers (0-9).
-                *    # Numbers and number related symbols (0-9, +-$%\,.).
-                *    @ Symbols.
-                *    H All SBCS characters without Space.
-                *    ^ Any character not included in the specified format.
-                *    \ Escape character.
-                *  For example, format = 'Ａ', then the wijinputtext can only input the upper case DBCS alphabet.
-                *  If you input the SBCS 'k', then it will be automatic conver to DBCS 'Ｋ' if the autoConvert is true,
-                *  But if the autoConvert is false, you can't input 'k'.
+                /** Gets or sets how to display the Ellipsis string when the control's content is
+                * longer than its Width.
+                * @exluce
+                */
+                this.ellipsis = EllipsisMode.None;
+                /** Gets or sets the Ellipsis string shows in the control.
+                */
+                this.ellipsisString = String.fromCharCode(8230);
+                /** Gets or sets whether display the OverflowTip.
+                */
+                this.showOverflowTip = false;
+                /**Gets or sets whether to highlight the control's Text on receiving input focus.
+                */
+                this.highlightText = false;
+                /** Determines the format string that defines the type of text
+                * allowed for input in the control.
+                *
+                * @remarks
+                * The following key words are supported.
+                * DBCS Keywords:
+                *   Ａ Upper case DBCS alphabet (A-Z).
+                *   ａ Lower case DBCS alphabet (a-z).
+                *   Ｋ DBCS Katakana.
+                *   ９ DBCS Numbers (0-9).
+                *   ＃ DBCS numbers and number related symbols (0-9, +-$%\,.).
+                *   ＠ DBCS symbols.
+                *   Ｊ Hiragana.
+                *   Ｚ All DBCS characters without Space.
+                *   Ｎ Only DBCS large Katakanas.
+                *   Ｇ Only DBCS large Hiragana.
+                *   Ｔ Only allow surrogate char.
+                *   Ｄ All DBCS characters, except for surrogates.
+                *   Ｓ DBCS space.
+                * SBCS Keywords:
+                *   A Upper case alphabet (A-Z).
+                *   a Lower case alphabet (a-z).
+                *   K Katakana.
+                *   9 Numbers (0-9).
+                *   # Numbers and number related symbols (0-9, +-$%\,.).
+                *   @ Symbols.
+                *   H All SBCS characters without Space.
+                *   N Only SBCS large Katakanas.
+                *   S SBCS Space.
+                *   ^ Any character not included in the specified format.
+                *   \ Escape character.
+                * For example, format = 'Ａ', then the wijinputtext can only input the upper case DBCS alphabet.
+                * If you input the SBCS 'k', then it will be automatic conver to DBCS 'Ｋ' if the autoConvert is true,
+                * But if the autoConvert is false, you can't input 'k'.
                 */
                 this.format = '';
                 /** Sets the Ime Mode setting of widget.
                 * Possible values are: 'auto', 'active', 'inactive', 'disabled'
                 */
                 this.imeMode = 'auto';
-                /**  Determines whether the maximum length constraint for
-                *  input is byte-based or character-based.
+                /** Determines whether the maximum length constraint for
+                * input is byte-based or character-based.
                 */
                 this.lengthAsByte = false;
                 /**  Determines the maximum length of text that can be input
@@ -400,22 +456,35 @@ var wijmo;
                 /** Determines the text of the wijinputtext.
                 */
                 this.text = null;
+                /** @ignore */
+                this.allowSpinLoop = false;
+                /** @ignore */
+                this.spinnerAlign = "verticalRight";
+                /** @ignore */
+                this.showSpinner = false;
+                /** @ignore */
+                this.culture = '';
+                /** The readingImeStringOutput event handler.
+                * A function called when the japanese reading ime string is generated.
+                * @event
+                * @dataKey {readingString} the generaged reading ime string.
+                */
+                this.readingImeStringOutput = null;
             }
             return wijinputtext_options;
         })();        
         wijinputtext.prototype.options = $.extend(true, {
         }, input.wijinputcore.prototype.options, new wijinputtext_options());
         $.wijmo.registerWidget(widgetName, wijinputtext.prototype);
-        var wijInputTextProvider = (function (_super) {
-            __extends(wijInputTextProvider, _super);
+        /** @ignore */
+        var wijInputTextProvider = (function () {
             function wijInputTextProvider(owner) {
-                        _super.call(this);
                 this.inputWidget = owner;
             }
             wijInputTextProvider.prototype.toString = //insertAt(strInput: string, position: number, rh?: wijInputResult) {
             //    return true;
             //}
-            function () {
+            function (ignorePasswordChar) {
                 if(this.inputWidget._showNullText() && !this.inputWidget.isFocused() && this.isValueNull()) {
                     this.inputWidget.element.data('isShowNullText', true);
                     return this.inputWidget.options.nullText;
@@ -423,7 +492,11 @@ var wijmo;
                     this.inputWidget.element.data('isShowNullText', false);
                     return '';
                 } else if(this.inputWidget.imtextbox && this.inputWidget.imtextbox.GetPasswordChar()) {
-                    return this.inputWidget.imtextbox.GetText();
+                    if(ignorePasswordChar) {
+                        return this.inputWidget.options.text;
+                    } else {
+                        return this.inputWidget.imtextbox._getInputValueWithPlaceHolder();
+                    }
                 } else if(this.inputWidget.imtextbox) {
                     return this.inputWidget.imtextbox._getInputValueWithPlaceHolder();
                 } else if(this.inputWidget.options.text !== undefined) {
@@ -442,11 +515,26 @@ var wijmo;
             wijInputTextProvider.prototype.setText = function (text) {
                 this.inputWidget.imtextbox.SetText(text);
             };
+            wijInputTextProvider.prototype.replaceWith = function (range, text) {
+                var index = range.start;
+                var result = new input.wijInputResult();
+                if(range.start < range.end) {
+                    this.removeAt(range.start, range.end - 1, result, true);
+                    index = result.testPosition;
+                }
+                return this.insertAt(text, index, result) ? result : null;
+            };
+            wijInputTextProvider.prototype.insertAt = function (char, index, rh) {
+            };
+            wijInputTextProvider.prototype.removeAt = function (start, end, rh, skipCheck) {
+            };
             return wijInputTextProvider;
-        })(input.wijTextProvider);
+        })();
         input.wijInputTextProvider = wijInputTextProvider;        
+        /** @ignore */
         var IMTextBox = (function () {
             function IMTextBox(element, container) {
+                this.ToolTip = null;
                 this.placeHolder = "";
                 //#endregion
                 this.Focused = false;
@@ -808,7 +896,8 @@ var wijmo;
                     if(evt.target == this.InputElement && !this.MultiLine) {
                         var isFocused = document.activeElement == evt.target;
                         var hitTestResult = input.Utility.IsMouseDownOnClearButton(evt);
-                        if(this.MouseUpHasValue && isFocused && hitTestResult && !this.PasswordMode) {
+                        //if (this.MouseUpHasValue && isFocused && hitTestResult && !this.PasswordMode) {
+                        if(this.MouseUpHasValue && isFocused && hitTestResult) {
                             var thisObj = this;
                             setTimeout(function (parameters) {
                                 thisObj.Clear();
@@ -1361,12 +1450,6 @@ var wijmo;
             function (isShowOverflowTip) {
                 isShowOverflowTip = input.Utility.CheckBool(isShowOverflowTip);
                 this.OverflowTip = isShowOverflowTip;
-                if((!this.MultiLine) && this.OverflowTip) {
-                    var self = this;
-                    input.Utility.AttachEvent(document, "mousemove", function (evt) {
-                        input.GlobalEventHandler.OnMouseMove(self, evt);
-                    }, false);
-                }
             };
             IMTextBox.prototype.GetOverwrite = /**
             * Gets whether the contents of the control are overwritten.
@@ -1397,7 +1480,9 @@ var wijmo;
                     this.PasswordChar = passwordChar;
                     this.PasswordMode = true;
                     //this.SetText(this.UIProcess.Filter.CheckText(this.GetText()).CheckedText);
-                    this.InternalSetText(this.GetText());
+                    if(!this.isNullText) {
+                        this.InternalSetText(this.GetText());
+                    }
                     this.tempIMEMode = this.GetImeMode();
                     this.SetImeMode(ImeMode.Disabled);
                 } else {
@@ -2344,8 +2429,10 @@ var wijmo;
                             //commented by Kevin, May 21, 2007
                             //bug#7960, JIS2004
                             //change to standard position
-                            var newStart = start;
-                            end = end;
+                            //var newStart = start;
+                            //end = end;
+                            var newStart = obj.value.GetStandardPosition(start);
+                            end = obj.value.GetStandardPosition(end, newStart - start);
                             start = newStart;
                             //end by Kevin
                             end = obj.value.length - end;
@@ -2501,6 +2588,8 @@ var wijmo;
                 }
                 this.SelectionStart = start;
                 this.SelectionEnd = end;
+                this.DropDownEditData.SelectionStart = start;
+                this.DropDownEditData.SelectionEnd = end;
             };
             IMTextBox.prototype.InternalSetSelection = function (start, end) {
                 if(this.MultiLine) {
@@ -2641,8 +2730,9 @@ var wijmo;
                         //}
                         this.switchPasswordChar = false;
                     }
-                    this.GetJQueryInputElement().data('preText', text);
-                }
+                    // DaryLuo 2014/02/11 fix bug 50765.
+                    //this.GetJQueryInputElement().data('preText', text);
+                                    }
                 // End by Yang
                 // HelenLiu 2013/07/09 fix bug 1005 in IM HTML5.
                 if(!NoUpdateDisplay) {
@@ -2666,7 +2756,7 @@ var wijmo;
                     if(this.Focused === false) {
                         text = this.placeHolder;
                     }
-                } else {
+                } else if(!(text === this.placeHolder && this.isNullText)) {
                     this.isNullText = false;
                 }
                 this.InputElement.value = text;
@@ -2752,6 +2842,7 @@ var wijmo;
                 return passwordText;
             };
             IMTextBox.prototype.Focus = function () {
+                this._destoryOverflowTip();
                 //Set the dropdown list value.
                 //document.all.ttt1.value += isFocusOnList;
                 //added by shen yuan for bug 4620.
@@ -2943,7 +3034,7 @@ var wijmo;
                     this.IsActive = false;
                 }
                 //// add by Sean Huang at 2008.10.30, for bug 9908 -->
-                //this.FireKeyExit();
+                this.FireKeyExit();
                 //// end of Sean Huang <--
                 //add by sj for readingImeStringOutput
                 if(input.Utility.IsIE() && this.ImeMode) {
@@ -2960,10 +3051,6 @@ var wijmo;
                 //			this.ImeInput("LoseFocusInput");
                 //		}
                 // End by Yang
-                // Frank Liu fixing defect #41(IE8) at 2013/09/22.
-                if(this.ImeMode && this.InputElement.value !== '') {
-                    this.isNullText = false;
-                }
                 // Add comments by Yang at 9:42 Aug. 29th 2007
                 // For Firefox doesn't support set a value in onblur event when IME opens.
                 //this.ImeInput("LoseFocusInput");
@@ -3120,6 +3207,13 @@ var wijmo;
                     }
                 }
             };
+            IMTextBox.prototype.FireKeyExit = function () {
+                if(this.EventInfo != null && this.EventInfo.Type == "KeyExit") {
+                    this.UIProcess.FireEvent(this, this.EventInfo.Name, this.EventInfo.Args, this.EventInfo.Type);
+                    this.FocusType = input.FocusType.KeyExit;
+                    this.EventInfo = null;
+                }
+            };
             IMTextBox.prototype.GetTruePosition = // Get the real position from the ellipsis string.
             function (oldSelection, newText, oldText, textHeadLength) {
                 var ellipsisStringLength = this.EllipsisString.GetLength();
@@ -3220,8 +3314,13 @@ var wijmo;
                 }
             };
             IMTextBox.prototype.ImeInput = //ImeInput = function(operate, reInputType)
-            function (operate, reInputType, evt) {
+            function (operate, reInputType, evt, fromContextMenuPaste) {
                 // End by Yang
+                if(fromContextMenuPaste) {
+                    var oldText = this.Text;
+                    var selEnd = this.SelectionEnd;
+                    var selStart = this.SelectionStart;
+                }
                 //var newValue = this.InputElement.value;
                 // Add comments by Yang at 10:02 June 1st 2007
                 // For fix bug 8338
@@ -3260,6 +3359,13 @@ var wijmo;
                 if(input.Utility.IsIE() && this.HasValidatedImeInput) {
                     this.InternalSetText(newValue, true);
                     //this.InternalSetText(this.Text, true);
+                    if(fromContextMenuPaste) {
+                        var newText = this.Text;
+                        if(oldText !== newText) {
+                            var s = selStart + newText.length - (oldText.length - (selEnd - selStart));
+                            this.SetSelection(s, s);
+                        }
+                    }
                     return false;
                 }
                 // End by Yang
@@ -3319,17 +3425,15 @@ var wijmo;
                 var isLoseFocusInput = false;
                 // End by Yang
                 if(operate == "LoseFocusInput") {
-                    /* Frank Liu fixing defect #41(IE8) at 2013/09/18.
-                    if (imeInputText == "") {
-                    // Add comments by Yang at 14:45 May 29 2007
-                    // For fix bug 8230
-                    if (this.GetText() != this.Text) {
-                    this._setInputValueWithPlaceHolder(this.Text);
+                    if(imeInputText == "") {
+                        // Add comments by Yang at 14:45 May 29 2007
+                        // For fix bug 8230
+                        if(this.GetText() != this.Text) {
+                            this._setInputValueWithPlaceHolder(this.Text);
+                        }
+                        // End by Yang
+                        return;
                     }
-                    // End by Yang
-                    return;
-                    }
-                    */
                     //Mask_ImeResponse = true;
                     // Add comments by Yang at 14:12 May 8 2007
                     // For fix bug 7968
@@ -3794,6 +3898,9 @@ var wijmo;
                     var mouseupHandler = function (evt) {
                         input.GlobalEventHandler.OnMouseUp(self, evt);
                     };
+                    var mouseoverHandler = function (evt) {
+                        input.GlobalEventHandler.OnMouseOver(self, evt);
+                    };
                     var selectstartHandler = function (evt) {
                         input.GlobalEventHandler.OnSelectStart(self, evt);
                     };
@@ -3956,6 +4063,7 @@ var wijmo;
                         'activate.imtextbox': activateHandler,
                         'deactivate.imtextbox': deactivateHandler
                     });
+                    $(this.GetJQueryInputElement()[0].parentElement).on("mouseover", mouseoverHandler);
                 }
             };
             IMTextBox.prototype.WebkitEditableContentChanged = function (evt) {
@@ -4615,6 +4723,7 @@ var wijmo;
                 return false;
             };
             IMTextBox.prototype.MouseDown = function (evt) {
+                this._isInnerKeyPressCall = false;
                 var mouseButton = input.Utility.GetMouseButton(evt);
                 this.FocusedWhenMouseDown = document.activeElement == evt.target;
                 this.MouseDownOnClearButton = input.Utility.IsMouseDownOnClearButton(evt);
@@ -4901,6 +5010,43 @@ var wijmo;
             function (evt) {
             };
             IMTextBox.prototype.MouseOver = function () {
+                var shouldShowOverFlowTip = !(this.HasFocus || this.MultiLine || !this.OverflowTip);
+                if(shouldShowOverFlowTip) {
+                    var obj = this.InputElement;
+                    var text = this.GetText();
+                    if(this.isTextEllipsis) {
+                        text = this.Text;
+                    }
+                    if(this.PasswordMode) {
+                        var temptext = "";
+                        for(var i = 0; i < text.GetLength(); i++) {
+                            temptext += this.PasswordChar;
+                        }
+                        text = temptext;
+                    }
+                    var scrollwidth = input.Utility.MeasureText(text, obj).Width;
+                    if(scrollwidth > obj.clientWidth) {
+                        this.ToolTip = $(this.InputElement.parentElement).wijtooltip({
+                            content: text,
+                            position: {
+                                my: "left bottom",
+                                at: "left+1 top"
+                            }
+                        });
+                        $(this.InputElement.parentElement).wijtooltip("show");
+                    } else {
+                        shouldShowOverFlowTip = false;
+                    }
+                }
+                if(!shouldShowOverFlowTip) {
+                    this._destoryOverflowTip();
+                }
+            };
+            IMTextBox.prototype._destoryOverflowTip = function () {
+                if(this.ToolTip != null) {
+                    this.ToolTip = null;
+                    $(this.InputElement.parentElement).wijtooltip("destroy");
+                }
             };
             IMTextBox.prototype._isinsertGroup = function (editMode) {
                 return editMode == input.EditMode.Insert || editMode == input.EditMode.FixedInsert;
@@ -5256,6 +5402,7 @@ var wijmo;
             return IMTextBox;
         })();
         input.IMTextBox = IMTextBox;        
+        /** @ignore */
         var GcTextBoxUIProcess = (function (_super) {
             __extends(GcTextBoxUIProcess, _super);
             function GcTextBoxUIProcess(autoConvert, format, /*elementID,*/ passwordMode, passwordChar, isjQueryControl, owner) {
@@ -5294,7 +5441,7 @@ var wijmo;
                 //this.TextChangedEvent = owner.TextChangedEvent;
                 //this.DropDownCloseEvent = owner.DropDownCloseEvent;
                 //this.DropDownOpenEvent = owner.DropDownOpenEvent;
-                this.Filter = new TextFilter(autoConvert, format);
+                this.Filter = new input.TextFilter(autoConvert, format);
                 this.IsjQueryControl = isjQueryControl;
                 this.PasswordMode = passwordMode;
                 this.PasswordChar = passwordChar;
@@ -5309,7 +5456,7 @@ var wijmo;
                 //}
                             }
             GcTextBoxUIProcess.prototype.Reset = function () {
-                this.Filter = new TextFilter(this.control.AutoConvert, this.control.Format);
+                this.Filter = new input.TextFilter(this.control.AutoConvert, this.control.Format);
                 this.PasswordMode = this.control.PasswordMode;
                 this.PasswordChar = this.control.GetPasswordChar();
             };
@@ -5507,8 +5654,8 @@ var wijmo;
                         } else {
                             retInfo.System = true;
                             ret = new Object();
-                            if(this.KeyExitEvent != "" && this.KeyExitEvent != null) {
-                                ret.Name = this.KeyExitEvent;
+                            if(this.Owner.KeyExitEvent != "" && this.Owner.KeyExitEvent != null) {
+                                ret.Name = this.Owner.KeyExitEvent;
                                 ret.Args = {
                                     Key: (k == 9 ? input.ExitKeys.Tab : input.ExitKeys.ShiftTab)
                                 };
@@ -6003,6 +6150,25 @@ var wijmo;
                                             case 27:
                         this.control.Clear();
                         break;
+                        // DaryLuo 2014/03/05 fix bug 49440.
+                        // Support swedish key board. AlrGr key.
+                        // Same as Cltrl+Alt +XX. [50, 51, 52, 53, 55, 56, 57, 48, 187, 69, 226, 77, 186]
+                                            case 393266:
+                    case 393267:
+                    case 393268:
+                    case 393269:
+                    case 393271:
+                    case 393272:
+                    case 393273:
+                    case 393264:
+                    case 393403:
+                    case 393285:
+                    case 393442:
+                    case 393293:
+                    case 393402:
+                        this.keypressResponse = true;
+                        retInfo.System = true;
+                        break;
                     default:
                         break;
                 }
@@ -6223,12 +6389,11 @@ var wijmo;
                         // Modified by shenyuan at 2006-01-23 for bug #5058.
                         //modified by sj to remove allowspace
                         //if (inputChar != " " || (allowspace != "None"))
-                        //if (insertChar != "") // Frank Liu removed for defect #41 at 2013/09/17.
-                        //    //end by sj
-                        //{
-                        newText = oldText.Substring(0, start) + insertChar + oldText.Substring(end, oldText.GetLength());
-                        //}
-                                            } else//Overwrite
+                        if(insertChar != "")//end by sj
+                         {
+                            newText = oldText.Substring(0, start) + insertChar + oldText.Substring(end, oldText.GetLength());
+                        }
+                    } else//Overwrite
                      {
                         if(insertChar != "") {
                             if(start == oldText.GetLength()) {
@@ -6541,6 +6706,9 @@ var wijmo;
                 }
                 //var pasteData = Utility.GetPasteData(this.Owner ? this.Owner.GetUseClipboard() : true);
                 var pasteData = (clipboardtext == null ? input.Utility.GetPasteData(useClipboard) : clipboardtext);
+                if(input.Utility.chrome) {
+                    pasteData = pasteData.replace(/\r\n/g, "\n");
+                }
                 if(!isSetSelectedText && this.Owner && this.Owner.MultiLine === false) {
                     pasteData = input.BaseUIProcess.UpdateCrLfString(pasteData, this.Owner.AcceptsCrLf);
                 }
@@ -6787,8 +6955,8 @@ var wijmo;
                 if(this.GetLength(formatedDragText, lengthAsByte) >= maxLengthOfNewInput && maxLength != 0 && exitOnLastChar && maxLengthCheckedDragText != "") {
                     //var ret = this.MoveControl(this.ElementID, true);
                     var ret = new Object();
-                    if(this.KeyExitEvent != "" && this.KeyExitEvent != null) {
-                        ret.Name = this.KeyExitEvent;
+                    if(this.Owner.KeyExitEvent != "" && this.Owner.KeyExitEvent != null) {
+                        ret.Name = this.Owner.KeyExitEvent;
                         //modified by sj 2008.8.13 for bug 582
                         //ret.Args="";
                         ret.Args = new Object();
@@ -7223,6 +7391,7 @@ var wijmo;
         })(input.BaseUIProcess);
         input.GcTextBoxUIProcess = GcTextBoxUIProcess;        
         ;
+        /** @ignore */
         var AutoComplete = (function () {
             function AutoComplete(owner) {
                 this._hightlightIndex = -1;
@@ -7592,1322 +7761,6 @@ var wijmo;
             return AutoComplete;
         })();
         input.AutoComplete = AutoComplete;        
-        ;
-        /**
-        *Represents the CharacterType enum
-        */
-        var CharacterType = (function () {
-            function CharacterType() {
-                this.DBCS_UpperAlphabet = 0x80000002;
-                // 1000 0000 0000 0000,0000 0000 0000 0010
-                this.SBCS_UpperAlphabet = 0x40000001;
-                // 0100 0000 0000 0000,0000 0000 0000 0001
-                this.DBCS_LowerAlphabet = 0x80000008;
-                // 1000 0000 0000 0000,0000 0000 0000 1000
-                this.SBCS_LowerAlphabet = 0x40000004;
-                // 0100 0000 0000 0000,0000 0000 0000 0100
-                this.DBCS_Number = 0x80000020;
-                // 1000 0000 0000 0000,0000 0000 0010 0000
-                this.SBCS_Number = 0x40000010;
-                // 0100 0000 0000 0000,0000 0000 0001 0000
-                this.DBCS_Binary = 0x80000080;
-                // 1000 0000 0000 0000,0000 0000 1000 0000
-                this.SBCS_Binary = 0x40000040;
-                // 0100 0000 0000 0000,0000 0000 0100 0000
-                this.DBCS_Hexadecimal = 0x80000200;
-                // 1000 0000 0000 0000,0000 0010 0000 0000
-                this.SBCS_Hexadecimal = 0x40000100;
-                // 0100 0000 0000 0000,0000 0001 0000 0000
-                this.DBCS_Symbol = 0x80000800;
-                // 1000 0000 0000 0000,0000 1000 0000 0000
-                this.SBCS_Symbol = 0x40000400;
-                // 0100 0000 0000 0000,0000 0100 0000 0000
-                this.DBCS_NumberSymbol = 0x80002000;
-                // 1000 0000 0000 0000,0010 0000 0000 0000
-                this.SBCS_NumberSymbol = 0x40001000;
-                // 0100 0000 0000 0000,0001 0000 0000 0000
-                this.DBCS_Katakana = 0x80008000;
-                // 1000 0000 0000 0000,1000 0000 0000 0000
-                this.SBCS_Katakana = 0x40004000;
-                // 0100 0000 0000 0000,0100 0000 0000 0000
-                this.DBCS_Space = 0x80020000;
-                // 1000 0000 0000 0010,0000 0000 0000 0000
-                this.SBCS_Space = 0x40010000;
-                // 0100 0000 0000 0001,0000 0000 0000 0000
-                this.TwoBytes = 0x80080000;
-                // 1000 0000 0000 1000,0000 0000 0000 0000
-                this.FourBytes = 0x80040000;
-                // 1000 0000 0000 0100,0000 0000 0000 0000
-                this.DBCS_ShiftJIS = 0x80100000;
-                // 1000 0000 0001 0000,0000 0000 0000 0001
-                this.DBCS_JISX0208 = 0x80200000;
-                // 1000 0000 0010 0000,0000 0000 0000 0010
-                this.Emoji = 0x00400000;
-                // 0000,0000 0100 0000 0000,0000 0000 0000 0000
-                this.IVS = 0x00800000;
-                // 0000,0000 1000 0000 0000,0000 0000 0000 0000
-                //add new format here
-                this.DBCS_Hiragana = 0x81000000;
-                // 1000 0001 0000 0000,0000 0000 0000 0000
-                this.Upper_SBCS_Katakana = 0x48000000;
-                // 0100 1000 0000 0000,0000 0000 0000 0000
-                this.Upper_DBCS_Katakana = 0x90000000;
-                // 1001 0000 0000 0000,0000 0000 0000 0000
-                this.Upper_DBCS_Hiragana = 0xA0000000;
-                // 1010 0000 0000 0000,0000 0000 0000 0000
-                this.All = 0xC6000000;
-                // 1100 0110 0000 0000,0000 0000 0000 0000
-                this.DBCS_All = 0x84000000;
-                // 1000 0100 0000 0000,0000 0000 0000 0000
-                this.SBCS_All = 0x42000000;
-                // 0100 0010 0000 0000,0000 0000 0000 0000
-                this.DBCS = 0x80000000;
-                // 1000 0000 0000 0000,0000 0000 0000 0000
-                this.SBCS = 0x40000000;
-            }
-            return CharacterType;
-        })();        
-        // 0100 0000 0000 0000,0000 0000 0000 0000
-        ;
-        /**
-        *Represents the Client-side TextFilter class
-        */
-        var TextFilter = (function () {
-            function TextFilter(autoConvert, format) {
-                //Character type enum object
-                this.charType = new CharacterType();
-                //Indicates the format string.
-                this.format = format;
-                this.includeFormat = "";
-                this.excludeFormat = "";
-                this.includeNormalChar = "";
-                this.excludeNormalChar = "";
-                this.allowTypes = this.charType.All;
-                this.excludeTypes = this.charType.All;
-                //Wheher the format is "^"
-                this.include = true;
-                this.autoConvert = autoConvert;
-                //this.allowSpace = allowSpace;
-                //this.allowSpace = "None";
-                //The CharProcess object
-                this.charExInstance = input.CharProcess.CharEx;
-                this.isInputValid = true;
-                //Indicates which type is allowed.
-                this.ParseFormat(this.format);
-            }
-            TextFilter.prototype.allowDBCS = /// <summary>
-            /// Gets whether the filter allow DBCS.
-            /// </summary>
-            function () {
-                return !(((this.allowTypes & this.charType.DBCS_All) != 0) ^ this.include);
-            };
-            TextFilter.prototype.allowSBCS = /// <summary>
-            /// Gets whether the filter allow SBCS.
-            /// </summary>
-            function () {
-                return !(((this.allowTypes & this.charType.SBCS_All) != 0) ^ this.include);
-            };
-            TextFilter.prototype.GetIncludeFormat = function (format) {
-                if(format == null || format.GetLength() == 0) {
-                    return "";
-                }
-                var includeFormat = "";
-                for(var i = 0; i < format.GetLength(); i++) {
-                    var currentChar = format.Substring(i, i + 1);
-                    if(currentChar == '\\')//   '\\'
-                     {
-                        if(i != format.GetLength() - 1) {
-                            includeFormat = includeFormat + currentChar;
-                            includeFormat = includeFormat + format.Substring(i + 1, i + 2);
-                            i++;
-                        } else {
-                            // such as @"^\".
-                            throw "Exception.TextFilter.Format.Invalid";
-                        }
-                    } else if(currentChar == '^')// '^'
-                     {
-                        return includeFormat;
-                    } else {
-                        includeFormat = includeFormat + currentChar;
-                    }
-                }
-                return includeFormat;
-            };
-            TextFilter.prototype.GetExcludeFormat = function (format) {
-                if(format == null || format.GetLength() == 0) {
-                    return "";
-                }
-                var caretCount = 0;
-                var excludeFormat = "";
-                for(var i = 0; i < format.GetLength(); i++) {
-                    var currentChar = format.Substring(i, i + 1);
-                    if(currentChar == '\\')//   '\\'
-                     {
-                        if(i != format.GetLength() - 1) {
-                            if(caretCount != 0) {
-                                excludeFormat = excludeFormat + currentChar;
-                                excludeFormat = excludeFormat + format.Substring(i + 1, i + 2);
-                            }
-                            i++;
-                        } else {
-                            // such as @"^\".
-                            throw "Exception.TextFilter.Format.Invalid";
-                        }
-                    } else if(currentChar == '^')// '^'
-                     {
-                        caretCount++;
-                        if(caretCount > 1) {
-                            throw "Exception.TextFilter.Format.DuplicatedChar";
-                        }
-                    } else {
-                        if(caretCount != 0) {
-                            excludeFormat = excludeFormat + currentChar;
-                        }
-                    }
-                }
-                if(caretCount == 1) {
-                    excludeFormat = '^' + excludeFormat;
-                }
-                return excludeFormat;
-            };
-            TextFilter.prototype.ParseIncludeFormat = function (format) {
-                if(format == null || format.GetLength() == 0) {
-                    this.allowTypes = this.charType.All;
-                    this.includeNormalChar = "";
-                    this.includeFormat = "";
-                    return;
-                }
-                this.allowTypes = 0;
-                this.includeNormalChar = "";
-                for(var i = 0; i < format.GetLength(); i++) {
-                    switch(format.charCodeAt(i)) {
-                        case 94:
-                            // "^"
-                            break;
-                        case 92:
-                            // "/"
-                            if(i == format.GetLength() - 1) {
-                                throw "Exception.TextFilter.Format.Invalid";
-                            }
-                            this.includeNormalChar = this.includeNormalChar + format.Substring(i + 1, i + 2);
-                            i++;
-                            break;
-                        case 65313:
-                            //DBCS A
-                            if((this.allowTypes & this.charType.DBCS_UpperAlphabet) == (this.charType.DBCS_UpperAlphabet | 0)) {
-                                ;
-                            } else {
-                                //return;
-                                this.allowTypes |= this.charType.DBCS_UpperAlphabet;
-                            }
-                            break;
-                        case 65:
-                            //SBCS A
-                            if((this.allowTypes & this.charType.SBCS_UpperAlphabet) == this.charType.SBCS_UpperAlphabet) {
-                                ;
-                            } else {
-                                //return;
-                                this.allowTypes |= this.charType.SBCS_UpperAlphabet;
-                            }
-                            break;
-                        case 65345:
-                            //DBCS a
-                            if((this.allowTypes & this.charType.DBCS_LowerAlphabet) == (this.charType.DBCS_LowerAlphabet | 0)) {
-                                ;
-                            } else {
-                                //return;
-                                this.allowTypes |= this.charType.DBCS_LowerAlphabet;
-                            }
-                            break;
-                        case 97:
-                            //SBCS a
-                            if((this.allowTypes & this.charType.SBCS_LowerAlphabet) == this.charType.SBCS_LowerAlphabet) {
-                                ;
-                            } else {
-                                //return;
-                                this.allowTypes |= this.charType.SBCS_LowerAlphabet;
-                            }
-                            break;
-                        case 65323:
-                            //DBCS K
-                            if((this.allowTypes & this.charType.DBCS_Katakana) == (this.charType.DBCS_Katakana | 0)) {
-                                ;
-                            } else {
-                                //return;
-                                this.allowTypes |= this.charType.DBCS_Katakana;
-                            }
-                            break;
-                        case 75:
-                            //SBCS K
-                            if((this.allowTypes & this.charType.SBCS_Katakana) == this.charType.SBCS_Katakana) {
-                                ;
-                            } else {
-                                //return;
-                                this.allowTypes |= this.charType.SBCS_Katakana;
-                            }
-                            break;
-                        case 65305:
-                            //DBCS 9
-                            if((this.allowTypes & this.charType.DBCS_Number) == (this.charType.DBCS_Number | 0)) {
-                                ;
-                            } else {
-                                //return;
-                                this.allowTypes |= this.charType.DBCS_Number;
-                            }
-                            break;
-                        case 57:
-                            //SBCS 9
-                            if((this.allowTypes & this.charType.SBCS_Number) == this.charType.SBCS_Number) {
-                                ;
-                            } else {
-                                //return;
-                                this.allowTypes |= this.charType.SBCS_Number;
-                            }
-                            break;
-                        case 65283:
-                            //DBCS #
-                            if((this.allowTypes & this.charType.DBCS_NumberSymbol) == (this.charType.DBCS_NumberSymbol | 0)) {
-                                ;
-                            } else {
-                                //return;
-                                this.allowTypes |= this.charType.DBCS_NumberSymbol;
-                            }
-                            break;
-                        case 35:
-                            //SBCS #
-                            if((this.allowTypes & this.charType.SBCS_NumberSymbol) == this.charType.SBCS_NumberSymbol) {
-                                ;
-                            } else {
-                                // return;
-                                this.allowTypes |= this.charType.SBCS_NumberSymbol;
-                            }
-                            break;
-                        case 65312:
-                            //DBCS @
-                            if((this.allowTypes & this.charType.DBCS_Symbol) == (this.charType.DBCS_Symbol | 0)) {
-                                ;
-                            } else {
-                                //return;
-                                this.allowTypes |= this.charType.DBCS_Symbol;
-                            }
-                            break;
-                        case 64:
-                            //SBCS @
-                            if((this.allowTypes & this.charType.SBCS_Symbol) == this.charType.SBCS_Symbol) {
-                                ;
-                            } else {
-                                //return;
-                                this.allowTypes |= this.charType.SBCS_Symbol;
-                            }
-                            break;
-                        case 65314:
-                            //DBCS B
-                            if((this.allowTypes & this.charType.DBCS_Binary) == (this.charType.DBCS_Binary | 0)) {
-                                ;
-                            } else {
-                                //return;
-                                this.allowTypes |= this.charType.DBCS_Binary;
-                            }
-                            break;
-                        case 66:
-                            //SBCS B
-                            if((this.allowTypes & this.charType.SBCS_Binary) == this.charType.SBCS_Binary) {
-                                ;
-                            } else {
-                                //return;
-                                this.allowTypes |= this.charType.SBCS_Binary;
-                            }
-                            break;
-                        case 65336:
-                            //DBCS X
-                            if((this.allowTypes & this.charType.DBCS_Hexadecimal) == (this.charType.DBCS_Hexadecimal | 0)) {
-                                ;
-                            } else {
-                                //return;
-                                this.allowTypes |= this.charType.DBCS_Hexadecimal;
-                            }
-                            break;
-                        case 88:
-                            //SBCS X
-                            if((this.allowTypes & this.charType.SBCS_Hexadecimal) == this.charType.SBCS_Hexadecimal) {
-                                ;
-                            } else {
-                                // return;
-                                this.allowTypes |= this.charType.SBCS_Hexadecimal;
-                            }
-                            break;
-                        case 65322:
-                            //DBCS J
-                            if((this.allowTypes & this.charType.DBCS_Hiragana) == (this.charType.DBCS_Hiragana | 0)) {
-                                ;
-                            } else {
-                                //return;
-                                this.allowTypes |= this.charType.DBCS_Hiragana;
-                            }
-                            break;
-                        case 65338:
-                            //DBCS Z
-                            if((this.allowTypes & this.charType.DBCS_All) == (this.charType.DBCS_All | 0)) {
-                                ;
-                            } else {
-                                //return;
-                                this.allowTypes |= this.charType.DBCS_All;
-                            }
-                            break;
-                        case 65325:
-                            //DBCS M
-                            if((this.allowTypes & this.charType.DBCS_ShiftJIS) == (this.charType.DBCS_ShiftJIS | 0)) {
-                                ;
-                            } else {
-                                //return;
-                                this.allowTypes |= this.charType.DBCS_ShiftJIS;
-                            }
-                            break;
-                        case 65321:
-                            //DBCS I
-                            if((this.allowTypes & this.charType.DBCS_JISX0208) == (this.charType.DBCS_JISX0208 | 0)) {
-                                ;
-                            } else {
-                                //return;
-                                this.allowTypes |= this.charType.DBCS_JISX0208;
-                            }
-                            break;
-                        case 72:
-                            //SBCS H
-                            if((this.allowTypes & this.charType.SBCS_All) == this.charType.SBCS_All) {
-                                ;
-                            } else {
-                                //return;
-                                this.allowTypes |= this.charType.SBCS_All;
-                            }
-                            break;
-                        case 78:
-                            if((this.allowTypes & this.charType.Upper_SBCS_Katakana) == this.charType.Upper_SBCS_Katakana) {
-                                ;
-                            } else {
-                                //return;
-                                this.allowTypes |= this.charType.Upper_SBCS_Katakana;
-                            }
-                            break;
-                        case 65326:
-                            // DBCS N
-                            if((this.allowTypes & this.charType.Upper_DBCS_Katakana) == this.charType.Upper_DBCS_Katakana) {
-                                ;
-                            } else {
-                                //return;
-                                this.allowTypes |= this.charType.Upper_DBCS_Katakana;
-                            }
-                            break;
-                        case 65319:
-                            // DBCS G
-                            if((this.allowTypes & this.charType.Upper_DBCS_Hiragana) == this.charType.Upper_DBCS_Hiragana) {
-                                ;
-                            } else {
-                                //return;
-                                this.allowTypes |= this.charType.Upper_DBCS_Hiragana;
-                            }
-                            break;
-                        case 65331:
-                            // DBCS S
-                            if((this.allowTypes & this.charType.DBCS_Space) == this.charType.DBCS_Space) {
-                                ;
-                            } else {
-                                // return;
-                                this.allowTypes |= this.charType.DBCS_Space;
-                            }
-                            break;
-                        case 83:
-                            // SBCS S
-                            if((this.allowTypes & this.charType.SBCS_Space) == this.charType.SBCS_Space) {
-                                ;
-                            } else {
-                                // return;
-                                this.allowTypes |= this.charType.SBCS_Space;
-                            }
-                            break;
-                        case 65332:
-                            // DBCS T
-                            if((this.allowTypes & this.charType.FourBytes) == this.charType.FourBytes) {
-                                ;
-                            } else {
-                                //return;
-                                this.allowTypes |= this.charType.FourBytes;
-                            }
-                            break;
-                        case 65316:
-                            // DBCS D
-                            if((this.allowTypes & this.charType.TwoBytes) == this.charType.TwoBytes) {
-                                ;
-                            } else {
-                                //return;
-                                this.allowTypes |= this.charType.TwoBytes;
-                            }
-                            break;
-                        case 65317:
-                            // Emoji key word.
-                            this.allowTypes |= this.charType.Emoji;
-                            break;
-                        case 65334:
-                            this.allowTypes |= this.charType.IVS;
-                            break;
-                        default:
-                            this.includeNormalChar = this.includeNormalChar + format.Substring(i, i + 1);
-                            break;
-                    }
-                }
-            };
-            TextFilter.prototype.ParseExcludeFormat = function (format) {
-                if(format == null || format.GetLength() == 0) {
-                    this.excludeTypes = this.excludeTypes.All;
-                    this.excludeNormalChar = "";
-                    this.excludeFormat = "";
-                    return;
-                }
-                if(format == "^") {
-                    this.excludeTypes = this.charType.All;
-                    this.excludeNormalChar = "";
-                    this.excludeFormat = "^";
-                    return;
-                }
-                this.excludeTypes = 0;
-                this.excludeNormalChar = "";
-                for(var i = 0; i < format.GetLength(); i++) {
-                    switch(format.charCodeAt(i)) {
-                        case 94:
-                            // "^"
-                            break;
-                        case 92:
-                            // "/"
-                            if(i == format.GetLength() - 1) {
-                                throw "Exception.TextFilter.Format.Invalid";
-                            }
-                            this.excludeNormalChar = this.excludeNormalChar + format.Substring(i + 1, i + 2);
-                            i++;
-                            break;
-                        case 65313:
-                            //DBCS A
-                            if((this.excludeTypes & this.charType.DBCS_UpperAlphabet) == (this.charType.DBCS_UpperAlphabet | 0)) {
-                                ;
-                            } else {
-                                //return;
-                                this.excludeTypes |= this.charType.DBCS_UpperAlphabet;
-                            }
-                            break;
-                        case 65:
-                            //SBCS A
-                            if((this.excludeTypes & this.charType.SBCS_UpperAlphabet) == this.charType.SBCS_UpperAlphabet) {
-                                ;
-                            } else {
-                                //return;
-                                this.excludeTypes |= this.charType.SBCS_UpperAlphabet;
-                            }
-                            break;
-                        case 65345:
-                            //DBCS a
-                            if((this.excludeTypes & this.charType.DBCS_LowerAlphabet) == (this.charType.DBCS_LowerAlphabet | 0)) {
-                                ;
-                            } else {
-                                //return;
-                                this.excludeTypes |= this.charType.DBCS_LowerAlphabet;
-                            }
-                            break;
-                        case 97:
-                            //SBCS a
-                            if((this.excludeTypes & this.charType.SBCS_LowerAlphabet) == this.charType.SBCS_LowerAlphabet) {
-                                ;
-                            } else {
-                                //return;
-                                this.excludeTypes |= this.charType.SBCS_LowerAlphabet;
-                            }
-                            break;
-                        case 65323:
-                            //DBCS K
-                            if((this.excludeTypes & this.charType.DBCS_Katakana) == (this.charType.DBCS_Katakana | 0)) {
-                                ;
-                            } else {
-                                //return;
-                                this.excludeTypes |= this.charType.DBCS_Katakana;
-                            }
-                            break;
-                        case 75:
-                            //SBCS K
-                            if((this.excludeTypes & this.charType.SBCS_Katakana) == this.charType.SBCS_Katakana) {
-                                ;
-                            } else {
-                                //return;
-                                this.excludeTypes |= this.charType.SBCS_Katakana;
-                            }
-                            break;
-                        case 65305:
-                            //DBCS 9
-                            if((this.excludeTypes & this.charType.DBCS_Number) == (this.charType.DBCS_Number | 0)) {
-                                return;
-                            } else {
-                                this.excludeTypes |= this.charType.DBCS_Number;
-                            }
-                            break;
-                        case 57:
-                            //SBCS 9
-                            if((this.excludeTypes & this.charType.SBCS_Number) == this.charType.SBCS_Number) {
-                                ;
-                            } else {
-                                //return;
-                                this.excludeTypes |= this.charType.SBCS_Number;
-                            }
-                            break;
-                        case 65283:
-                            //DBCS #
-                            if((this.excludeTypes & this.charType.DBCS_NumberSymbol) == (this.charType.DBCS_NumberSymbol | 0)) {
-                                ;
-                            } else {
-                                //return;
-                                this.excludeTypes |= this.charType.DBCS_NumberSymbol;
-                            }
-                            break;
-                        case 35:
-                            //SBCS #
-                            if((this.excludeTypes & this.charType.SBCS_NumberSymbol) == this.charType.SBCS_NumberSymbol) {
-                                ;
-                            } else {
-                                //return;
-                                this.excludeTypes |= this.charType.SBCS_NumberSymbol;
-                            }
-                            break;
-                        case 65312:
-                            //DBCS @
-                            if((this.excludeTypes & this.charType.DBCS_Symbol) == (this.charType.DBCS_Symbol | 0)) {
-                                ;
-                            } else {
-                                //return;
-                                this.excludeTypes |= this.charType.DBCS_Symbol;
-                            }
-                            break;
-                        case 64:
-                            //SBCS @
-                            if((this.excludeTypes & this.charType.SBCS_Symbol) == this.charType.SBCS_Symbol) {
-                                ;
-                            } else {
-                                //return;
-                                this.excludeTypes |= this.charType.SBCS_Symbol;
-                            }
-                            break;
-                        case 65314:
-                            //DBCS B
-                            if((this.excludeTypes & this.charType.DBCS_Binary) == (this.charType.DBCS_Binary | 0)) {
-                                ;
-                            } else {
-                                //return;
-                                this.excludeTypes |= this.charType.DBCS_Binary;
-                            }
-                            break;
-                        case 66:
-                            //SBCS B
-                            if((this.excludeTypes & this.charType.SBCS_Binary) == this.charType.SBCS_Binary) {
-                                ;
-                            } else {
-                                //return;
-                                this.excludeTypes |= this.charType.SBCS_Binary;
-                            }
-                            break;
-                        case 65336:
-                            //DBCS X
-                            if((this.excludeTypes & this.charType.DBCS_Hexadecimal) == (this.charType.DBCS_Hexadecimal | 0)) {
-                                ;
-                            } else {
-                                //return;
-                                this.excludeTypes |= this.charType.DBCS_Hexadecimal;
-                            }
-                            break;
-                        case 88:
-                            //SBCS X
-                            if((this.excludeTypes & this.charType.SBCS_Hexadecimal) == this.charType.SBCS_Hexadecimal) {
-                                ;
-                            } else {
-                                // return;
-                                this.excludeTypes |= this.charType.SBCS_Hexadecimal;
-                            }
-                            break;
-                        case 65322:
-                            //DBCS J
-                            if((this.excludeTypes & this.charType.DBCS_Hiragana) == (this.charType.DBCS_Hiragana | 0)) {
-                                ;
-                            } else {
-                                //return;
-                                this.excludeTypes |= this.charType.DBCS_Hiragana;
-                            }
-                            break;
-                        case 65338:
-                            //DBCS Z
-                            if((this.excludeTypes & this.charType.DBCS_All) == (this.charType.DBCS_All | 0)) {
-                                ;
-                            } else {
-                                //return;
-                                this.excludeTypes |= this.charType.DBCS_All;
-                            }
-                            break;
-                        case 65325:
-                            //DBCS M
-                            if((this.excludeTypes & this.charType.DBCS_ShiftJIS) == (this.charType.DBCS_ShiftJIS | 0)) {
-                                ;
-                            } else {
-                                // return;
-                                this.excludeTypes |= this.charType.DBCS_ShiftJIS;
-                            }
-                            break;
-                        case 65321:
-                            //DBCS I
-                            if((this.excludeTypes & this.charType.DBCS_JISX0208) == (this.charType.DBCS_JISX0208 | 0)) {
-                                ;
-                            } else {
-                                //return;
-                                this.excludeTypes |= this.charType.DBCS_JISX0208;
-                            }
-                            break;
-                        case 72:
-                            //SBCS H
-                            if((this.excludeTypes & this.charType.SBCS_All) == this.charType.SBCS_All) {
-                                ;
-                            } else {
-                                //return;
-                                this.excludeTypes |= this.charType.SBCS_All;
-                            }
-                            break;
-                        case 78:
-                            if((this.excludeTypes & this.charType.Upper_SBCS_Katakana) == this.charType.Upper_SBCS_Katakana) {
-                                ;
-                            } else {
-                                //return;
-                                this.excludeTypes |= this.charType.Upper_SBCS_Katakana;
-                            }
-                            break;
-                        case 65326:
-                            // DBCS N
-                            if((this.excludeTypes & this.charType.Upper_DBCS_Katakana) == this.charType.Upper_DBCS_Katakana) {
-                                ;
-                            } else {
-                                //return;
-                                this.excludeTypes |= this.charType.Upper_DBCS_Katakana;
-                            }
-                            break;
-                        case 65319:
-                            // DBCS G
-                            if((this.excludeTypes & this.charType.Upper_DBCS_Hiragana) == this.charType.Upper_DBCS_Hiragana) {
-                                ;
-                            } else {
-                                //return;
-                                this.excludeTypes |= this.charType.Upper_DBCS_Hiragana;
-                            }
-                            break;
-                        case 65331:
-                            // DBCS S
-                            if((this.excludeTypes & this.charType.DBCS_Space) == this.charType.DBCS_Space) {
-                                ;
-                            } else {
-                                // return;
-                                this.excludeTypes |= this.charType.DBCS_Space;
-                            }
-                            break;
-                        case 83:
-                            // SBCS S
-                            if((this.excludeTypes & this.charType.SBCS_Space) == this.charType.SBCS_Space) {
-                                ;
-                            } else {
-                                //return;
-                                this.excludeTypes |= this.charType.SBCS_Space;
-                            }
-                            break;
-                        case 65332:
-                            // DBCS T
-                            if((this.excludeTypes & this.charType.FourBytes) == this.charType.FourBytes) {
-                                ;
-                            } else {
-                                //return;
-                                this.excludeTypes |= this.charType.FourBytes;
-                            }
-                            break;
-                        case 65316:
-                            // DBCS D
-                            if((this.excludeTypes & this.charType.TwoBytes) == this.charType.TwoBytes) {
-                                ;
-                            } else {
-                                //return;
-                                this.excludeTypes |= this.charType.TwoBytes;
-                            }
-                            break;
-                        case 65317:
-                            // Emoji key word.
-                            this.excludeTypes |= this.charType.Emoji;
-                            break;
-                        case 65334:
-                            this.excludeTypes |= this.charType.IVS;
-                            break;
-                        default:
-                            this.excludeNormalChar = this.excludeNormalChar + format.Substring(i, i + 1);
-                            break;
-                    }
-                }
-            };
-            TextFilter.prototype.ParseFormat = /**
-            *Parses the format string and get a filter to check character.
-            *@param format - The format string
-            *@return  Return the text filter object
-            */
-            function (format) {
-                this.includeFormat = this.GetIncludeFormat(format);
-                this.excludeFormat = this.GetExcludeFormat(format);
-                this.ParseIncludeFormat(this.includeFormat);
-                this.ParseExcludeFormat(this.excludeFormat);
-            };
-            TextFilter.prototype.IsValidProcess = function (c, charType, normalChar) {
-                if(normalChar.IndexOf(c) != -1) {
-                    return true;
-                }
-                if(c == '\x09' || c == '\x0D' || c == '\x0A') {
-                    return true;
-                }
-                if(charType == 0) {
-                    return false;
-                }
-                // Check the character type.
-                var isValid = false;
-                if(charType == this.charType.All) {
-                    return true;
-                }
-                if((charType & this.charType.Emoji) == (this.charType.Emoji | 0) && this.IsEmoji(c)) {
-                    return true;
-                }
-                if((charType & this.charType.IVS) == (this.charType.IVS | 0) && this.IsIVS(c)) {
-                    return true;
-                }
-                if((charType & this.charType.FourBytes) == (this.charType.FourBytes | 0) && this.IsFourBytes(c)) {
-                    return true;
-                }
-                if(c.GetLength() == 1 && c.length > 1) {
-                    // DaryLuo 2013/04/28 fix bug 1061, 1062 in IM Web 7.1
-                    return false;
-                }
-                if((charType & this.charType.DBCS_ShiftJIS) == (this.charType.DBCS_ShiftJIS | 0) && this.IsShiftJIS(c)) {
-                    return true;
-                }
-                if(this.charExInstance.IsFullWidth(c)) {
-                    if((charType & this.charType.DBCS) != (this.charType.DBCS | 0)) {
-                        return false;
-                    }
-                    if((charType & this.charType.DBCS_All) == (this.charType.DBCS_All | 0) && c != '\u3000') {
-                        isValid = true;
-                    } else if((charType & this.charType.DBCS_LowerAlphabet) == (this.charType.DBCS_LowerAlphabet | 0) && this.IsLower(c)) {
-                        isValid = true;
-                    } else if((charType & this.charType.DBCS_UpperAlphabet) == (this.charType.DBCS_UpperAlphabet | 0) && this.IsUpper(c)) {
-                        isValid = true;
-                    } else if((charType & this.charType.DBCS_Number) == (this.charType.DBCS_Number | 0) && this.IsNumber(c)) {
-                        isValid = true;
-                    } else if((charType & this.charType.DBCS_Binary) == (this.charType.DBCS_Binary | 0) && this.IsBinary(c)) {
-                        isValid = true;
-                    } else if((charType & this.charType.DBCS_Hexadecimal) == (this.charType.DBCS_Hexadecimal | 0) && this.IsHex(c)) {
-                        isValid = true;
-                    } else if((charType & this.charType.DBCS_Symbol) == (this.charType.DBCS_Symbol | 0) && this.IsSymbol(c)) {
-                        isValid = true;
-                    } else if((charType & this.charType.DBCS_NumberSymbol) == (this.charType.DBCS_NumberSymbol | 0) && this.IsNumberSymbol(c)) {
-                        isValid = true;
-                    } else if((charType & this.charType.DBCS_Katakana) == (this.charType.DBCS_Katakana | 0) && this.IsKatakana(c)) {
-                        //2012/08/17, Robin Hotfix Bug#37.
-                        // The char '\u30FC' is hiranaga while it is katakana type.
-                        // So !Include will have some special logic for checking chars in the intersection.
-                        //isValid = true;
-                        var isMixedJPChar = this.IsHiragana(c);
-                        if(isMixedJPChar) {
-                            if(this.include) {
-                                isValid = true;
-                            } else {
-                                isValid = ((charType & this.charType.DBCS_Hiragana) == (this.charType.DBCS_Hiragana | 0));
-                            }
-                        } else {
-                            isValid = true;
-                        }
-                    } else if((charType & this.charType.DBCS_Hiragana) == (this.charType.DBCS_Hiragana | 0) && this.IsHiragana(c)) {
-                        //isValid = true;
-                        var isMixedJPChar = this.IsKatakana(c);
-                        if(isMixedJPChar) {
-                            if(this.include) {
-                                isValid = true;
-                            } else {
-                                isValid = ((charType & this.charType.DBCS_Katakana) == (this.charType.DBCS_Katakana | 0));
-                            }
-                        } else {
-                            isValid = true;
-                        }
-                    } else if((charType & this.charType.DBCS_JISX0208) == (this.charType.DBCS_JISX0208 | 0) && this.IsJISX0208(c)) {
-                        isValid = true;
-                    } else if((charType & this.charType.Upper_DBCS_Katakana) == (this.charType.Upper_DBCS_Katakana | 0) && this.IsKatakana(c) && this.IsUpperKana(c)) {
-                        isValid = true;
-                    } else if((charType & this.charType.Upper_DBCS_Hiragana) == (this.charType.Upper_DBCS_Hiragana | 0) && this.IsHiragana(c) && this.IsUpperKana(c)) {
-                        isValid = true;
-                    } else if((charType & this.charType.DBCS_Space) == (this.charType.DBCS_Space | 0) && this.IsFormatSpace(c)) {
-                        isValid = true;
-                    } else if((charType & this.charType.FourBytes) == (this.charType.FourBytes | 0) && this.IsFourBytes(c)) {
-                        isValid = true;
-                    } else if((charType & this.charType.TwoBytes) == (this.charType.TwoBytes | 0) && !this.IsFourBytes(c) && c != '\u3000') {
-                        isValid = true;
-                    }
-                } else {
-                    if((charType & this.charType.SBCS) != this.charType.SBCS) {
-                        return false;
-                    }
-                    if((charType & this.charType.SBCS_All) == this.charType.SBCS_All && c != '\x20') {
-                        isValid = true;
-                    } else if((charType & this.charType.SBCS_LowerAlphabet) == this.charType.SBCS_LowerAlphabet && this.IsLower(c)) {
-                        isValid = true;
-                    } else if((charType & this.charType.SBCS_UpperAlphabet) == this.charType.SBCS_UpperAlphabet && this.IsUpper(c)) {
-                        isValid = true;
-                    } else if((charType & this.charType.SBCS_Number) == this.charType.SBCS_Number && this.IsNumber(c)) {
-                        isValid = true;
-                    } else if((charType & this.charType.SBCS_Binary) == this.charType.SBCS_Binary && this.IsBinary(c)) {
-                        isValid = true;
-                    } else if((charType & this.charType.SBCS_Hexadecimal) == this.charType.SBCS_Hexadecimal && this.IsHex(c)) {
-                        isValid = true;
-                    } else if((charType & this.charType.SBCS_Symbol) == this.charType.SBCS_Symbol && this.IsSymbol(c)) {
-                        isValid = true;
-                    } else if((charType & this.charType.SBCS_NumberSymbol) == this.charType.SBCS_NumberSymbol && this.IsNumberSymbol(c)) {
-                        isValid = true;
-                    } else if((charType & this.charType.SBCS_Katakana) == this.charType.SBCS_Katakana && this.IsKatakana(c)) {
-                        isValid = true;
-                    } else if((charType & this.charType.Upper_SBCS_Katakana) == this.charType.Upper_SBCS_Katakana && this.IsKatakana(c) && this.IsUpperKana(c)) {
-                        isValid = true;
-                    } else if((charType & this.charType.SBCS_Space) == this.charType.SBCS_Space && this.IsFormatSpace(c)) {
-                        isValid = true;
-                    }
-                }
-                return isValid;
-            };
-            TextFilter.prototype.IsIncludeValid = function (c) {
-                return this.IsValidProcess(c, this.allowTypes, this.includeNormalChar);
-            };
-            TextFilter.prototype.IsExcludeValid = function (c) {
-                return this.IsValidProcess(c, this.excludeTypes, this.excludeNormalChar);
-            };
-            TextFilter.prototype.IsValid = /**
-            *Check whether the character is valid.
-            *@param c - The character to be checked
-            *@return Return the value indicating whether the character is valid
-            */
-            function (c) {
-                if(this.excludeFormat != "") {
-                    if(!this.IsExcludeValid(c)) {
-                        if(this.includeFormat != "") {
-                            return this.IsIncludeValid(c);
-                        }
-                    } else {
-                        return false;
-                    }
-                } else {
-                    if(this.includeFormat != "") {
-                        return this.IsIncludeValid(c);
-                    }
-                }
-                return true;
-            };
-            TextFilter.prototype.IsFormatSpace = function (c) {
-                if(c == '\x20' || c == '\u3000') {
-                    return true;
-                } else {
-                    return false;
-                }
-            };
-            TextFilter.prototype.IsFourBytes = function (c) {
-                var charEx = input.CharProcess.CharEx;
-                var textElement = c.Substring(0, 1);
-                if(textElement.length > 1) {
-                    for(var i = 0; i < textElement.length; i++) {
-                        if(charEx.IsSurrogate(textElement[i])) {
-                            return true;
-                        }
-                    }
-                }
-                return false;
-            };
-            TextFilter.prototype.IsUpper = function (c) {
-                return this.charExInstance.IsUpper(c);
-            };
-            TextFilter.prototype.IsLower = function (c) {
-                return this.charExInstance.IsLower(c);
-            };
-            TextFilter.prototype.IsNumber = function (c) {
-                return this.charExInstance.IsDigit(c);
-            };
-            TextFilter.prototype.IsBinary = function (c) {
-                c = this.IsFullWidth(c) ? this.ToHalfWidth(c) : c;
-                return (c == '0' || c == '1');
-            };
-            TextFilter.prototype.IsHex = function (c) {
-                c = this.IsFullWidth(c) ? this.ToHalfWidth(c) : c;
-                return (c == 'A' || c == 'B' || c == 'C' || c == 'D' || c == 'E' || c == 'F' || c == 'a' || c == 'b' || c == 'c' || c == 'd' || c == 'e' || c == 'f' || this.IsDigit(c));
-            };
-            TextFilter.prototype.IsSymbol = function (c) {
-                return this.charExInstance.IsHalfWidthSymbol(c) || this.charExInstance.IsFullWidthSymbol(c);
-            };
-            TextFilter.prototype.IsNumberSymbol = function (c) {
-                c = this.IsFullWidth(c) ? this.ToHalfWidth(c) : c;
-                return (this.IsDigit(c) || c == '+' || c == '-' || c == '$' || c == '%' || c == '\\' || c == ',' || c == '.');
-            };
-            TextFilter.prototype.IsKatakana = function (c) {
-                return this.charExInstance.IsKatakana(c);
-            };
-            TextFilter.prototype.IsHiragana = function (c) {
-                return this.charExInstance.IsHiragana(c);
-            };
-            TextFilter.prototype.IsShiftJIS = function (c) {
-                return this.charExInstance.IsShiftJIS(c);
-            };
-            TextFilter.prototype.IsJISX0208 = function (c) {
-                return this.charExInstance.IsJISX0208(c);
-            };
-            TextFilter.prototype.IsEmoji = function (c) {
-                var ref = {
-                };
-                //return EmojiHelper.IsEmoji(c, 0, ref);
-                return false;
-            };
-            TextFilter.prototype.IsIVS = function (c) {
-                var ref = {
-                };
-                //return IVSCharHelper.IsIVSElement(c, 0, ref);
-                return false;
-            };
-            TextFilter.prototype.IsDBCS = function (c) {
-                return this.IsFullWidth(c);
-            };
-            TextFilter.prototype.IsSBCS = function (c) {
-                return !this.IsFullWidth(c);
-            };
-            TextFilter.prototype.IsFullWidth = function (c) {
-                return this.charExInstance.IsFullWidth(c);
-            };
-            TextFilter.prototype.IsSurrogatePair = //commented by Kevin, May 21, 2007
-            //Bug#7960, JIS2004
-            function (c) {
-                return this.charExInstance.IsSurrogatePair(c);
-            };
-            TextFilter.prototype.ToHalfWidth = //end by Kevin
-            function (c) {
-                return this.charExInstance.ToHalfWidth(c);
-            };
-            TextFilter.prototype.IsDigit = function (c) {
-                return this.charExInstance.IsDigit(c);
-            };
-            TextFilter.prototype.IsUpperKana = /// <summary>
-            ///   Checks whether the speical character is a upper case katakana character.
-            /// </summary>
-            /// <param name="c">
-            ///   A <b>char</b> indicates the character to be checked.
-            /// </param>
-            /// <returns>
-            ///   If the character is a upper case katakana character, return <b>true</b>, otherwise, return <b>false</b>.
-            /// </returns>
-            function (c) {
-                return this.charExInstance.IsUpperKana(c);
-            };
-            TextFilter.prototype.CheckValidSpace = function (character) {
-                if((character == '\x20') && ((this.allowTypes & this.charType.SBCS_Space) == (this.charType.SBCS_Space | 0))) {
-                    return true;
-                } else if((character == '\u3000') && ((this.allowTypes & this.charType.DBCS_Space) == (this.charType.DBCS_Space | 0))) {
-                    return true;
-                }
-                return false;
-            };
-            TextFilter.prototype.Check = //	/// <summary>
-            //	/// Check whether the character is valid.
-            //	/// </summary>
-            //	/// <param name="text">The string to be checked.</param>
-            //	/// <param name="index">The character index in the string.</param>
-            //	/// <returns>The convert string.</returns
-            function (text, index) {
-                var character;
-                if(index != null)//Added For Bug 2438
-                 {
-                    character = text.Substring(index, index + 1);
-                } else {
-                    character = text;
-                }
-                var isValid = this.IsValid(character);
-                if(isValid) {
-                    return character;
-                }
-                //		}
-                if(this.autoConvert) {
-                    if(index != null)//Added for Bug 2438
-                     {
-                        return this.Convert(text, index);
-                    } else {
-                        return this.Convert(character);
-                    }
-                }
-                return "";
-            };
-            TextFilter.prototype.CheckText = function (text) {
-                var length = text.GetLength();
-                var ret = {
-                    IsInputValid: true,
-                    CheckedText: ""
-                };
-                for(var i = 0; i < length; ) {
-                    var c = text.Substring(i, i + 1);
-                    if(c != "\t" && c != "\r" && c != "\n") {
-                        var temp = this.Check(text, i);
-                        if(temp.index != null) {
-                            i = temp.index;
-                            c = temp.strValue;
-                        } else {
-                            c = temp;
-                            i++;
-                        }
-                        if(c == "") {
-                            ret.IsInputValid = false;
-                        }
-                    } else {
-                        i++;
-                    }
-                    ret.CheckedText += c;
-                }
-                return ret;
-            };
-            TextFilter.prototype.Convert = /// <summary>
-            /// Convert the character in the special index.
-            /// </summary>
-            /// <param name="text">The string to be checked.</param>
-            /// <param name="index">The character index in the string.</param>
-            /// <returns>The convert string.</returns>
-            function (text, index) {
-                var c;
-                if(index == null) {
-                    c = text;
-                } else {
-                    c = text.Substring(index, index + 1);
-                }
-                var isValid = false;
-                // Convert between upper and lower alphabet automatically.
-                if(this.charExInstance.IsAlphabet(c)) {
-                    var r = this.charExInstance.IsLower(c) ? c.toUpperCase() : c.toLowerCase();
-                    isValid = this.IsValid(r);
-                    if(isValid) {
-                        return r;
-                    }
-                    c = this.charExInstance.IsFullWidth(c) ? this.charExInstance.ToHalfWidth(c) : this.charExInstance.ToFullWidth(c).text;
-                    isValid = this.IsValid(c);
-                    if(isValid) {
-                        return c;
-                    }
-                    r = this.charExInstance.IsFullWidth(r) ? this.charExInstance.ToHalfWidth(r) : this.charExInstance.ToFullWidth(r).text;
-                    isValid = this.IsValid(r);
-                    if(isValid) {
-                        return r;
-                    }
-                    return "";
-                }
-                // Convert from Hiragana to other styles automatically.
-                if(this.charExInstance.IsHiragana(c)) {
-                    // Large < - > Small
-                    if(this.charExInstance.IsLowerKana(c)) {
-                        var u = this.charExInstance.ToUpperKana(c);
-                        isValid = this.IsValid(u);
-                        if(isValid) {
-                            return u;
-                        }
-                    } else if(this.charExInstance.HasLowerKana(c)) {
-                        var l = this.charExInstance.ToLowerKana(c);
-                        isValid = this.IsValid(l);
-                        if(isValid) {
-                            return l;
-                        }
-                    }
-                    // Hiragana to DBCS Katakana
-                    var r = this.charExInstance.ToKatakana(c);
-                    isValid = this.IsValid(r);
-                    if(isValid) {
-                        return r;
-                    }
-                    if(this.charExInstance.IsLowerKana(r)) {
-                        var u = this.charExInstance.ToUpperKana(r);
-                        isValid = this.IsValid(u);
-                        if(isValid) {
-                            return u;
-                        }
-                    } else if(this.charExInstance.HasLowerKana(r)) {
-                        var l = this.charExInstance.ToLowerKana(r);
-                        isValid = this.IsValid(l);
-                        if(isValid) {
-                            return l;
-                        }
-                    }
-                    // Hiragana to SBCS Katakana
-                    var chars = this.charExInstance.ToHalfWidthEx(r);
-                    isValid = this.IsValid(chars);
-                    if(isValid) {
-                        return chars;
-                    }
-                    if(this.charExInstance.IsLowerKana(chars)) {
-                        chars = this.charExInstance.ToUpperKana(chars);
-                        isValid = this.IsValid(chars);
-                        if(isValid) {
-                            return chars;
-                        }
-                    } else if(this.charExInstance.HasLowerKana(chars)) {
-                        chars = this.charExInstance.ToLowerKana(chars);
-                        isValid = this.IsValid(chars);
-                        if(isValid) {
-                            return chars;
-                        }
-                    }
-                    return "";
-                }
-                // Convert from Katakana to Hiragana (or DBCS <-> SBCS)automatically.
-                if(this.charExInstance.IsKatakana(c)) {
-                    // Large < - > Small
-                    if(this.charExInstance.IsLowerKana(c)) {
-                        var u = this.charExInstance.ToUpperKana(c);
-                        isValid = this.IsValid(u);
-                        if(isValid) {
-                            return u;
-                        }
-                    } else if(this.charExInstance.HasLowerKana(c)) {
-                        var l = this.charExInstance.ToLowerKana(c);
-                        isValid = this.IsValid(l);
-                        if(isValid) {
-                            return l;
-                        }
-                    }
-                    // DBCS < - > SBCS
-                    var processedAll = false;
-                    var r = c;
-                    if(this.charExInstance.IsFullWidth(c)) {
-                        var newChars = this.charExInstance.ToHalfWidthEx(c);
-                        if(newChars.GetLength() > 0) {
-                            isValid = this.IsValid(newChars);
-                            if(isValid) {
-                                return newChars;
-                            }
-                        }
-                        if(this.charExInstance.IsLowerKana(newChars)) {
-                            newChars = this.charExInstance.ToUpperKana(newChars);
-                            isValid = this.IsValid(newChars);
-                            if(isValid) {
-                                return newChars;
-                            }
-                        } else if(this.charExInstance.HasLowerKana(newChars)) {
-                            newChars = this.charExInstance.ToLowerKana(newChars);
-                            isValid = this.IsValid(newChars);
-                            if(isValid) {
-                                return newChars;
-                            }
-                        }
-                    } else {
-                        if(index == null) {
-                            r = this.charExInstance.ToFullWidth(c).text;
-                            if(!this.charExInstance.IsKatakana(r)) {
-                                // ***********
-                                return "";
-                            }
-                            isValid = this.IsValid(r);
-                            if(isValid) {
-                                return r;
-                            }
-                        } else {
-                            if((index + 1) < text.GetLength()) {
-                                var convertObj = this.charExInstance.ToFullWidth(text.Substring(index, index + 2));
-                                r = convertObj.text;
-                                processedAll = convertObj.processedAll;
-                            } else {
-                                r = this.charExInstance.ToFullWidth(c).text;
-                            }
-                            if(!this.charExInstance.IsKatakana(r)) {
-                                return "";
-                            }
-                            isValid = this.IsValid(r);
-                            if(isValid) {
-                                index++;
-                                if(processedAll) {
-                                    index++;
-                                }
-                                return {
-                                    index: index,
-                                    strValue: r
-                                };
-                            }
-                        }
-                        if(this.charExInstance.IsLowerKana(r)) {
-                            var u = this.charExInstance.ToUpperKana(r);
-                            isValid = this.IsValid(u);
-                            if(isValid) {
-                                return u;
-                            }
-                        } else if(this.charExInstance.HasLowerKana(r)) {
-                            var l = this.charExInstance.ToLowerKana(r);
-                            isValid = this.IsValid(l);
-                            if(isValid) {
-                                return l;
-                            }
-                        }
-                    }
-                    r = this.charExInstance.ToHiragana(r);
-                    isValid = this.IsValid(r);
-                    if(isValid) {
-                        if(index != null) {
-                            index++;
-                            if(processedAll) {
-                                index++;
-                            }
-                            var retObj = {
-                                index: index,
-                                strValue: r
-                            };
-                            //add by sj for bug 2955
-                            if(r == '\u3094') {
-                                if(processedAll) {
-                                    retObj.strValue = '\u3046' + '\u309B';
-                                } else {
-                                    retObj.strValue = "";
-                                }
-                            }
-                            //end by sj
-                            return retObj;
-                        } else {
-                            //add by sj for bug 2955
-                            if(r == '\u3094') {
-                                return "";
-                            }
-                            //end by sj
-                            return r;
-                        }
-                    }
-                    if(this.charExInstance.IsLowerKana(r)) {
-                        var u = this.charExInstance.ToUpperKana(r);
-                        isValid = this.IsValid(u);
-                        if(isValid) {
-                            return u;
-                        }
-                    } else if(this.charExInstance.HasLowerKana(r)) {
-                        var l = this.charExInstance.ToLowerKana(r);
-                        isValid = this.IsValid(l);
-                        if(isValid) {
-                            return l;
-                        }
-                    }
-                }
-                // Convert between DBCS and SBCS automatically.
-                c = this.charExInstance.IsFullWidth(c) ? this.charExInstance.ToHalfWidth(c) : this.charExInstance.ToFullWidth(c).text;
-                //		var ret = this.IsSpace(c);
-                //		if (ret.IsSpace && this.CheckCharByAllowSpace(ret.Character, this.allowSpace))
-                //		{
-                //			return ret.Character;
-                //		}
-                isValid = this.IsValid(c);
-                if(isValid) {
-                    return c;
-                }
-                return "";
-            };
-            return TextFilter;
-        })();
-        input.TextFilter = TextFilter;        
         ;
     })(wijmo.input || (wijmo.input = {}));
     var input = wijmo.input;

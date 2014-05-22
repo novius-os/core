@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20133.20
+ * Wijmo Library 3.20141.34
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -8,7 +8,6 @@
  * Licensed under the Wijmo Commercial License. Also available under the GNU GPL Version 3 license.
  * licensing@wijmo.com
  * http://wijmo.com/widgets/license/
- *
  *
  */
 var __extends = this.__extends || function (d, b) {
@@ -18,7 +17,9 @@ var __extends = this.__extends || function (d, b) {
 };
 var wijmo;
 (function (wijmo) {
+    /// <reference path="jquery.wijmo.wijstringinfo.ts"/>
     /// <reference path="jquery.wijmo.wijinputcore.ts"/>
+    /// <reference path="jquery.wijmo.wijinputnumberformat.ts"/>
     /*globals wijinputcore wijNumberTextProvider wijInputResult
     wijNumberFormat window jQuery*/
     /*
@@ -32,7 +33,10 @@ var wijmo;
     *	globalize.js
     *	jquery.mousewheel.js
     *	jquery.wijmo.wijpopup.js
+    *	jquery.wijmo.wijcharex.js
+    *	jquery.wijmo.wijstringinfo.js
     *	jquery.wijmo.wijinputcore.js
+    *  jquery.wijmo.wijinputnumberformat.js
     *
     */
     (function (input) {
@@ -113,10 +117,7 @@ var wijmo;
             };
             wijinputnumber.prototype.focus = /** Set the focus to the widget. */
             function () {
-                _super.prototype.focus.call(this);
-                // if focused by calling this method, recover the caret position.
-                var prevPos = this.element.data('prevCursorPos');
-                this.element.wijtextselection(prevPos, prevPos);
+                this._doFocus();
             };
             wijinputnumber.prototype._setOption = function (key, value) {
                 _super.prototype._setOption.call(this, key, value);
@@ -346,6 +347,12 @@ var wijmo;
                     this._trigger('valueBoundsExceeded');
                     if(!this.isFocused()) {
                         this._textProvider.setNullValue(false);
+                        this.options.value = this._textProvider.getValue();
+                        if(this._textProvider._stringFormat.isNegative()) {
+                            this.element.addClass(this.options.negativeClass);
+                        } else {
+                            this.element.removeClass(this.options.negativeClass);
+                        }
                         _super.prototype._updateText.call(this, keepSelection);
                     }
                 }
@@ -360,18 +367,34 @@ var wijmo;
                 var selRange = this.element.wijtextselection(), rh = new input.wijInputResult();
                 if(this.element.data('focusNotCalledFirstTime') !== -9 && (new Date().getTime() - this.element.data('focusNotCalledFirstTime')) < 600) {
                     this.element.data('focusNotCalledFirstTime', -9);
-                    this.element.data('prevCursorPos', 0);
+                    this.element.data('prevSelection', {
+                        start: 0,
+                        end: 0
+                    });
                 }
-                if(this.element.data('prevCursorPos') === -1) {
-                    this.element.data('prevCursorPos', selRange.start);
+                if(this.element.data('prevSelection') === null) {
+                    this.element.data('prevSelection', {
+                        start: selRange.start,
+                        end: selRange.start
+                    });
                 } else {
-                    selRange.start = (this.element.data('prevCursorPos'));
+                    selRange.start = (this.element.data('prevSelection').start);
                 }
                 rh.testPosition = selRange.start;
-                this._textProvider.spinEnumPart(selRange.start, rh, this.options.increment, up);
+                if(this.options.increment < 0) {
+                    var incrementBackup = this.options.increment;
+                    this.options.increment *= -1;
+                    this._textProvider.spinEnumPart(selRange.start, rh, this.options.increment, !up);
+                    this.options.increment = incrementBackup;
+                } else {
+                    this._textProvider.spinEnumPart(selRange.start, rh, this.options.increment, up);
+                }
                 up ? this._trigger('spinUp', null) : this._trigger('spinDown', null);
                 this._updateText();
-                this.element.data('prevCursorPos', rh.testPosition);
+                this.element.data('prevSelection', {
+                    start: rh.testPosition,
+                    end: rh.testPosition
+                });
                 if(!noFocus) {
                     this.selectText(rh.testPosition, rh.testPosition);
                 }
@@ -433,6 +456,7 @@ var wijmo;
                 switch(key) {
                     case jqKeyCode.TAB:
                         if(this.options.tabAction !== "field") {
+                            this._trigger('keyExit');
                             break;
                         }
                         var dpPosition = this.element.val().indexOf('.');
@@ -476,6 +500,70 @@ var wijmo;
             function () {
                 this._doSpin(false, false, true);
             };
+            wijinputnumber.prototype._getRealNegativePrefix = function () {
+                if(this._userNegativePrefix !== undefined) {
+                    return this._userNegativePrefix.replace(/\$/g, this.options.currencySymbol);
+                } else {
+                    if(this.options.negativePrefix === null) {
+                        // in _create()
+                        return "";
+                    }
+                    return this.options.negativePrefix.replace(/\$/g, this.options.currencySymbol);
+                }
+            };
+            wijinputnumber.prototype._getRealPositivePrefix = function () {
+                if(this._userPositivePrefix !== undefined) {
+                    return this._userPositivePrefix.replace(/\$/g, this.options.currencySymbol);
+                } else {
+                    if(this.options.positivePrefix === null) {
+                        // in _create()
+                        return "";
+                    }
+                    return this.options.positivePrefix.replace(/\$/g, this.options.currencySymbol);
+                }
+            };
+            wijinputnumber.prototype._getRealNegativeSuffix = function () {
+                if(this._userNegativeSuffix !== undefined) {
+                    return this._userNegativeSuffix.replace(/\$/g, this.options.currencySymbol);
+                } else {
+                    if(this.options.negativeSuffix === null) {
+                        // in _create()
+                        return "";
+                    }
+                    return this.options.negativeSuffix.replace(/\$/g, this.options.currencySymbol);
+                }
+            };
+            wijinputnumber.prototype._getRealPositiveSuffix = function () {
+                if(this._userPositiveSuffix !== undefined) {
+                    return this._userPositiveSuffix.replace(/\$/g, this.options.currencySymbol);
+                } else {
+                    if(this.options.positiveSuffix === null) {
+                        // in _create()
+                        return "";
+                    }
+                    return this.options.positiveSuffix.replace(/\$/g, this.options.currencySymbol);
+                }
+            };
+            wijinputnumber.prototype._afterFocused = function () {
+                if(this._isNullText()) {
+                    _super.prototype._doFocus.call(this);
+                } else {
+                    this._doFocus();
+                }
+            };
+            wijinputnumber.prototype._doFocus = function () {
+                _super.prototype.focus.call(this);
+                if(this.options.highlightText) {
+                    this.element.wijtextselection(0, this.element.val().length);
+                } else {
+                    // if focused by calling this method, recover the caret position.
+                    var prevPos = this.element.data('prevSelection');
+                    if(prevPos) {
+                        this.element.wijtextselection(prevPos.start, prevPos.end);
+                    }
+                }
+                this.element.data('isFocusSelecting', true);
+            };
             return wijinputnumber;
         })(input.wijinputcore);
         input.wijinputnumber = wijinputnumber;        
@@ -507,38 +595,39 @@ var wijmo;
                 this.showGroup = false;
                 /** Indicates the number of decimal places to display.
                 * @remarks
-                * Possible values are integer from -2 to 8. They are:
-                * useDefault: -2,
-                * asIs: -1,
-                * zero: 0,
-                * one: 1,
-                * two: 2,
-                * three: 3,
-                * four: 4,
-                * five: 5,
-                * six: 6,
-                * seven: 7,
-                * eight: 8
+                * Possible values are integer from -2 to 8.
                 */
                 this.decimalPlaces = 2;
-                /** Determines how much to increase/decrease the input field.
+                /** Determines how much to increase/decrease the active field when performing spin on the the active field.
                 */
                 this.increment = 1;
                 /** Determine the current symbol when number type is currency.
+                * @remarks
+                * If the currencySymbol's value is null and number's type is currency, wijinputnumber will dispaly the currency symbol from the current culture, for use US culture, it is '$'.  <br />
+                * But user can change this behavior by setting the currencySymbol option, then the '$' will changed to the specified value.
                 */
                 this.currencySymbol = null;
                 /** Determine the prefix string used for negative value.
+                * The default value will depend on the wijinputnumber's type option.
                 */
                 this.negativePrefix = null;
                 /** Determine the suffix string used for negative value.
+                * The default value will depend on the wijinputnumber's type option.
                 */
                 this.negativeSuffix = null;
                 /** Determine the prefix string used for positive value.
+                * The default value will depend on the wijinputnumber's type option.
                 */
                 this.positivePrefix = null;
                 /** Determine the suffix stirng used for positive value.
+                * The default value will depend on the wijinputnumber's type option.
                 */
                 this.positiveSuffix = null;
+                /** @ignore */
+                this.imeMode = '';
+                /** Indicates whether to highlight the control's Text on receiving input focus.
+                */
+                this.highlightText = false;
                 /** The valueChanged event handler.
                 * A function called when the value of the input is changed.
                 * @event
@@ -546,10 +635,12 @@ var wijmo;
                 this.valueChanged = null;
                 /** The spinUp event handler.
                 * A function called when spin up event fired.
+                * @event
                 */
                 this.spinUp = null;
                 /** The spinDown event handler.
                 * A function called when spin down event fired.
+                * @event
                 */
                 this.spinDown = null;
                 /** The valueBoundsExceeded event handler. A function called when
@@ -565,20 +656,19 @@ var wijmo;
         }, input.wijinputcore.prototype.options, new wijinputnumber_options());
         $.wijmo.registerWidget("wijinputnumber", wijinputnumber.prototype);
         //==============================
-        var wijNumberTextProvider = (function (_super) {
-            __extends(wijNumberTextProvider, _super);
+        /** @ignore */
+        var wijNumberTextProvider = (function () {
             function wijNumberTextProvider(owner, type) {
-                        _super.call(this);
                 this._type = 'numeric';
                 this._stringFormat = null;
                 this._nullvalue = false;
                 this.inputWidget = owner;
                 this._type = type;
-                this._stringFormat = new wijNumberFormat(this.inputWidget);
-                this._stringFormat.setValueFromJSFloat(this.getValue());
+                this._stringFormat = new input.wijNumberFormat()/*this.inputWidget*/ ;
+                this._stringFormat.setValueFromJSFloat(this.getValue(), this.inputWidget._getCulture(), this.inputWidget._getRealPositivePrefix(), this.inputWidget._getRealPositiveSuffix(), this.inputWidget._getRealNegativePrefix(), this.inputWidget._getRealNegativeSuffix(), this.inputWidget.options);
             }
             wijNumberTextProvider.prototype.getEditingValue = function () {
-                return this._stringFormat.tryParseValue(this._stringFormat._strippedText);
+                return this._stringFormat.tryParseValue(this._stringFormat._strippedText, this.inputWidget._getCulture(), this.inputWidget.options);
             };
             wijNumberTextProvider.prototype._getCulture = function () {
                 return this.inputWidget._getCulture();
@@ -590,7 +680,7 @@ var wijmo;
                 return this._getCulture().numberFormat[","];
             };
             wijNumberTextProvider.prototype.tryParseValue = function (value) {
-                return this._stringFormat.tryParseValue(value);
+                return this._stringFormat.tryParseValue(value, this.inputWidget._getCulture(), this.inputWidget.options);
             };
             wijNumberTextProvider.prototype.toString = function () {
                 if(this.inputWidget._showNullText() && !this.inputWidget.isFocused() && this.isValueNull()) {
@@ -604,7 +694,7 @@ var wijmo;
                 if(this.isValueNull()) {
                     return "";
                 }
-                return this._stringFormat.getFormattedValue();
+                return this._stringFormat.getFormattedValue(this.inputWidget._initialValue, this.isValueNull(), this.inputWidget._getCulture(), this.inputWidget._getRealPositivePrefix(), this.inputWidget._getRealPositiveSuffix(), this.inputWidget._getRealNegativePrefix(), this.inputWidget._getRealNegativeSuffix(), this.inputWidget.options);
             };
             wijNumberTextProvider.prototype.isValueNull = function () {
                 var o = this.inputWidget.options;
@@ -692,7 +782,9 @@ var wijmo;
                 if(num.charAt(pos) === ' ' || num.charAt(pos) === this.inputWidget.options.currencySymbol) {
                     pos++;
                 }
-                while(num.charAt(pos) === '0' && num.charAt(pos + 1) !== '.') {
+                var cultureObj = Globalize.findClosestCulture(this.inputWidget.options.culture);
+                var nf = cultureObj.numberFormat, specificFormat = nf[this.inputWidget.options.type] || nf;
+                while(num.charAt(pos) === '0' && num.charAt(pos + 1) !== specificFormat['.']) {
                     num = num.substr(0, pos) + num.substr(pos + 1);
                 }
                 return num;
@@ -709,10 +801,9 @@ var wijmo;
                 position -= prefix.length;
                 if(!rh) {
                     rh = new input.wijInputResult();
-                }//else {
-                
+                }
+                var isNullValueBackup = this._nullvalue;
                 this.setNullValue(false);
-                //}
                 if(strInput.length === 1) {
                     if(strInput === '+') {
                         var signBefore = this._stringFormat.isNegative();
@@ -728,7 +819,7 @@ var wijmo;
                     }
                     if(strInput === '-' || strInput === ')' || strInput === '(') {
                         var isNegativeBefore = this._stringFormat.isNegative();
-                        this._stringFormat.invertSign();
+                        this._stringFormat.invertSign(this.inputWidget._getCulture(), this.inputWidget._getRealPositivePrefix(), this.inputWidget._getRealPositiveSuffix(), this.inputWidget._getRealNegativePrefix(), this.inputWidget._getRealNegativeSuffix(), this.inputWidget.options);
                         this.checkAndRepairBounds(true, false);
                         if(this._stringFormat.isNegative() === isNegativeBefore) {
                             rh.testPosition = prefix.length + position - 1;
@@ -763,6 +854,7 @@ var wijmo;
                                 rh.testPosition = position;
                                 return true;
                             } else {
+                                this.setNullValue(isNullValueBackup);
                                 return false;
                             }
                         }
@@ -806,11 +898,11 @@ var wijmo;
                     this.checkAndRepairBounds(true, false);
                 }
                 if(sign === '-' || sign === ')' || sign === '(') {
-                    this._stringFormat.invertSign();
+                    this._stringFormat.invertSign(this.inputWidget._getCulture(), this.inputWidget._getRealPositivePrefix(), this.inputWidget._getRealPositiveSuffix(), this.inputWidget._getRealNegativePrefix(), this.inputWidget._getRealNegativeSuffix(), this.inputWidget.options);
                     this.checkAndRepairBounds(true, false);
                 }
                 rh.testPosition = prefix.length + beginText.length + filtratedText.length - 1;
-                this._stringFormat.deFormatValue((this._stringFormat.isNegative() ? "-" : "") + beginText + filtratedText + endText);
+                this._stringFormat.deFormatValue((this._stringFormat.isNegative() ? "-" : "") + beginText + filtratedText + endText, this.inputWidget._getCulture(), this.inputWidget._getRealPositivePrefix(), this.inputWidget._getRealPositiveSuffix(), this.inputWidget._getRealNegativePrefix(), this.inputWidget._getRealNegativeSuffix(), this.inputWidget.options);
                 newText = this._stringFormat._strippedText;
                 //this.checkAndRepairBounds(true, false);
                 try  {
@@ -848,7 +940,7 @@ var wijmo;
                     }
                     newText += curText.slice(end + 1);
                     newText = newText || "0";
-                    this._stringFormat.deFormatValue(newText);
+                    this._stringFormat.deFormatValue(newText, this.inputWidget._getCulture(), this.inputWidget._getRealPositivePrefix(), this.inputWidget._getRealPositiveSuffix(), this.inputWidget._getRealNegativePrefix(), this.inputWidget._getRealNegativeSuffix(), this.inputWidget.options);
                     newText = this._stringFormat._currentText;
                     this.setNullValue(false);
                     if(this.inputWidget.options.showGroup) {
@@ -878,285 +970,32 @@ var wijmo;
                 return true;
             };
             wijNumberTextProvider.prototype.replaceWith = function (range, text) {
+                if(text === '.' && this.inputWidget.options.decimalPlaces <= 0) {
+                    var result = new input.wijInputResult();
+                    result.testPosition = range.start - 1;
+                    return result;
+                }
                 var shouldInvertAgain = false;
                 if(this._stringFormat.isNegative() && text === '-' && range.text.length === this._stringFormat._currentText.length) {
                     shouldInvertAgain = true;
                 }
-                var superResult = _super.prototype.replaceWith.call(this, range, text);
+                var superResult = this.superReplaceWith(range, text);
                 if(shouldInvertAgain) {
                     this.insertAt('-', this.inputWidget.element.wijtextselection().start, superResult);
                 }
                 return superResult;
             };
-            wijNumberTextProvider.prototype.spinEnumPart = function (position, rh, val, isIncrease) {
-                if(!rh) {
-                    rh = new input.wijInputResult();
+            wijNumberTextProvider.prototype.superReplaceWith = function (range, text) {
+                var index = range.start;
+                var result = new input.wijInputResult();
+                if(range.start < range.end) {
+                    this.removeAt(range.start, range.end - 1, result, true);
+                    index = result.testPosition;
                 }
-                val = parseInt(val.toString());
-                var prefixBeforeSpin = this.inputWidget._getPrefix();
-                var dpPosition = this._stringFormat._currentText.indexOf(this._getCulture().numberFormat['.']);
-                var valueStringWithoutMinus = this._stringFormat._currentValueInString.replace('-', '');
-                var dpPositionInValueString = valueStringWithoutMinus.indexOf('.');
-                var hasDecimalPoint = true;
-                if(dpPosition === -1) {
-                    hasDecimalPoint = false;
-                    dpPosition = this._stringFormat._currentText.length;
-                }
-                if(dpPositionInValueString === 0) {
-                    //".000"
-                    dpPositionInValueString = 1;
-                } else if(dpPositionInValueString === -1) {
-                    dpPositionInValueString = dpPosition;
-                }
-                var scope = Math.pow(10, this.inputWidget.options.decimalPlaces);
-                if(rh.testPosition > dpPosition && hasDecimalPoint) {
-                    var fullVal = val;
-                    val = val / scope;
-                    if(Math.abs(val) >= 1) {
-                        isIncrease ? this._stringFormat.spinUp(parseInt(val), this._nullvalue) : this._stringFormat.spinDown(parseInt(val), this._nullvalue);
-                        val = (fullVal - parseInt(val) * scope) / scope// prevent float precision problem.
-                        ;
-                    }
-                }
-                isIncrease ? this._stringFormat.spinUp(val, this._nullvalue) : this._stringFormat.spinDown(val, this._nullvalue);
-                this.setNullValue(false);
-                var allowWrap = this.inputWidget.options.allowSpinLoop;
-                this.checkAndRepairBounds(true, false, allowWrap);
-                var valueStringWithoutMinusAfterSpin = this._stringFormat._currentValueInString.replace('-', '');
-                var dpPositionInValueStringAfterSpin = valueStringWithoutMinusAfterSpin.indexOf('.');
-                if(dpPositionInValueStringAfterSpin === -1) {
-                    hasDecimalPoint = false;
-                    dpPositionInValueStringAfterSpin = valueStringWithoutMinusAfterSpin.length;
-                }
-                var prefixAfterSpin = this.inputWidget._getPrefix();
-                if(dpPositionInValueStringAfterSpin !== dpPositionInValueString && hasDecimalPoint) {
-                    rh.testPosition = rh.testPosition - prefixBeforeSpin.length + prefixAfterSpin.length + dpPositionInValueStringAfterSpin - dpPositionInValueString;
-                } else {
-                    rh.testPosition = rh.testPosition - prefixBeforeSpin.length + prefixAfterSpin.length;
-                }
+                return this.insertAt(text, index, result) ? result : null;
             };
-            wijNumberTextProvider.prototype.getValue = function () {
-                return this._stringFormat.getJSFloatValue();
-            };
-            wijNumberTextProvider.prototype.setValue = function (val) {
-                try  {
-                    //if val is null, show null value instead of 0
-                    if(val === null) {
-                        this.setNullValue(true);
-                        val = this.inputWidget._initialValue;
-                    } else {
-                        this.setNullValue(false);
-                    }
-                    this._stringFormat.setValueFromJSFloat(val);
-                    this.checkAndRepairBounds(true, false);
-                    return true;
-                } catch (e) {
-                    return false;
-                }
-            };
-            wijNumberTextProvider.prototype.setNullValue = function (value) {
-                this._nullvalue = value;
-            };
-            return wijNumberTextProvider;
-        })(input.wijTextProvider);
-        input.wijNumberTextProvider = wijNumberTextProvider;        
-        //updateStringFormat() {
-        //    var t = '0';
-        //    if (typeof (this._stringFormat) !== 'undefined') {
-        //        t = this._stringFormat._currentValueInString;
-        //    }
-        //    this._stringFormat = new wijNumberFormat(this.inputWidget);
-        //    this._stringFormat._currentValueInString = t;
-        //}
-        //============================
-        var wijNumberFormat = (function () {
-            function wijNumberFormat(inputWidget) {
-                this.inputWidget = inputWidget;
-                // stripped value with en-US culture
-                this._currentValueInString = '0';
-                this._currentText = '0';
-                this._strippedText = '0';
-                this._groupSeparator = ' ';
-            }
-            wijNumberFormat.prototype._isNegtive = function (value) {
-                return value.indexOf('-') !== -1 || value.indexOf('(') !== -1;
-            };
-            wijNumberFormat.prototype._stripValue = function (value) {
-                var nf = this.inputWidget._getCulture().numberFormat, specificFormat = nf[this.inputWidget.options.type] || nf, isNegative = this._isNegtive(value), groupSep = //this.isNegative(),
-                specificFormat[','], decimalSep = specificFormat['.'], stripRgx = new RegExp('[' + groupSep + nf.percent.symbol + this.inputWidget.options.currencySymbol + ' ]', 'g'), match;
-                this._groupSeparator = groupSep;
-                value = this._removeNegativeSign(value);
-                value = value.replace(stripRgx, '');
-                value = value.replace(decimalSep, '.');
-                match = /([\d\.])+/.exec(value);
-                if(match) {
-                    value = match[0];
-                }
-                if(isNegative) {
-                    value = '-' + value;
-                }
-                return value;
-            };
-            wijNumberFormat.prototype.tryParseValue = function (value) {
-                try  {
-                    var result = parseFloat(this._stripValue(value));
-                    if(isNaN(result)) {
-                        result = null;
-                    }
-                    return result;
-                } catch (e) {
-                    return null;
-                }
-            };
-            wijNumberFormat.prototype.deFormatValue = function (value) {
-                value = this._stripValue(value);
-                this._currentValueInString = value;
-                this._currentText = this._formatValue(value);
-            };
-            wijNumberFormat.prototype._formatValue = function (strippedValue) {
-                var ops = this.inputWidget.options;
-                var nf = this.inputWidget._getCulture().numberFormat, specificFormat = nf[ops.type] || nf, dp = ops.decimalPlaces, groupSep = // isNegative = this.isNegative(), //this.isNegtive(strippedValue),
-                // pattern = specificFormat.pattern[isNegative ? 0 : 1] || 'n',
-                specificFormat[','], decimalSep = specificFormat['.'], decimals = dp !== -2 ? dp : specificFormat.decimals, groupSizes = ops.showGroup ? specificFormat.groupSizes : [
-                    0
-                ], digitsString;
-                strippedValue = this._removeLeadingZero(strippedValue);
-                digitsString = this._formatDigit(strippedValue, groupSep, decimalSep, decimals, groupSizes);
-                digitsString = this._removeLeadingZero(digitsString, ops.showGroup ? groupSep : "");
-                if(digitsString.indexOf(decimalSep) === 0) {
-                    digitsString = '0' + digitsString;
-                }
-                if(digitsString === '') {
-                    digitsString = '0';
-                }
-                this._currentValueInString = strippedValue;
-                //this._currentText = this.applyFormatPattern(pattern, digitsString,
-                //    nf.percent.symbol, this.inputWidget.options.currencySymbol);
-                this._strippedText = digitsString;
-                this._currentText = this._getPrefix() + digitsString + this._getSuffix();
-                return this._currentText;
-            };
-            wijNumberFormat.prototype._getPrefix = function () {
-                if(this.isNegative()) {
-                    if(this.inputWidget._userNegativePrefix !== undefined) {
-                        return this.inputWidget._userNegativePrefix.replace(/\$/g, this.inputWidget.options.currencySymbol);
-                    } else {
-                        if(this.inputWidget.options.negativePrefix === null) {
-                            // in _create()
-                            return "";
-                        }
-                        return this.inputWidget.options.negativePrefix.replace(/\$/g, this.inputWidget.options.currencySymbol);
-                    }
-                } else {
-                    if(this.inputWidget._userPositivePrefix !== undefined) {
-                        return this.inputWidget._userPositivePrefix.replace(/\$/g, this.inputWidget.options.currencySymbol);
-                    } else {
-                        if(this.inputWidget.options.positivePrefix === null) {
-                            // in _create()
-                            return "";
-                        }
-                        return this.inputWidget.options.positivePrefix.replace(/\$/g, this.inputWidget.options.currencySymbol);
-                    }
-                }
-            };
-            wijNumberFormat.prototype._getSuffix = function () {
-                if(this.isNegative()) {
-                    if(this.inputWidget._userNegativeSuffix !== undefined) {
-                        return this.inputWidget._userNegativeSuffix.replace(/\$/g, this.inputWidget.options.currencySymbol);
-                    } else {
-                        if(this.inputWidget.options.negativeSuffix === null) {
-                            // in _create()
-                            return "";
-                        }
-                        return this.inputWidget.options.negativeSuffix.replace(/\$/g, this.inputWidget.options.currencySymbol);
-                    }
-                } else {
-                    if(this.inputWidget._userPositiveSuffix !== undefined) {
-                        return this.inputWidget._userPositiveSuffix.replace(/\$/g, this.inputWidget.options.currencySymbol);
-                    } else {
-                        if(this.inputWidget.options.positiveSuffix === null) {
-                            // in _create()
-                            return "";
-                        }
-                        return this.inputWidget.options.positiveSuffix.replace(/\$/g, this.inputWidget.options.currencySymbol);
-                    }
-                }
-            };
-            wijNumberFormat.prototype.getFormattedValue = function () {
-                //var prefix = this.inputWidget._getPrefix(),
-                //    suffix = this.inputWidget._getSuffix();
-                //return prefix + this._removeNegativeSign(this.formatValue(this._currentValueInString)) + suffix;
-                if(!this.inputWidget._showNullText() && this.inputWidget.isValueNull()) {
-                    this._currentValueInString = this.inputWidget._initialValue + '';
-                }
-                return this._formatValue(this._currentValueInString);
-            };
-            wijNumberFormat.prototype.getJSFloatValue = function () {
-                try  {
-                    if(this._currentValueInString === '' || this._currentValueInString === '.') {
-                        return 0;
-                    }
-                    return parseFloat(this._currentValueInString);
-                } catch (e) {
-                    return Number.NaN;
-                }
-            };
-            wijNumberFormat.prototype.clear = function () {
-                this._currentValueInString = '0';
-                this._currentText = '0';
-                this._strippedText = '0';
-            };
-            wijNumberFormat.prototype.setValueFromJSFloat = function (value) {
-                var strValue = value.toFixed(this.inputWidget.options.decimalPlaces + 1);
-                try  {
-                    this._currentValueInString = strValue;
-                    this._formatValue(strValue);
-                    return true;
-                } catch (e) {
-                    return false;
-                }
-            };
-            wijNumberFormat.prototype.isZero = function (val) {
-                if (typeof val === "undefined") { val = this._currentValueInString; }
-                var test = this._removeNegativeSign(val), dbl;
-                if(!test) {
-                    return true;
-                }
-                dbl = parseFloat(test);
-                return !isNaN(dbl) && !dbl;
-            };
-            wijNumberFormat.prototype.setPositiveSign = function () {
-                this._currentValueInString = this._removeNegativeSign(this._currentValueInString);
-            };
-            wijNumberFormat.prototype._removeNegativeSign = function (text) {
-                return text.replace(/[()\-]/g, "");
-            };
-            wijNumberFormat.prototype._removeLeadingZero = function (text, groupSep) {
-                if (typeof groupSep === "undefined") { groupSep = ""; }
-                var text = text.replace(/^0+/, "");
-                while(groupSep.length > 0 && text.indexOf(groupSep) === 0) {
-                    text = text.substr(groupSep.length);
-                    var text = text.replace(/^0+/, "");
-                }
-                return text;
-            };
-            wijNumberFormat.prototype.isNegative = function () {
-                return this._currentValueInString.indexOf('-') !== -1 || this._currentValueInString.indexOf('(') !== -1;
-            };
-            wijNumberFormat.prototype.invertSign = function () {
-                var isNegative = this.isNegative();
-                if(isNegative) {
-                    this.setPositiveSign();
-                } else {
-                    this._currentValueInString = (!this._currentValueInString.length) ? '0' : '-' + this._currentValueInString;
-                }
-                if(this.isZero()) {
-                    this._currentValueInString = isNegative ? '0' : '-0';
-                }
-                this._formatValue(this._currentValueInString);
-            };
-            wijNumberFormat.prototype._parseNumber = function (strippedValue) {
-                if (typeof strippedValue === "undefined") { strippedValue = this._currentValueInString; }
+            wijNumberTextProvider.prototype._parseNumber = function (strippedValue) {
+                if (typeof strippedValue === "undefined") { strippedValue = this._stringFormat._currentValueInString; }
                 var arr = strippedValue.split(".", 2);
                 var retObj = {
                     integer: parseInt(arr[0], 10) || 0,
@@ -1168,7 +1007,7 @@ var wijmo;
                 }
                 return retObj;
             };
-            wijNumberFormat.prototype._doSpin = function (delta, nullValue) {
+            wijNumberTextProvider.prototype._doSpin = function (delta, nullValue) {
                 // 5, -1, 0.03, -0.08
                 var num = this._parseNumber();
                 var deltaDirection = delta >= 0 ? 1 : -1;
@@ -1239,174 +1078,106 @@ var wijmo;
                 }
                 if(nullValue) {
                     if(delta >= 0) {
-                        this._currentValueInString = this.inputWidget.options.minValue.toString();
+                        this._stringFormat._currentValueInString = this.inputWidget.options.minValue.toString();
                     } else {
-                        this._currentValueInString = this.inputWidget.options.maxValue.toString();
+                        this._stringFormat._currentValueInString = this.inputWidget.options.maxValue.toString();
                     }
                 } else {
-                    this._currentValueInString = signPrefix + integerString + '.' + decimalString;
+                    this._stringFormat._currentValueInString = signPrefix + integerString + '.' + decimalString;
                 }
             };
-            wijNumberFormat.prototype.spinUp = function (val, nullValue) {
+            wijNumberTextProvider.prototype.spinUp = function (val, nullValue) {
                 if(val === null || val === undefined) {
                     val = 1;
                 }
                 this._doSpin(val, nullValue);
             };
-            wijNumberFormat.prototype.spinDown = function (val, nullValue) {
+            wijNumberTextProvider.prototype.spinDown = function (val, nullValue) {
                 if(val === null || val === undefined) {
                     val = 1;
                 }
                 this._doSpin(-val, nullValue);
             };
-            wijNumberFormat.prototype.checkDigitsLimits = function (digitCount) {
-                var arr = this._currentValueInString.split("."), fraction = '';
-                if(!arr.length || (arr.length === 1 && arr[0] === '')) {
-                    return;
+            wijNumberTextProvider.prototype.spinEnumPart = function (position, rh, val, isIncrease) {
+                if(!rh) {
+                    rh = new input.wijInputResult();
                 }
-                if(arr.length > 1) {
-                    fraction = arr[1];
+                val = parseInt(val.toString());
+                var prefixBeforeSpin = this.inputWidget._getPrefix();
+                var dpPosition = this._stringFormat._currentText.indexOf(this._getCulture().numberFormat['.']);
+                var valueStringWithoutMinus = this._stringFormat._currentValueInString.replace('-', '');
+                var dpPositionInValueString = valueStringWithoutMinus.indexOf('.');
+                var hasDecimalPoint = true;
+                if(dpPosition === -1) {
+                    hasDecimalPoint = false;
+                    dpPosition = this._stringFormat._currentText.length;
                 }
-                fraction = fraction.substring(0, digitCount);
-                while(fraction.length < digitCount) {
-                    fraction += "0";
+                if(dpPositionInValueString === 0) {
+                    //".000"
+                    dpPositionInValueString = 1;
+                } else if(dpPositionInValueString === -1) {
+                    dpPositionInValueString = dpPosition;
                 }
-                this._currentValueInString = arr[0];
-                if(fraction) {
-                    this._currentValueInString += "." + fraction;
+                var scope = Math.pow(10, this.inputWidget.options.decimalPlaces);
+                if(rh.testPosition > dpPosition && hasDecimalPoint) {
+                    var fullVal = val;
+                    val = val / scope;
+                    if(Math.abs(val) >= 1) {
+                        isIncrease ? this.spinUp(parseInt(val), this._nullvalue) : this.spinDown(parseInt(val), this._nullvalue);
+                        val = (fullVal - parseInt(val) * scope) / scope// prevent float precision problem.
+                        ;
+                    }
+                }
+                isIncrease ? this.spinUp(val, this._nullvalue) : this.spinDown(val, this._nullvalue);
+                this.setNullValue(false);
+                var allowWrap = this.inputWidget.options.allowSpinLoop;
+                this.checkAndRepairBounds(true, false, allowWrap);
+                var valueStringWithoutMinusAfterSpin = this._stringFormat._currentValueInString.replace('-', '');
+                var dpPositionInValueStringAfterSpin = valueStringWithoutMinusAfterSpin.indexOf('.');
+                if(dpPositionInValueStringAfterSpin === -1) {
+                    hasDecimalPoint = false;
+                    dpPositionInValueStringAfterSpin = valueStringWithoutMinusAfterSpin.length;
+                }
+                var prefixAfterSpin = this.inputWidget._getPrefix();
+                if(dpPositionInValueStringAfterSpin !== dpPositionInValueString && hasDecimalPoint) {
+                    rh.testPosition = rh.testPosition - prefixBeforeSpin.length + prefixAfterSpin.length + dpPositionInValueStringAfterSpin - dpPositionInValueString;
+                } else {
+                    rh.testPosition = rh.testPosition - prefixBeforeSpin.length + prefixAfterSpin.length;
                 }
             };
-            wijNumberFormat.prototype.checkMinValue = function (minValue, chkAndRepair, chkIsLessOrEqMin) {
-                if (typeof chkIsLessOrEqMin === "undefined") { chkIsLessOrEqMin = false; }
-                var result = true, integerFractionArr, currentIntegerPart, currentFractionPart, minIntegerPart, minFractionPart;
+            wijNumberTextProvider.prototype.getValue = function () {
+                return this._stringFormat.getJSFloatValue();
+            };
+            wijNumberTextProvider.prototype.setValue = function (val) {
                 try  {
-                    integerFractionArr = this._currentValueInString.split(".");
-                    currentIntegerPart = parseFloat((integerFractionArr[0] === '' || integerFractionArr[0] === '-') ? '0' : integerFractionArr[0]);
-                    currentFractionPart = 0;
-                    if(integerFractionArr.length > 1 && parseFloat(integerFractionArr[1]) >= 0) {
-                        currentFractionPart = parseFloat('1.' + integerFractionArr[1]);
+                    //if val is null, show null value instead of 0
+                    if(val === null) {
+                        this.setNullValue(true);
+                        val = this.inputWidget._initialValue;
+                    } else {
+                        this.setNullValue(false);
                     }
-                    if(currentIntegerPart < 0 || integerFractionArr[0] === '-' || (integerFractionArr[0].length > 0 && integerFractionArr[0][0] === '-')) {
-                        currentFractionPart = currentFractionPart * (-1);
-                    }
-                    minValue = '' + minValue.toFixed(12) + '';
-                    integerFractionArr = minValue.split(".");
-                    minIntegerPart = parseFloat((integerFractionArr[0] === '' || integerFractionArr[0] === '-') ? '0' : integerFractionArr[0]);
-                    minFractionPart = 0;
-                    if(integerFractionArr.length > 1 && parseFloat(integerFractionArr[1]) >= 0) {
-                        minFractionPart = parseFloat('1.' + integerFractionArr[1]);
-                    }
-                    if(minIntegerPart < 0 || integerFractionArr[0] === '-' || (integerFractionArr[0].length > 0 && integerFractionArr[0][0] === '-')) {
-                        minFractionPart = minFractionPart * (-1);
-                    }
-                    if(currentIntegerPart > minIntegerPart) {
-                        return true;
-                    }
-                    if(currentIntegerPart < minIntegerPart || (chkIsLessOrEqMin && currentIntegerPart === minIntegerPart && currentFractionPart <= minFractionPart)) {
-                        result = false;
-                    } else if(currentIntegerPart === minIntegerPart && currentIntegerPart < 0 && currentFractionPart < minFractionPart) {
-                        result = false;
-                    } else if(currentIntegerPart === minIntegerPart && currentIntegerPart >= 0 && currentFractionPart < minFractionPart) {
-                        result = false;
-                    }
-                    if(!result && chkAndRepair) {
-                        this._currentValueInString = '' + minValue + '';
-                    }
+                    this._stringFormat.setValueFromJSFloat(val, this.inputWidget._getCulture(), this.inputWidget._getRealPositivePrefix(), this.inputWidget._getRealPositiveSuffix(), this.inputWidget._getRealNegativePrefix(), this.inputWidget._getRealNegativeSuffix(), this.inputWidget.options);
+                    this.checkAndRepairBounds(true, false);
+                    return true;
                 } catch (e) {
+                    return false;
                 }
-                return result;
             };
-            wijNumberFormat.prototype.checkMaxValue = function (maxValue, chkAndRepair) {
-                var result = true, integerFractionArr, currentIntegerPart, currentFractionPart, maxIntegerPart, maxFractionPart;
-                try  {
-                    integerFractionArr = this._currentValueInString.split(".");
-                    currentIntegerPart = parseFloat((integerFractionArr[0] === '' || integerFractionArr[0] === '-') ? '0' : integerFractionArr[0]);
-                    currentFractionPart = 0;
-                    if(integerFractionArr.length > 1 && parseFloat(integerFractionArr[1]) >= 0) {
-                        currentFractionPart = parseFloat('1.' + integerFractionArr[1]);
-                    }
-                    if(currentIntegerPart < 0 || integerFractionArr[0] === '-' || (integerFractionArr[0].length > 0 && integerFractionArr[0][0] === '-')) {
-                        currentFractionPart = currentFractionPart * (-1);
-                    }
-                    maxValue = '' + maxValue.toFixed(12) + '';
-                    integerFractionArr = maxValue.split(".");
-                    maxIntegerPart = parseFloat((integerFractionArr[0] === '' || integerFractionArr[0] === '-') ? '0' : integerFractionArr[0]);
-                    maxFractionPart = 0;
-                    if(integerFractionArr.length > 1 && parseFloat(integerFractionArr[1]) >= 0) {
-                        maxFractionPart = parseFloat('1.' + integerFractionArr[1]);
-                    }
-                    if(maxIntegerPart < 0 || integerFractionArr[0] === '-' || (integerFractionArr[0].length > 0 && integerFractionArr[0][0] === '-')) {
-                        maxFractionPart = maxFractionPart * (-1);
-                    }
-                    if(currentIntegerPart < maxIntegerPart) {
-                        return true;
-                    }
-                    if(currentIntegerPart > maxIntegerPart) {
-                        result = false;
-                    }
-                    if(currentIntegerPart === maxIntegerPart && currentIntegerPart >= 0 && currentFractionPart > maxFractionPart) {
-                        result = false;
-                    }
-                    if(currentIntegerPart === maxIntegerPart && currentIntegerPart < 0 && currentFractionPart > maxFractionPart) {
-                        result = false;
-                    }
-                    if(!result && chkAndRepair) {
-                        this._currentValueInString = '' + maxValue + '';
-                    }
-                } catch (e) {
-                }
-                return result;
+            wijNumberTextProvider.prototype.setNullValue = function (value) {
+                this._nullvalue = value;
             };
-            wijNumberFormat.prototype._formatDigit = //applyFormatPattern(pattern: string, digitString: string, percentSymbol: string, currencySymbol: string) {
-            //    return pattern
-            //        .replace(/n/g, digitString)
-            //        .replace(/%/g, percentSymbol)
-            //        .replace(/\$/g, currencySymbol);
-            //}
-            function (strippedValue, groupSep, decimalSep, decimals, groupSizes) {
-                var absValue = this._removeNegativeSign(strippedValue), decimalPos, result, groupSizeIndex, groupCount, ch, i;
-                decimalPos = absValue.indexOf('.');
-                if(decimalPos === -1) {
-                    decimalPos = absValue.length;
-                }
-                result = '';
-                groupSizeIndex = 0;
-                groupCount = 0;
-                for(i = absValue.length - 1; i >= 0; i--) {
-                    ch = absValue.charAt(i);
-                    if(i < decimalPos) {
-                        result = ch + result;
-                        groupCount++;
-                        if(groupCount === groupSizes[groupSizeIndex] * 1 && groupSizes[groupSizeIndex] * 1 && i) {
-                            result = groupSep + result;
-                            groupCount = 0;
-                            if(groupSizes.length - 1 > groupSizeIndex) {
-                                groupSizeIndex++;
-                            }
-                        }
-                    }
-                }
-                if(decimals > 0) {
-                    result = result + decimalSep;
-                    for(i = 0; i < decimals; i++) {
-                        ch = '0';
-                        if(i + decimalPos + 1 < absValue.length) {
-                            ch = absValue.charAt(i + decimalPos + 1);
-                        }
-                        result = result + ch;
-                    }
-                }
-                if(decimals === -1) {
-                    if(decimalPos < absValue.length - 1) {
-                        result = result + decimalSep;
-                        result = result + absValue.substr(decimalPos + 1);
-                    }
-                }
-                return result;
-            };
-            return wijNumberFormat;
+            return wijNumberTextProvider;
         })();
-        input.wijNumberFormat = wijNumberFormat;        
-    })(wijmo.input || (wijmo.input = {}));
+        input.wijNumberTextProvider = wijNumberTextProvider;        
+        //updateStringFormat() {
+        //    var t = '0';
+        //    if (typeof (this._stringFormat) !== 'undefined') {
+        //        t = this._stringFormat._currentValueInString;
+        //    }
+        //    this._stringFormat = new wijNumberFormat(this.inputWidget);
+        //    this._stringFormat._currentValueInString = t;
+        //}
+            })(wijmo.input || (wijmo.input = {}));
     var input = wijmo.input;
 })(wijmo || (wijmo = {}));

@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20133.20
+ * Wijmo Library 3.20141.34
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -8,7 +8,6 @@
  * Licensed under the Wijmo Commercial License. Also available under the GNU GPL Version 3 license.
  * licensing@wijmo.com
  * http://wijmo.com/widgets/license/
- *
  *
  */
 /// <reference path="../External/declarations/jquery.d.ts"/>
@@ -468,7 +467,7 @@ var wijmo;
         }
         $.each(splitString(text, width, style), function (idx, line) {
             var lineText = line.join(' '), align = textAlign || "near", txt = self.text(x, top, lineText), offsetX = 0, offsetY = 0;
-            txt.attr(style);
+            txt.wijAttr(style, null);
             bounds = txt.wijGetBBox();
             switch(align) {
                 case "near":
@@ -659,6 +658,65 @@ var wijmo;
         svg += '</svg>';
         return svg;
     };
+    Raphael.fn.group = function () {
+        var r = this;
+        function Group() {
+            var inst, set = r.set(), group = r.raphael.vml ? document.createElement("group") : document.createElementNS("http://www.w3.org/2000/svg", "g");
+            r.canvas.appendChild(group);
+            inst = {
+                type: 'group',
+                node: group,
+                paper: // In raphael attr method, it need paper, attrs, _, so here define it.
+                r,
+                attrs: {
+                },
+                _: {
+                },
+                id: Raphael.createUUID(),
+                push: function (item) {
+                    function pushOneRaphaelVector(it) {
+                        var i;
+                        if(it.type === 'set') {
+                            for(i = 0; i < it.length; i++) {
+                                pushOneRaphaelVector(it[i]);
+                            }
+                        } else {
+                            group.appendChild(it.node);
+                            set.push(it);
+                        }
+                    }
+                    if(arguments.length > 1) {
+                        $.each(arguments, function (i, arg) {
+                            pushOneRaphaelVector(arg);
+                        });
+                    } else {
+                        pushOneRaphaelVector(item);
+                    }
+                    return this;
+                },
+                getBBox: function () {
+                    return set.getBBox();
+                }
+            };
+            // create methods which is extend from Raphael.
+            $.each([
+                "attr", 
+                "stop", 
+                "animate", 
+                "wijAnimate", 
+                "remove", 
+                "wijRemove"
+            ], function (i, name) {
+                inst[name] = function () {
+                    if(Raphael.el[name]) {
+                        return Raphael.el[name].apply(this, arguments);
+                    }
+                };
+            });
+            return inst;
+        }
+        return Group();
+    };
     Raphael.el.wijRemove = function () {
         var self = this, jqobj;
         if(self.removed) {
@@ -702,6 +760,13 @@ var wijmo;
             this.shadow.animate(params, ms, easing, callback);
         }
     } , Raphael.el.wijAttr = function (name, value) {
+        if($.isPlainObject(name)) {
+            $.each(name, function (key, val) {
+                parseOption(key, val, name);
+            });
+        } else if(typeof (name) === "string") {
+            name = parseOption(name, value);
+        }
         this.attr(name, value);
         if(this.shadow) {
             if(typeof (name) === "object") {
@@ -807,21 +872,39 @@ var wijmo;
     // fixed an issue that when set to width/height/r to negative value,
     // the browser will throw exception in console.  This issue is found in
     // bar chart seriesTransition animation when the easing is backIn.
-    var raphaelAttr = Raphael.el.attr;
+        var raphaelAttr = Raphael.el.attr, handleValue = function (key, val) {
+        if(key === "width" || key === "height" || key === "r") {
+            if(!isNaN(val) && val < 0) {
+                return 0;
+            }
+        } else if(key === "clip-rect") {
+            if($.isArray(val)) {
+                $.each(val, function (i, v) {
+                    if(!isNaN(v) && v < 0) {
+                        val[i] = 0;
+                    }
+                });
+            }
+        }
+        return val;
+    }, parseOption = function (optName, optValue, attr) {
+        // for some attr parameters for svg element, they should obey the patter like 'xxxx-xxxx'
+        // They are 'arrow-end', 'clip-rect', 'fill' related attribute, 'font' related attribute,
+        // 'stroke' related attribute and 'text' related attribute.
+        var newOptName = optName.toLowerCase().replace(/^(font|stroke|clip|arrow|text|fill)(\w+)$/, "$1-$2");
+        if(attr && newOptName !== optName) {
+            delete attr[optName];
+            attr[newOptName] = optValue;
+        }
+        return newOptName;
+    };
     Raphael.el.attr = function (name, value) {
         if($.isPlainObject(name)) {
             $.each(name, function (key, val) {
-                if(key === "width" || key === "height" || key === "r") {
-                    if(!isNaN(val) && val < 0) {
-                        name[key] = 0;
-                    }
-                }
+                name[key] = handleValue(key, val);
             });
-        }
-        if(name === "width" || name === "height" || name === "r") {
-            if(!isNaN(value) && value < 0) {
-                value = 0;
-            }
+        } else {
+            value = handleValue(name, value);
         }
         return raphaelAttr.apply(this, arguments);
     };

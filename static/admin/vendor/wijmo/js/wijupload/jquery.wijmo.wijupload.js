@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20133.20
+ * Wijmo Library 3.20141.34
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -8,7 +8,6 @@
  * Licensed under the Wijmo Commercial License. Also available under the GNU GPL Version 3 license.
  * licensing@wijmo.com
  * http://wijmo.com/widgets/license/
- *
  *
  */
 var __extends = this.__extends || function (d, b) {
@@ -74,7 +73,7 @@ var wijmo;
                     xhttpr.open("POST", action, true);
                     xhttpr.setRequestHeader("Wijmo-RequestType", "XMLHttpRequest");
                     xhttpr.setRequestHeader("Cache-Control", "no-cache");
-                    xhttpr.setRequestHeader("Wijmo-FileName", name);
+                    xhttpr.setRequestHeader("Wijmo-FileName", encodeURI(name));
                     xhttpr.setRequestHeader("Content-Type", "application/octet-stream");
                     xhttpr.upload.onprogress = function (e) {
                         if(e.lengthComputable) {
@@ -650,7 +649,7 @@ var wijmo;
             wijupload.prototype._createDisabledDiv = function (outerEle) {
                 var self = this, div, ele = //Change your outerelement here
                 outerEle ? outerEle : self.upload, eleOffset = ele.offset(), disabledWidth = ele.outerWidth(), disabledHeight = ele.outerHeight();
-                div = $("<div></div>").addClass("ui-disabled").css({
+                div = $("<div></div>").addClass(self.options.wijCSS.stateDisabled).css({
                     "z-index": "99999",
                     position: "absolute",
                     width: disabledWidth,
@@ -697,6 +696,7 @@ var wijmo;
                     self.disabledDiv.remove();
                     self.disabledDiv = null;
                 }
+                _super.prototype.destroy.call(this);
                 //end for disabled option
                             };
             wijupload.prototype.widget = /**
@@ -931,7 +931,7 @@ var wijmo;
                         //					if (xhr.status != 200) {
                         //						throw xhr;
                         //					}
-                        self._trigger("complete", obj.e, t.inputFile);
+                        self._trigger("complete", obj.e, $.extend(true, t.inputFile, obj));
                         progressSpan.removeClass(uploadLoadingClass);
                         progressSpan.html("100%");
                         self._removeFileRow(t.fileRow, uploader, true);
@@ -1001,6 +1001,7 @@ var wijmo;
                 var self = this, o = self.options, progressAll = self.progressAll;
                 self.upload.delegate(isUploadCancel, "click." + self.widgetName, function (e) {
                     var cancelBtn = $(this), fileRow = cancelBtn.parents(isUploadFileRow), fileInput, uploader;
+                    e.preventDefault();
                     if((o.enableSWFUploadOnIE && $.browser.msie) || o.enableSWFUpload) {
                         var file = fileRow.data("file");
                         //self.swfupload.queueData.queueSize -= file.size;
@@ -1030,6 +1031,7 @@ var wijmo;
                 });
                 self.upload.delegate(isUploadUpload, "click." + self.widgetName, function (e) {
                     var uploadBtn = $(this), fileRow = uploadBtn.parents(isUploadFileRow), fileInput, uploader;
+                    e.preventDefault();
                     if((o.enableSWFUploadOnIE && $.browser.msie) || o.enableSWFUpload) {
                         var file = fileRow.data("file");
                         self.uploadAll = false;
@@ -1058,9 +1060,9 @@ var wijmo;
                             uploader.upload();
                         }
                     }
-                    e.preventDefault();
                 });
                 self.upload.delegate("." + uploadUploadAllClass, "click." + self.widgetName, function (e) {
+                    e.preventDefault();
                     if((o.enableSWFUploadOnIE && $.browser.msie) || o.enableSWFUpload) {
                         self.uploadAll = true;
                         if(self._wijUpload()) {
@@ -1087,6 +1089,7 @@ var wijmo;
                     }
                 });
                 self.upload.delegate("." + uploadCancelAllClass, "click." + self.widgetName, function (e) {
+                    e.preventDefault();
                     if((o.enableSWFUploadOnIE && $.browser.msie) || o.enableSWFUpload) {
                         $.each(self.swfupload.queueData.files, function (key, v) {
                             self.swfupload.cancelUpload(key);

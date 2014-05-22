@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20133.20
+ * Wijmo Library 3.20141.34
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -8,7 +8,6 @@
  * Licensed under the Wijmo Commercial License. Also available under the GNU GPL Version 3 license.
  * licensing@wijmo.com
  * http://wijmo.com/widgets/license/
- *
  *
  */
 var __extends = this.__extends || function (d, b) {
@@ -31,6 +30,8 @@ var wijmo;
     *
     */
     (function (chart) {
+        var PI = 180;
+        var TwoPI = 360;
         /**
         * @widget
         */
@@ -117,6 +118,9 @@ var wijmo;
             wijpiechart.prototype._hanldSharedXData = //Override chartcore's _hanldSharedXData, there's no x/y axis in piechart.
             function () {
             };
+            wijpiechart.prototype._checkSeriesDataEmpty = function (series) {
+                return isNaN(series.data);
+            };
             wijpiechart.prototype._getSeriesFromTR = function (theaders, sList, seriesList) {
                 var label = null, th = null, tds = null, data = null, series = null;
                 if(sList.length) {
@@ -183,11 +187,11 @@ var wijmo;
                     }, pieId = dataObj.pieID || "", sectors = element.data("fields").chartElements["sectors" + pieId], cb = this.canvasBounds, pieCX = (cb.startX + cb.endX) / 2, pieCY = (cb.startY + cb.endY) / 2, angle = Raphael.angle(mousePos.left, mousePos.top, pieCX, pieCY);
                     if(previousAngle) {
                         rotation = Math.round(angle - previousAngle);
-                        if(Math.abs(angle - previousAngle) > 180) {
+                        if(Math.abs(angle - previousAngle) > PI) {
                             if(angle > previousAngle) {
-                                rotation = rotation - 360;
+                                rotation = rotation - TwoPI;
                             } else {
-                                rotation = rotation + 360;
+                                rotation = rotation + TwoPI;
                             }
                         }
                         if(rotation) {
@@ -219,10 +223,10 @@ var wijmo;
                 }
                 //add targetCenterAngle >=0.01 to prevent the precision issue.
                 if(this.touchttSector && this.touchttSector === touchSector && Math.abs(this.targetCenterAngle) >= 0.01) {
-                    if(this.targetCenterAngle > 180) {
-                        angle = this.targetCenterAngle - 360;
-                    } else if(this.targetCenterAngle < -180) {
-                        angle = this.targetCenterAngle + 360;
+                    if(this.targetCenterAngle > PI) {
+                        angle = this.targetCenterAngle - TwoPI;
+                    } else if(this.targetCenterAngle < -PI) {
+                        angle = this.targetCenterAngle + TwoPI;
                     } else {
                         angle = this.targetCenterAngle;
                     }
@@ -244,7 +248,7 @@ var wijmo;
                 this.tapTarget = null;
             };
             wijpiechart.prototype._rotateCallback = function (sector, labels) {
-                var cb = this.canvasBounds, pieCX = (cb.startX + cb.endX) / 2, pieCY = (cb.startY + cb.endY) / 2, idx = sector.index, rotation = 0, transforms = sector.attr("transform"), label;
+                var cb = this.canvasBounds, pieCX = (cb.startX + cb.endX) / 2, pieCY = (cb.startY + cb.endY) / 2, idx = sector.index, rotation = 0, transforms = sector.attr("transform"), transformAttr, label;
                 $.each(transforms, function (idx, transform) {
                     if(transform[0] !== "r") {
                         return true;
@@ -253,25 +257,33 @@ var wijmo;
                         rotation += transform[1];
                     }
                 });
+                transformAttr = Raphael.format("r{0},{1},{2}", rotation, pieCX, pieCY);
                 if(pieCX > 0) {
-                    rotation = rotation % 360;
-                    sector.attr("transform", Raphael.format("r{0},{1},{2}", rotation, pieCX, pieCY));
+                    rotation = rotation % TwoPI;
+                    transformAttr = Raphael.format("r{0},{1},{2}", rotation, pieCX, pieCY);
+                    sector.attr("transform", transformAttr);
                 }
                 if(sector.tracker) {
-                    sector.tracker.attr("transform", Raphael.format("r{0},{1},{2}", rotation, pieCX, pieCY));
+                    sector.tracker.attr("transform", transformAttr);
                     sector.tracker.show();
                 }
                 if(sector.shadow) {
-                    sector.shadow.attr("transform", Raphael.format("r{0},{1},{2}", rotation, pieCX, pieCY));
+                    sector.shadow.attr("transform", transformAttr);
                     sector.shadow.show();
                 }
                 if(labels && labels.length && labels.length > idx) {
                     label = labels[idx];
                     label.attr("transform", Raphael.format("r{0},{1},{2}r{3}", rotation, pieCX, pieCY, 0 - rotation));
+                    if(label.connector) {
+                        label.connector.attr("transform", transformAttr);
+                    }
                     if($(label.node).data("legendHide")) {
                         return;
                     }
                     label.show();
+                    if(label.connector) {
+                        label.connector.show();
+                    }
                 }
             };
             wijpiechart.prototype._getTouchttSector = function (specifiedSector) {
@@ -286,7 +298,7 @@ var wijmo;
                         targetAngle = 270;
                         break;
                     case "west":
-                        targetAngle = 180;
+                        targetAngle = PI;
                         break;
                     case "north":
                     default:
@@ -302,11 +314,11 @@ var wijmo;
                             rotation += transform[1];
                         }
                     });
-                    rotation = rotation % 360;
+                    rotation = rotation % TwoPI;
                     if(rotation < 0) {
-                        rotation = 360 + rotation;
+                        rotation = TwoPI + rotation;
                     }
-                    rotation = (targetAngle + rotation) % 360;
+                    rotation = (targetAngle + rotation) % TwoPI;
                     if(specifiedSector) {
                         if(sector === specifiedSector) {
                             _this.targetCenterAngle = (angle.start + angle.end) / 2 - rotation;
@@ -388,13 +400,13 @@ var wijmo;
                 }
                 this.tooltip.showAt(point);
             };
-            wijpiechart.prototype._isTouchEnabled = function () {
-                return $.support.isTouchEnabled && $.support.isTouchEnabled() && this.options.enableTouchBehavior;
+            wijpiechart.prototype._isTouchBehaviorEnabled = function () {
+                return this.options.enableTouchBehavior && this._isTouchEnabled();
             };
             wijpiechart.prototype._mouseDown = function (e, args) {
                 var target = $(e.target), element = this.chartElement, pieId, sectors, labels;
                 _super.prototype._mouseDown.call(this, e, args);
-                if(this._isTouchEnabled()) {
+                if(this._isTouchBehaviorEnabled()) {
                     this.isTapAndHold = true;
                     if(target.data("owner")) {
                         target = target.data("owner");
@@ -418,12 +430,15 @@ var wijmo;
                     if(labels && labels.length) {
                         var label = labels[idx];
                         label.hide();
+                        if(label.connector) {
+                            label.connector.hide();
+                        }
                     }
                 });
             };
             wijpiechart.prototype._mouseUp = function (e, args) {
                 _super.prototype._mouseUp.call(this, e, args);
-                if(this._isTouchEnabled() && this.isTapAndHold) {
+                if(this._isTouchBehaviorEnabled() && this.isTapAndHold) {
                     this._rotateToSectorCenter(null);
                 }
             };
@@ -439,7 +454,7 @@ var wijmo;
             wijpiechart.prototype._click = function (e, args) {
                 var element = this.chartElement, pieId, sectors, sector;
                 _super.prototype._click.call(this, e, args);
-                if(this._isTouchEnabled() && this.tooltip) {
+                if(this._isTouchBehaviorEnabled() && this.tooltip) {
                     pieId = args.pieID || "";
                     sectors = element.data("fields").chartElements["sectors" + pieId];
                     if(sectors.length && sectors.length > args.index) {
@@ -453,7 +468,7 @@ var wijmo;
                 var wijCSS = this.options.wijCSS, element = this.chartElement, fields = element.data("fields");
                 _super.prototype._paintTooltip.call(this);
                 if(this.tooltip && fields) {
-                    if(this._isTouchEnabled()) {
+                    if(this._isTouchBehaviorEnabled()) {
                         this.tooltip.setOptions({
                             closeBehavior: "none",
                             mouseTrailing: false,
@@ -526,7 +541,9 @@ var wijmo;
                     widget: this,
                     enableTouchBehavior: o.enableTouchBehavior,
                     availableWidth: width,
-                    availableHeight: height
+                    availableHeight: height,
+                    direction: o.direction,
+                    isTouchBehaviorEnable: this._isTouchBehaviorEnabled()
                 });
                 this.piechartRender.render(!o.radius);
             };
@@ -551,6 +568,15 @@ var wijmo;
         })(chart.wijchartcore);
         chart.wijpiechart = wijpiechart;        
         /** end of private methods */
+        /*
+        * Piechart segments orientation
+        */
+        var pieChartDirection = (function () {
+            function pieChartDirection() { }
+            pieChartDirection.clockwise = "clockwise";
+            pieChartDirection.counterClockwise = "counterClockwise";
+            return pieChartDirection;
+        })();        
         var wijpiechart_options = (function () {
             function wijpiechart_options() {
                 /**
@@ -708,6 +734,11 @@ var wijmo;
                 * @param {IWijPieChartEventArgs} args The data with this event.
                 */
                 this.click = null;
+                /** Sets the direction in which pie segmets will be drawn - clocwise or counterClockwise.
+                * @type {pieChartDirection}
+                * @remarks default value is "counterClockwise"
+                */
+                this.direction = pieChartDirection.counterClockwise;
             }
             return wijpiechart_options;
         })();        
@@ -740,10 +771,10 @@ var wijmo;
                 }, chartLabelStyle = $.extend(true, {
                 }, textStyle, o.chartLabelStyle, labelsOpts.style), chartLabelFormatString = labelsOpts.formatString || o.chartLabelFormatString, chartLabelFormatter = labelsOpts.formatter || o.chartLabelFormatter, culture = o.culture, bounds = o.bounds, startX = bounds.startX, startY = bounds.startY, radius = o.radius, showChartLabels = o.showChartLabels, animation = o.animation, seriesTransition = o.seriesTransition, innerRadius = o.innerRadius, fields = ele.data("fields") || {
                 }, chartElements = fields.chartElements || {
-                }, aniSectorAttrs = fields.aniSectorAttrs, aniLabelAttrs = fields.aniLabelAttrs, total = 0, angle = o.startAngle || 0, wijCSS = o.wijCSS, pieID, path, attr, sectorAttrs = [], labelAttrs = [], sectors = [], labels = [], tooltipTars = [], seriesEles = [], trackers = canvas.set(), widget = this.options.widget, calAngle = angle, availableWidth = o.availableWidth, availableHeight = o.availableHeight, oldRadius = o.radius;
+                }, aniSectorAttrs = fields.aniSectorAttrs, aniLabelAttrs = fields.aniLabelAttrs, total = 0, angle = o.startAngle || 0, wijCSS = o.wijCSS, pieID, path, attr, sectorAttrs = [], labelAttrs = [], sectors = [], labels = [], tooltipTars = [], seriesEles = [], trackers = canvas.set(), widget = this.options.widget, calAngle = angle, availableWidth = o.availableWidth, availableHeight = o.availableHeight, oldRadius = o.radius, direction = o.direction;
                 canvas.customAttributes.segment = function (x, y, a1, a2, outerR, innerR) {
                     var path = null, offset = 0.01;
-                    if(a2 - a1 > 360 - offset) {
+                    if(a2 - a1 > TwoPI - offset) {
                         a2 -= offset;
                     } else if(a2 - a1 < offset) {
                         a2 += offset;
@@ -759,12 +790,12 @@ var wijmo;
                 };
                 $.each(seriesList, function (idx, series) {
                     if(series && typeof (series.data) === "number") {
-                        total += series.data;
+                        total += Math.abs(series.data);
                     }
                 });
                 if(radiusNotSet && showChartLabels && (labelsOpts.position === "outside")) {
                     $.each(seriesList, function (idx, series) {
-                        var actualSize, textStyle, chartLabel, formatter, label, labelBounds, tempRadius = radius, seriesWidth = 0, seriesHeight = 0, anglePlus = 360 * series.data / total, seriesAngle = anglePlus / 2 + calAngle;
+                        var actualSize, textStyle, chartLabel, formatter, label, labelBounds, tempRadius = radius, seriesWidth = 0, seriesHeight = 0, anglePlus = TwoPI * Math.abs(series.data) / total, seriesAngle = anglePlus / 2 + calAngle;
                         series = $.extend(true, {
                             offset: 0
                         }, series);
@@ -830,13 +861,20 @@ var wijmo;
                         opacity: 1,
                         stroke: "gray",
                         "stroke-width": 1
-                    }, seriesStyles[idx % stylesLength]), anglePlus = 360 * series.data / total, cx = startX + radius, cy = startY + radius, center, sector, label, pos, textStyle, borderPos, tracker, chartLabel, formatter, labelPosition = labelsOpts.position, labelConnectorStyle = labelsOpts.connectorStyle, labelOffset = labelsOpts.offset, calculatedAngle, labelBounds, labelConnector, animate = false;
+                    }, seriesStyles[idx % stylesLength]), anglePlus = TwoPI * Math.abs(series.data) / total, cx = startX + radius, cy = startY + radius, center, sector, label, pos, textStyle, borderPos, tracker, chartLabel, formatter, labelPosition = labelsOpts.position, labelConnectorStyle = labelsOpts.connectorStyle, labelOffset = labelsOpts.offset, calculatedAngle, labelBounds, labelConnector, animate = false;
                     pieID = series.pieID;
+                    var angleEnd, angleMediana;
+                    var isClockwise = direction == pieChartDirection.clockwise;
+                    if(isClockwise) {
+                        angleEnd = angle - anglePlus , angleMediana = angle - anglePlus / 2;
+                    } else {
+                        angleEnd = angle + anglePlus , angleMediana = angle + anglePlus / 2;
+                    }
                     series = $.extend(true, {
                         offset: 0
                     }, series);
                     if(series.offset) {
-                        center = getPositionByAngle(cx, cy, series.offset, angle + anglePlus / 2);
+                        center = getPositionByAngle(cx, cy, series.offset, angleMediana);
                         cx = center.x;
                         cy = center.y;
                     }
@@ -844,7 +882,7 @@ var wijmo;
                         cx, 
                         cy, 
                         angle, 
-                        angle + anglePlus, 
+                        angleEnd, 
                         radius, 
                         innerRadius
                     ];
@@ -859,7 +897,7 @@ var wijmo;
                                 cx, 
                                 cy, 
                                 0, 
-                                360, 
+                                TwoPI, 
                                 radius, 
                                 innerRadius
                             ];
@@ -886,7 +924,7 @@ var wijmo;
                     }
                     sector.angles = {
                         start: angle,
-                        end: angle + anglePlus
+                        end: angleEnd
                     };
                     sector.index = idx;
                     sector.getOffset = function (offset) {
@@ -931,10 +969,10 @@ var wijmo;
                     $(sector.node).data("wijchartDataObj", series);
                     if(showChartLabels) {
                         if(labelPosition === "outside") {
-                            borderPos = getPositionByAngle(cx, cy, radius, angle + anglePlus / 2);
-                            pos = getPositionByAngle(cx, cy, radius + labelOffset, angle + anglePlus / 2);
+                            borderPos = getPositionByAngle(cx, cy, radius, angleMediana);
+                            pos = getPositionByAngle(cx, cy, radius + labelOffset, angleMediana);
                         } else {
-                            pos = getPositionByAngle(cx, cy, series.offset + radius * 2 / 3, angle + anglePlus / 2);
+                            pos = getPositionByAngle(cx, cy, series.offset + radius * 2 / 3, angleMediana);
                         }
                         textStyle = $.extend(true, {
                         }, textStyle, chartLabelStyle);
@@ -977,7 +1015,7 @@ var wijmo;
                             label = widget._text.call(widget, pos.x, pos.y, chartLabel).attr(textStyle);
                         }
                         if(labelPosition === "outside") {
-                            calculatedAngle = (angle + anglePlus / 2) % 360;
+                            calculatedAngle = (angleMediana) % TwoPI;
                             labelBounds = label.wijGetBBox();
                             if(calculatedAngle >= 90 && calculatedAngle <= 270) {
                                 label.transform(Raphael.format("T{0},{1}", -labelBounds.width / 2, 0));
@@ -1024,7 +1062,8 @@ var wijmo;
                     series.y = series.data;
                     series.total = total;
                     series.type = "pie";
-                    angle += anglePlus;
+                    //angle += anglePlus;
+                    angle = angleEnd;
                 });
                 //ensuring labels are rendered on top of pie slices.
                 if(labels && labels.length) {
@@ -1053,17 +1092,16 @@ var wijmo;
                 this.unbindLiveEvents();
                 this.bindLiveEvents();
             };
-            PieChartRender.prototype._isTouchEnabled = function () {
-                return $.support.isTouchEnabled && $.support.isTouchEnabled() && this.options.enableTouchBehavior === true;
-            };
             PieChartRender.prototype.bindLiveEvents = function () {
-                var _this = this;
-                var o = this.options, ele = this.element, tooltip = o.tooltip, offset = {
+                var o = this.options, touchEnabled = o.widget._isTouchEnabled(), enableTouchBehavior = o.isTouchBehaviorEnable, ele = this.element, tooltip = o.tooltip, offset = {
                     x: 0,
                     y: 0
-                }, touchEventPre = "", isFunction = $.isFunction, disabled = o.disabled, animation = o.animation;
-                if(this._isTouchEnabled()) {
+                }, touchEventPre = "", touchBehaviorEventPre = "", isFunction = $.isFunction, disabled = o.disabled, animation = o.animation;
+                if(touchEnabled) {
                     touchEventPre = "wij";
+                }
+                if(enableTouchBehavior) {
+                    touchBehaviorEventPre = "wij";
                 }
                 if(tooltip) {
                     tooltip.setTargets(this.tooltipTars);
@@ -1098,7 +1136,7 @@ var wijmo;
                     if(isFunction(mouseUp)) {
                         mouseUp.call(ele, e, dataObj);
                     }
-                }).on(touchEventPre + "mouseover." + o.widgetName, "." + o.wijCSS.pieElement, function (e) {
+                }).on(touchBehaviorEventPre + "mouseover." + o.widgetName, "." + o.wijCSS.pieElement, function (e) {
                     if(disabled) {
                         return;
                     }
@@ -1119,7 +1157,7 @@ var wijmo;
                     if(isFunction(mouseOver)) {
                         mouseOver.call(ele, e, dataObj);
                     }
-                    if(_this._isTouchEnabled()) {
+                    if(enableTouchBehavior) {
                         return;
                     }
                     if(sector.removed) {
@@ -1163,7 +1201,7 @@ var wijmo;
                         }, 150);
                         sector.showAnimationTimer = showAnimationTimer;
                     }
-                }).on(touchEventPre + "mouseout." + o.widgetName, "." + o.wijCSS.pieElement, function (e) {
+                }).on(touchBehaviorEventPre + "mouseout." + o.widgetName, "." + o.wijCSS.pieElement, function (e) {
                     if(disabled) {
                         return;
                     }
@@ -1184,7 +1222,7 @@ var wijmo;
                     if(isFunction(mouseOut)) {
                         mouseOut.call(ele, e, dataObj);
                     }
-                    if(_this._isTouchEnabled()) {
+                    if(enableTouchBehavior) {
                         return;
                     }
                     if(sector.removed) {
@@ -1255,6 +1293,14 @@ var wijmo;
                     }
                 }).on(touchEventPre + "click." + o.widgetName, "." + o.wijCSS.pieElement, function (e) {
                     if(disabled) {
+                        return;
+                    }
+                    // The sector rotates twice on ios decive.
+                    // There is 300ms click delay on iOS devices, when rotate the sector,
+                    // the wijclick event will be fired twice, one is caused by touch on tracker(tracker is hiding after touch end),
+                    // then another wijclick is caused by click on sector.
+                    // So when click on sector, return it.
+                    if(window.navigator.userAgent.match(/iPhone|iPad|iPod/i) && enableTouchBehavior && !($.wijraphael.hasClass(e.target, o.wijCSS.pieTracker))) {
                         return;
                     }
                     var click = o.click, target = $(e.target), dataObj;

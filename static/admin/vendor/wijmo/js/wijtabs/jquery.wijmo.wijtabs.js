@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20133.20
+ * Wijmo Library 3.20141.34
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -8,7 +8,8 @@
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * licensing@wijmo.com
  * http://wijmo.com/widgets/license/
- *
+ * ----
+ * Credits: Wijmo includes some MIT-licensed software, see copyright notices below.
  */
 var __extends = this.__extends || function (d, b) {
     function __() { this.constructor = d; }
@@ -60,6 +61,12 @@ var wijmo;
                         this._innerDestroy(true);
                         this._tabify(true);
                         break;
+                    case 'scrollable':
+                        if(!value) {
+                            this._removeScroller();
+                        }
+                        this._tabify(false);
+                        break;
                     default:
                         this._tabify(false);
                         break;
@@ -73,10 +80,10 @@ var wijmo;
                         if(_this.element.wijRemoveVisibilityObserver) {
                             _this.element.wijRemoveVisibilityObserver();
                         }
-                        var dataObj = _this.element.data("wijtabs"), wijmoDataObj = _this.element.data("wijmoWijtabs");
+                        var dataObj = _this.element.data("wijtabs"), wijmoDataObj = _this.element.data("wijmo-wijtabs");
                         _this._innerDestroy(true);
                         _this.element.data("wijtabs", dataObj);
-                        _this.element.data("wijmoWijtabs", wijmoDataObj);
+                        _this.element.data("wijmo-wijtabs", wijmoDataObj);
                         _this._tabify(true);
                     }, "wijtabs");
                 }
@@ -170,9 +177,7 @@ var wijmo;
                             break;
                     }
                     if(o.sortable && this.list.sortable) {
-                        this.list.sortable({
-                            axis: (tabsAlign === 'Top' || tabsAlign === 'Bottom') ? "x" : "y"
-                        });
+                        this._createSortable(tabsAlign);
                     }
                     // Selected tab
                     // use "selected" option or try to retrieve:
@@ -228,7 +233,7 @@ var wijmo;
                         this.load(o.selected);
                     }
                     // clean up to avoid memory leaks in certain versions of IE 6
-                    $(window).bind('unload', function () {
+                    $(window).bind('unload.wijtabs', function () {
                         if(self.lis) {
                             self.lis.add(self.anchors).unbind('.tabs');
                         }
@@ -237,6 +242,19 @@ var wijmo;
                 } else {
                     // update selected after add/remove
                     o.selected = this.lis.index(this.lis.filter('.' + o.wijCSS.tabsActive));
+                    if(this.list.data("ui-sortable")) {
+                        if(this.list.sortable) {
+                            if(o.sortable) {
+                                this.list.sortable('enable');
+                            } else {
+                                this.list.sortable('disable');
+                            }
+                        }
+                    } else {
+                        if(o.sortable && this.list.sortable) {
+                            this._createSortable(tabsAlign);
+                        }
+                    }
                 }
                 // update collapsible
                 this.element[o.collapsible ? 'addClass' : 'removeClass'](o.wijCSS.tabsCollapsible);
@@ -432,6 +450,25 @@ var wijmo;
                 // disable click in any case
                 this.anchors.bind('click.tabs', function () {
                     return false;
+                });
+            };
+            wijtabs.prototype._createSortable = function (tabsAlign) {
+                var self = this;
+                self.list.sortable({
+                    update: function (e, ui) {
+                        self.lis = $('li:has(a)', self.list);
+                        self.anchors = self.lis.map(function () {
+                            return $('a', this)[0];
+                        });
+                        var href = ui.item.find("a").attr("href"), panel = self.panels.filter(href), panelIndex = self.panels.index(panel), newIndex = self.lis.index(ui.item);
+                        if(panelIndex > newIndex) {
+                            $(self.panels[newIndex]).before(panel);
+                        } else {
+                            $(self.panels[newIndex]).after(panel);
+                        }
+                        self.panels = $("." + self.options.wijCSS.tabsPanel, self.element);
+                    },
+                    axis: (tabsAlign === 'Top' || tabsAlign === 'Bottom') ? "x" : "y"
                 });
             };
             wijtabs.prototype._blindPanel = function (panel, mode) {
@@ -749,6 +786,11 @@ var wijmo;
                 if(o.cookie) {
                     this._cookie(null, o.cookie);
                 }
+                this.list = null;
+                this.anchors = null;
+                this.lis = null;
+                this.panels = null;
+                $(window).unbind('unload.wijtabs');
                 return this;
             };
             wijtabs.prototype._cleanup = function () {
@@ -1048,9 +1090,9 @@ var wijmo;
                 };
                 /** @ignore */
                 this.wijMobileCSS = {
-                    header: "ui-header ui-bar-c",
-                    content: "ui-content ui-body ui-body-c",
-                    stateDefault: "ui-btn-up-a",
+                    header: "ui-header ui-bar-b",
+                    content: "ui-content ui-body ui-body-b",
+                    stateDefault: "ui-btn ui-btn-a",
                     stateActive: "ui-btn-down-b"
                 };
                 /** Determines the tabs' alignment in respect to the content.

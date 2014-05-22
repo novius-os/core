@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20133.20
+ * Wijmo Library 3.20141.34
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -8,7 +8,8 @@
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * licensing@wijmo.com
  * http://wijmo.com/widgets/license/
- *
+ * ----
+ * Credits: Wijmo includes some MIT-licensed software, see copyright notices below.
  */
 var __extends = this.__extends || function (d, b) {
     function __() { this.constructor = d; }
@@ -96,7 +97,7 @@ var wijmo;
                 o.position.of = self.element;
                 self._bindLiveEvents();
                 self._tooltipCache = tooltip;
-                if(id !== "") {
+                if(id) {
                     describedBy = tooltip._$tooltip.attr("aria-describedby");
                     describedBy = describedBy === undefined ? "" : describedBy + " ";
                     tooltip._$tooltip.attr("aria-describedby", describedBy + id);
@@ -949,7 +950,7 @@ var wijmo;
                 this.wijMobileCSS = {
                     header: "ui-header ui-bar-a",
                     content: "ui-body-a",
-                    stateDefault: "ui-btn-up-a",
+                    stateDefault: "ui-btn ui-btn-a",
                     stateHover: "ui-btn-down-a",
                     stateActive: "ui-btn-down-a"
                 };

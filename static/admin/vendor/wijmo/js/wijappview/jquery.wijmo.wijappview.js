@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20133.20
+ * Wijmo Library 3.20141.34
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -8,7 +8,6 @@
  * Licensed under the Wijmo Commercial License. Also available under the GNU GPL Version 3 license.
  * licensing@wijmo.com
  * http://wijmo.com/widgets/license/
- *
  *
  */
 var __extends = this.__extends || function (d, b) {
@@ -19,6 +18,7 @@ var __extends = this.__extends || function (d, b) {
 var wijmo;
 (function (wijmo) {
     /// <reference path="../Base/jquery.wijmo.widget.ts" />
+    /// <reference path="../wijutil/jquery.wijmo.wijutil.ts" />
     /*globals jQuery*/
     /*
     * Depends:
@@ -107,7 +107,7 @@ var wijmo;
             };
             wijappview.prototype._hijackLinks = function (root) {
                 var _this = this;
-                root.on("click." + widgetName, "a, .ui-btn", function (e) {
+                root.on("click." + widgetName, "a:not(.WijListviewNestedLink), .ui-btn:not(.WijListviewNestedLink)", function (e) {
                     if(e.isDefaultPrevented()) {
                         return;
                     }
@@ -137,6 +137,9 @@ var wijmo;
                         return;
                     }
                     var type = $form.attr("method"), target = $form.attr("target"), url = _this._getUrl($form);
+                    if(!url) {
+                        return;
+                    }
                     e.preventDefault();
                     e.stopPropagation();
                     _this.changePage(url, {
@@ -514,7 +517,7 @@ var wijmo;
                     this._updateUrl(absUrl, relUrl, document.title);
                     forceUpdateUrl = false;
                 }
-                toPage.jqmData("page", this._jqmPageEnclosingWidget).trigger("pagecreate").trigger(this.widgetEventPrefix + "pageinit", triggerData);
+                toPage.jqmData("mobile-page", this._jqmPageEnclosingWidget).jqmData("page", this._jqmPageEnclosingWidget).enhanceWithin().trigger("pagecreate").trigger(this.widgetEventPrefix + "pageinit", triggerData);
                 // TODO: temporary workaround
                 this._trigger("pagechange", null, triggerData);
             };
@@ -607,7 +610,7 @@ var wijmo;
             wijappview.prototype._updateUrl = function (absUrl, relUrl, title) {
                 this._updatingUrl = true;
                 try  {
-                    $.mobile.urlHistory.ignoreNextHashChange = true;
+                    $.mobile.navigate.navigator.preventHashAssignPopState = true;
                     document.location.hash = absUrl === this._documentUrl ? "" : this.options.urlParamName + "=" + relUrl;
                 }finally {
                     this._updatingUrl = false;
@@ -628,6 +631,42 @@ var wijmo;
                     reloadPage: false,
                     showLoadMsg: false
                 };
+                /** Fires before a page is loaded
+                * @event
+                * @param {jQuery.Event} e Standard jQuery event object
+                * @param {IPageLoadEventArgs} args Information about an event
+                */
+                this.pagebeforeload = null;
+                /** Fires after a page is loaded
+                * @event
+                * @param {jQuery.Event} e Standard jQuery event object
+                * @param {IPageLoadEventArgs} args Information about an event
+                */
+                this.pageload = null;
+                /** Fires when a page load is failed
+                * @event
+                * @param {jQuery.Event} e Standard jQuery event object
+                * @param {IPageLoadEventArgs} args Information about an event
+                */
+                this.pageloadfailed = null;
+                /** Fires before the current page is changed
+                * @event
+                * @param {jQuery.Event} e Standard jQuery event object
+                * @param {IPageChangeEventArgs} args Information about an event
+                */
+                this.pagebeforechange = null;
+                /** Fires after a page is changed
+                * @event
+                * @param {jQuery.Event} e Standard jQuery event object
+                * @param {IPageChangeEventArgs} args Information about an event
+                */
+                this.pagechange = null;
+                /** Fires when a page change is failed
+                * @event
+                * @param {jQuery.Event} e Standard jQuery event object
+                * @param {IPageChangeEventArgs} args Information about an event
+                */
+                this.pagechangefailed = null;
                 this.wijCSS = {
                     wijappview: {
                         outerDiv: mainClass,

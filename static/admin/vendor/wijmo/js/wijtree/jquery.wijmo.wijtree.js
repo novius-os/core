@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20133.20
+ * Wijmo Library 3.20141.34
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -8,7 +8,6 @@
  * Licensed under the Wijmo Commercial License. Also available under the GNU GPL Version 3 license.
  * licensing@wijmo.com
  * http://wijmo.com/widgets/license/
- *
  *
  */
 var __extends = this.__extends || function (d, b) {
@@ -29,7 +28,41 @@ var wijmo;
     */
     (function (tree) {
         "use strict";
-        var $ = jQuery, widgetName = "wijtree";
+        var $ = jQuery, widgetName = "wijtree", generateMarkup = function (item) {
+            if(!$.isPlainObject(item)) {
+                return;
+            }
+            var u = item.navigateUrl || "#", li = "<li><a href='" + u + "'>";
+            if(typeof item.text === "string" && item.text) {
+                li += "<span>" + item.text + "</span>";
+            }
+            li += "</a></li>";
+            return li;
+        }, generateItemsMarkup = function (items) {
+            var lis = "";
+            $.each(items, function (i, item) {
+                if(!$.isPlainObject(item)) {
+                    return true;
+                }
+                var u = item.navigateUrl || "#", hasChildren = item.nodes && item.nodes.length > 0, li = "<li><div class='wijmo-wijtree-node'><span class='wijmo-wijtree-inner'>";
+                if(hasChildren) {
+                    li += "<span class='wijmo-wijtree-hitarea'></span>";
+                }
+                li += "<span class='wijmo-wijtree-nodeimage'></span><a href='" + u + "'>";
+                if(typeof item.text === "string" && item.text) {
+                    li += "<span>" + item.text + "</span>";
+                }
+                li += "</a></span></div>";
+                if(hasChildren) {
+                    li += "<ul>";
+                    li += generateItemsMarkup(item.nodes);
+                    li += "</ul>";
+                }
+                li += "</li> ";
+                lis += li;
+            });
+            return lis;
+        };
         /** @widget */
         var wijtree = (function (_super) {
             __extends(wijtree, _super);
@@ -97,7 +130,6 @@ var wijmo;
                 if(o.nodes && o.nodes.length) {
                     self._useDOMInit = false;
                 }
-                self._enabled = true;
                 self._insertPosition = "unKnown"//end,after,before
                 ;
                 self.nodeWidgetName = "wijtreenode";
@@ -124,10 +156,7 @@ var wijmo;
                         role: "tree",
                         "aria-multiselectable": true
                     });
-                    self.$nodes.addClass("wijmo-wijtree-list").addClass(o.wijCSS.helperReset);
-                    if(o.showExpandCollapse === false) {
-                        self.$nodes.addClass("wijmo-wijtree-allexpanded");
-                    }
+                    self.$nodes.addClass("wijmo-wijtree-list " + o.wijCSS.helperReset + (o.showExpandCollapse ? "" : " wijmo-wijtree-allexpanded"));
                     self._createChildNodes();
                     self.widgetDom.append($("<div>").css("clear", "both"));
                 }
@@ -138,17 +167,22 @@ var wijmo;
             wijtree.prototype._createChildNodes = function () {
                 var self = this, options = {
                     nIndex: undefined
-                }, nodes = [], ns = self.$nodes, data = self.options.nodes, lis = ns.children("li");
+                }, nodes = [], ns = self.$nodes, data = self.options.nodes, lis;
                 if(!self._useDOMInit || data.length) {
                     ns.empty();
-                    $.each(data, function (i, n) {
-                        var $li = self._generateMarkup(n);
-                        ns.append($li);
-                        options.nIndex = i;
+                    lis = generateItemsMarkup(data);
+                    ns.html(lis);
+                    self.htmlGenerated = true;
+                    lis = ns.children("li");
+                    lis.each(function (idx, ele) {
+                        var $li = $(ele);
+                        options.nIndex = idx;
                         self._createNodeWidget($li, options);
                         nodes.push(self._getNodeWidget($li));
                     });
+                    self.htmlGenerated = false;
                 } else {
+                    lis = ns.children("li");
                     lis.each(function (idx, ele) {
                         var $li = $(ele), w;
                         self._createNodeWidget($li, options);
@@ -160,19 +194,6 @@ var wijmo;
                 self._hasChildren = nodes.length > 0;
                 self._setField("nodes", nodes);
                 self.nodes = nodes;
-            };
-            wijtree.prototype._generateMarkup = function (item) {
-                var li, a, u = item.navigateUrl || "";
-                if(!$.isPlainObject(item)) {
-                    return;
-                }
-                li = $("<li></li>");
-                a = $("<a>").attr("src", (typeof u === "string" && u) ? u : "#");
-                a.appendTo(li);
-                if(typeof item.text === "string" && item.text) {
-                    $("<span>").html(item.text).appendTo(a);
-                }
-                return li;
             };
             wijtree.prototype._createNodeWidget = function ($li, options) {
                 var self = this, nodeWidgetName = self.nodeWidgetName;
@@ -676,57 +697,81 @@ var wijmo;
                 self.$checkBox = null;
                 self.$hitArea = null;
                 self.$nodes = null;
-                self.$nodeImage = $("<span>");
-                self.$nodeBody = $("<div>").attr({
-                    role: "treeitem",
-                    "aria-expanded": false,
-                    "aria-checked": false,
-                    "aria-selected": false
-                });
-                if(self._tree.options.showCheckBoxes === true) {
-                    self.$checkBox = $("<div>");
-                }
-                if(self.$navigateUrl.length === 0) {
-                    self.$navigateUrl = $li.children("div");
-                    self.$navigateUrl.addClass("wijmo-wijtree-template");
-                    self._isTemplate = true;
-                }
-                if(self.$navigateUrl.length === 0) {
-                    self.$navigateUrl = $("<a>");
-                    self.$navigateUrl.attr("href", "#");
-                }
-                if(!self._isTemplate) {
-                    self.$text = self.$navigateUrl.find("span:eq(0)");
-                    if(self.$text.length === 0) {
-                        self.$navigateUrl.wrapInner("<span></span>");
-                        self.$text = self.$navigateUrl.find("span:eq(0)");
+                if(self._tree && self._tree.htmlGenerated) {
+                    self.$nodeBody = $li.children(".wijmo-wijtree-node").attr({
+                        role: "treeitem",
+                        "aria-expanded": false,
+                        "aria-checked": false,
+                        "aria-selected": false
+                    });
+                    self.$inner = self.$nodeBody.children(".wijmo-wijtree-inner");
+                    self.$inner.addClass(o.wijCSS.helperClearFix + " wijmo-wijtree-inner " + o.wijCSS.cornerAll);
+                    self.$nodeImage = self.$inner.children(".wijmo-wijtree-nodeimage");
+                    if(self._tree.options.showCheckBoxes === true) {
+                        self.$checkBox = $("<div>");
+                        self.$checkBox.insertAfter(self.$nodeImage);
+                        self.$checkBox.wijtreecheck();
                     }
+                    self.$navigateUrl = self.$inner.children("a");
+                    self.$text = self.$navigateUrl.children("span:eq(0)");
+                    self._hasChildren = self._getChildren();
+                    self._createChildNodes($li);
+                } else {
+                    self.$nodeImage = $("<span>");
+                    self.$nodeBody = $("<div>").attr({
+                        role: "treeitem",
+                        "aria-expanded": false,
+                        "aria-checked": false,
+                        "aria-selected": false
+                    });
+                    if(self._tree.options.showCheckBoxes === true) {
+                        self.$checkBox = $("<div>");
+                    }
+                    if(self.$navigateUrl.length === 0) {
+                        self.$navigateUrl = $li.children("div");
+                        self.$navigateUrl.addClass("wijmo-wijtree-template");
+                        self._isTemplate = true;
+                    }
+                    if(self.$navigateUrl.length === 0) {
+                        self.$navigateUrl = $("<a href='#'></a>");
+                    }
+                    if(!self._isTemplate) {
+                        self.$text = self.$navigateUrl.children("span:eq(0)");
+                        if(self.$text.length === 0) {
+                            self.$navigateUrl.wrapInner("<span></span>");
+                            self.$text = self.$navigateUrl.children("span:eq(0)");
+                        }
+                    }
+                    self._hasChildren = self._getChildren();
+                    self.$inner = $("<span></span>").addClass(o.wijCSS.helperClearFix + " wijmo-wijtree-inner " + o.wijCSS.cornerAll);
+                    self._createChildNodes($li);
+                    self.$inner.append(self.$nodeImage);
+                    if(self.$checkBox !== null) {
+                        self.$inner.append(self.$checkBox);
+                        self.$checkBox.wijtreecheck();
+                    }
+                    self.$inner.append(self.$navigateUrl);
+                    self.$nodeBody.append(self.$inner);
+                    $li.prepend(self.$nodeBody);
                 }
-                self._hasChildren = self._getChildren();
-                self.$inner = $("<span></span>").addClass(o.wijCSS.helperClearFix).addClass("wijmo-wijtree-inner").addClass(o.wijCSS.cornerAll);
-                self._createChildNodes($li);
-                self.$inner.append(self.$nodeImage);
-                if(self.$checkBox !== null) {
-                    self.$inner.append(self.$checkBox);
-                    self.$checkBox.wijtreecheck();
-                }
-                self.$inner.append(self.$navigateUrl);
-                self.$nodeBody.append(self.$inner);
-                $li.prepend(self.$nodeBody);
             };
             wijtreenode.prototype._createChildNodes = function ($li) {
                 var self = this, nodes = [], o = self.options;
                 if(self._hasChildren) {
                     $li.addClass("wijmo-wijtree-parent");
-                    self.$nodeBody.addClass("wijmo-wijtree-node").addClass("wijmo-wijtree-header").addClass(o.wijCSS.stateDefault);
-                    self.$hitArea = $("<span>");
-                    self.$inner.prepend(self.$hitArea);
-                    self.$nodes = $li.find("ul:eq(0)");
+                    self.$nodeBody.addClass("wijmo-wijtree-node wijmo-wijtree-header " + o.wijCSS.stateDefault);
+                    if(self._tree && self._tree.htmlGenerated) {
+                        self.$hitArea = self.$inner.children(".wijmo-wijtree-hitarea");
+                    } else {
+                        self.$hitArea = $("<span>");
+                        self.$inner.prepend(self.$hitArea);
+                    }
+                    self.$nodes = $li.children("ul:eq(0)");
                     nodes = self._createChildNode();
-                    self.$nodes.addClass("wijmo-wijtree-list").addClass(o.wijCSS.helperReset).addClass("wijmo-wijtree-child");
+                    self.$nodes.addClass("wijmo-wijtree-list wijmo-wijtree-child " + o.wijCSS.helperReset);
                 } else {
                     $li.addClass("wijmo-wijtree-item");
-                    self.$nodeBody.addClass("wijmo-wijtree-node").addClass(o.wijCSS.stateDefault);
+                    self.$nodeBody.addClass("wijmo-wijtree-node " + o.wijCSS.stateDefault);
                 }
                 //fix #39816, ie10 renders bullets for ul even when list-style-type is set none.
                 //it's known issue for ie10. Please refer to http://bugs.jqueryui.com/ticket/8844.
@@ -734,29 +779,41 @@ var wijmo;
                 self._setField("nodes", nodes);
             };
             wijtreenode.prototype._createChildNode = function () {
-                var self = this, o = self.options, nodes = [], opts = {
+                var self = this, o = self.options, nodes = [], lis, opts = {
                     nIndex: undefined,
-                    treeClass: undefined,
+                    treeClass: o.treeClass,
                     cfli: undefined,
                     nodes: undefined
                 };
                 if(o.nodes && o.nodes.length) {
-                    if(self.$nodes && self.$nodes.length) {
-                        self.$nodes.empty();
+                    if(self._tree && self._tree.htmlGenerated) {
+                        var lis = self.$nodes.children("li");
+                        $.each(lis, function (i, li) {
+                            var $li = $(li), nodeWidget;
+                            $li.data("owner", self);
+                            opts.nIndex = i;
+                            $li.wijtreenode(opts);
+                            nodeWidget = self._getNodeWidget($li);
+                            nodeWidget._index = i;
+                            nodes.push(nodeWidget);
+                        });
                     } else {
-                        self.$nodes = $("<ul>").appendTo(self.element);
+                        if(self.$nodes && self.$nodes.length) {
+                            self.$nodes.empty();
+                        } else {
+                            self.$nodes = $("<ul>").appendTo(self.element);
+                        }
+                        $.each(o.nodes, function (i, n) {
+                            var $li = $(generateMarkup(n)), nodeWidget;
+                            self.$nodes.append($li);
+                            $li.data("owner", self);
+                            opts.nIndex = i;
+                            $li.wijtreenode(opts);
+                            nodeWidget = self._getNodeWidget($li);
+                            nodeWidget._index = i;
+                            nodes.push(nodeWidget);
+                        });
                     }
-                    $.each(o.nodes, function (i, n) {
-                        var $li = self._generateMarkup(n), nodeWidget;
-                        self.$nodes.append($li);
-                        $li.data("owner", self);
-                        opts.nIndex = i;
-                        opts.treeClass = o.treeClass;
-                        $li.wijtreenode(opts);
-                        nodeWidget = self._getNodeWidget($li);
-                        nodeWidget._index = i;
-                        nodes.push(nodeWidget);
-                    });
                 } else {
                     if(!o.nodes) {
                         o.nodes = [];
@@ -766,7 +823,6 @@ var wijmo;
                         $li.data("owner", self);
                         opts.cfli = true;
                         opts.nIndex = i;
-                        opts.treeClass = o.treeClass;
                         opts.nodes = [];
                         $li.wijtreenode(opts)//the arg must be jquerify
                         ;
@@ -776,19 +832,6 @@ var wijmo;
                     });
                 }
                 return nodes;
-            };
-            wijtreenode.prototype._generateMarkup = function (item) {
-                var li, a, u = item.navigateUrl || "";
-                if(!$.isPlainObject(item)) {
-                    return;
-                }
-                li = $("<li></li>");
-                a = $("<a>").attr("src", (typeof u === "string" && u) ? u : "#");
-                a.appendTo(li);
-                if(typeof item.text === "string" && item.text) {
-                    $("<span>").html(item.text).appendTo(a);
-                }
-                return li;
             };
             wijtreenode.prototype._initNode = function () {
                 //init node(children,class, tree)
@@ -1056,22 +1099,31 @@ var wijmo;
                 this._animation(false);
             };
             wijtreenode.prototype._animation = function (show) {
-                var self = this, el = self.$nodes, animate = show ? "expandAnimation" : "collapseAnimation", event = show ? "nodeExpanded" : "nodeCollapsed", effect, animation = self._tree.options[animate];
-                if(el) {
-                    el.css("opacity", 1);
-                    if($.browser.msie && parseInt($.browser.version) < 9) {
-                        el.css("filter", "alpha(opacity=1); ZOOM: 1");
+                var self = this, el = self.$nodes, animate = show ? "expandAnimation" : "collapseAnimation", event = show ? "nodeExpanded" : "nodeCollapsed", effect, animation = self._tree.options[animate], opacity, strOpacity;
+                function restoreOpacity(element) {
+                    if(element.css(strOpacity) !== opacity) {
+                        element.css(strOpacity, opacity);
                     }
+                }
+                if(el) {
                     if(animation) {
+                        if($.browser.msie && parseInt($.browser.version) < 9) {
+                            strOpacity = "filter";
+                        } else {
+                            strOpacity = "opacity";
+                        }
+                        opacity = el.css(strOpacity);
                         effect = animation.animated || animation.effect;
                         if($.effects && !!effect) {
                             el[show ? "show" : "hide"](effect, {
                                 easing: animation.easing
                             }, animation.duration, function () {
+                                restoreOpacity(el);
                                 self._tree._trigger(event, null, self);
                             });
                         } else {
                             el[show ? "show" : "hide"](animation.duration, function () {
+                                restoreOpacity(el);
                                 self._tree._trigger(event, null, self);
                             });
                         }
@@ -2045,7 +2097,7 @@ var wijmo;
                     if(owner.element.is(":" + this.options.treeClass)) {
                         return owner;
                     } else {
-                        return owner._getTree();
+                        return owner._tree;
                     }
                 }
                 return null;
@@ -2063,7 +2115,7 @@ var wijmo;
                 return li;
             };
             wijtreenode.prototype._getChildren = function () {
-                return (this.element.find(">ul:first>li").length > 0 && this.element.children("ul:first")) || !!(this.options.nodes && this.options.nodes.length);
+                return !!(this.options.nodes && this.options.nodes.length) || (this.element.children("ul:first").children("li").length > 0);
             };
             wijtreenode.prototype._getNodeWidget = function (el) {
                 var node = this._getNodeByDom(el), widget;
@@ -2179,7 +2231,7 @@ var wijmo;
         }, wijmo.wijmoWidget.prototype.options, {
             wijMobileCSS: {
                 header: "ui-header ui-bar-a",
-                content: "ui-body-c",
+                content: "ui-body-b",
                 stateHover: "ui-btn-down-b",
                 stateActive: "ui-btn-down-b"
             },
@@ -2192,8 +2244,8 @@ var wijmo;
                 */
                 this.wijMobileCSS = {
                     header: "ui-header ui-bar-a",
-                    content: "ui-body-c",
-                    stateDefault: "ui-btn-up-c",
+                    content: "ui-body-b",
+                    stateDefault: "ui-btn ui-btn-b",
                     stateHover: "ui-btn-down-c",
                     stateActive: "ui-btn-down-b"
                 };
@@ -2254,8 +2306,8 @@ var wijmo;
                 */
                 this.wijMobileCSS = {
                     header: "ui-header ui-bar-a",
-                    content: "ui-body-c",
-                    stateDefault: "ui-btn-up-c",
+                    content: "ui-body-b",
+                    stateDefault: "ui-btn ui-btn-b",
                     stateHover: "ui-btn-down-b",
                     stateActive: "ui-btn-down-c"
                 };

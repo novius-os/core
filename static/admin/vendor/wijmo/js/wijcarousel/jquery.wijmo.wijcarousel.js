@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20133.20
+ * Wijmo Library 3.20141.34
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -8,7 +8,6 @@
  * Licensed under the Wijmo Commercial License. Also available under the GNU GPL Version 3 license.
  * licensing@wijmo.com
  * http://wijmo.com/widgets/license/
- *
  *
  */
 var __extends = this.__extends || function (d, b) {
@@ -40,7 +39,7 @@ var wijmo;
             }
             wijcarousel.prototype._handleDisabledOption = function (disabled, ele) {
                 var self = this, o = self.options;
-                if(self.pager && !self.pager.is(":hidden")) {
+                if(self.pager && !self.pager.is(":hidden") && o.pagerType === "numbers") {
                     self.pager.wijpager("option", "disabled", disabled);
                 }
                 // when change the disabled option, apply the button CSS class.
@@ -321,6 +320,8 @@ var wijmo;
                 self.list.addClass(listCss).addClass(o.wijCSS.helperClearFix);
                 allCss = baseCss + o.wijCSS.widget + " " + containerCss + " " + (o.preview ? (previewCss + " ") : "") + (o.display > 1 ? o.wijCSS.content + " " + o.wijCSS.cornerAll : "");
                 self.container.addClass(allCss);
+                //set dir to default value:ltr
+                self.container.attr("dir", "ltr");
                 self._createItems(isHorizontal);
                 self._createClip(isHorizontal);
                 self._applyContainerStyle(isHorizontal);
@@ -760,11 +761,7 @@ var wijmo;
                             break;
                         case "pagerType":
                             if(value !== old) {
-                                if(self.pager && self.pager.jquery) {
-                                    self.pager.remove();
-                                    self.pager = null;
-                                }
-                                self._createPager();
+                                self._reCreatePager();
                             }
                             break;
                         case "disabled":
@@ -773,9 +770,22 @@ var wijmo;
                         case "showControlsOnHover":
                             self._set_showControlsOnHover(value);
                             break;
+                        case "thumbnails":
+                            self._reCreatePager();
+                            break;
                         default:
                             break;
                     }
+                }
+            };
+            wijcarousel.prototype._reCreatePager = function () {
+                var self = this;
+                if(self.pager && self.pager.jquery) {
+                    self.pager.remove();
+                    self.pager = null;
+                }
+                if(self.options.showPager) {
+                    self._createPager();
                 }
             };
             wijcarousel.prototype._getItemBound = function () {
@@ -1265,7 +1275,7 @@ var wijmo;
                 this.wijMobileCSS = {
                     header: "ui-header ui-bar-a",
                     content: "ui-body-a",
-                    stateDefault: "ui-btn-up-a",
+                    stateDefault: "ui-btn ui-btn-a",
                     stateHover: "ui-btn-down-a",
                     stateActive: "ui-btn-down-b",
                     iconPlay: "ui-icon-arrow-r",

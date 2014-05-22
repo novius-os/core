@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20133.20
+ * Wijmo Library 3.20141.34
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -8,7 +8,8 @@
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * licensing@wijmo.com
  * http://wijmo.com/widgets/license/
- *
+ * ----
+ * Credits: Wijmo includes some MIT-licensed software, see copyright notices below.
  */
 /// <reference path="../External/declarations/jquery.d.ts"/>
 /// <reference path="../External/declarations/jquery.ui.d.ts"/>
@@ -593,6 +594,11 @@ var wijmo;
             browser[matched.browser] = true;
             browser.version = matched.version;
         }
+        //check whether the browser is ie11.
+        if(browser.mozilla && !!navigator.userAgent.match(/Trident\/\d+?\./)) {
+            browser.msie = true;
+            browser.mozilla = false;
+        }
         // Chrome is Webkit, but Webkit is also Safari.
         if(browser.chrome) {
             browser.webkit = true;
@@ -660,6 +666,31 @@ var wijmo;
         throw "keyCode object is not found";
     }
     wijmo.getKeyCodeEnum = getKeyCodeEnum;
+    function getCSSSelector(classNames) {
+        var classNameArr, resultArr = new Array();
+        if(classNames == null || classNames.length == 0 || typeof classNames != "string") {
+            return "";
+        }
+        classNameArr = classNames.split(" ");
+        for(var index = 0; index < classNameArr.length; index++) {
+            if(classNameArr[index].length != 0) {
+                resultArr.push(classNameArr[index]);
+            }
+        }
+        if(resultArr.length == 0) {
+            return "";
+        }
+        return resultArr.join(".");
+    }
+    wijmo.getCSSSelector = getCSSSelector;
+    function htmlEncode(val) {
+        return $('<div/>').text(val).html();
+    }
+    wijmo.htmlEncode = htmlEncode;
+    function htmlDecode(val) {
+        return $('<div/>').html(val).text();
+    }
+    wijmo.htmlDecode = htmlDecode;
 })(wijmo || (wijmo = {}));
 function __wijReadOptionEvents(eventsArr, widgetInstance) {
     // handle option events
@@ -720,3 +751,43 @@ function wijmoASPNetParseOptions(o) {
     }
     return o;
 }
+var wijmo;
+(function (wijmo) {
+    (function (input) {
+        /** @ignore */
+        var wijInputResult = (function () {
+            function wijInputResult() {
+                this.characterEscaped = 1;
+                this.noEffect = 2;
+                this.sideEffect = 3;
+                this.success = 4;
+                this.unknown = 0;
+                this.hint = 0;
+                this.asciiCharacterExpected = -1;
+                this.alphanumericCharacterExpected = -2;
+                this.digitExpected = -3;
+                this.invalidInput = -51;
+                this.letterExpected = -4;
+                this.nonEditPosition = -54;
+                this.positionOutOfRange = -55;
+                this.promptCharNotAllowed = -52;
+                this.unavailableEditPosition = -53;
+                this.testPosition = -1;
+            }
+            return wijInputResult;
+        })();
+        input.wijInputResult = wijInputResult;
+    })(wijmo.input || (wijmo.input = {}));
+    var input = wijmo.input;
+})(wijmo || (wijmo = {}));
+$.wijinputcore = $.wijinputcore || {
+};
+$.wijinputcore.format = $.wijinputcore.format || function (value, formatOrType, options) {
+    if(typeof value === 'number' || value instanceof Number) {
+        return $.wijinputcore.formatnumber(value, formatOrType, options);
+    } else if(value instanceof Date) {
+        return $.wijinputcore.formatdate(value, formatOrType, options);
+    } else {
+        return $.wijinputcore.formatmask(value, formatOrType, options);
+    }
+};

@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20133.20
+ * Wijmo Library 3.20141.34
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -8,7 +8,8 @@
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * licensing@wijmo.com
  * http://wijmo.com/widgets/license/
- *
+ * ----
+ * Credits: Wijmo includes some MIT-licensed software, see copyright notices below.
  */
 var __extends = this.__extends || function (d, b) {
     function __() { this.constructor = d; }
@@ -76,7 +77,7 @@ var wijmo;
                 $.wijmo.widget.prototype._setOption.apply(this, arguments);
             };
             wijexpander.prototype._create = function () {
-                var o = this.options, elems = this.element.children(), header, content;
+                var o = this.options, elems = this.element.children(), header, content, wijCSS = o.wijCSS;
                 // enable touch support:
                 if(window.wijmoApplyWijTouchUtilEvents) {
                     $ = window.wijmoApplyWijTouchUtilEvents($);
@@ -99,10 +100,10 @@ var wijmo;
                     header.wrapInner('<a href="javascript:void(null)"></a>');
                     //header.wrapInner('<a href="#"></a>');
                                     }
-                if(header.find("> .ui-icon").length === 0) {
-                    $('<span class="ui-icon"></span>').insertBefore($("> a", header)[0]);
+                if(header.find("> ." + wijmo.getCSSSelector(wijCSS.icon)).length === 0) {
+                    $('<span></span>').addClass(wijCSS.icon).insertBefore($("> a", header)[0]);
                 }
-                content.addClass("ui-expander-content " + o.wijCSS.content);
+                content.addClass("ui-expander-content " + wijCSS.content);
             };
             wijexpander.prototype._init = // widget initialization:
             function () {
@@ -116,12 +117,12 @@ var wijmo;
                     this.element.find("> .ui-expander-header").addClass(o.wijCSS.stateDefault + " " + o.wijCSS.cornerAll).attr({
                         "aria-expanded": "false",
                         tabIndex: -1
-                    }).find("> .ui-icon").addClass(this._triangleIconClosed);
+                    }).find("> ." + wijmo.getCSSSelector(o.wijCSS.icon)).addClass(this._triangleIconClosed);
                 } else {
                     this.element.find("> .ui-expander-header").addClass(o.wijCSS.stateDefault + " " + o.wijCSS.stateActive).attr({
                         "aria-expanded": "true",
                         tabIndex: 0
-                    }).addClass(this._headerCornerOpened).find("> .ui-icon").addClass(this._triangleIconOpened);
+                    }).addClass(this._headerCornerOpened).find("> ." + wijmo.getCSSSelector(o.wijCSS.icon)).addClass(this._triangleIconOpened);
                     this.element.find("> .ui-expander-content").addClass("ui-expander-content-active").addClass(this._contentCornerOpened).wijTriggerVisibility();
                 }
                 if(o.disabled) {
@@ -293,7 +294,7 @@ var wijmo;
                 this.element.find("> .ui-expander-header").removeClass(o.wijCSS.stateActive).removeClass(this._headerCornerOpened).attr({
                     "aria-expanded": "false",
                     tabIndex: -1
-                }).addClass(o.wijCSS.stateDefault + " " + o.wijCSS.cornerAll).find("> .ui-icon").removeClass(this._triangleIconOpened).addClass(this._triangleIconClosed);
+                }).addClass(o.wijCSS.stateDefault + " " + o.wijCSS.cornerAll).find("> ." + wijmo.getCSSSelector(o.wijCSS.icon)).removeClass(this._triangleIconOpened).addClass(this._triangleIconClosed);
                 this.options.expanded = false;
                 return true;
             };
@@ -346,7 +347,7 @@ var wijmo;
                 this.element.find("> .ui-expander-header").removeClass(o.wijCSS.cornerAll).addClass(o.wijCSS.stateActive).addClass(this._headerCornerOpened).attr({
                     "aria-expanded": "true",
                     tabIndex: 0
-                }).find("> .ui-icon").removeClass(this._triangleIconClosed).addClass(this._triangleIconOpened);
+                }).find("> ." + wijmo.getCSSSelector(o.wijCSS.icon)).removeClass(this._triangleIconClosed).addClass(this._triangleIconOpened);
                 this.options.expanded = true;
                 return true;
             };
@@ -366,7 +367,7 @@ var wijmo;
                 */
                 this.wijMobileCSS = {
                     header: "ui-header ui-bar-a",
-                    content: "ui-content ui-body ui-body-c"
+                    content: "ui-content ui-body ui-body-b"
                 };
                 /** Selector option for auto self initialization.
                 * This option is internal.

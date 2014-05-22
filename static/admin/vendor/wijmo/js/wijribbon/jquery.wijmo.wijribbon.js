@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20133.20
+ * Wijmo Library 3.20141.34
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -8,7 +8,6 @@
  * Licensed under the Wijmo Commercial License. Also available under the GNU GPL Version 3 license.
  * licensing@wijmo.com
  * http://wijmo.com/widgets/license/
- *
  *
  */
 var __extends = this.__extends || function (d, b) {
@@ -78,7 +77,7 @@ var wijmo;
             };
             wijribbon.prototype._setDisabled = function (value) {
                 var self = this, element = self.element, eleOffset = element.offset(), offsetTop = eleOffset.top, offsetLeft = eleOffset.left, offsetParent = $("body"), wijCSS = this.options.wijCSS, disabledModal = self.disabledModal;
-                if(element.data("wijmoWijtabs")) {
+                if(element.data("wijmo-wijtabs")) {
                     element.wijtabs("option", "disabled", value);
                 }
                 if(element.closest(".wijmo-wijeditor").length !== 0) {

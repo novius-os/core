@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20133.20
+ * Wijmo Library 3.20141.34
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -8,7 +8,6 @@
  * Licensed under the Wijmo Commercial License. Also available under the GNU GPL Version 3 license.
  * licensing@wijmo.com
  * http://wijmo.com/widgets/license/
- *
  *
  */
 var __extends = this.__extends || function (d, b) {
@@ -84,13 +83,23 @@ var wijmo;
             };
             wijdatepager.prototype._disable = function () {
                 this.element.addClass(this.options.wijCSS.stateDisabled);
-                this.element.find("." + decButtonClass).button("option", "disabled", true);
-                this.element.find("." + incButtonClass).button("option", "disabled", true);
+                if($.mobile == null) {
+                    this.element.find("." + decButtonClass).button("option", "disabled", true);
+                    this.element.find("." + incButtonClass).button("option", "disabled", true);
+                } else {
+                    this.element.find("." + decButtonClass).addClass(this.options.wijCSS.stateDisabled);
+                    this.element.find("." + incButtonClass).addClass(this.options.wijCSS.stateDisabled);
+                }
             };
             wijdatepager.prototype._enable = function () {
                 this.element.removeClass(this.options.wijCSS.stateDisabled);
-                this.element.find("." + decButtonClass).button("option", "disabled", false);
-                this.element.find("." + incButtonClass).button("option", "disabled", false);
+                if($.mobile == null) {
+                    this.element.find("." + decButtonClass).button("option", "disabled", false);
+                    this.element.find("." + incButtonClass).button("option", "disabled", false);
+                } else {
+                    this.element.find("." + decButtonClass).removeClass(this.options.wijCSS.stateDisabled);
+                    this.element.find("." + incButtonClass).removeClass(this.options.wijCSS.stateDisabled);
+                }
             };
             wijdatepager.prototype._create = ///	<summary>
             ///	Creates date pager DOM elements and binds interactive events.
@@ -130,15 +139,9 @@ var wijmo;
                     });
                 } else {
                     decBtn.html("");
-                    decBtn.attr("data-icon", "arrow-l");
-                    decBtn.button({
-                        text: false
-                    });
+                    decBtn.addClass(o.wijCSS.iconArrowLeft + " " + o.wijCSS.icon + " ui-btn");
                     incBtn.html("");
-                    incBtn.attr("data-icon", "arrow-r");
-                    incBtn.button({
-                        text: false
-                    });
+                    incBtn.addClass(o.wijCSS.iconArrowRight + " " + o.wijCSS.icon + " ui-btn");
                 }
                 decBtn.click($.proxy(this.goLeft, this));
                 incBtn.click($.proxy(this.goRight, this));
@@ -626,8 +629,8 @@ var wijmo;
                 /** @ignore */
                 this.wijMobileCSS = {
                     header: "ui-header ui-bar-a",
-                    content: "ui-body ui-body-c",
-                    stateDefault: "ui-btn-up-c"
+                    content: "ui-body ui-body-b",
+                    stateDefault: "ui-btn ui-btn-b"
                 };
                 /** @ignore */
                 this.initSelector = ":jqmData(role='wijdatepager')";

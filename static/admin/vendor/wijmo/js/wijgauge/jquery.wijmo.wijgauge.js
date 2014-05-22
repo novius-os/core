@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20133.20
+ * Wijmo Library 3.20141.34
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -8,7 +8,6 @@
  * Licensed under the Wijmo Commercial License. Also available under the GNU GPL Version 3 license.
  * licensing@wijmo.com
  * http://wijmo.com/widgets/license/
- *
  *
  */
 var __extends = this.__extends || function (d, b) {
@@ -263,6 +262,7 @@ var wijmo;
                 }
                 self._autoCalculate();
                 self._draw();
+                self._bindResizeEvent();
             };
             wijgauge.prototype._setDefaultWidth = function () {
             };
@@ -314,6 +314,10 @@ var wijmo;
             };
             wijgauge.prototype._set_value = function (value, oldValue) {
                 this._setPointer();
+            };
+            wijgauge.prototype._set_autoResize = function () {
+                this._unbindResizeEvent();
+                this._bindResizeEvent();
             };
             wijgauge.prototype._set_max = function () {
                 this._redrawMarksAndLabels();
@@ -533,6 +537,7 @@ var wijmo;
                 self._unbindEvents(self.majorMarks);
                 self._unbindEvents(self.minorMarks);
                 self._unbindEvents(self.labels);
+                self._unbindResizeEvent();
                 self.element.removeClass("ui-widget").empty();
                 //Add for fixing bug 16039
                 if(self.disabledDiv) {
@@ -601,6 +606,21 @@ var wijmo;
                     //linearValue = Math.pow(alpha, o.logarithmicBase);
                                     }
                 return min + (max - min) * linearValue;
+            };
+            wijgauge.prototype._bindResizeEvent = function () {
+                var _this = this;
+                this.resizeIntent = 250;
+                if(this.options.autoResize) {
+                    this.element.on("resize." + this.widgetName, function () {
+                        clearTimeout(_this.resizeTimer);
+                        _this.resizeTimer = setTimeout(function () {
+                            _this.redraw();
+                        }, _this.resizeIntent);
+                    });
+                }
+            };
+            wijgauge.prototype._unbindResizeEvent = function () {
+                this.element.off("resize." + this.widgetName);
             };
             wijgauge.prototype._bindClickEvents = function (eles) {
                 var self = this;
@@ -708,6 +728,8 @@ var wijmo;
                 * Sets the height of the gauge area in pixels.
                 */
                 this.height = 400;
+                /** A value that indicates whether to redraw the gauge automatically when resizing the gauge element.  */
+                this.autoResize = true;
                 /**
                 * Sets appearance options for the major tick marks that appear next to the numeric labels around the face of the gauge.
                 * @example

@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20133.20
+ * Wijmo Library 3.20141.34
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -8,7 +8,6 @@
  * Licensed under the Wijmo Commercial License. Also available under the GNU GPL Version 3 license.
  * licensing@wijmo.com
  * http://wijmo.com/widgets/license/
- *
  *
  */
 var __extends = this.__extends || function (d, b) {
@@ -851,8 +850,8 @@ var wijmo;
                 /** @ignore*/
                 this.wijMobileCSS = {
                     header: "ui-header ui-bar-a",
-                    content: "ui-body-c",
-                    stateDefault: "ui-btn-up-a",
+                    content: "ui-body-b",
+                    stateDefault: "ui-btn ui-btn-a",
                     stateHover: "ui-btn-down-a",
                     stateActive: "ui-btn-down-a"
                 };

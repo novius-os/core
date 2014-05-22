@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20133.20
+ * Wijmo Library 3.20141.34
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -8,7 +8,6 @@
  * Licensed under the Wijmo Commercial License. Also available under the GNU GPL Version 3 license.
  * licensing@wijmo.com
  * http://wijmo.com/widgets/license/
- *
  *
  */
 var __extends = this.__extends || function (d, b) {
@@ -23,6 +22,7 @@ var wijmo;
     /// <reference path="../wijpiechart/jquery.wijmo.wijpiechart.ts"/>
     /// <reference path="../wijlinechart/jquery.wijmo.wijlinechart.ts"/>
     /// <reference path="../wijscatterchart/jquery.wijmo.wijscatterchart.ts"/>
+    /// <reference path="../wijcandlestickchart/jquery.wijmo.wijcandlestickchart.ts"/>
     /*globals jQuery, Globalize*/
     /*
     * Depends:
@@ -37,6 +37,7 @@ var wijmo;
     *
     */
     (function (chart) {
+        var wijcandlestickchartFn = $.wijmo.wijcandlestickchart;
         /**
         * @widget
         */
@@ -47,7 +48,7 @@ var wijmo;
 
             }
             wijcompositechart.prototype._create = function () {
-                var self = this, o = self.options, defFill = self._getDefFill(), seriesStyles = o.seriesStyles, yAxis, yAxes;
+                var self = this, o = self.options, defFill = self._getDefFill(), yAxis, yAxes;
                 $.each(o.seriesList, function (idx, series) {
                     if(series.type === "bar") {
                         $.extend(true, o.axis, {
@@ -61,6 +62,12 @@ var wijmo;
                         return true;
                     } else if(series.type === "pie" && series.pieSeriesList) {
                         series.data = series.pieSeriesList;
+                    } else if(series.candlestickSeries && series.candlestickSeries.data && $.inArray(series.type, [
+                        "hl", 
+                        "ohlc", 
+                        "candlestick"
+                    ]) != -1) {
+                        series.data = series.candlestickSeries.data;
                     }
                 });
                 $.extend(true, {
@@ -83,44 +90,10 @@ var wijmo;
                     o.axis.y = yAxes;
                 }
                 self._handleChartStyles();
-                // default some fills
-                //$.each(seriesStyles, function (idx, style) {
-                //	if (!style.fill) {
-                //		style.fill = defFill[idx];
-                //	}
-                //});
-                seriesStyles = o.seriesStyles;
-                // extend stock style
-                $.each(o.seriesList, function (i, series) {
-                    if(self._isStockSeries(series)) {
-                        var seriesStyle = seriesStyles[i], type = series.type, defaultFill = seriesStyle.fill, bakStyle = $.extend({
-                        }, seriesStyle);
-                        if(seriesStyle) {
-                            if(!seriesStyle.highLow) {
-                                seriesStyle.highLow = bakStyle;
-                            }
-                            if(type === "hloc") {
-                                if(!seriesStyle.open) {
-                                    seriesStyle.open = bakStyle;
-                                }
-                                if(!seriesStyle.close) {
-                                    seriesStyle.close = bakStyle;
-                                }
-                            } else {
-                                if(!seriesStyle.fallingClose) {
-                                    seriesStyle.fallingClose = bakStyle;
-                                }
-                                if(!seriesStyle.raisingClose) {
-                                    seriesStyle.raisingClose = bakStyle;
-                                }
-                            }
-                        }
-                    }
-                });
-                o.seriesStyles = seriesStyles;
-                if(self._isContainsStock()) {
-                    self.isContainsStock = true;
-                    self._handleXData();
+                self._checkChartType();
+                if(self.isContainsCandlestick) {
+                    self.bindXData = false;
+                    self._handleXDataForCandlestick();
                 }
                 _super.prototype._create.call(this);
                 self.chartElement.addClass(o.wijCSS.compositechart);
@@ -128,7 +101,22 @@ var wijmo;
             wijcompositechart.prototype._setOption = function (key, value) {
                 // ignore the is100Percent option.
                 if(key !== "is100Percent") {
+                    if(key === "axis" && this.isContainsCandlestick) {
+                        if(wijcandlestickchartFn) {
+                            wijcandlestickchartFn.prototype._handleMaxMinInAxis.apply(this, [
+                                value
+                            ]);
+                        }
+                    }
                     _super.prototype._setOption.call(this, key, value);
+                }
+            };
+            wijcompositechart.prototype._seriesListSeted = function () {
+                this._checkChartType();
+                if(this.isContainsCandlestick) {
+                    this.timeUtil.dispose();
+                    this.timeUtil = null;
+                    this._handleXDataForCandlestick();
                 }
             };
             wijcompositechart.prototype._supportStacked = function () {
@@ -140,8 +128,12 @@ var wijmo;
             function () {
                 var self = this, element = self.chartElement, fields = element.data("fields"), aniBarsAttr = fields && fields.aniBarsAttr;
                 element.removeClass(self.options.wijCSS.compositechart);
+                if(this.timeUtil) {
+                    this.timeUtil.dispose();
+                }
                 _super.prototype.destroy.call(this);
                 self._destroyRaphaelArray(aniBarsAttr);
+                self.aniPathsAttr = null;
                 element.data("fields", null);
             };
             wijcompositechart.prototype._isBarChart = function () {
@@ -181,63 +173,59 @@ var wijmo;
                     }
                 }
             };
-            wijcompositechart.prototype._bindData = function () {
-                var self = this, o = self.options, dataSource = o.dataSource, seriesList = o.seriesList, shareData = o.data, sharedXList;
-                $.each(seriesList, function (i, series) {
-                    var data = series.data, dataX, dataY, dataY1, ds = series.dataSource || dataSource, type = series.type, dataLabel, dataValue, dataOffset, pieData = [];
-                    if(ds && data) {
-                        if(type === "pie") {
-                            dataLabel = data.label;
-                            dataValue = data.value;
-                            dataOffset = data.offset;
-                            if(dataLabel && dataLabel.bind) {
-                                dataLabel = self._getBindData(ds, dataLabel.bind);
-                            }
-                            if(dataValue && dataValue.bind) {
-                                dataValue = self._getBindData(ds, dataValue.bind);
-                            }
-                            if(dataOffset && dataOffset.bind) {
-                                dataOffset = self._getBindData(ds, dataOffset.bind);
-                            }
-                            if(dataLabel && $.isArray(dataLabel) && dataLabel.length && dataValue && $.isArray(dataValue) && dataValue.length) {
-                                $.each(dataValue, function (idx, val) {
-                                    var label, offset = 0;
-                                    if(idx >= 0 && idx < dataLabel.length) {
-                                        label = dataLabel[idx];
-                                    }
-                                    if(dataOffset && $.isArray(dataValue) && dataOffset.length && idx >= 0 && idx < dataOffset.length) {
-                                        offset = typeof dataOffset[idx] === 'undefined' ? 0 : dataOffset[idx];
-                                    }
-                                    pieData.push({
-                                        data: val,
-                                        label: label,
-                                        offset: offset,
-                                        legendEntry: true
-                                    });
-                                });
-                                series.data = pieData;
-                            }
-                        } else {
-                            dataX = data.x;
-                            dataY = data.y;
-                            dataY1 = data.y1;
-                            if(dataX && dataX.bind) {
-                                data.x = self._getBindData(ds, dataX.bind);
-                            } else if(shareData && shareData.x && shareData.x.bind) {
-                                if(sharedXList === undefined) {
-                                    sharedXList = self._getBindData(ds, shareData.x.bind);
-                                }
-                                data.x = sharedXList;
-                            }
-                            if(dataY && dataY.bind) {
-                                data.y = self._getBindData(ds, dataY.bind);
-                            }
-                            if(dataY1 && dataY1.bind) {
-                                data.y1 = self._getBindData(ds, dataY1.bind);
-                            }
-                        }
+            wijcompositechart.prototype._bindSeriesData = // handle data bind
+            function (ds, series, sharedXList) {
+                var _this = this;
+                var data = series.data, type = series.type, dataLabel, dataValue, dataOffset, pieData = [];
+                if(type === "pie") {
+                    dataLabel = data.label;
+                    dataValue = data.value;
+                    dataOffset = data.offset;
+                    if(dataLabel && dataLabel.bind) {
+                        dataLabel = this._getBindData(ds, dataLabel.bind);
                     }
-                });
+                    if(dataValue && dataValue.bind) {
+                        dataValue = this._getBindData(ds, dataValue.bind);
+                    }
+                    if(dataOffset && dataOffset.bind) {
+                        dataOffset = this._getBindData(ds, dataOffset.bind);
+                    }
+                    if(dataLabel && $.isArray(dataLabel) && dataLabel.length && dataValue && $.isArray(dataValue) && dataValue.length) {
+                        $.each(dataValue, function (idx, val) {
+                            var label, offset = 0;
+                            if(idx >= 0 && idx < dataLabel.length) {
+                                label = dataLabel[idx];
+                            }
+                            if(dataOffset && $.isArray(dataValue) && dataOffset.length && idx >= 0 && idx < dataOffset.length) {
+                                offset = typeof dataOffset[idx] === 'undefined' ? 0 : dataOffset[idx];
+                            }
+                            pieData.push({
+                                data: val,
+                                label: label,
+                                offset: offset,
+                                legendEntry: true
+                            });
+                        });
+                        series.data = pieData;
+                    }
+                } else {
+                    _super.prototype._bindSeriesData.call(this, ds, series, sharedXList);
+                    if(data.x && $.isArray(data.x)) {
+                        this.bindXData = true;
+                    }
+                    $.each([
+                        "high", 
+                        "low", 
+                        "open", 
+                        "close", 
+                        "y1"
+                    ], function (i, name) {
+                        var d = data[name];
+                        if(d && d.bind) {
+                            data[name] = _this._getBindData(ds, d.bind);
+                        }
+                    });
+                }
             };
             wijcompositechart.prototype.getElement = /**
             * Returns the raphael element with the given type and index.
@@ -366,30 +354,10 @@ var wijmo;
                 }
                 return icon;
             };
-            wijcompositechart.prototype._showHideStockSeries = function (seriesEle, type) {
-                $.each(seriesEle, function (i, stockNode) {
-                    if(stockNode.hl) {
-                        stockNode.hl[type]();
-                    }
-                    if(stockNode.o) {
-                        stockNode.o[type]();
-                    }
-                    if(stockNode.c) {
-                        stockNode.c[type]();
-                    }
-                    if(stockNode.path) {
-                        stockNode.path[type]();
-                    }
-                    if(stockNode.h) {
-                        stockNode.h[type]();
-                    }
-                    if(stockNode.l) {
-                        stockNode.l[type]();
-                    }
-                    if(stockNode.oc) {
-                        stockNode.oc[type]();
-                    }
-                });
+            wijcompositechart.prototype._showHideCandlestickSeries = function (seriesEle, type) {
+                if(wijcandlestickchartFn) {
+                    wijcandlestickchartFn.prototype._showHideSeries.apply(this, arguments);
+                }
             };
             wijcompositechart.prototype._showSerieEles = function (seriesEle) {
                 var type = seriesEle.type, eles = seriesEle.eles, showLabels = this.options.showChartLabels, dataObj;
@@ -486,17 +454,23 @@ var wijmo;
                             }
                         });
                         break;
-                    case "hloc":
+                    case "ohlc":
                     case "hl":
                     case "candlestick":
-                        this._showHideStockSeries(eles, "show");
+                        this._showHideCandlestickSeries(eles, "show");
                         break;
                     case "bubble":
                         $.each(eles, function (i, bubbleInfo) {
                             if(bubbleInfo.bubble) {
                                 bubbleInfo.bubble.show();
+                                if(bubbleInfo.bubble.shadow) {
+                                    bubbleInfo.bubble.shadow.show();
+                                }
                                 if(bubbleInfo.bubble.tracker) {
                                     bubbleInfo.bubble.tracker.show();
+                                }
+                                if($(bubbleInfo.bubble.node).data("wijchartDataObj")) {
+                                    $(bubbleInfo.bubble.node).data("wijchartDataObj").visible = true;
                                 }
                             }
                             if(bubbleInfo.dcl) {
@@ -591,17 +565,23 @@ var wijmo;
                             }
                         });
                         break;
-                    case "hloc":
+                    case "ohlc":
                     case "hl":
                     case "candlestick":
-                        this._showHideStockSeries(eles, "hide");
+                        this._showHideCandlestickSeries(eles, "hide");
                         break;
                     case "bubble":
                         $.each(eles, function (i, bubbleInfo) {
                             if(bubbleInfo.bubble) {
                                 bubbleInfo.bubble.hide();
+                                if(bubbleInfo.bubble.shadow) {
+                                    bubbleInfo.bubble.shadow.hide();
+                                }
                                 if(bubbleInfo.bubble.tracker) {
                                     bubbleInfo.bubble.tracker.hide();
+                                }
+                                if($(bubbleInfo.bubble.node).data("wijchartDataObj")) {
+                                    $(bubbleInfo.bubble.node).data("wijchartDataObj").visible = false;
                                 }
                             }
                             if(bubbleInfo.dcl) {
@@ -660,237 +640,111 @@ var wijmo;
                     });
                 }
             };
-            wijcompositechart.prototype._isContainsStock = // begin for stock chart
-            function () {
-                var isContainsStock = false, self = this, o = self.options, seriesList = o.seriesList;
-                $.each(seriesList, function (i, series) {
+            wijcompositechart.prototype._setDefaultTooltipText = function (data) {
+                if(data.type === "candlestick" && wijcandlestickchartFn) {
+                    return wijcandlestickchartFn.prototype._setDefaultTooltipText.apply(this, arguments);
+                }
+                return _super.prototype._setDefaultTooltipText.call(this, data);
+            };
+            wijcompositechart.prototype._checkChartType = function () {
+                var _this = this;
+                this.isContainsBubble = false;
+                this.isContainsCandlestick = false;
+                $.each(this.options.seriesList, function (i, series) {
                     var type = series.type;
-                    if(type === "hloc" || type === "hl" || type === "candlestick") {
-                        isContainsStock = true;
-                        return false;
+                    if(!_this.isContainsCandlestick && (type === "ohlc" || type === "hl" || type === "candlestick")) {
+                        _this.isContainsCandlestick = true;
+                    } else if(!_this.isContainsBubble && type === "bubble") {
+                        _this.isContainsBubble = true;
                     }
                 });
-                return isContainsStock;
             };
-            wijcompositechart.prototype._handleXData = function () {
-                // TO DO for stockchart
-                //var self = this,
-                //	o = self.options,
-                //	seriesList = o.seriesList,
-                //	xValues = [];
-                //$.each(seriesList, function (i, series) {
-                //	xValues = xValues.concat(series.data.x);
-                //});
-                //self.timeUtil = new $.wijstockchart.datetimeUtil(xValues);
-                //$.each(seriesList, function (i, series) {
-                //	series.data.x = $.map(series.data.x, function (n, i) {
-                //		return self.timeUtil.getTimeIndex(n);
-                //	})
-                //});
-                            };
-            wijcompositechart.prototype._isStockSeries = function (series) {
+            wijcompositechart.prototype._handleXDataForCandlestick = function () {
+                if(wijcandlestickchartFn) {
+                    wijcandlestickchartFn.prototype._handleXData.apply(this, arguments);
+                }
+            };
+            wijcompositechart.prototype._isCandlestickSeries = function (series) {
                 var type = series.type;
-                return type === "hloc" || type === "hl" || type === "candlestick";
+                return type === "ohlc" || type === "hl" || type === "candlestick";
             };
             wijcompositechart.prototype._paintChartArea = function () {
-                var self = this, o = self.options, data = o.data;
-                if(self._isSeriesDataEmpty()) {
+                var self = this, seriesList = self.options.seriesList;
+                if(self._isSeriesListDataEmpty()) {
                     return;
                 }
                 // add the hl to data.y
-                $.each(o.seriesList, function (i, n) {
+                $.each(seriesList, function (i, n) {
                     var data = n.data;
-                    if(self._isStockSeries(n)) {
+                    if(self._isCandlestickSeries(n)) {
                         data.y = [].concat(data.high).concat(data.low);
                     }
                 });
+                if(this.bubbleAxisAdjust) {
+                    this.bubbleAxisAdjust.dispose();
+                }
+                this.bubbleAxisAdjust = new chart.BubbleAxisAdjust(this);
                 _super.prototype._paintChartArea.call(this);
                 // delete data.y
-                $.each(o.seriesList, function (i, n) {
-                    if(self._isStockSeries(n)) {
+                $.each(seriesList, function (i, n) {
+                    if(self._isCandlestickSeries(n)) {
                         delete n.data.y;
                     }
                 });
             };
-            wijcompositechart.prototype._isSeriesDataEmpty = function () {
-                var self = this, sl = self.options.seriesList;
-                if(!sl || sl.length === 0) {
-                    return true;
-                }
-                $.each(sl, function (idx, s) {
-                    var type = s.type;
-                    if(type === "hloc" || type === "candlestick") {
-                        if(!s.data || (!s.data.x || !s.data.high || !s.data.low || !s.data.open || !s.data.close)) {
-                            return true;
-                        }
-                    } else if(type === "hl") {
-                        if(!s.data || (!s.data.x || !s.data.high || !s.data.low)) {
-                            return true;
-                        }
-                    } else if(type === "pie" && (!s.data || !s.label || s.label.length === 0)) {
+            wijcompositechart.prototype._checkSeriesDataEmpty = function (series) {
+                var type = series.type, data = series.data, checkEmptyData = this._checkEmptyData;
+                if(this._isCandlestickSeries(series)) {
+                    if(!data || checkEmptyData(data.x) || checkEmptyData(data.high) || checkEmptyData(data.low)) {
                         return true;
-                    } else {
-                        if(!s.data || ((!s.data.x || !s.data.y) && !s.data.xy)) {
+                    }
+                    if(type === "ohlc" || type === "candlestick") {
+                        if(checkEmptyData(data.open) || checkEmptyData(data.low)) {
                             return true;
                         }
                     }
-                });
-                return false;
-            };
-            wijcompositechart.prototype._validateSeriesData = function (series) {
-                var type = this.options.type, data = series.data;
-                if(type === "hl") {
-                    if(data.x === undefined && data.high === undefined && data.low === undefined) {
-                        return false;
+                    return false;
+                } else if(type === "pie") {
+                    if(!data || !$.isArray(data)) {
+                        return true;
                     }
+                    return false;
                 } else {
-                    if(data.x === undefined && data.high === undefined && data.low === undefined && data.open === undefined && data.close === undefined) {
-                        return false;
-                    }
-                }
-                return true;
-            };
-            wijcompositechart.prototype._isStockChart = function () {
-                if(this.isContainsStock) {
-                    return true;
-                }
-                return false;
-            };
-            wijcompositechart.prototype._calculateStockParameters = function (axisInfo, options) {
-                // check for bar chart and x axis expansion
-                if(axisInfo.id === "x") {
-                    var minor = options.unitMinor, autoMin = options.autoMin, autoMax = options.autoMax, adj = this._getStockAdjustment(axisInfo);
-                    if(this.timeUtil && this.timeUtil.getCount) {
-                        axisInfo.max = this.timeUtil.getCount() - 1;
-                    }
-                    if(adj === 0) {
-                        adj = minor;
-                    } else {
-                        if(minor < adj && minor !== 0) {
-                            adj = Math.floor(adj / minor) * minor;
+                    if(type === "bubble") {
+                        if(!data || checkEmptyData(data.y1)) {
+                            return true;
                         }
                     }
-                    if(autoMin) {
-                        axisInfo.min -= adj;
-                    }
-                    if(autoMax) {
-                        axisInfo.max += adj;
-                    }
-                    this._calculateMajorMinor(options, axisInfo);
+                    return _super.prototype._checkSeriesDataEmpty.call(this, series);
                 }
-            };
-            wijcompositechart.prototype._getStockAdjustment = function (axisInfo) {
-                var self = this, o = self.options, max = axisInfo.max, min = axisInfo.min, length, series = o.seriesList;
-                $.each(series, function (i, s) {
-                    if(!length) {
-                        length = s.data.x.length;
-                    } else {
-                        length = Math.max(s.data.x.length);
-                    }
-                });
-                return (max - min) / length;
             };
             wijcompositechart.prototype._calculateMajorMinor = function (axisOptions, axisInfo) {
-                var self = this, o = self.options, canvasBounds = axisInfo.bounds || self.canvasBounds, autoMajor = axisOptions.autoMajor, autoMinor = axisOptions.autoMinor, maxData = axisInfo.max, minData = axisInfo.min, isTime = axisInfo.isTime, tinc = axisInfo.tinc, formatString = axisInfo.annoFormatString, maxText = null, minText = null, sizeMax = null, sizeMin = null, mx = null, mn = null, prec = null, _prec = null, textStyle = null, dx = maxData - minData, width = 0, height = 0, nticks = 0, major = 0;
-                if(!self.isContainsStock) {
+                if(this.isContainsCandlestick && axisInfo.id === "x") {
+                    wijcandlestickchartFn.prototype._calculateMajorMinor.apply(this, arguments);
+                } else {
                     _super.prototype._calculateMajorMinor.call(this, axisOptions, axisInfo);
-                    return;
-                }
-                if(autoMajor) {
-                    textStyle = $.extend(true, {
-                    }, o.textStyle, axisOptions.textStyle, axisOptions.labels.style);
-                    if(axisInfo.id === "x") {
-                        if(minData < 0) {
-                            minData = 0;
-                        }
-                        if(maxData > self.timeUtil.getCount() - 1) {
-                            maxData = self.timeUtil.getCount() - 1;
-                        }
-                        maxData = self.timeUtil.getOATime(maxData);
-                        minData = self.timeUtil.getOATime(minData);
-                        if(!self.formatString) {
-                            formatString = formatString || chart.ChartDataUtil.getTimeDefaultFormat(maxData, minData);
-                            self.formatString = formatString;
-                        } else {
-                            formatString = self.formatString;
-                        }
-                        maxText = Globalize.format($.fromOADate(maxData), formatString, self._getCulture());
-                        minText = Globalize.format($.fromOADate(minData), formatString, self._getCulture());
-                        mx = self._text(-1000, -1000, maxText).attr(textStyle);
-                        mn = self._text(-1000, -1000, minText).attr(textStyle);
-                        sizeMax = mx.wijGetBBox();
-                        sizeMin = mn.wijGetBBox();
-                        mx.wijRemove();
-                        mx = null;
-                        mn.wijRemove();
-                        mn = null;
-                    } else {
-                        prec = chart.ChartDataUtil.nicePrecision(dx);
-                        _prec = prec + 1;
-                        if(_prec < 0 || _prec > 15) {
-                            _prec = 0;
-                        }
-                        mx = self._text(-1000, -1000, $.round(maxData, _prec).toString()).attr(textStyle);
-                        mn = self._text(-1000, -1000, $.round(minData, _prec).toString()).attr(textStyle);
-                        sizeMax = mx.wijGetBBox();
-                        sizeMin = mn.wijGetBBox();
-                        mx.wijRemove();
-                        mx = null;
-                        mn.wijRemove();
-                        mn = null;
-                    }
-                    if(sizeMax.width < sizeMin.width) {
-                        sizeMax.width = sizeMin.width;
-                    }
-                    if(sizeMax.height < sizeMin.height) {
-                        sizeMax.height = sizeMin.height;
-                    }
-                    if(!self._isVertical(axisOptions.compass)) {
-                        // Add comments by RyanWu@20100907.
-                        // Subtract axisTextOffset because we must left
-                        // the space between major text and major rect.
-                        width = canvasBounds.endX - canvasBounds.startX - axisInfo.vOffset - axisInfo.axisTextOffset;
-                        major = width / sizeMax.width;
-                        if(Number.POSITIVE_INFINITY === major) {
-                            nticks = 0;
-                        } else {
-                            nticks = parseInt(major.toString(), 10);
-                        }
-                    } else {
-                        height = canvasBounds.endY - canvasBounds.startY - axisInfo.vOffset - axisInfo.axisTextOffset;
-                        major = height / sizeMax.height;
-                        if(Number.POSITIVE_INFINITY === major) {
-                            nticks = 0;
-                        } else {
-                            nticks = parseInt(major.toString(), 10);
-                        }
-                    }
-                    major = dx;
-                    if(nticks > 0) {
-                        dx /= nticks;
-                        axisInfo.tprec = chart.ChartDataUtil.nicePrecision(dx);
-                        major = chart.ChartDataUtil.niceNumber(2 * dx, -prec, true);
-                        if(major < dx) {
-                            major = chart.ChartDataUtil.niceNumber(dx, -prec + 1, false);
-                        }
-                        if(major < dx) {
-                            major = chart.ChartDataUtil.niceTickNumber(dx);
-                        }
-                        //					}
-                                            }
-                    axisOptions.unitMajor = major;
-                }
-                if(autoMinor && axisOptions.unitMajor && !isNaN(axisOptions.unitMajor)) {
-                    axisOptions.unitMinor = axisOptions.unitMajor / 2;
                 }
             };
-            wijcompositechart.prototype._getTickText = function (text) {
+            wijcompositechart.prototype._getXTickText = function (text) {
                 //return text;
                                 var self = this, formatString = self.formatString;
-                if(self.isContainsStock) {
-                    return Globalize.format(self.timeUtil.getTime(text), formatString, self._getCulture());
+                if(self.isContainsCandlestick && wijcandlestickchartFn) {
+                    return wijcandlestickchartFn.prototype._getXTickText.apply(this, arguments);
                 }
                 return text;
+            };
+            wijcompositechart.prototype._adjustTickValuesForCandlestickChart = function (tickValues) {
+                if(this.isContainsCandlestick && wijcandlestickchartFn) {
+                    return wijcandlestickchartFn.prototype._adjustTickValuesForCandlestickChart.apply(this, arguments);
+                } else {
+                    return _super.prototype._adjustTickValuesForCandlestickChart.call(this, tickValues);
+                }
+            };
+            wijcompositechart.prototype._getTickTextForCalculateUnit = function (value, axisInfo, prec) {
+                if(axisInfo.id === "x" && this.isContainsCandlestick) {
+                    return wijcandlestickchartFn.prototype._getTickTextForCalculateUnit.apply(this, arguments);
+                }
+                return _super.prototype._getTickTextForCalculateUnit.call(this, value, axisInfo, prec);
             };
             wijcompositechart.prototype._AdjustAxisBounds = function (axisInfo, axisOptions) {
                 var self = this, o = self.options, mx, mn, sizeMax, sizeMin, maxData = axisInfo.max, minData = axisInfo.min, dx = maxData - minData, prec = chart.ChartDataUtil.nicePrecision(dx), _prec = prec + 1, bounds = axisInfo.bounds, textStyle = $.extend(true, {
@@ -903,7 +757,7 @@ var wijmo;
                     bounds.startY += sizeMin.height;
                 }
                 if(!axisInfo.isLastAxis) {
-                    bounds.endY -= (sizeMax.height) / 2;
+                    bounds.endY -= (sizeMax.height);
                 }
             };
             wijcompositechart.prototype._initYAxisHeight = function () {
@@ -993,12 +847,9 @@ var wijmo;
                     click: function (e, args) {
                         self._trigger("click", e, args);
                     }
-                }, fields = self.chartElement.data("fields"), tmpOptions, chartgroup, _chartRender, isContainsStock = self._isContainsStock();
+                }, fields = self.chartElement.data("fields"), tmpOptions, chartgroup, _chartRender;
                 if(fields) {
                     fields.ctracers = [];
-                }
-                if(isContainsStock) {
-                    self._handleXData();
                 }
                 $.each(o[seriesList], function (i, series) {
                     var type = series.type, chart = {
@@ -1072,9 +923,6 @@ var wijmo;
                     } else if(type === "bezier") {
                         series.fitType = "bezier";
                     }
-                    if(chartType === "stock" && series.data.high && series.data.low) {
-                        series.data.y = [].concat(series.data.high).concat(series.data.low);
-                    }
                     if(isMulityYAxis) {
                         chart.yAxis = yAxis || 0;
                     }
@@ -1136,7 +984,8 @@ var wijmo;
                                 tmpOptions = $.extend(true, {
                                 }, options, {
                                     bounds: pieBounds,
-                                    radius: r
+                                    radius: r,
+                                    isTouchBehaviorEnable: false
                                 }, pie);
                                 _chartRender = new chartModule.PieChartRender(self.chartElement, tmpOptions);
                                 _chartRender.render();
@@ -1174,9 +1023,13 @@ var wijmo;
                         case "bezier":
                         case "area":
                             chartgroup = self._getyAxisGroup(chart);
+                            if(!self.aniPathsAttr) {
+                                self.aniPathsAttr = {
+                                };
+                            }
                             $.each(chartgroup, function (ykey, subchart) {
-                                if(!self.aniPathsAttr) {
-                                    self.aniPathsAttr = [];
+                                if(!self.aniPathsAttr[type]) {
+                                    self.aniPathsAttr[type] = [];
                                 }
                                 tmpOptions = $.extend(true, {
                                 }, options, {
@@ -1188,7 +1041,7 @@ var wijmo;
                                     type === "area" ? "area" : "line",
                                     hole: o.hole
                                 }, subchart);
-                                tmpOptions.aniPathsAttr = self.aniPathsAttr;
+                                tmpOptions.aniPathsAttr = self.aniPathsAttr[type];
                                 tmpOptions.chartLabelEles = self.chartLabelEles;
                                 tmpOptions.axis.y = o.axis.y[ykey] || o.axis.y;
                                 tmpOptions.extremeValue = {
@@ -1226,24 +1079,30 @@ var wijmo;
                                 self._savechartData(type, seriesIndexs);
                             });
                             break;
-                        case "hloc":
+                        case "ohlc":
                         case "hl":
                         case "candlestick":
-                            // now do not support the stock chart.
-                            //chartgroup = self._getyAxisGroup(chart);
-                            //$.each(chartgroup, function (ykey, subchart) {
-                            //	tmpOptions = $.extend(true, {}, options, {
-                            //		axis: o.axis,
-                            //		isXTime: self.axisInfo.x.isTime,
-                            //		isYTime: self.axisInfo.y[0].isTime,
-                            //		timeUtil: self.timeUtil,
-                            //		maxWidth: o.maxWidth || 15,
-                            //		type: type
-                            //	}, subchart);
-                            //	tmpOptions.axis.y = o.axis.y[ykey] || o.axis.y;
-                            //	self.chartElement.wijstock(tmpOptions);
-                            //	self._savechartData(type);
-                            //});
+                            chartgroup = self._getyAxisGroup(chart);
+                            $.each(chartgroup, function (ykey, subchart) {
+                                tmpOptions = $.extend(true, {
+                                }, options, {
+                                    axis: o.axis,
+                                    timeUtil: self.timeUtil,
+                                    type: type
+                                }, subchart);
+                                tmpOptions.axis.y = o.axis.y[ykey] || o.axis.y;
+                                // extend the styles.
+                                $.each(tmpOptions.seriesStyles, function (i, seriesStyle) {
+                                    wijcandlestickchartFn.prototype._setDefaultFill(type, seriesStyle);
+                                });
+                                _chartRender = new chartModule.CandlestickChartRender(self.chartElement, tmpOptions);
+                                _chartRender.render();
+                                seriesIndexs = [];
+                                $.each(subchart.seriesList, function (i, sl) {
+                                    seriesIndexs.push(sl.sIndex);
+                                });
+                                self._savechartData(type, seriesIndexs);
+                            });
                             break;
                         case "bubble":
                             chartgroup = self._getyAxisGroup(chart);
@@ -1264,7 +1123,8 @@ var wijmo;
                                     chartLabel: chartLabel,
                                     minimumSize: o.minimumSize || 5,
                                     maximumSize: o.maximumSize || 20,
-                                    sizingMethod: o.sizingMethod || "diameter"
+                                    sizingMethod: o.sizingMethod || "diameter",
+                                    bubbleRadius: self.bubbleAxisAdjust.bubbleRadius
                                 }, subchart);
                                 tmpOptions.axis.y = o.axis.y[ykey] || o.axis.y;
                                 tmpOptions.yAxisInfo = self.axisInfo.y[ykey] || self.axisInfo.y[0];
@@ -1358,17 +1218,14 @@ var wijmo;
                 if(fields && fields.ctracers) {
                     $.each(fields.ctracers, function (index, ctracer) {
                         var type = ctracer.type;
-                        if(type === "hloc") {
-                        } else {
-                            if(ctracer.trackers) {
-                                ctracer.trackers.toFront();
-                            }
+                        if(ctracer.trackers) {
+                            ctracer.trackers.toFront();
                         }
                     });
                 }
-                self.chartElement.delegate(".linetracker, .wijchart-canvas-marker, .bartracker, .pietracker, .wijscatterchart, .bubbletracker", "mouseover." + namespace, $.proxy(self._tooltipMouseOver, self));
-                self.chartElement.delegate(".linetracker, .wijchart-canvas-marker, .bartracker, .pietracker, .wijscatterchart, .bubbletracker", "mouseout." + namespace, $.proxy(self._tooltipMouseOut, self));
-                self.chartElement.delegate(".linetracker, .wijchart-canvas-marker, .bartracker, .pietracker, .wijscatterchart, .bubbletracker", "mousemove." + namespace, $.proxy(self._tooltipMouseMove, self));
+                self.chartElement.delegate(".linetracker, .wijchart-canvas-marker, .bartracker, .pietracker, .wijscatterchart, .bubbletracker, .candlesticktracker", "mouseover." + namespace, $.proxy(self._tooltipMouseOver, self));
+                self.chartElement.delegate(".linetracker, .wijchart-canvas-marker, .bartracker, .pietracker, .wijscatterchart, .bubbletracker, .candlesticktracker", "mouseout." + namespace, $.proxy(self._tooltipMouseOut, self));
+                self.chartElement.delegate(".linetracker, .wijchart-canvas-marker, .bartracker, .pietracker, .wijscatterchart, .bubbletracker, .candlesticktracker", "mousemove." + namespace, $.proxy(self._tooltipMouseMove, self));
             };
             wijcompositechart.prototype._tooltipMouseOver = function (e) {
                 var target = e.target, self = this, tooltip = self.tooltip, hint = self.options.hint, op = null, title = hint.title, content = hint.content, hintStyle = hint.style, isTitleFunc = $.isFunction(title), isContentFunc = $.isFunction(content), data, bbox, position, raphaelObj;
@@ -1635,12 +1492,13 @@ var wijmo;
                 return "";
             };
             wijcompositechart.prototype._calculateParameters = function (axisInfo, options) {
-                var self = this, hasBarType = false, minor, adj;
+                var self = this, hasBarType = false, minor, maxAdj = 0, minAdj = 0, bubbleAdj, max = axisInfo.max, min = axisInfo.min;
                 _super.prototype._calculateParameters.call(this, axisInfo, options);
-                // handle stock chart.
-                if(self.isContainsStock) {
-                    self._calculateStockParameters(axisInfo, options);
-                    return;
+                // in chartcore, it will according the number value to calculate value, the value may less than the value which is adjusted in bubble.
+                // So here to reset the value.
+                axisInfo.max = Math.max(max, axisInfo.max);
+                if(min !== 0) {
+                    axisInfo.min = Math.min(min, axisInfo.min);
                 }
                 $.each(self.options.seriesList, function (idx, series) {
                     if(series.type === "column" || series.type === "bar") {
@@ -1648,27 +1506,36 @@ var wijmo;
                         return false;
                     }
                 });
-                if(!hasBarType) {
-                    return;
-                }
                 // check for bar chart and x axis expansion
                 if(axisInfo.id === "x") {
                     minor = options.unitMinor;
-                    adj = self._getBarAdjustment(axisInfo);
-                    if(adj === 0) {
-                        adj = minor;
-                    } else {
-                        if(minor < adj && minor !== 0) {
-                            adj = Math.floor(adj / minor) * minor;
-                        }
+                    if(hasBarType) {
+                        maxAdj = minAdj = Math.max(maxAdj, self._getBarAdjustment(axisInfo, minor));
                     }
-                    axisInfo.min -= adj;
-                    axisInfo.max += adj;
+                    if(self.isContainsCandlestick && wijcandlestickchartFn) {
+                        maxAdj = minAdj = Math.max(maxAdj, wijcandlestickchartFn.prototype._getCandlestickAdjustment.apply(this, [
+                            axisInfo, 
+                            minor
+                        ]));
+                    }
+                }
+                if(self.isContainsBubble && $.wijmo.wijbubblechart) {
+                    bubbleAdj = this.bubbleAxisAdjust.getAdjust(axisInfo, options);
+                    maxAdj = Math.max(maxAdj, bubbleAdj.max - axisInfo.max);
+                    minAdj = Math.max(minAdj, axisInfo.min - bubbleAdj.min);
+                }
+                if(minAdj) {
+                    axisInfo.min -= minAdj;
+                }
+                if(maxAdj) {
+                    axisInfo.max += maxAdj;
+                }
+                if(maxAdj || minAdj) {
                     self._calculateMajorMinor(options, axisInfo);
                 }
             };
-            wijcompositechart.prototype._getBarAdjustment = function (axisInfo) {
-                var len = 0, o = this.options, max = axisInfo.max, min = axisInfo.min, xLen = 0;
+            wijcompositechart.prototype._getBarAdjustment = function (axisInfo, minor) {
+                var len = 0, o = this.options, max = axisInfo.max, min = axisInfo.min, xLen = 0, adj;
                 $.each(o.seriesList, function (idx, series) {
                     if(series.type === "pie") {
                         return true;
@@ -1682,16 +1549,24 @@ var wijmo;
                     }
                 });
                 if(len > 1) {
-                    return (max - min) / len * o.clusterWidth * 0.0125;
+                    adj = (max - min) / len * o.clusterWidth * 0.0125;
                 } else if(len === 1) {
                     if(min === 0.0 && max === 1.0) {
                         min = -1.0;
                         axisInfo.min = min;
                     }
-                    return (max - min) * 0.0125;
+                    adj = (max - min) * 0.0125;
                 } else {
-                    return 0;
+                    adj = 0;
                 }
+                if(adj === 0) {
+                    adj = minor;
+                } else {
+                    if(minor < adj && minor !== 0) {
+                        adj = Math.floor(adj / minor) * minor;
+                    }
+                }
+                return adj;
             };
             return wijcompositechart;
         })(chart.wijchartcore);
@@ -1724,7 +1599,10 @@ var wijmo;
                     lineElement: "wijlinechart",
                     areaElement: "wijlinechart-area",
                     lineTracker: "linetracker",
-                    canvasMarker: "wijchart-canvas-marker"
+                    canvasMarker: "wijchart-canvas-marker",
+                    wijCandlestickChart: "wijmo-wijcandlestickchart",
+                    candlestickChart: "wijcandlestickchart",
+                    candlestickChartTracker: "candlesticktracker"
                 };
                 /**
                 * A value that determines whether to show a stacked chart.

@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20133.20
+ * Wijmo Library 3.20141.34
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -8,7 +8,6 @@
  * Licensed under the Wijmo Commercial License. Also available under the GNU GPL Version 3 license.
  * licensing@wijmo.com
  * http://wijmo.com/widgets/license/
- *
  *
  */
 var __extends = this.__extends || function (d, b) {
@@ -45,6 +44,8 @@ var wijmo;
     *	globalize.js
     *	jquery.mousewheel.js
     *	jquery.wijmo.wijutil.js
+    *	jquery.wijmo.wijcharex.js
+    *	jquery.wijmo.wijstringinfo.js
     *	jquery.wijmo.wijinputcore.js
     *	jquery.wijmo.wijinputdate.js
     *   jquery.wijmo.wijinputnumber.js
@@ -745,6 +746,11 @@ var wijmo;
                     case "viewType":
                         if(o.viewType !== value) {
                             o.viewType = value;
+                            if(value.toLowerCase() === "day" || value.toLowerCase() === "list") {
+                                o.selectedDates = [
+                                    o.selectedDate
+                                ];
+                            }
                             this._onViewTypeChanged();
                         }
                         break;
@@ -906,9 +912,13 @@ var wijmo;
                 $("<div class=\"wijmo-wijev-statusbar " + o.wijCSS.header + " " + o.wijCSS.cornerBottom + "\">" + "</div>").appendTo(this.element);
                 navigationbar = this.element.find(".wijmo-wijev-navigationbar");
                 toolsBar = this.element.find(".wijmo-wijev-headerbar .wijmo-wijev-tools");
-                navigationbar.find(".wijmo-wijev-today").button({
-                    text: this.localizeString("buttonToday", "today")
-                }).click($.proxy(this._onTodayClick, this));
+                if($.mobile != null) {
+                    navigationbar.find(".wijmo-wijev-today").addClass("ui-btn ui-btn-corner-all").click($.proxy(this._onTodayClick, this));
+                } else {
+                    navigationbar.find(".wijmo-wijev-today").button({
+                        text: this.localizeString("buttonToday", "today")
+                    }).click($.proxy(this._onTodayClick, this));
+                }
                 this.element.find(".wijmo-wijev-datepager").wijdatepager({
                     selectedDate: o.selectedDate,
                     localization: o.datePagerLocalization,
@@ -1248,6 +1258,9 @@ var wijmo;
                 } else {
                     eventsDataById = this._eventsDataById;
                 }
+                if(!o.eventsData) {
+                    o.eventsData = [];
+                }
                 loadEventsCallback = function (events) {
                     if(!events) {
                         return;
@@ -1497,16 +1510,20 @@ var wijmo;
                         "</select></li>" + "<li><label>" + this.localizeString("labelCalendar", "Calendar") + "</label>" + "<select class=\"wijmo-wijev-calendar\"></select></li>" + "<li class=\"wijmo-wijev-description-item\"><label>" + this.localizeString("labelDescription", "Description") + "</label>" + "<textarea class=\"wijmo-wijev-description\" /></li>" + "</ul>" + "<div class=\"footer\">" + "<a href=\"#\" class=\"wijmo-wijev-delete\">" + this.localizeString("buttonDelete", "Delete") + "</a>" + "<a href=\"#\" class=\"wijmo-wijev-save\">" + this.localizeString("buttonOK", "OK") + "</a>" + "<a href=\"#\" class=\"wijmo-wijev-cancel\">" + this.localizeString("buttonCancel", "Cancel") + "</a>" + "</div>" + "<div class=\"wijmo-wijev-angle\"></div>" + "</div>";
                     }
                     this._editEventDialog = $(dialogTemplate);
-                    this.element.append(this._editEventDialog);
+                    if(o.ensureEventDialogOnBody) {
+                        $("body").append(this._editEventDialog);
+                    } else {
+                        this.element.append(this._editEventDialog);
+                    }
                     //color
-                    this._editEventDialog.find(".wijmo-wijev-color-button").button({
+                    this._initEventDialogButton(this._editEventDialog.find(".wijmo-wijev-color-button"), $.proxy(this._onColorButtonClick, {
+                        dlg: this._editEventDialog,
+                        self: this
+                    }), {
                         icons: {
                             primary: o.wijCSS.iconArrowDown
                         }
-                    }).click($.proxy(this._onColorButtonClick, {
-                        dlg: this._editEventDialog,
-                        self: this
-                    }));
+                    });
                     /*
                     this._editEventDialog.find(".wijmo-wijev-color-arrow").button({
                     icons: { primary: "ui-icon-triangle-1-s" },
@@ -1514,12 +1531,12 @@ var wijmo;
                     }).click($.proxy(this._onColorButtonClick, this)).parent().buttonset();
                     */
                     //delete
-                    this._editEventDialog.find(".wijmo-wijev-delete").button().click($.proxy(function () {
+                    this._initEventDialogButton(this._editEventDialog.find(".wijmo-wijev-delete"), $.proxy(function () {
                         this.deleteEvent(this._editEventDialog.appt);
                         this._editEventDialog.wijpopup("hide");
                     }, this));
                     //close
-                    this._editEventDialog.find(".wijmo-wijev-cancel").button().click($.proxy(function (ev) {
+                    this._initEventDialogButton(this._editEventDialog.find(".wijmo-wijev-cancel"), $.proxy(function (ev) {
                         this._editEventDialog.wijpopup("hide");
                         ev.preventDefault();
                     }, this));
@@ -1634,7 +1651,7 @@ var wijmo;
                     this._editEventDialog.find(".wijmo-wijev-allday").wijcheckbox().change($.proxy(this._eventDialogEnsureTimePartState, this));
                     this._editEventDialog.find(".wijmo-wijev-subject,.wijmo-wijev-location,.wijmo-wijev-description").wijtextbox();
                     // save:
-                    this._editEventDialog.find(".wijmo-wijev-save").button().click($.proxy(function (e) {
+                    this._initEventDialogButton(this._editEventDialog.find(".wijmo-wijev-save"), $.proxy(function (e) {
                         try  {
                             var appt = this._validateAndReadApptDialogFields(this._editEventDialog);
                             if(appt.prevData) {
@@ -1662,11 +1679,13 @@ var wijmo;
                             this.element.find(".wijmo-wijev-dayview .ui-selected").removeClass("ui-selected");
                         }, this),
                         shown: $.proxy(function (e) {
-                            var self = this;
+                            var self = this, superPanelUnFocus = $.browser.msie ? true : false;
                             if(!this._dropDownInitialized) {
                                 // fix for wijdropdown,
                                 // create widget when select element is shown.
-                                this._editEventDialog.find(".wijmo-wijev-calendar").wijdropdown().bind("change", function (e) {
+                                this._editEventDialog.find(".wijmo-wijev-calendar").wijdropdown({
+                                    "unfocus": superPanelUnFocus
+                                }).bind("change", function (e) {
                                     var cal = self._calendarsById[this.value];
                                     if(cal && cal.color) {
                                         self._addColorClass(self._editEventDialog.find(".wijmo-wijev-color"), cal.color);
@@ -1676,7 +1695,9 @@ var wijmo;
                                         }
                                     }
                                 });
-                                this._editEventDialog.find(".wijmo-wijev-repeat").wijdropdown().bind("change", function (e) {
+                                this._editEventDialog.find(".wijmo-wijev-repeat").wijdropdown({
+                                    "unfocus": superPanelUnFocus
+                                }).bind("change", function (e) {
                                     var repeat = this.value, appt = self._editEventDialog.appt;
                                     switch(repeat) {
                                         case "none":
@@ -1734,6 +1755,13 @@ var wijmo;
                             this._updateEditEventPopupCallout();
                         }, this)
                     });
+                }
+            };
+            wijevcal.prototype._initEventDialogButton = function (element, proxyHandler, buttonOptions) {
+                if($.mobile == null) {
+                    element.button(buttonOptions).click(proxyHandler);
+                } else {
+                    element.addClass("ui-btn").click(proxyHandler);
                 }
             };
             wijevcal.prototype._updateEditEventPopupCallout = function () {
@@ -2532,6 +2560,9 @@ var wijmo;
                 // in C1EventsCalendar with all view types:
                                 var apps = this.options.eventsData, i, c;
                 this._eventsDataById[o.id] = o;
+                if(!apps) {
+                    return;
+                }
                 for(i = 0 , c = apps.length; i < c; i += 1) {
                     if(apps[i].start > o.start) {
                         apps.splice(i, 0, o);
@@ -2838,112 +2869,114 @@ var wijmo;
                     this._eventsDataById = {
                     };
                 }
-                for(i = 0 , icnt = appts.length; i < icnt; i += 1) {
-                    appt = appts[i];
-                    this._eventsDataById[appt.id] = appt;
-                    if(appt.recurrenceState === "master") {
-                        pattern = appt.recurrencePattern;
-                        if(pattern.removedOccurrences) {
-                            removedArr = removedArr.concat(pattern.removedOccurrences);
-                        }
-                        // populate pattern:
-                        jcnt = pattern.occurrences || maxOccurrenceCount;
-                        patternStart = pattern.patternStartDate || appt.start;
-                        patternStartTime = pattern.startTime || appt.start;
-                        patternEndTime = pattern.endTime || appt.end;
-                        //alert("pattern.recurrenceType=" + pattern.recurrenceType);
-                        switch(pattern.recurrenceType) {
-                            case "daily":
-                                for(j = 0; j < jcnt; j += 1) {
-                                    occurrenceAppt = this._cloneObj(appt);
-                                    occurrenceAppt.parentRecurrenceId = appt.id;
-                                    occurrenceAppt.recurrenceState = "occurrence";
-                                    occurrenceAppt.start = this._setTime(this._addDays(patternStart, j), patternStartTime);
-                                    occurrenceAppt.end = this._setTime(occurrenceAppt.start, patternEndTime, patternStartTime);
-                                    occurrenceAppt.recurrencePattern = null;
-                                    if(this._testIsEventInTimeInterval(occurrenceAppt, start, end)) {
-                                        occurrenceAppt.id = this._formatString("{0}_OCCR_{1:yyyy_MM_dd}", appt.id, occurrenceAppt.start);
-                                        occurrenceHash[occurrenceAppt.id] = occurrenceAppt;
+                if(appts) {
+                    for(i = 0 , icnt = appts.length; i < icnt; i += 1) {
+                        appt = appts[i];
+                        this._eventsDataById[appt.id] = appt;
+                        if(appt.recurrenceState === "master") {
+                            pattern = appt.recurrencePattern;
+                            if(pattern.removedOccurrences) {
+                                removedArr = removedArr.concat(pattern.removedOccurrences);
+                            }
+                            // populate pattern:
+                            jcnt = pattern.occurrences || maxOccurrenceCount;
+                            patternStart = pattern.patternStartDate || appt.start;
+                            patternStartTime = pattern.startTime || appt.start;
+                            patternEndTime = pattern.endTime || appt.end;
+                            //alert("pattern.recurrenceType=" + pattern.recurrenceType);
+                            switch(pattern.recurrenceType) {
+                                case "daily":
+                                    for(j = 0; j < jcnt; j += 1) {
+                                        occurrenceAppt = this._cloneObj(appt);
+                                        occurrenceAppt.parentRecurrenceId = appt.id;
+                                        occurrenceAppt.recurrenceState = "occurrence";
+                                        occurrenceAppt.start = this._setTime(this._addDays(patternStart, j), patternStartTime);
+                                        occurrenceAppt.end = this._setTime(occurrenceAppt.start, patternEndTime, patternStartTime);
+                                        occurrenceAppt.recurrencePattern = null;
+                                        if(this._testIsEventInTimeInterval(occurrenceAppt, start, end)) {
+                                            occurrenceAppt.id = this._formatString("{0}_OCCR_{1:yyyy_MM_dd}", appt.id, occurrenceAppt.start);
+                                            occurrenceHash[occurrenceAppt.id] = occurrenceAppt;
+                                        }
                                     }
-                                }
-                                break;
-                            case "workdays":
-                                for(j = 0; j < jcnt; j += 1) {
-                                    occurrenceAppt = this._cloneObj(appt);
-                                    occurrenceAppt.parentRecurrenceId = appt.id;
-                                    occurrenceAppt.recurrenceState = "occurrence";
-                                    occurrenceAppt.start = this._setTime(this._addDays(patternStart, j), patternStartTime);
-                                    //getDay() : Sunday is 0, Monday is 1, and so on.
-                                    if(occurrenceAppt.start.getDay() === 0 || occurrenceAppt.start.getDay() === 6) {
-                                        continue;
+                                    break;
+                                case "workdays":
+                                    for(j = 0; j < jcnt; j += 1) {
+                                        occurrenceAppt = this._cloneObj(appt);
+                                        occurrenceAppt.parentRecurrenceId = appt.id;
+                                        occurrenceAppt.recurrenceState = "occurrence";
+                                        occurrenceAppt.start = this._setTime(this._addDays(patternStart, j), patternStartTime);
+                                        //getDay() : Sunday is 0, Monday is 1, and so on.
+                                        if(occurrenceAppt.start.getDay() === 0 || occurrenceAppt.start.getDay() === 6) {
+                                            continue;
+                                        }
+                                        occurrenceAppt.end = this._setTime(occurrenceAppt.start, patternEndTime, patternStartTime);
+                                        occurrenceAppt.recurrencePattern = null;
+                                        if(this._testIsEventInTimeInterval(occurrenceAppt, start, end)) {
+                                            occurrenceAppt.id = this._formatString("{0}_OCCR_{1:yyyy_MM_dd}", appt.id, occurrenceAppt.start);
+                                            occurrenceHash[occurrenceAppt.id] = occurrenceAppt;
+                                        }
                                     }
-                                    occurrenceAppt.end = this._setTime(occurrenceAppt.start, patternEndTime, patternStartTime);
-                                    occurrenceAppt.recurrencePattern = null;
-                                    if(this._testIsEventInTimeInterval(occurrenceAppt, start, end)) {
-                                        occurrenceAppt.id = this._formatString("{0}_OCCR_{1:yyyy_MM_dd}", appt.id, occurrenceAppt.start);
-                                        occurrenceHash[occurrenceAppt.id] = occurrenceAppt;
+                                    break;
+                                case "weekly":
+                                    for(j = 0; j < jcnt; j += 1) {
+                                        occurrenceAppt = this._cloneObj(appt);
+                                        occurrenceAppt.parentRecurrenceId = appt.id;
+                                        occurrenceAppt.recurrenceState = "occurrence";
+                                        occurrenceAppt.start = this._setTime(this._addDays(patternStart, j * 7), patternStartTime);
+                                        occurrenceAppt.end = this._setTime(occurrenceAppt.start, patternEndTime, patternStartTime);
+                                        occurrenceAppt.recurrencePattern = null;
+                                        if(this._testIsEventInTimeInterval(occurrenceAppt, start, end)) {
+                                            occurrenceAppt.id = this._formatString("{0}_OCCR_{1:yyyy_MM_dd}", appt.id, occurrenceAppt.start);
+                                            occurrenceHash[occurrenceAppt.id] = occurrenceAppt;
+                                        }
                                     }
-                                }
-                                break;
-                            case "weekly":
-                                for(j = 0; j < jcnt; j += 1) {
-                                    occurrenceAppt = this._cloneObj(appt);
-                                    occurrenceAppt.parentRecurrenceId = appt.id;
-                                    occurrenceAppt.recurrenceState = "occurrence";
-                                    occurrenceAppt.start = this._setTime(this._addDays(patternStart, j * 7), patternStartTime);
-                                    occurrenceAppt.end = this._setTime(occurrenceAppt.start, patternEndTime, patternStartTime);
-                                    occurrenceAppt.recurrencePattern = null;
-                                    if(this._testIsEventInTimeInterval(occurrenceAppt, start, end)) {
-                                        occurrenceAppt.id = this._formatString("{0}_OCCR_{1:yyyy_MM_dd}", appt.id, occurrenceAppt.start);
-                                        occurrenceHash[occurrenceAppt.id] = occurrenceAppt;
+                                    break;
+                                case "monthly":
+                                    for(j = 0; j < jcnt; j += 1) {
+                                        occurrenceAppt = this._cloneObj(appt);
+                                        occurrenceAppt.parentRecurrenceId = appt.id;
+                                        occurrenceAppt.recurrenceState = "occurrence";
+                                        occurrenceAppt.start = this._setTime(new Date(patternStart), patternStartTime);
+                                        occurrenceAppt.start.setMonth(occurrenceAppt.start.getMonth() + j);
+                                        occurrenceAppt.end = this._setTime(occurrenceAppt.start, patternEndTime, patternStartTime);
+                                        occurrenceAppt.recurrencePattern = null;
+                                        if(this._testIsEventInTimeInterval(occurrenceAppt, start, end)) {
+                                            occurrenceAppt.id = this._formatString("{0}_OCCR_{1:yyyy_MM_dd}", appt.id, occurrenceAppt.start);
+                                            occurrenceHash[occurrenceAppt.id] = occurrenceAppt;
+                                        }
                                     }
-                                }
-                                break;
-                            case "monthly":
-                                for(j = 0; j < jcnt; j += 1) {
-                                    occurrenceAppt = this._cloneObj(appt);
-                                    occurrenceAppt.parentRecurrenceId = appt.id;
-                                    occurrenceAppt.recurrenceState = "occurrence";
-                                    occurrenceAppt.start = this._setTime(new Date(patternStart), patternStartTime);
-                                    occurrenceAppt.start.setMonth(occurrenceAppt.start.getMonth() + j);
-                                    occurrenceAppt.end = this._setTime(occurrenceAppt.start, patternEndTime, patternStartTime);
-                                    occurrenceAppt.recurrencePattern = null;
-                                    if(this._testIsEventInTimeInterval(occurrenceAppt, start, end)) {
-                                        occurrenceAppt.id = this._formatString("{0}_OCCR_{1:yyyy_MM_dd}", appt.id, occurrenceAppt.start);
-                                        occurrenceHash[occurrenceAppt.id] = occurrenceAppt;
+                                    break;
+                                case "yearly":
+                                    for(j = 0; j < jcnt; j += 1) {
+                                        occurrenceAppt = this._cloneObj(appt);
+                                        occurrenceAppt.parentRecurrenceId = appt.id;
+                                        occurrenceAppt.recurrenceState = "occurrence";
+                                        occurrenceAppt.start = this._setTime(new Date(patternStart), patternStartTime);
+                                        occurrenceAppt.start.setYear(occurrenceAppt.start.getFullYear() + j);
+                                        occurrenceAppt.end = this._setTime(occurrenceAppt.start, patternEndTime, patternStartTime);
+                                        occurrenceAppt.recurrencePattern = null;
+                                        if(this._testIsEventInTimeInterval(occurrenceAppt, start, end)) {
+                                            occurrenceAppt.id = this._formatString("{0}_OCCR_{1:yyyy_MM_dd}", appt.id, occurrenceAppt.start);
+                                            occurrenceHash[occurrenceAppt.id] = occurrenceAppt;
+                                        }
                                     }
-                                }
-                                break;
-                            case "yearly":
-                                for(j = 0; j < jcnt; j += 1) {
-                                    occurrenceAppt = this._cloneObj(appt);
-                                    occurrenceAppt.parentRecurrenceId = appt.id;
-                                    occurrenceAppt.recurrenceState = "occurrence";
-                                    occurrenceAppt.start = this._setTime(new Date(patternStart), patternStartTime);
-                                    occurrenceAppt.start.setYear(occurrenceAppt.start.getFullYear() + j);
-                                    occurrenceAppt.end = this._setTime(occurrenceAppt.start, patternEndTime, patternStartTime);
-                                    occurrenceAppt.recurrencePattern = null;
-                                    if(this._testIsEventInTimeInterval(occurrenceAppt, start, end)) {
-                                        occurrenceAppt.id = this._formatString("{0}_OCCR_{1:yyyy_MM_dd}", appt.id, occurrenceAppt.start);
-                                        occurrenceHash[occurrenceAppt.id] = occurrenceAppt;
-                                    }
-                                }
-                                break;
-                            case "monthlyNth":
-                                break;
-                            case "yearlyNth":
-                                break;
-                        }
-                    } else {
-                        if(this._testIsEventInTimeInterval(appt, start, end)) {
-                            if(appt.recurrenceState === "exception") {
-                                exceptionsArr.push(appt);
-                            } else {
-                                if(appt.recurrenceState === "removed") {
-                                    removedArr.push(appt.id);
-                                    this.log("[warning] Seems we found removed event inside events storage, id:" + appt.id);
+                                    break;
+                                case "monthlyNth":
+                                    break;
+                                case "yearlyNth":
+                                    break;
+                            }
+                        } else {
+                            if(this._testIsEventInTimeInterval(appt, start, end)) {
+                                if(appt.recurrenceState === "exception") {
+                                    exceptionsArr.push(appt);
                                 } else {
-                                    eventsArr.push(appt);
+                                    if(appt.recurrenceState === "removed") {
+                                        removedArr.push(appt.id);
+                                        this.log("[warning] Seems we found removed event inside events storage, id:" + appt.id);
+                                    } else {
+                                        eventsArr.push(appt);
+                                    }
                                 }
                             }
                         }
@@ -3189,9 +3222,11 @@ var wijmo;
                     }
                     if(self._eventsDataById[o.id]) {
                         appts = self.options.eventsData;
-                        for(i = 0; i < appts.length; i = i + 1) {
-                            if(appts[i].id === id) {
-                                appts.splice(i, 1);
+                        if(appts) {
+                            for(i = 0; i < appts.length; i = i + 1) {
+                                if(appts[i].id === id) {
+                                    appts.splice(i, 1);
+                                }
                             }
                         }
                         delete self._eventsDataById[o.id];
@@ -3567,7 +3602,6 @@ var wijmo;
                         of: targetCell,
                         my: "left center",
                         at: "right center",
-                        within: this.element.parent(),
                         offset: (targetCell && e ? Math.round(e.offsetX - targetCell.width()) : 10) + " 0",
                         collision: "fit"
                     });
@@ -3597,6 +3631,9 @@ var wijmo;
                 toolsBar.find(".wijmo-wijev-" + o.viewType.toLowerCase())[0]["checked"] = true;
                 if($().buttonset) {
                     toolsBar.buttonset("refresh");
+                } else if($().checkboxradio) {
+                    // refresh the buttons of toolBar for mobile control.
+                    toolsBar.find(":radio").checkboxradio("refresh");
                 }
             };
             wijevcal.prototype._redrawActiveView = function () {
@@ -3780,9 +3817,10 @@ var wijmo;
             };
             wijevcal.prototype._invalidateDayView = //<< end of views cache
             function (scrollHeightOnly) {
-                var headercontainer = this.element.find(".wijmo-wijev-headercontainer"), scrollcontent = this.element.find(".wijmo-wijev-scrollcontent"), timeruler = scrollcontent.find(".wijmo-wijev-timeruler"), dayHeaderColumns = headercontainer.find(".wijmo-wijev-dayheadercolumn"), dayColumns = scrollcontent.find(".wijmo-wijev-daycolumn"), title = this.element.find(".wijmo-wijev-view .wijmo-wijev-header-title"), headerTitleH, viewWidth, allDayCellH, allDayApptH, allDayLabelH, maxAllDayApptCount, curAllDayApptCount, timeRulerOuterWidth = timeruler.outerWidth(), i, dayscontainerWidth, dayscontainerHeight, columnOuterWidth, scrollpanel;
+                var headercontainer = this.element.find(".wijmo-wijev-headercontainer"), scrollcontent = this.element.find(".wijmo-wijev-scrollcontent"), timeruler = scrollcontent.find(".wijmo-wijev-timeruler"), dayHeaderColumns = headercontainer.find(".wijmo-wijev-dayheadercolumn"), dayColumns = scrollcontent.find(".wijmo-wijev-daycolumn"), viewType = this.options.viewType.toLowerCase(), headerTitleH, title, viewWidth, allDayCellH, allDayApptH, allDayLabelH, maxAllDayApptCount, curAllDayApptCount, timeRulerOuterWidth = timeruler.outerWidth(), i, dayscontainerWidth, dayscontainerHeight, columnOuterWidth, scrollpanel;
                 this._updateHeaderTitleText()// ensure header title visibility
                 ;
+                title = this.element.find(".wijmo-wijev-view.wijmo-wijev-" + viewType + "view .wijmo-wijev-header-title");
                 headerTitleH = title.is(":visible") ? title.outerHeight(true) : 0;
                 this._invalidateView();
                 if(!this._maxAllDayEventCount) {
@@ -3818,14 +3856,21 @@ var wijmo;
                 scrollpanel = this.element.find(".wijmo-wijev-scrollpanel");
                 scrollpanel.outerWidth(viewWidth);
                 scrollpanel.outerHeight(dayscontainerHeight);
-                scrollpanel.wijsuperpanel("refresh");
-                switch(this.options.viewType.toLowerCase()) {
+                this._refreshSuperPanel(scrollpanel);
+                switch(viewType) {
                     case "day":
                         this._updateDayViewDetails();
                         break;
                     case "list":
                         this._updateListViewDetails();
                         break;
+                }
+            };
+            wijevcal.prototype._refreshSuperPanel = function (panel) {
+                if(!($.support.isTouchEnabled && $.support.isTouchEnabled()) && this._isIE8()) {
+                    panel.wijsuperpanel("paintPanel", true);
+                } else {
+                    panel.wijsuperpanel("refresh");
                 }
             };
             wijevcal.prototype._updateDayViewDetails = /* view details */
@@ -3927,7 +3972,8 @@ var wijmo;
                     //$agendaList.parents(".wijmo-wijsuperpanel:first").wijsuperpanel("refresh");
                     // fixed the issue 41787, do not use the parents if the eventscalender is inside of superpanel, it will cause exception.
                     if(agendaContainer.data("wijmo-wijsuperpanel")) {
-                        agendaContainer.wijsuperpanel("refresh");
+                        //Don't set focus back to element in IE8
+                        this._refreshSuperPanel(agendaContainer);
                     }
                     return;
                 }
@@ -3936,6 +3982,9 @@ var wijmo;
                 /////////
                 $agendaList.html("");
                 this._renderAgendaEvents($agendaList, startDt, endDt, listViewMode, agendaContainer);
+            };
+            wijevcal.prototype._isIE8 = function () {
+                return $.browser.msie && $.browser.version && parseFloat($.browser.version) <= 8;
             };
             wijevcal.prototype._renderAgendaEvents = function ($agendaList, startDt, endDt, listViewMode, agendaContainer) {
                 var appts = this._eventsView, appt, i, apptsCount, daysCount, dayIdx = 0, curDayApptsCount, s = "", s2 = "", viewStart = null, viewEnd = null, o = this.options, curDayStart, curDayEnd, eventsPerPage = 100, self = this, loadedEventsCount = $agendaList.data("wijevcal_agenda_loadedeventscount");
@@ -4028,7 +4077,7 @@ var wijmo;
                 });
                 // Fixed the issue 41787.
                 if(agendaContainer.data("wijmo-wijsuperpanel")) {
-                    agendaContainer.wijsuperpanel("refresh");
+                    this._refreshSuperPanel(agendaContainer);
                 }
                 //$agendaList.parents(".wijmo-wijsuperpanel").wijsuperpanel("refresh");
                             };
@@ -5022,8 +5071,8 @@ var wijmo;
                 */
                 this.wijMobileCSS = {
                     header: "ui-header ui-bar-a",
-                    content: "ui-body ui-body-c",
-                    stateDefault: "ui-btn-up-c"
+                    content: "ui-body ui-body-b",
+                    stateDefault: "ui-btn ui-btn-b"
                 };
                 /** Selector option for auto self initialization.
                 *	This option is internal.
@@ -5181,7 +5230,7 @@ var wijmo;
                 *							start: new Date(2011, 4, 6, 17, 30),
                 *							end: new Date(2011, 4, 6, 17, 35) }] });
                 */
-                this.eventsData = [];
+                this.eventsData = null;
                 /** The event objects array. This option is read-only.
                 * This option is deprecated:
                 *	please, use eventsData option, instead.
@@ -5353,6 +5402,14 @@ var wijmo;
                 *			{ viewType: "month" });
                 */
                 this.viewType = "day";
+                /** A value indicating the event dialog element will be append to the body or eventcalendar container.
+                * @remarks
+                *       If the value is true, the dialog will be appended to body element.
+                *       else it will append to the eventcalendar container.
+                * @example $("#eventscalendar").wijevcal(
+                *		{ ensureEventDialogOnBody: true });
+                */
+                this.ensureEventDialogOnBody = false;
                 /** Array of the calendar names which need to be shown.
                 * @type {Array}
                 * @example

@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20133.20
+ * Wijmo Library 3.20141.34
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -8,7 +8,8 @@
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * licensing@wijmo.com
  * http://wijmo.com/widgets/license/
- *
+ * ----
+ * Credits: Wijmo includes some MIT-licensed software, see copyright notices below.
  */
 var __extends = this.__extends || function (d, b) {
     function __() { this.constructor = d; }
@@ -270,7 +271,7 @@ var wijmo;
             };
             wijvideo.prototype._createDisabledDiv = function (outerEle) {
                 var ele = this.$vidParent, eleOffset = ele.offset(), disabledWidth = ele.outerWidth(), disabledHeight = ele.outerHeight();
-                return $("<div></div>").addClass("ui-disabled").css({
+                return $("<div></div>").addClass(this.options.wijCSS.stateDisabled).css({
                     "z-index": "99999",
                     position: "absolute",
                     width: disabledWidth,
@@ -419,13 +420,13 @@ var wijmo;
                 this.$seekSlider.wijtooltip("option", "content", self._getToolTipContent(currentTime));
             };
             wijvideo.prototype._hideToolTips = function () {
-                if(this.$seekSlider.data("wijmoWijtooltip")) {
+                if(this.$seekSlider.data("wijmo-wijtooltip")) {
                     this.$seekSlider.wijtooltip("hide");
                 }
-                if(this.$volumeBtn.data("wijmoWijtooltip")) {
+                if(this.$volumeBtn.data("wijmo-wijtooltip")) {
                     this.$volumeBtn.wijtooltip("hide");
                 }
-                if(this.$fullScreenBtn.data("wijmoWijtooltip")) {
+                if(this.$fullScreenBtn.data("wijmo-wijtooltip")) {
                     this.$fullScreenBtn.wijtooltip("hide");
                 }
             };

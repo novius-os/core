@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20133.20
+ * Wijmo Library 3.20141.34
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -8,7 +8,6 @@
  * Licensed under the Wijmo Commercial License. Also available under the GNU GPL Version 3 license.
  * licensing@wijmo.com
  * http://wijmo.com/widgets/license/
- *
  *
  */
 var __extends = this.__extends || function (d, b) {
@@ -1099,7 +1098,11 @@ var wijmo;
                 });
             };
             LineChartRender.prototype.renderPath = function (canvas, bounds, lineSeries, paths, shadowPaths, linesStyle, lineHoverStyle, lineMarkerStyle, lineMarkerHoverStyle, markers, markersSet, animationSet, pathArr, aniPathsAttr, initAniPath, lineStyle, chartLabelStyle, aniMarkersAttr, aniLabelsAttr, defaultChartLabels, pathIdx, type, lastPathAttr, stacked, virtualMarkers, wijCSS) {
-                var path, fill, fillOpacity, opacity, area, startX, endX, tracker, trackerWidth, labelStyle, prevPathArr, prevPath, currentPathArr, idx, noFillStyle;
+                var path, fill, fillOpacity, opacity, area, startX, endX, tracker, trackerWidth, labelStyle, prevPathArr, prevPath, currentPathArr, idx, noFillStyle, endY;
+                endY = bounds.endY;
+                if(this.options.axis && this.options.axis.y && !isNaN(this.options.axis.y.origin)) {
+                    endY = this._calculatePoint(this.options.axis.y.origin, "y");
+                }
                 path = canvas.path(pathArr.join(" "));
                 path.straight = initAniPath.join(" ");
                 //shadow
@@ -1116,10 +1119,10 @@ var wijmo;
                     $.merge(lastPathAttr, [
                         "L", 
                         startX, 
-                        bounds.endY, 
+                        endY, 
                         "L", 
                         endX, 
-                        bounds.endY
+                        endY
                     ]);
                 }
                 tracker = canvas.path(pathArr.join(" "));
@@ -1178,7 +1181,7 @@ var wijmo;
                         else {
                         */
                         pathArr.push("V");
-                        pathArr.push(bounds.endY);
+                        pathArr.push(endY);
                         pathArr.push("H");
                         pathArr.push(startX);
                         pathArr.push("Z");
@@ -1197,14 +1200,14 @@ var wijmo;
                                 }
                                 if(i < currentPathArr.length - 1 && currentPathArr[i + 1][0] === "M") {
                                     pathArr.push("V");
-                                    pathArr.push(bounds.endY);
+                                    pathArr.push(endY);
                                     pathArr.push("H");
                                     pathArr.push(startX);
                                     pathArr.push("Z");
                                 }
                                 if(i === currentPathArr.length - 1) {
                                     pathArr.push("V");
-                                    pathArr.push(bounds.endY);
+                                    pathArr.push(endY);
                                     pathArr.push("H");
                                     pathArr.push(startX);
                                     pathArr.push("Z");
@@ -1221,7 +1224,7 @@ var wijmo;
                         stroke: "none"
                     });
                     initAniPath.push("V");
-                    initAniPath.push(bounds.endY);
+                    initAniPath.push(endY);
                     initAniPath.push("H");
                     initAniPath.push(startX);
                     initAniPath.push("Z");
@@ -1247,6 +1250,9 @@ var wijmo;
                     }
                     path.wijAttr(noFillStyle);
                     //end comments.
+                    if(lineHoverStyle.fill) {
+                        delete lineHoverStyle.fill;
+                    }
                     aniPathsAttr.push({
                         path: $.extend(true, {
                         }, path.attr()),
@@ -1307,6 +1313,16 @@ var wijmo;
                 $.wijraphael.addClass($(path.node), Raphael.format("{0} {1}", wijCSS.canvasObject, wijCSS.lineElement));
                 $(path.node).data("wijchartDataObj", lineSeries);
             };
+            LineChartRender.prototype._calculatePoint = function (val, dir) {
+                var axis = this.options.axis, bounds = this.options.bounds, min = axis[dir].min, max = axis[dir].max, len, rate;
+                if(dir === "x") {
+                    rate = (bounds.endX - bounds.startX) / (max - min);
+                    return bounds.startX + (val - min) * rate;
+                } else {
+                    rate = (bounds.endY - bounds.startY) / (max - min);
+                    return bounds.endY - (val - min) * rate;
+                }
+            };
             LineChartRender.prototype.renderPoint = function (cBounds, canvas, initAniPath, pathArr, markers, aniMarkersAttr, animationSet, defaultChartLabels, aniLabelsAttr, chartLabelEles, chartLabelFormatString, needAnimated, firstYPoint, lastYPoint, valX, valY, dataY, axis, fitType, isXTime, isYTime, pointIdx, lineMarkerStyle, lineMarkerHoverStyle, lineSeries, paintSymbol, showChartLabels, symbols, valuesX, valuesY, valsY, display, stacked, virtualMarkers, culture, wijCSS) {
                 var width = cBounds.endX - cBounds.startX, height = cBounds.endY - cBounds.startY, minX = axis.x.min, minY = axis.y.min, maxX = axis.x.max, maxY = axis.y.max, kx = width / (maxX - minX), ky = height / (maxY - minY), marker, dot, val, X = 0, Y, initAniY, markerData, defaultChartLabel, markerVisible = lineSeries.markers.visible, widget = this.widget, pointX;
                 if(isNaN(valX) || typeof valX === "string") {
@@ -1314,8 +1330,8 @@ var wijmo;
                 } else {
                     val = valX;
                 }
-                X = cBounds.startX + (val - minX) * kx;
-                Y = cBounds.endY - (valY - minY) * ky;
+                X = this._calculatePoint(val, "x");
+                Y = this._calculatePoint(valY, "y");
                 valsY[pointIdx].x = X;
                 valsY[pointIdx].y = Y;
                 if(needAnimated) {
@@ -1326,7 +1342,7 @@ var wijmo;
                     initAniPath.push(initAniY);
                 }
                 if(!valsY[pointIdx].isHole) {
-                    pathArr = this.getPathArrByFitType(pathArr, fitType, pointIdx, valuesY.length, cBounds, valuesX, valuesY, X, Y, isXTime, isYTime, valX, valY, kx, ky, minX, minY, valsY, display, stacked);
+                    pathArr = this.getPathArrByFitType(pathArr, fitType, pointIdx, valuesY.length, cBounds, valuesX, valuesY, X, Y, isXTime, isYTime, valX, valY, valsY, display, stacked);
                 } else {
                     return pathArr;
                 }
@@ -1480,7 +1496,7 @@ var wijmo;
                     y2: p2y + dy2
                 };
             };
-            LineChartRender.prototype.getPathArrByFitType = function (pathArr, fitType, idx, len, cBounds, valuesX, valuesY, X, Y, isXTime, isYTime, valX, valY, kx, ky, minX, minY, valsY, display, stacked) {
+            LineChartRender.prototype.getPathArrByFitType = function (pathArr, fitType, idx, len, cBounds, valuesX, valuesY, X, Y, isXTime, isYTime, valX, valY, valsY, display, stacked) {
                 var valY2 = null, Y0 = 0, Y2 = 0, X0 = 0, X2 = 0, valX2 = null, a = null, valueY = valsY[idx], isNextPointHole = false, index = valueY.idx, i, prevIdx = idx - 1, nextIdx = idx + 1;
                 if(display === "excludeHole" && !stacked) {
                     if(idx > 0 && idx < len - 1) {
@@ -1554,15 +1570,16 @@ var wijmo;
                         if(isYTime) {
                             valY2 = $.toOADate(valY2);
                         }
-                        Y2 = cBounds.endY - (valY2 - minY) * ky;
+                        //Y2 = cBounds.endY - (valY2 - minY) * ky;
+                        Y2 = this._calculatePoint(valY2, "y");
                         if(isNaN(valX) || typeof valX === "string") {
-                            X2 = cBounds.startX + (nextIdx - minX) * kx;
+                            X2 = this._calculatePoint(nextIdx, "x");
                         } else {
                             valX2 = valuesX[nextIdx];
                             if(isXTime) {
                                 valX2 = $.toOADate(valX2);
                             }
-                            X2 = cBounds.startX + (valX2 - minX) * kx;
+                            X2 = this._calculatePoint(valX2, "x");
                         }
                         a = this.getAnchors(X0, Y0, X, Y, X2, Y2);
                         pathArr = pathArr.concat([

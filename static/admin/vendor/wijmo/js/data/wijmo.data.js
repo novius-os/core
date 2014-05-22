@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20133.20
+ * Wijmo Library 3.20141.34
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -8,7 +8,6 @@
  * Licensed under the Wijmo Commercial License. Also available under the GNU GPL Version 3 license.
  * licensing@wijmo.com
  * http://wijmo.com/widgets/license/
- *
  *
  */
 /// <reference path="../../External/declarations/jquery.d.ts"/>
@@ -210,11 +209,37 @@ var wijmo;
         })(BaseObservable);
         data._MutableObservable = _MutableObservable;        
         var MutableObservable = data.util.funcClass(_MutableObservable);
+        /** @ignore */
+        var _NumericMutableObservable = (function (_super) {
+            __extends(_NumericMutableObservable, _super);
+            function _NumericMutableObservable(value) {
+                        _super.call(this, value, false);
+                this.value = value;
+            }
+            _NumericMutableObservable.prototype.change = function (delta) {
+                return this._call(this._call() + delta);
+            };
+            _NumericMutableObservable.prototype.inc = function () {
+                return this.change(1);
+            };
+            _NumericMutableObservable.prototype.dec = function () {
+                return this.change(-1);
+            };
+            return _NumericMutableObservable;
+        })(_MutableObservable);
+        data._NumericMutableObservable = _NumericMutableObservable;        
+        var NumericMutableObservable = data.util.funcClass(_NumericMutableObservable);
         function observable(value) {
             if (typeof value === "undefined") { value = null; }
             return new MutableObservable(value);
         }
         data.observable = observable;
+        /** @ignore */
+        function numericObservable(value) {
+            if (typeof value === "undefined") { value = 0; }
+            return new NumericMutableObservable(value);
+        }
+        data.numericObservable = numericObservable;
         /** @ignore */
         function observableWithNewValueCheck(value) {
             if (typeof value === "undefined") { value = null; }
@@ -994,7 +1019,7 @@ function synced(fn) {
                     this.currentPosition(newIndex);
                 } else if(pos >= 0 && pos < this.array.length) {
                     this.currentItem(this.array[pos]);
-                } else if(pos == this.array.length && this.array.length > 0) {
+                } else if(pos >= this.array.length && this.array.length > 0) {
                     pos = this.array.length - 1;
                     this.currentPosition(pos);
                     this.currentItem(this.array[pos]);
@@ -1099,7 +1124,7 @@ function updatePaging() {
                 }
                 // sort
                 if(!this._compiledSort.isEmpty) {
-                    destination.sort(this._compiledSort.compare);
+                    this._stableSort(destination, this._compiledSort.compare);
                 }
                 // page
                 var totalCount = destination.length;
@@ -1115,6 +1140,29 @@ function updatePaging() {
                     results: destination,
                     totalCount: totalCount
                 };
+            };
+            Shape.prototype._stableSort = function (arr, fn) {
+                var isChrome = /chrom(e|ium)/.test(navigator.userAgent.toLowerCase()) && /Google Inc/.test(navigator.vendor);
+                if(fn && isChrome) {
+                    arr.forEach(function (ele, index) {
+                        arr[index] = {
+                            index: index,
+                            value: ele
+                        };
+                    });
+                    arr.sort(function (c, d) {
+                        var result = fn(c.value, d.value);
+                        if(result === 0) {
+                            return c.index - d.index;
+                        }
+                        return result;
+                    });
+                    arr.forEach(function (ele, index) {
+                        arr[index] = ele.value;
+                    });
+                } else {
+                    arr.sort(fn);
+                }
             };
             Shape.prototype.toObj = function () {
                 return {
@@ -1135,7 +1183,7 @@ function updatePaging() {
                 this.local = [];
                 this._updatingShape = false;
                 this._pageCount = data.observable(1);
-                this._totalItemCount = data.observable(0);
+                this._totalItemCount = data.numericObservable(0);
                 //#endregion shape
                 //#region loading
                 this._isLoaded = data.observable(false);
@@ -1351,6 +1399,7 @@ function updatePaging() {
             ArrayDataViewBase.prototype._remove = function (entry) {
                 this.local.splice(entry.index, 1);
                 data.util.remove(this.sourceArray, entry.item);
+                this._totalItemCount.dec();
                 this.trigger();
             };
             ArrayDataViewBase.prototype.remove = function (item) {
@@ -1394,6 +1443,7 @@ function updatePaging() {
                 this._currentEditItem(null);
                 if(this._isCurrentEditItemNew) {
                     this.sourceArray.push(item);
+                    this._totalItemCount.inc();
                 }
                 var filter = this._shape._compiledFilter;
                 if(!filter.isEmpty && !filter.func(item)) {

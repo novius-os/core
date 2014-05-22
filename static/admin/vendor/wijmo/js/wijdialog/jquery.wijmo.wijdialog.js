@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20133.20
+ * Wijmo Library 3.20141.34
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -8,7 +8,8 @@
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * licensing@wijmo.com
  * http://wijmo.com/widgets/license/
- *
+ * ----
+ * Credits: Wijmo includes some MIT-licensed software, see copyright notices below.
  */
 var __extends = this.__extends || function (d, b) {
     function __() { this.constructor = d; }
@@ -146,10 +147,10 @@ var wijmo;
                                         return;
                                     }
                                     var dialogEle = $(".ui-dialog:visible:last .ui-dialog-content"), dialogObj;
-                                    if(dialogEle.data("wijmoWijdialog")) {
-                                        dialogObj = dialogEle.data("wijmoWijdialog");
+                                    if(dialogEle.data("wijmo-wijdialog")) {
+                                        dialogObj = dialogEle.data("wijmo-wijdialog");
                                     } else {
-                                        dialogObj = dialogEle.data("wijmoC1dialog");
+                                        dialogObj = dialogEle.data("wijmo-c1dialog");
                                     }
                                     if(dialogObj) {
                                         dialogObj._focusTabbable();
@@ -522,7 +523,16 @@ var wijmo;
                 self.isPin = false;
                 if(self.options.appendTo === "body") {
                     if(self.form.length) {
-                        self.uiDialog.appendTo(self.form);
+                        //move the dialog to the form so that the data of form elements can be submit.
+                        self.formOnSubmit = (self.form)[0].onsubmit;
+                        (self.form)[0].onsubmit = function () {
+                            self.uiDialog.appendTo(self.form);
+                            return (!self.formOnSubmit) ? true : self.formOnSubmit();
+                        };
+                        //bind click event to the submit button to submit the form
+                        self.uiDialog.find("input[type='submit'], button[type='submit']").bind('click.wijdialog', function () {
+                            self.form.submit();
+                        });
                     }
                 }
             };
@@ -602,6 +612,13 @@ var wijmo;
                     self.disabledDiv = null;
                 }
                 //end for disabled option
+                if(self.options.appendTo === "body" && self.form.length) {
+                    self.uiDialog.find("input[type='submit'], button[type='submit']").off('click.wijdialog');
+                    (self.form)[0].onsubmit = null;
+                    if(self.formOnSubmit) {
+                        (self.form)[0].onsubmit = self.formOnSubmit;
+                    }
+                }
                 //$.ui.dialog.prototype._destroy.apply(self, arguments);
                 _super.prototype.destroy.call(this);
                 self.element.removeClass(wijCSS.uiDialogContent).removeClass(wijCSS.content);
@@ -1368,7 +1385,7 @@ var wijmo;
             * The open method opens an instance of the wijdialog.
             */
             function () {
-                var self = this, o = self.options;
+                var self = this, o = self.options, effects;
                 if((o.hide === "drop" || o.hide === "bounce") && $.browser.msie) {
                     //fixed bug when effect "drop" on IE
                     self.uiDialog.css("filter", "auto");
@@ -1381,6 +1398,7 @@ var wijmo;
                         //						self._restoreToNormal();
                         //					}
                                             } else {
+                        self._setOpener();
                         self.uiDialog.show();
                         self._isOpen = true;
                     }
@@ -1388,7 +1406,22 @@ var wijmo;
                 } else {
                     // for 38166 issue:
                     // http://stackoverflow.com/questions/14965912/jquery-dialog-iframe-gives-this-error-in-ie9-script5009-array-is-undefined
-                    if($.browser.msie && $.browser.version === "9.0") {
+                    if(self._isIE9()) {
+                        effects = [
+                            "blind",
+                            "bounce",
+                            "clip",
+                            "drop",
+                            "explode",
+                            "fold",
+                            "size",
+                            "shake",
+                            "slide",
+                            "transfer"
+                        ];
+                        if(o.show && effects.indexOf(o.show) > -1) {
+                            o.show = null;
+                        }
                         window.setTimeout(function () {
                             self.innerFrame.attr("src", o.contentUrl);
                         }, 200);
@@ -1399,6 +1432,7 @@ var wijmo;
                         //$.ui.dialog.prototype.open.apply(self, arguments);
                         _super.prototype.open.call(this);
                     } else {
+                        self._setOpener();
                         self.uiDialogTitlebar.show();
                         self._isOpen = true;
                     }
@@ -1414,11 +1448,37 @@ var wijmo;
                     }
                 }
             };
+            wijdialog.prototype._setOpener = function () {
+                var self = this;
+                if(!self.opener && self.document && self.document[0]) {
+                    self.opener = $(self.document[0].activeElement);
+                }
+            };
+            wijdialog.prototype._isIE9 = function () {
+                return $.browser.msie && parseInt($.browser.version) === 9;
+            };
             wijdialog.prototype.close = /**
             * The close method closes the dialog widget.
             */
             function () {
-                var self = this, o = self.options;
+                var self = this, o = self.options, effects;
+                if(self.innerFrame && self._isIE9()) {
+                    effects = [
+                        "blind",
+                        "bounce",
+                        "clip",
+                        "drop",
+                        "explode",
+                        "fold",
+                        "size",
+                        "shake",
+                        "slide",
+                        "transfer"
+                    ];
+                    if(o.hide && effects.indexOf(o.hide) > -1) {
+                        o.hide = null;
+                    }
+                }
                 if(_super.prototype.close.call(this)) {
                     if(self.innerFrame) {
                         self.innerFrame.attr("src", "");

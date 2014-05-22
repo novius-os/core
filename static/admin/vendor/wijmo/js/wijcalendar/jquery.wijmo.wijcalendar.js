@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20133.20
+ * Wijmo Library 3.20141.34
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -8,7 +8,8 @@
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * licensing@wijmo.com
  * http://wijmo.com/widgets/license/
- *
+ * ----
+ * Credits: Wijmo includes some MIT-licensed software, see copyright notices below.
  */
 var __extends = this.__extends || function (d, b) {
     function __() { this.constructor = d; }
@@ -128,6 +129,7 @@ var wijmo;
                 //$.wijmo.widget.prototype.destroy.apply(this, arguments);
                 _super.prototype.destroy.call(this);
                 this.close();
+                this._unbindEvents();
                 this.element.html("");
                 this.element.removeClass("wijmo-wijcalendar " + wijCSS.datepickerInline + " " + wijCSS.datepicker + " " + wijCSS.widget + " " + wijCSS.content + " " + wijCSS.helperClearFix + " " + wijCSS.cornerAll + " " + wijCSS.datepickerMulti).removeAttr('role');
                 var self = this;
@@ -145,6 +147,9 @@ var wijmo;
             };
             wijcalendar.prototype._setOption = function (key, value) {
                 //$.wijmo.widget.prototype._setOption.apply(this, arguments);
+                if(key === "disabled" && value === this.options.disabled) {
+                    return;
+                }
                 _super.prototype._setOption.call(this, key, value);
                 switch(key) {
                     case "showWeekDays":
@@ -191,6 +196,14 @@ var wijmo;
                     case "allowQuickPick":
                         this.refresh();
                         break;
+                    case "disabled":
+                        if(value) {
+                            this._unbindEvents();
+                        } else {
+                            //some classes are not added to some elements when disabled is true,
+                            //so invoke this._bindEvents method is not enough.
+                            this.refresh();
+                        }
                 }
             };
             wijcalendar.prototype._previewWrapper = function (add) {
@@ -318,7 +331,7 @@ var wijmo;
                 this._myGrid = undefined;
                 this.refresh();
                 this.element.data('dragging.wijcalendar', false);
-                if(this.element.data("wijmoWijpopup")) {
+                if(this.element.data("wijmo-wijpopup")) {
                     this.element.wijpopup('show', position);
                 }
             };
@@ -330,7 +343,7 @@ var wijmo;
                 this._myGrid = undefined;
                 this.refresh();
                 this.element.data('dragging.wijcalendar', false);
-                if(this.element.data("wijmoWijpopup")) {
+                if(this.element.data("wijmo-wijpopup")) {
                     this.element.wijpopup('showAt', x, y);
                 }
             };
@@ -445,8 +458,7 @@ var wijmo;
                     this._trigger('afterSelect', null, args);
                     if(!!o.selectionMode.days) {
                         this.element.data('dragging.wijcalendar', true);
-                        $(document.body).bind("mouseup." + this.widgetName, function () {
-                            $(document.body).unbind("mouseup." + self.widgetName);
+                        $(document.body).one("mouseup." + this.widgetName, function () {
                             self.element.data('dragging.wijcalendar', false);
                         });
                     }
@@ -1320,6 +1332,33 @@ var wijmo;
                 }
                 cell.removeClass(this.options.wijCSS.stateHover);
             };
+            wijcalendar.prototype._unbindEvents = function () {
+                var self = this, ele = self.element, wijCSS = self.options.wijCSS, selectionMode = self.options.selectionMode;
+                ele.unbind(".wijcalendar");
+                ele.find('div .wijmo-wijcalendar-navbutton').unbind();
+                ele.find("." + wijCSS.datepickerTitle).unbind();
+                ele.find(".wijmo-wijcalendar-prevpreview-button, .wijmo-wijcalendar-nextpreview-button").unbind('mouseenter.wijcalendar').unbind('mouseleave.wijcalendar');
+                if(self._myGrid === undefined) {
+                    ele.find(".wijmo-wijcalendar-day-selectable").unbind();
+                    if($.support.isTouchEnabled && $.support.isTouchEnabled()) {
+                        if($.browser.msie) {
+                            ele.unbind("contextmenu.wijcalendar");
+                        }
+                        ele.find(".wijmo-wijcalendar-day-selectable").unbind("wijmouseup.wijcalendar");
+                    }
+                    if(!!selectionMode.month) {
+                        ele.find(".wijmo-wijcalendar-monthselector").unbind();
+                    }
+                    if(!!selectionMode.weekDay) {
+                        ele.find("." + wijCSS.datepickerWeekDay).unbind();
+                    }
+                    if(!!selectionMode.weekNumber) {
+                        ele.find(".wijmo-wijcalendar-week-num").unbind();
+                    }
+                } else {
+                    ele.find(".wijmo-wijcalendar-day-selectable").unbind();
+                }
+            };
             wijcalendar.prototype._bindEvents = function () {
                 var wijCSS = this.options.wijCSS, eventPre = "";
                 // fix the issue 42890, if touch is enabled, all the touch events should use wij prefix.
@@ -1767,8 +1806,8 @@ var wijmo;
                 /** @ignore*/
                 this.wijMobileCSS = {
                     header: "ui-header ui-bar-a",
-                    content: "ui-body ui-body-c",
-                    stateDefault: "ui-btn-up-c",
+                    content: "ui-body ui-body-b",
+                    stateDefault: "ui-btn ui-btn-b",
                     stateHighlight: "ui-btn-down-e"
                 };
                 /** Assigns the string value of the culture ID that appears on the calendar

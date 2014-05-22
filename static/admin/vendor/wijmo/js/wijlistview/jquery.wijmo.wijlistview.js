@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20133.20
+ * Wijmo Library 3.20141.34
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -8,7 +8,8 @@
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * licensing@wijmo.com
  * http://wijmo.com/widgets/license/
- *
+ * ----
+ * Credits: Wijmo includes some MIT-licensed software, see copyright notices below.
  */
 var __extends = this.__extends || function (d, b) {
     function __() { this.constructor = d; }
@@ -42,7 +43,7 @@ var wijmo;
                 return $.mobile.listview;
             };
             wijlistview.prototype._getListViewFromData = function () {
-                return this.element.data("wijmoWijlistview");
+                return this.element.data("wijmo-wijlistview");
             };
             wijlistview.prototype._create = function () {
                 var listview = this._getListViewFromData();
@@ -57,6 +58,19 @@ var wijmo;
                 var dataContent = this.element.closest("div[data-role='content']");
                 if(!(dataContent && dataContent.length > 0)) {
                     this.element.wrap("<div data-role='content' class='ui-content' />");
+                }
+            };
+            wijlistview.prototype._createSubPages = function () {
+                var nestedItem = this.element.find("li").filter(function () {
+                    return $(this).find("ul, ol").length > 0;
+                });
+                $.mobile.listview.prototype._createSubPages.apply(this, arguments);
+                if(nestedItem.length > 0) {
+                    nestedItem.each(function () {
+                        var self = $(this), link = self.find("a");
+                        self.addClass("WijListviewNestedLink");
+                        link.addClass("WijListviewNestedLink");
+                    });
                 }
             };
             return wijlistview;

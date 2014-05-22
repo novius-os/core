@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20133.20
+ * Wijmo Library 3.20141.34
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -8,7 +8,6 @@
  * Licensed under the Wijmo Commercial License. Also available under the GNU GPL Version 3 license.
  * licensing@wijmo.com
  * http://wijmo.com/widgets/license/
- *
  *
  */
 var __extends = this.__extends || function (d, b) {
@@ -159,7 +158,7 @@ var wijmo;
                         }
                     },
                     onRequest: function (settings, shape) {
-                        if(typeof shape.filter == "object") {
+                        if(typeof shape.filter == "object" && shape.filter != null) {
                             settings.data.$filter = ODataView._filterExpr(shape.filter);
                         }
                         if($.isArray(shape.sort)) {

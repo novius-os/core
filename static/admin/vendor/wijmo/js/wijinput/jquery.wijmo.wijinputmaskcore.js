@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20133.20
+ * Wijmo Library 3.20141.34
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -8,7 +8,6 @@
  * Licensed under the Wijmo Commercial License. Also available under the GNU GPL Version 3 license.
  * licensing@wijmo.com
  * http://wijmo.com/widgets/license/
- *
  *
  */
 var __extends = this.__extends || function (d, b) {
@@ -18,6 +17,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var wijmo;
 (function (wijmo) {
+    /// <reference path="jquery.wijmo.wijstringinfo.ts"/>
     /// <reference path="jquery.wijmo.wijinputcore.ts"/>
     /*
     * Depends:
@@ -27,6 +27,7 @@ var wijmo;
     (function (input) {
         "use strict";
         var $ = jQuery;
+        /** @ignore */
         var CharacterFilter = (function () {
             function CharacterFilter(label, owner, include) {
                 this.filterLabel = label;
@@ -397,6 +398,7 @@ var wijmo;
             return CharacterFilter;
         })();
         input.CharacterFilter = CharacterFilter;        
+        /** @ignore */
         var HalfWidthFilter = (function (_super) {
             __extends(HalfWidthFilter, _super);
             function HalfWidthFilter(owner, include) {
@@ -413,6 +415,7 @@ var wijmo;
             };
             return HalfWidthFilter;
         })(CharacterFilter);        
+        /** @ignore */
         var FullWidthFilter = (function (_super) {
             __extends(FullWidthFilter, _super);
             function FullWidthFilter(owner, include) {
@@ -429,6 +432,7 @@ var wijmo;
             };
             return FullWidthFilter;
         })(CharacterFilter);        
+        /** @ignore */
         var HiraganaFilter = (function (_super) {
             __extends(HiraganaFilter, _super);
             function HiraganaFilter(owner, include) {
@@ -445,6 +449,7 @@ var wijmo;
             };
             return HiraganaFilter;
         })(CharacterFilter);        
+        /** @ignore */
         var ShiftJISFilter = (function (_super) {
             __extends(ShiftJISFilter, _super);
             function ShiftJISFilter(owner, include) {
@@ -455,6 +460,7 @@ var wijmo;
             };
             return ShiftJISFilter;
         })(CharacterFilter);        
+        /** @ignore */
         var JISX0208Filter = (function (_super) {
             __extends(JISX0208Filter, _super);
             function JISX0208Filter(owner, include) {
@@ -465,6 +471,7 @@ var wijmo;
             };
             return JISX0208Filter;
         })(CharacterFilter);        
+        /** @ignore */
         var DBCSHiraganaFilter = (function (_super) {
             __extends(DBCSHiraganaFilter, _super);
             function DBCSHiraganaFilter(owner, include) {
@@ -475,6 +482,7 @@ var wijmo;
             };
             return DBCSHiraganaFilter;
         })(CharacterFilter);        
+        /** @ignore */
         var DBCSKatakanaFilter = (function (_super) {
             __extends(DBCSKatakanaFilter, _super);
             function DBCSKatakanaFilter(owner, include) {
@@ -485,6 +493,7 @@ var wijmo;
             };
             return DBCSKatakanaFilter;
         })(CharacterFilter);        
+        /** @ignore */
         var SBCSKatakanaFilter = (function (_super) {
             __extends(SBCSKatakanaFilter, _super);
             function SBCSKatakanaFilter(owner, include) {
@@ -495,6 +504,7 @@ var wijmo;
             };
             return SBCSKatakanaFilter;
         })(CharacterFilter);        
+        /** @ignore */
         var SurrogateFilter = (function (_super) {
             __extends(SurrogateFilter, _super);
             function SurrogateFilter(owner, include) {
@@ -519,6 +529,7 @@ var wijmo;
             };
             return SurrogateFilter;
         })(CharacterFilter);        
+        /** @ignore */
         var HalfWidthKatakanaFilter = (function (_super) {
             __extends(HalfWidthKatakanaFilter, _super);
             function HalfWidthKatakanaFilter(owner, include) {
@@ -535,6 +546,7 @@ var wijmo;
             };
             return HalfWidthKatakanaFilter;
         })(CharacterFilter);        
+        /** @ignore */
         var FullWidthKatakanaFilter = (function (_super) {
             __extends(FullWidthKatakanaFilter, _super);
             function FullWidthKatakanaFilter(owner, include) {
@@ -551,6 +563,7 @@ var wijmo;
             };
             return FullWidthKatakanaFilter;
         })(CharacterFilter);        
+        /** @ignore */
         var HalfWidthSymbolsFilter = (function (_super) {
             __extends(HalfWidthSymbolsFilter, _super);
             function HalfWidthSymbolsFilter(owner, include) {
@@ -567,6 +580,7 @@ var wijmo;
             };
             return HalfWidthSymbolsFilter;
         })(CharacterFilter);        
+        /** @ignore */
         var FullWidthSymbolsFilter = (function (_super) {
             __extends(FullWidthSymbolsFilter, _super);
             function FullWidthSymbolsFilter(owner, include) {
@@ -583,6 +597,7 @@ var wijmo;
             };
             return FullWidthSymbolsFilter;
         })(CharacterFilter);        
+        /** @ignore */
         var LimitedFilter = (function (_super) {
             __extends(LimitedFilter, _super);
             function LimitedFilter(includeChars, excludeChars, owner, include) {
@@ -610,6 +625,7 @@ var wijmo;
             };
             return LimitedFilter;
         })(CharacterFilter);        
+        /** @ignore */
         var RangeFilter = (function (_super) {
             __extends(RangeFilter, _super);
             function RangeFilter(startChar, endChar, owner, include) {
@@ -628,6 +644,7 @@ var wijmo;
             };
             return RangeFilter;
         })(CharacterFilter);        
+        /** @ignore */
         var UnionFilter = (function (_super) {
             __extends(UnionFilter, _super);
             function UnionFilter(owner, include) {
@@ -707,6 +724,7 @@ var wijmo;
             };
             return UnionFilter;
         })(CharacterFilter);        
+        /** @ignore */
         var Field = (function () {
             function Field(label) {
                 this.minLength = -1;
@@ -789,6 +807,7 @@ var wijmo;
             return Field;
         })();
         input.Field = Field;        
+        /** @ignore */
         var PromptField = (function (_super) {
             __extends(PromptField, _super);
             function PromptField(text) {
@@ -817,6 +836,7 @@ var wijmo;
             };
             return PromptField;
         })(Field);        
+        /** @ignore */
         var FilterField = (function (_super) {
             __extends(FilterField, _super);
             function FilterField(owner) {
@@ -1041,7 +1061,7 @@ var wijmo;
                     this._bitState = this._oldBitState;
                     this._trueLength = temp.GetLength();
                     for(var i = temp.GetLength() - 1; i >= 0; i--) {
-                        if(this._bitState[i] === false) {
+                        if(this._bitState[i] == false) {
                             this._trueLength--;
                         } else {
                             break;
@@ -1288,6 +1308,7 @@ var wijmo;
             };
             return FilterField;
         })(Field);        
+        /** @ignore */
         var EnumField = (function (_super) {
             __extends(EnumField, _super);
             function EnumField(owner) {
@@ -2040,6 +2061,7 @@ var wijmo;
             };
             return EnumField;
         })(Field);        
+        /** @ignore */
         var FieldCollection = (function () {
             function FieldCollection(count) {
                 this.fieldArray = [];
@@ -2145,6 +2167,7 @@ var wijmo;
             return FieldCollection;
         })();
         input.FieldCollection = FieldCollection;        
+        /** @ignore */
         var BaseInputControl = (function () {
             function BaseInputControl() {
                 this.KeyActionList = null;
@@ -4223,6 +4246,7 @@ var wijmo;
             return BaseInputControl;
         })();
         input.BaseInputControl = BaseInputControl;        
+        /** @ignore */
         var KeywordType;
         (function (KeywordType) {
             KeywordType._map = [];
@@ -4237,6 +4261,7 @@ var wijmo;
             KeywordType.PromptChar = 0x08;
             KeywordType.Unknow = 0x09;
         })(KeywordType || (KeywordType = {}));
+        /** @ignore */
         var MaskFormat = (function () {
             function MaskFormat() { }
             MaskFormat.DBCS_A = input.CharProcess.CharEx.ToFullWidth('A').text;
@@ -4466,7 +4491,7 @@ var wijmo;
                             fields.PushBack(new PromptField(promptS));
                         } else {
                             var filterField = new FilterField(MaskFormat.Owner);
-                            filterField.FilterField(1, 1, filter);
+                            filterField.FilterField(1, 1, filter, []);
                             fields.PushBack(filterField);
                         }
                     }
@@ -5228,6 +5253,7 @@ var wijmo;
             };
             return MaskFormat;
         })();        
+        /** @ignore */
         var MaskFieldCollection = (function (_super) {
             __extends(MaskFieldCollection, _super);
             function MaskFieldCollection(owner, count, formatNull) {
@@ -6393,7 +6419,7 @@ var wijmo;
                 }
             };
             MaskFieldCollection.prototype.GetPosByCurrentField = function (curField) {
-                if(!curField) {
+                if(curField == null) {
                     return null;
                 }
                 var startIndex = 0;
@@ -6499,6 +6525,7 @@ var wijmo;
             return MaskFieldCollection;
         })(FieldCollection);
         input.MaskFieldCollection = MaskFieldCollection;        
+        /** @ignore */
         var MaskUIProcess = (function (_super) {
             __extends(MaskUIProcess, _super);
             function MaskUIProcess(data) {
@@ -7686,6 +7713,7 @@ var wijmo;
             return MaskUIProcess;
         })(input.BaseUIProcess);
         input.MaskUIProcess = MaskUIProcess;        
+        /** @ignore */
         var MaskControl = (function (_super) {
             __extends(MaskControl, _super);
             function MaskControl() {
@@ -8334,6 +8362,10 @@ var wijmo;
                     }
                     if(retInfo.EventInfo != null) {
                         this.UIProcess.FireEvent(this, retInfo.EventInfo.Name, retInfo.EventInfo.Args, retInfo.EventInfo.Type);
+                        if(retInfo.EventInfo.Type === "KeyExit") {
+                            this.EventInfo = retInfo.EventInfo;
+                            this.FireKeyExit();
+                        }
                         this.FocusType = input.FocusType.ClientEvent;
                     }
                     if(evt.keyCode === 13) {
@@ -8929,6 +8961,16 @@ var wijmo;
                     if(!value && document.activeElement !== this.GetInputElement()) {
                         this.ShowPromptChar();
                     }
+                }
+            };
+            MaskControl.prototype.FireKeyExit = function () {
+                if(this.EventInfo != null && this.EventInfo.Type == "KeyExit") {
+                    if(this.KeyExit) {
+                        this.KeyExit.call(this);
+                    }
+                    this.FocusType = input.FocusType.KeyExit;
+                    //end by wuhao for fix bug 419
+                    this.EventInfo = null;
                 }
             };
             MaskControl.prototype.OnEditStatusChanged = function (callBack) {

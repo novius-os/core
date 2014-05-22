@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20133.20
+ * Wijmo Library 3.20141.34
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -8,7 +8,8 @@
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * licensing@wijmo.com
  * http://wijmo.com/widgets/license/
- *
+ * ----
+ * Credits: Wijmo includes some MIT-licensed software, see copyright notices below.
  */
 var __extends = this.__extends || function (d, b) {
     function __() { this.constructor = d; }
@@ -174,11 +175,14 @@ var wijmo;
                             };
             wijpopup.prototype.hide = /** Hides the element. */
             function () {
+                var _this = this;
                 if(!this.isVisible()) {
                     return;
                 }
                 if(this._trigger('hiding') === false) {
-                    this._bindDocMouseUpEvent();
+                    window.setTimeout(function () {
+                        _this._bindDocMouseUpEvent();
+                    }, 0);
                     return;
                 }
                 //$(document).unbind('mouseup.wijpopup');
@@ -228,7 +232,11 @@ var wijmo;
             };
             wijpopup.prototype._bindDocMouseUpEvent = function () {
                 var _this = this;
-                $(document).one('mouseup.wijpopup', function (e) {
+                var eventPre = '';
+                if($.support.isTouchEnabled && $.support.isTouchEnabled()) {
+                    eventPre = 'wij';
+                }
+                $(document).one(eventPre + 'mouseup.wijpopup', function (e) {
                     _this._onDocMouseUp(e, _this);
                 });
             };

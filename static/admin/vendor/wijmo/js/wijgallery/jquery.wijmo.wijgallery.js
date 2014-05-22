@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20133.20
+ * Wijmo Library 3.20141.34
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -8,7 +8,6 @@
  * Licensed under the Wijmo Commercial License. Also available under the GNU GPL Version 3 license.
  * licensing@wijmo.com
  * http://wijmo.com/widgets/license/
- *
  *
  */
 var __extends = this.__extends || function (d, b) {
@@ -272,10 +271,6 @@ var wijmo;
                     self.frameWrapper.addClass("wijmo-wijgallery-framewrapper-vertical");
                 }
                 if(o.showControlsOnHover) {
-                    if($.browser.msie && parseInt($.browser.version) > 9) {
-                        self.frame.data("previousBtnShown", false);
-                        self.frame.data("nextBtnShown", false);
-                    }
                     self.frame.bind("mouseenter." + self.widgetName, function () {
                         if(self.options.disabled) {
                             return;
@@ -286,17 +281,6 @@ var wijmo;
                             return;
                         }
                         self._hideControls("controls");
-                        if($.browser.msie && parseInt($.browser.version) > 9) {
-                            $.each([
-                                "previous", 
-                                "next"
-                            ], function (i, n) {
-                                if(self.frame.data(n + "BtnShown")) {
-                                    self._hideControls(n);
-                                    self.frame.data(n + "BtnShown", false);
-                                }
-                            });
-                        }
                     });
                 }
                 self.content = self.frame.children("div.wijmo-wijgallery-content");
@@ -350,7 +334,7 @@ var wijmo;
                             "background-color": "#fff"
                         });
                     }
-                    if(o.showControlsOnHover && !($.browser.msie && parseInt($.browser.version) > 9)) {
+                    if(o.showControlsOnHover) {
                         nav.bind("mouseenter." + self.widgetName, function () {
                             if(self.options.disabled) {
                                 return;
@@ -363,69 +347,14 @@ var wijmo;
                             self._hideControls(n);
                         });
                     }
-                    if(!($.browser.msie && parseInt($.browser.version) > 9)) {
-                        link.bind("click." + self.widgetName, function (event) {
-                            if(self.options.disabled) {
-                                return;
-                            }
-                            self[n]();
-                            event.preventDefault();
-                        });
-                    }
+                    link.bind("click." + self.widgetName, function (event) {
+                        if(self.options.disabled) {
+                            return;
+                        }
+                        self[n]();
+                        event.preventDefault();
+                    });
                 });
-                if($.browser.msie && parseInt($.browser.version) > 9) {
-                    self.frame.bind("click." + self.widgetName, function (e) {
-                        if(self.options.disabled) {
-                            return;
-                        }
-                        var framePrefix = ".wijmo-wijgallery-frame-", posX = e.clientX, posY = e.clientY;
-                        $.each([
-                            "previous", 
-                            "next"
-                        ], function (i, n) {
-                            var frameSelector = framePrefix + n, frame = self.frame.find(frameSelector);
-                            if(frame.length > 0) {
-                                if(self._checkPositionInElement({
-                                    X: posX,
-                                    Y: posY
-                                }, $(frame[0]))) {
-                                    self[n]();
-                                    e.preventDefault();
-                                }
-                            }
-                        });
-                    });
-                }
-                if(o.showControlsOnHover && $.browser.msie && parseInt($.browser.version) > 9) {
-                    self.frame.bind("mousemove." + self.widgetName, function (e) {
-                        if(self.options.disabled) {
-                            return;
-                        }
-                        var framePrefix = ".wijmo-wijgallery-frame-", posX = e.clientX, posY = e.clientY;
-                        $.each([
-                            "previous", 
-                            "next"
-                        ], function (i, n) {
-                            var frameSelector = framePrefix + n, frame = self.frame.find(frameSelector);
-                            if(frame.length > 0) {
-                                if(self._checkPositionInElement({
-                                    X: posX,
-                                    Y: posY
-                                }, $(frame[0]))) {
-                                    if(!self.frame.data(n + "BtnShown")) {
-                                        self._showControls(n);
-                                        self.frame.data(n + "BtnShown", true);
-                                    }
-                                } else {
-                                    if(self.frame.data(n + "BtnShown")) {
-                                        self._hideControls(n);
-                                        self.frame.data(n + "BtnShown", false);
-                                    }
-                                }
-                            }
-                        });
-                    });
-                }
             };
             wijgallery.prototype._createCounter = function () {
                 var self = this, o = self.options;
@@ -464,10 +393,7 @@ var wijmo;
                     if(!panel.length || self.options.mode !== "img") {
                         panel = self.frame;
                     }
-                    self[n + "Btn"] = $(self._createBtn(btnCssPrefix + n, css)).appendTo(panel);
-                    if(!(($.browser.msie && parseInt($.browser.version) > 9) && self.options.mode === "img")) {
-                        self[n + "Btn"].bind("click." + self.widgetName, $.proxy(self[n], self));
-                    }
+                    self[n + "Btn"] = $(self._createBtn(btnCssPrefix + n, css)).bind("click." + self.widgetName, $.proxy(self[n], self)).appendTo(panel);
                     self._applyBtnStyle(n);
                 });
             };
@@ -766,21 +692,18 @@ var wijmo;
                         self._thumbsScroll(index);
                     } else if(m === "img") {
                         if(self.picture && self.picture.length) {
-                            self.last.append(self.picture.unbind("load"));
+                            self.last.append(self.picture);
                         }
-                        self.current.hide();
+                        self.current.addClass("ui-helper-hidden-accessible");
                         self.last.show();
-                        self.picture = $("<img>").attr({
+                        self.picture = $("<img>");
+                        self.picture.one("load", function () {
+                            self.picture.data("itemIndex", index).appendTo(self.current);
+                            self._imageLoaded(self, size);
+                        }).attr({
                             src: img.url,
                             alt: img.title
-                        }).appendTo(self.current).data("itemIndex", index);
-                        if($.browser.msie && self.picture[0].hasAttribute("complete")) {
-                            self._imageLoaded(self, size);
-                        } else {
-                            self.picture.bind("load", function () {
-                                self._imageLoaded(self, size);
-                            });
-                        }
+                        });
                     } else if(m === "iframe") {
                         if(self.current.is(":hidden")) {
                             iframeContent = self.current;
@@ -821,10 +744,12 @@ var wijmo;
             wijgallery.prototype._imageLoaded = function (self, size) {
                 var pic = self.picture.attr("role", "img"), index = pic.data("itemIndex"), w = pic[0].naturalWidth || pic.width(), h = pic[0].naturalHeight || pic.height(), image = self.images[index];
                 self.loading.stop().hide();
+                self.current.removeClass("ui-helper-hidden-accessible");
+                self.current.hide();
                 if(self.pointer) {
                     self.pointer.fadeOut(100);
                 }
-                if(w > size.w || h > size.h) {
+                if(w >= size.w || h >= size.h) {
                     if(w / h > size.w / size.h) {
                         pic.css({
                             width: "100%"
@@ -1013,9 +938,6 @@ var wijmo;
                 }
                 self.current.stop(true, true);
                 self.last.stop(true, true);
-            };
-            wijgallery.prototype._checkPositionInElement = function (pos, ele) {
-                return pos.X >= ele.offset().left && pos.X < ele.offset().left + ele.width() && pos.Y >= ele.offset().top && pos.Y < ele.offset().top + ele.height();
             };
             wijgallery.prototype.count = /**
             * Returns a count of the number of items in the gallery.
@@ -1430,13 +1352,13 @@ var wijmo;
                 /** An object collection that contains the data of the gallery.
                 * @example
                 * $("#element").wijgallery( { data: [{
-                *		url: "../thumb/image1.jpg",
-                *		thumbUrl: "../images/image1.jpg",
-                *		title: "<span>Word Caption 1</span>"
+                *		url: "../images/image1.jpg",
+                *		thumbUrl: "../thumb/image1.jpg",
+                *		caption: "<span>Word Caption 1</span>"
                 * },{
-                *		imageUrl: "../thumb/image2.jpg",
-                *		linkUrl: "../images/image2.jpg",
-                *		title: "<span>Word Caption 2</span>"
+                *		url: "../images/image2.jpg",
+                *		thumbUrl: "../thumb/image2.jpg",
+                *		caption: "<span>Word Caption 2</span>"
                 * }] } );
                 */
                 this.data = [];

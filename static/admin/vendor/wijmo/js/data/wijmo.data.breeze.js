@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20133.20
+ * Wijmo Library 3.20141.34
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -8,7 +8,6 @@
  * Licensed under the Wijmo Commercial License. Also available under the GNU GPL Version 3 license.
  * licensing@wijmo.com
  * http://wijmo.com/widgets/license/
- *
  *
  */
 var __extends = this.__extends || function (d, b) {
@@ -63,7 +62,8 @@ var wijmo;
                 }
             };
             BreezeShape.prototype.setFilter = function (filter) {
-                if(!breeze.Predicate.isPredicate(filter)) {
+                //if (!breeze.Predicate.isPredicate(filter)) {
+                if(!(filter instanceof breeze.Predicate)) {
                     _super.prototype.setFilter.call(this, filter);
                     return;
                 }
@@ -193,17 +193,18 @@ var wijmo;
             BreezeDataView.prototype._beginEdit = //#endregion loading
             //#region editing
             function (item, isNew) {
-                if(!item.entityAspect) {
+                if(!item || !item.entityAspect) {
                     data.errors.breeze_notEntity(item);
                 }
+                _super.prototype._beginEdit.call(this, item, isNew);
             };
             BreezeDataView.prototype._currentItemHasChanges = function () {
-                var entity = this.currentEditItem(), p;
-                if(!entity.entityAspect) {
+                var entity = this.currentEditItem(), entityAspect = entity && entity.entityAspect, p;
+                if(!entityAspect) {
                     return false;
                 }
-                for(p in entity.entityAspect.originalValues) {
-                    if(this.getProperty(this.currentEditItem, p) !== entity.entityAspect.originalValues[p]) {
+                for(p in entityAspect.originalValues) {
+                    if(this.getProperty(this.currentEditItem, p) !== entityAspect.originalValues[p]) {
                         return true;
                     }
                 }
@@ -213,7 +214,7 @@ var wijmo;
                 if(!this.entityType) {
                     data.errors.breeze_entityTypeNotResolved(this.query.resourceName);
                 }
-                if(!entity.entityAspect) {
+                if(!entity || !entity.entityAspect) {
                     entity = this.entityType.createEntity(entity);
                 }
                 return entity;
@@ -230,18 +231,26 @@ var wijmo;
                 return _super.prototype.add.call(this, this._ensureEntity(entity));
             };
             BreezeDataView.prototype.commitEdit = function () {
+                if(!this.currentEditItem()) {
+                    return;
+                }
                 var entity = this.currentEditItem(), isNew = this.isCurrentEditItemNew, hasChanges = this._currentItemHasChanges();
                 _super.prototype.commitEdit.call(this);
                 if(isNew) {
                     this.manager.addEntity(entity);
-                } else if(hasChanges) {
+                } else if(hasChanges && entity && entity.entityAspect) {
                     entity.entityAspect.setModified();
                 }
             };
             BreezeDataView.prototype.cancelEdit = function () {
+                if(!this.currentEditItem()) {
+                    return;
+                }
                 var entity = this.currentEditItem();
                 _super.prototype.cancelEdit.call(this);
-                entity.entityAspect.setDeleted();
+                if(entity && entity.entityAspect) {
+                    entity.entityAspect.setDeleted();
+                }
             };
             BreezeDataView.prototype._remove = function (entry) {
                 var entity = entry.item.entityAspect;

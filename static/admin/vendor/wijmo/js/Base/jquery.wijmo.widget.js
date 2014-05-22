@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20133.20
+ * Wijmo Library 3.20141.34
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -8,7 +8,8 @@
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * licensing@wijmo.com
  * http://wijmo.com/widgets/license/
- *
+ * ----
+ * Credits: Wijmo includes some MIT-licensed software, see copyright notices below.
  */
 var __extends = this.__extends || function (d, b) {
     function __() { this.constructor = d; }
@@ -128,52 +129,30 @@ var wijmo;
             content: "ui-content",
             header: "ui-header",
             overlay: "ui-overlay",
-            stateDisabled: "ui-disabled",
+            stateDisabled: "ui-state-disabled",
             stateFocus: "ui-focus",
             stateActive: "ui-btn-active",
-            stateDefault: "ui-btn-up-a",
-            iconArrowUp: "ui-icon-arrow-u",
-            iconArrowRight: "ui-icon-arrow-r",
-            iconArrowDown: "ui-icon-arrow-d",
-            iconArrowLeft: "ui-icon-arrow-l",
-            iconArrowRightDown: "ui-icon-arrow-d",
-            iconSeekFirst: "ui-icon-arrow-l",
-            iconSeekEnd: "ui-icon-arrow-r",
-            iconSeekNext: "ui-icon-arrow-r",
-            iconSeekPrev: "ui-icon-arrow-l",
+            stateDefault: "ui-btn ui-btn-a",
+            icon: "ui-icon ui-btn-icon-notext",
+            iconArrowUp: "ui-icon-carat-u",
+            iconArrowRight: "ui-icon-carat-r",
+            iconArrowDown: "ui-icon-carat-d",
+            iconArrowLeft: "ui-icon-carat-l",
+            iconArrowRightDown: "ui-icon-carat-d",
+            iconSeekFirst: "ui-icon-carat-l",
+            iconSeekEnd: "ui-icon-carat-r",
+            iconSeekNext: "ui-icon-carat-r",
+            iconSeekPrev: "ui-icon-carat-l",
             iconClose: "ui-icon-delete",
             iconStop: "ui-icon-grid",
-            iconCheck: "ui-icon-checkbox-on"
+            iconCheck: "ui-icon-check"
         };
         jQueryWijmo.wijMobileThemePrefix = [
             "ui-bar", 
             "ui-body", 
             "ui-overlay", 
-            "ui-btn-up", 
-            "ui-btn-hover", 
-            "ui-btn-down"
+            "ui-btn"
         ];
-        jQueryWijmo.autoInit = // auto self-init widgets
-        function autoInit(widgetName, pageKeepNative) {
-            if($.mobile && $.mobile.page && pageKeepNative) {
-                //add keepNative to page to prevent default auto-initialization of form elements
-                var keepNative = $.mobile.page.prototype.options.keepNative;
-                if(keepNative && keepNative.length && keepNative.indexOf(pageKeepNative) === -1) {
-                    keepNative = [
-                        keepNative, 
-                        pageKeepNative
-                    ].join(", ");
-                } else {
-                    keepNative = pageKeepNative;
-                }
-                $.mobile.page.prototype.options.keepNative = keepNative;
-            }
-            if($.mobile && $.wijmo[widgetName] && $.wijmo[widgetName].prototype && $.wijmo[widgetName].prototype.enhanceWithin) {
-                $(document).bind("pagecreate create", function (e) {
-                    $.wijmo[widgetName].prototype.enhanceWithin(e.target);
-                });
-            }
-        };
         jQueryWijmo.registerWidget = function registerWidget(name, baseType, def, customizeInit) {
             var fullName = "wijmo." + name, init;
             if(typeof def === 'function') {
@@ -188,6 +167,7 @@ var wijmo;
             def.options = def.options || {
             };
             def.options.initSelector = def.options.initSelector || ":jqmData(role='" + name + "')";
+            def.initSelector = def.initSelector == null ? def.options.initSelector : def.initSelector + def.options.initSelector;
             if($.mobile && def.options && def.options.wijMobileCSS) {
                 def.options.wijCSS = def.options.wijCSS || {
                 };
@@ -196,8 +176,6 @@ var wijmo;
             $.widget(fullName, baseType, def);
             if(init) {
                 init.call();
-            } else if(this.autoInit) {
-                this.autoInit(name, def.options.initSelector);
             }
         };
         jQueryWijmo.addThemeToMobileCSS = function addThemeToMobileCSS(theme, classes) {
@@ -317,11 +295,6 @@ var wijmo;
         wijmoWidget.prototype._isMobile = true;
         wijmoWidget.prototype.options = $.extend(true, {
         }, wijmoWidget.prototype.options, wijmoWidget.prototype._baseWidget().prototype.options);
-        wijmoWidget.prototype.enhanceWithin = function (target, useKeepNative) {
-            if(!this._widgetCreated) {
-                $.mobile.widget.prototype.enhanceWithin.apply(this, arguments);
-            }
-        };
         wijmoWidget.prototype._getCreateOptions = function () {
             var ele = this.element, baseOptions, optionsParser = optionsParser = function (value) {
                 // Add quotes to key pair.

@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20133.20
+ * Wijmo Library 3.20141.34
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -8,7 +8,8 @@
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * licensing@wijmo.com
  * http://wijmo.com/widgets/license/
- *
+ * ----
+ * Credits: Wijmo includes some MIT-licensed software, see copyright notices below.
  */
 /// <reference path="../External/declarations/jquery.d.ts"/>
 /// <reference path="../External/declarations/jquery.ui.d.ts"/>
@@ -22,8 +23,7 @@
 */
 jQuery.extend(jQuery.support, {
     isTouchEnabled: function () {
-        if(!("ontouchstart" in window) && !("ontouchend" in document) && //!window.navigator.msPointerEnabled) {
-        !(typeof (window.navigator.msMaxTouchPoints) !== "undefined" && window.navigator.msMaxTouchPoints > 0)) {
+        if(!("ontouchstart" in window) && !("ontouchend" in document) && !(window.navigator.msMaxTouchPoints > 0 || window.navigator["maxTouchPoints"] > 0)) {
             return false;
         } else {
             return true;
@@ -41,18 +41,20 @@ var wijmo;
     (function (touch) {
         "use strict";
         var $ = jQuery;
-        var dataPropertyName = "virtualMouseBindings", touchTargetPropertyName = "virtualTouchID", virtualEventNames = "wijmouseover wijmousedown wijmousemove wijmouseup wijclick wijtap wijdoubletap wijtaphold wijmouseout wijmousecancel".split(" "), msPointerEnabled = window.navigator.msPointerEnabled, realEventNames = {
-            "wijmouseover": (!msPointerEnabled ? "mouseover" : "MSPointerOver"),
-            "wijmousedown": (!msPointerEnabled ? "mousedown" : "MSPointerDown"),
-            "wijmousemove": (!msPointerEnabled ? "mousemove" : "MSPointerMove"),
-            "wijmouseup": (!msPointerEnabled ? "mouseup" : "MSPointerUp"),
-            "wijmouseout": (!msPointerEnabled ? "mouseout" : "MSPointerOut"),
-            "wijmousecancel": (!msPointerEnabled ? "mousecancel" : "mousecancel"),
-            "wijclick": (!msPointerEnabled ? "click" : "MSGestureTap"),
-            "wijdoubletap": (!msPointerEnabled ? "dblclick" : "MSGestureDoubleTap"),
-            "wijtaphold": (!msPointerEnabled ? "gesturehold" : "MSGestureHold")
+        var dataPropertyName = "virtualMouseBindings", touchTargetPropertyName = "virtualTouchID", virtualEventNames = "wijmouseover wijmousedown wijmousemove wijmouseup wijclick wijtap wijdoubletap wijtaphold wijmouseout wijmousecancel".split(" "), pointerEnabled = // In IE 11, pointer events has been changed. For more information,
+        // please see http://msdn.microsoft.com/en-us/library/ie/dn304886(v=vs.85).aspx
+        window.navigator["pointerEnabled"], isMsPointerEvent = (window.navigator.msPointerEnabled || pointerEnabled) && $.support.isTouchEnabled(), pointerOver = pointerEnabled ? "pointerover" : "MSPointerOver", pointerDown = pointerEnabled ? "pointerdown" : "MSPointerDown", pointerMove = pointerEnabled ? "pointermove" : "MSPointerMove", pointerUp = pointerEnabled ? "pointerup" : "MSPointerUp", pointerOut = pointerEnabled ? "pointerout" : "MSPointerOut", realEventNames = {
+            "wijmouseover": (!isMsPointerEvent ? "mouseover" : pointerOver),
+            "wijmousedown": (!isMsPointerEvent ? "mousedown" : pointerDown),
+            "wijmousemove": (!isMsPointerEvent ? "mousemove" : pointerMove),
+            "wijmouseup": (!isMsPointerEvent ? "mouseup" : pointerUp),
+            "wijmouseout": (!isMsPointerEvent ? "mouseout" : pointerOut),
+            "wijmousecancel": (!isMsPointerEvent ? "mousecancel" : "mousecancel"),
+            "wijclick": (!isMsPointerEvent ? "click" : "MSGestureTap"),
+            "wijdoubletap": (!isMsPointerEvent ? "dblclick" : "MSGestureDoubleTap"),
+            "wijtaphold": (!isMsPointerEvent ? "gesturehold" : "MSGestureHold")
         }, touchEventProps = "clientX clientY pageX pageY screenX screenY".split(" "), nativeEventProps = "clientX clientY pageX pageY screenX screenY".split(" "), mouseHookProps = $.event.mouseHooks ? $.event.mouseHooks.props : [], mouseEventProps = $.event.props.concat(mouseHookProps), activeDocHandlers = {
-        }, resetTimerID = 0, startX = 0, startY = 0, didScroll = false, clickBlockList = [], blockMouseTriggers = false, blockTouchTriggers = false, eventCaptureSupported = "addEventListener" in document, $document = $(document), nextTouchID = 1, lastTouchID = 0, touchStartEventM = (!msPointerEnabled) ? "touchstart" : "MSPointerDown", touchEndEventM = (!msPointerEnabled) ? "touchend" : "MSPointerUp", touchMoveEventM = (!msPointerEnabled) ? "touchmove" : "MSPointerMove", touchScrollEventM = (!msPointerEnabled) ? "scroll" : "scroll";
+        }, resetTimerID = 0, startX = 0, startY = 0, didScroll = false, clickBlockList = [], blockMouseTriggers = false, blockTouchTriggers = false, eventCaptureSupported = "addEventListener" in document, $document = $(document), nextTouchID = 1, lastTouchID = 0, touchStartEventM = (!isMsPointerEvent) ? "touchstart" : pointerDown, touchEndEventM = (!isMsPointerEvent) ? "touchend" : pointerUp, touchMoveEventM = (!isMsPointerEvent) ? "touchmove" : pointerMove, touchScrollEventM = "scroll";
         $.wijmouse = {
             moveDistanceThreshold: 10,
             clickDistanceThreshold: 10,
@@ -201,7 +203,7 @@ var wijmo;
         }
         function handleTouchStart(event) {
             var touches = getNativeEvent(event).touches, target, flags, ne;
-            if(touches && touches.length === 1 || msPointerEnabled) {
+            if(touches && touches.length === 1 || isMsPointerEvent) {
                 target = event.target;
                 flags = getVirtualBindingFlags(target);
                 if(flags.hasVirtualBinding) {
@@ -435,10 +437,10 @@ var wijmo;
             }
         });
         var supportTouch = ("ontouchend" in document), scrollEvent = "touchmove scroll", touchStartEvent = supportTouch ? "touchstart" : "mousedown", touchStopEvent = supportTouch ? "touchend" : "mouseup", touchMoveEvent = supportTouch ? "touchmove" : "mousemove", gesturestartEvent = supportTouch ? "gesturestart" : "gesturestart", gesturechangeEvent = supportTouch ? "gesturechange" : "gesturechange", gestureendEvent = supportTouch ? "gestureend" : "gestureend";
-        if(window.navigator.msPointerEnabled) {
-            touchStartEvent = "MSPointerDown";
-            touchStopEvent = "MSPointerUp";
-            touchMoveEvent = "MSPointerMove";
+        if(isMsPointerEvent) {
+            touchStartEvent = pointerDown;
+            touchStopEvent = pointerUp;
+            touchMoveEvent = pointerMove;
             gesturestartEvent = "MSGestureStart";
             gesturechangeEvent = "MSGestureChange";
             gestureendEvent = "MSGestureEnd";
@@ -568,12 +570,12 @@ var wijmo;
         // gesture events
         var gestureEventProps = "altKey ctrlKey metaKey rotation scale shiftKey target velocityX velocityY translationX translationY".split(" ");
         function preInitGestureEvent(elem, eventName) {
-            if(window.navigator.msPointerEnabled && !elem.__wijMSGesturePreInit) {
+            if(isMsPointerEvent && !elem.__wijMSGesturePreInit) {
                 // listen for MS gestures
                 elem.__wijMSGesturePreInit = true;
                 var msGesture = new MSGesture();
                 msGesture.target = elem;
-                elem.addEventListener("MSPointerDown", function (e) {
+                elem.addEventListener(pointerDown, function (e) {
                     msGesture.addPointer(e.pointerId);
                 }, false);
             }
@@ -603,7 +605,7 @@ var wijmo;
                 prop = gestureEventProps[j];
                 event[prop] = event[prop] || oe[prop];
             }
-            if(window.navigator.msPointerEnabled && event.rotation) {
+            if(isMsPointerEvent && event.rotation) {
                 // automatically convert to degrees for metro:
                 event.rotation = event.rotation * 360 / Math.PI;
             }
@@ -784,6 +786,97 @@ var wijmo;
                 }
             };
         });
+        // wijslider inherit jQuery UI slider widget,
+        // then the touch event won't be fired in jQuery UI slider widget,
+        // so copy the ui.mouse code from jquery ui and add touch event support.
+        if($.ui && $.ui.mouse) {
+            var mouseHandled = false, eventPrefix = "";
+            if($.support.isTouchEnabled && $.support.isTouchEnabled()) {
+                eventPrefix = "wij";
+            }
+            $(document).bind(eventPrefix + "mouseup", function () {
+                mouseHandled = false;
+            });
+            $.ui.mouse.prototype._mouseInit = function () {
+                var that = this;
+                this.element.bind(eventPrefix + "mousedown." + this.widgetName, function (event) {
+                    return that._mouseDown(event);
+                }).bind(eventPrefix + "click." + this.widgetName, function (event) {
+                    if(true === $.data(event.target, that.widgetName + ".preventClickEvent")) {
+                        $.removeData(event.target, that.widgetName + ".preventClickEvent");
+                        event.stopImmediatePropagation();
+                        return false;
+                    }
+                });
+                this.started = false;
+            } , // TODO: make sure destroying one instance of mouse doesn't mess with
+            // other instances of mouse
+            $.ui.mouse.prototype._mouseDestroy = function () {
+                this.element.unbind("." + this.widgetName);
+                if(this._mouseMoveDelegate) {
+                    $(document).unbind(eventPrefix + "mousemove." + this.widgetName, this._mouseMoveDelegate).unbind(eventPrefix + "mouseup." + this.widgetName, this._mouseUpDelegate);
+                }
+            };
+            $.ui.mouse.prototype._mouseDown = function (event) {
+                // don't let more than one widget handle mouseStart
+                if(mouseHandled) {
+                    return;
+                }
+                // we may have missed mouseup (out of window)
+                (this._mouseStarted && this._mouseUp(event));
+                this._mouseDownEvent = event;
+                var that = this, touchEnabled = $.support.isTouchEnabled && $.support.isTouchEnabled(), btnIsLeft = (event.which === 1) || touchEnabled, targetCancel = false, elIsCancel = false;
+                if(event.target.nodeName) {
+                    targetCancel = $(event.target).closest(this.options.cancel).length > 0;
+                }
+                // event.target.nodeName works around a bug in IE 8 with
+                // disabled inputs (#7620)
+                // elIsCancel = (typeof this.options.cancel === "string" && event.target.nodeName ? $(event.target).closest(this.options.cancel).length : false);
+                elIsCancel = (typeof this.options.cancel === "string" && targetCancel);
+                if((!btnIsLeft || elIsCancel || !this._mouseCapture(event))) {
+                    return true;
+                }
+                this.mouseDelayMet = !this.options.delay;
+                if(!this.mouseDelayMet) {
+                    this._mouseDelayTimer = setTimeout(function () {
+                        that.mouseDelayMet = true;
+                    }, this.options.delay);
+                }
+                if(this._mouseDistanceMet(event) && this._mouseDelayMet(event)) {
+                    this._mouseStarted = (this._mouseStart(event) !== false);
+                    if(!this._mouseStarted) {
+                        event.preventDefault();
+                        return true;
+                    }
+                }
+                // Click event may never have fired (Gecko & Opera)
+                if(true === $.data(event.target, this.widgetName + ".preventClickEvent")) {
+                    $.removeData(event.target, this.widgetName + ".preventClickEvent");
+                }
+                // these delegates are required to keep context
+                this._mouseMoveDelegate = function (event) {
+                    return that._mouseMove(event);
+                };
+                this._mouseUpDelegate = function (event) {
+                    return that._mouseUp(event);
+                };
+                $(document).bind(eventPrefix + "mousemove." + this.widgetName, this._mouseMoveDelegate).bind(eventPrefix + "mouseup." + this.widgetName, this._mouseUpDelegate);
+                event.preventDefault();
+                mouseHandled = true;
+                return true;
+            };
+            $.ui.mouse.prototype._mouseUp = function (event) {
+                $(document).unbind(eventPrefix + "mousemove." + this.widgetName, this._mouseMoveDelegate).unbind(eventPrefix + "mouseup." + this.widgetName, this._mouseUpDelegate);
+                if(this._mouseStarted) {
+                    this._mouseStarted = false;
+                    if(event.target === this._mouseDownEvent.target) {
+                        $.data(event.target, this.widgetName + ".preventClickEvent", true);
+                    }
+                    this._mouseStop(event);
+                }
+                return false;
+            };
+        }
     })(wijmo.touch || (wijmo.touch = {}));
     var touch = wijmo.touch;
 })(wijmo || (wijmo = {}));

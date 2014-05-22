@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20133.20
+ * Wijmo Library 3.20141.34
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -8,7 +8,8 @@
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * licensing@wijmo.com
  * http://wijmo.com/widgets/license/
- *
+ * ----
+ * Credits: Wijmo includes some MIT-licensed software, see copyright notices below.
  */
 var __extends = this.__extends || function (d, b) {
     function __() { this.constructor = d; }
@@ -60,7 +61,7 @@ var wijmo;
             wijmenu.prototype._create = function () {
                 // Before crete menu items,hide the menu. To avoid show wild uls
                 // in the page before init the menu.
-                                var self = this, o = self.options, direction = o.direction, mode = o.mode, parentWidget, ele = self.element, sublist, keycode = wijmo.getKeyCodeEnum(), disabled = o.disabled;
+                                var self = this, o = self.options, ele = self.element, disabled = o.disabled;
                 self._initState();
                 if(ele.is(":hidden") && ele.wijAddVisibilityObserver) {
                     ele.wijAddVisibilityObserver(function () {
@@ -72,7 +73,6 @@ var wijmo;
                 }
                 //Fix for jQuery UI 1.10
                 ele.data("wijmomenu", $.camelCase(self.widgetFullName));
-                //ele.data("wijmomenu", self.widgetName);
                 //fix for issus 20651 by Chandler.Zheng on 2012/03/19
                 self.clickNameSpace = "click.wijmenudoc" + self._newId();
                 //end comment
@@ -90,7 +90,12 @@ var wijmo;
                     }
                 }
                 //end for disabled option
-                ele.bind("keydown.wijmenuEvent", function (event) {
+                self._bindKeyDownEvent();
+                //TODO: why super._create() is not invoked?
+                            };
+            wijmenu.prototype._bindKeyDownEvent = function () {
+                var self = this, o = self.options, direction = o.direction, mode = o.mode, keycode = wijmo.getKeyCodeEnum(), sublist, parentWidget;
+                self.element.on("keydown.wijmenuEvent", function (event) {
                     if(self._getDisabled()) {
                         return;
                     }
@@ -195,11 +200,11 @@ var wijmo;
                 });
             };
             wijmenu.prototype._keyDownToOpenSubmenu = function (activeItem, mode, event, sublist) {
-                var self = this;
+                var _this = this;
                 if(mode === "flyout" && wijmenu._hasVisibleSubMenus(activeItem)) {
                     if(sublist.is(":hidden")) {
                         activeItem._showFlyoutSubmenu(event, function () {
-                            self.activate(event, activeItem._getFirstSelectableSubItem());
+                            _this.activate(event, activeItem._getFirstSelectableSubItem());
                         });
                     }
                 } else if(mode === "sliding") {
@@ -246,10 +251,10 @@ var wijmo;
                     itemContainer = $("<ul>").addClass(o.wijCSS.wijmenuList).addClass(o.wijCSS.helperReset).data($.camelCase(self.widgetFullName), self).data("wijmomenu", $.camelCase(self.widgetFullName));
                 }
                 $(">li", self._getSublist()).each(function (i, n) {
-                    var $li = $(this), options = wijmenu._getMenuItemOptions(self.options, i), sublistWrapper, sublist;
+                    var $li = $(this), options = wijmenu._getMenuItemOptions(o, i), sublistWrapper, sublist;
                     w = self._createItemWidget($li, options);
                     items.push(w);
-                    self.options.items[i] = w.options;
+                    o.items[i] = w.options;
                     if(o.ensureSubmenuOnBody && o.mode === "flyout") {
                         sublist = w._getSublist();
                         self._bindMousehoverEvent(sublist);
@@ -266,7 +271,6 @@ var wijmo;
                 return items;
             };
             wijmenu.prototype._createItemWidget = function ($li, options) {
-                //var itemWidgetName = $.wijmo.wijmenu._itemWidgetName;
                 var itemWidgetName = wijmenu._itemWidgetName;
                 if($.fn[itemWidgetName]) {
                     $li[itemWidgetName](options);
@@ -274,13 +278,12 @@ var wijmo;
                 return wijmenu._getItemWidget($li);
             };
             wijmenu.prototype._handleDisabledOption = function (disabled, ele) {
+                //TODO: this function is only invoked in _setOption, it might be invoked in _create too.
                 var self = this;
                 if(disabled) {
                     if(!self.disabledDiv) {
                         self.disabledDiv = self._createDisabledDiv(ele);
                     }
-                    //fix for tfs issue 21458
-                    //self.disabledDiv.appendTo("body");
                     self.disabledDiv.appendTo(self.domObject.menucontainer);
                 } else {
                     if(self.disabledDiv) {
@@ -290,7 +293,7 @@ var wijmo;
                 }
             };
             wijmenu.prototype._getDisabled = function () {
-                var self = this, o = self.options;
+                var o = this.options;
                 return o.disabledState === true || o.disabled === true;
             };
             wijmenu.prototype._createDisabledDiv = function (outerEle) {
@@ -320,13 +323,8 @@ var wijmo;
             */
             function () {
                 var self = this;
-                this._innerDestroy();
-                //Add for support disabled option at 2011/7/8
-                if(self.disabledDiv) {
-                    self.disabledDiv.remove();
-                    self.disabledDiv = null;
-                }
-                //end for disabled option
+                self._handleDisabledOption(false, self.domObject.menucontainer);
+                self._innerDestroy();
                 _super.prototype.destroy.call(this);
             };
             wijmenu.prototype.activate = /** This method activates a menu item by deactivating the current item,
@@ -363,8 +361,12 @@ var wijmo;
                     }
                 }
                 link.addClass(o.wijCSS.stateFocus).end();
-                self.element.removeAttr("aria-activedescendant");
-                self.element.attr("aria-activedescendant", active.attr("id"));
+                //if the item has not an id attribute, set an attribute to it.
+                if(!link.attr("id")) {
+                    link.attr("id", this._newId());
+                    link.data("generatedID", true);
+                }
+                self.element.attr("aria-activedescendant", link.attr("id"));
                 //fix for issue 20547
                 if(isInCurrentSublist && !needToScroll && link.is('a')) {
                     link.focus();
@@ -381,10 +383,14 @@ var wijmo;
                 if(!active) {
                     return;
                 }
+                self.element.removeAttr("aria-activedescendant");
                 //Fix an issue that the class can't be removed sometimes when
                 //playing animation in FF/Webkit.
                 setTimeout(function () {
-                    active._getLink().removeClass(o.wijCSS.stateFocus).removeAttr("id");
+                    active._getLink().removeClass(o.wijCSS.stateFocus);
+                    if(active._getLink().data("generatedID")) {
+                        active._getLink().removeAttr("id");
+                    }
                     self._trigger("blur");
                 }, 0);
                 self.activeItem = null;
@@ -629,13 +635,13 @@ var wijmo;
                 }
             };
             wijmenu.prototype._initTrigger = function (triggerEle) {
-                var o = this.options, event = o.triggerEvent, self = this, menuContainer = self.domObject.menucontainer, namespace = ".wijmenuEvent";
+                var self = this, o = self.options, event = o.triggerEvent, menuContainer = self.domObject.menucontainer, namespace = ".wijmenuEvent";
                 if(triggerEle.is("iframe")) {
                     triggerEle = $(triggerEle.get(0).contentWindow.document);
                 }
                 switch(event) {
                     case "click":
-                        triggerEle.bind(event + namespace, function (e) {
+                        triggerEle.on(event + namespace, function (e) {
                             if(o.mode !== "popup") {
                                 self._displayMenu(e);
                             }
@@ -643,19 +649,19 @@ var wijmo;
                         });
                         break;
                     case "mouseenter":
-                        triggerEle.bind(event + namespace, function (e) {
+                        triggerEle.on(event + namespace, function (e) {
                             self._displayMenu(e);
                             e.stopPropagation();
                         });
                         break;
                     case "dblclick":
-                        triggerEle.bind(event + namespace, function (e) {
+                        triggerEle.on(event + namespace, function (e) {
                             self._displayMenu(e);
                             e.stopPropagation();
                         });
                         break;
                     case "rtclick":
-                        triggerEle.bind("contextmenu" + namespace, function (e) {
+                        triggerEle.on("contextmenu" + namespace, function (e) {
                             menuContainer.hide();
                             self._displayMenu(e);
                             e.preventDefault();
@@ -672,7 +678,7 @@ var wijmo;
                         triggerEle = $(triggerEle.get(0).contentWindow.document);
                     }
                     if(triggerEle && triggerEle.length > 0) {
-                        triggerEle.unbind(".wijmenuEvent").unbind("wijmenuEvent");
+                        triggerEle.off(".wijmenuEvent").off("wijmenuEvent");
                     }
                 }
             };
@@ -693,22 +699,21 @@ var wijmo;
                 }
             };
             wijmenu.prototype._bindMousehoverEvent = function (element) {
-                var self = this;
-                var o = self.options;
+                var self = this, o = self.options;
                 element.delegate("li>." + o.wijCSS.wijmenuLink, "mouseenter.wijmenuEvent", function () {
-                    var itemDisabled = $(this).hasAllClasses(o.wijCSS.stateDisabled);
+                    var item = $(this), itemDisabled = item.hasAllClasses(o.wijCSS.stateDisabled);
                     if(self._getDisabled() || itemDisabled) {
                         return;
                     }
-                    $(this).addClass(o.wijCSS.stateHover).addClass(o.wijCSS.stateDefault);
+                    item.addClass(o.wijCSS.stateHover).addClass(o.wijCSS.stateDefault);
                 }).delegate("li>." + o.wijCSS.wijmenuLink, "mouseleave.wijmenuEvent", function () {
-                    var itemDisabled = $(this).hasAllClasses(o.wijCSS.stateDisabled);
+                    var item = $(this), itemDisabled = item.hasAllClasses(o.wijCSS.stateDisabled);
                     if(self._getDisabled() || itemDisabled) {
                         return;
                     }
-                    $(this).removeClass(o.wijCSS.stateHover).removeClass(o.wijCSS.stateDefault);
-                    if($(this).data("subMenuOpened")) {
-                        $(this).addClass(o.wijCSS.stateActive);
+                    item.removeClass(o.wijCSS.stateHover).removeClass(o.wijCSS.stateDefault);
+                    if(item.data("subMenuOpened")) {
+                        item.addClass(o.wijCSS.stateActive);
                     }
                 });
             };
@@ -720,7 +725,7 @@ var wijmo;
             * menu.append("<li><a href='#'>new item</a></li>").wijmenu("refresh");
             */
             function () {
-                var self = this, ele = self.element, o = self.options, direction = o.direction, scrollcontainer, menucontainer, domObject, triggerEle, breadcrumb;
+                var self = this, ele = self.element, o = self.options, direction = o.direction, scrollcontainer, menucontainer, domObject, triggerEle;
                 if(self.domObject) {
                     self._innerDestroy();
                 }
@@ -739,7 +744,7 @@ var wijmo;
                     self._rootMenu.addClass(o.wijCSS.wijmenuRtl);
                 }
                 scrollcontainer.addClass("scrollcontainer checkablesupport");
-                menucontainer.addClass(o.wijCSS.widget).addClass(o.wijCSS.header).addClass(o.wijCSS.wijmenu).addClass(o.wijCSS.cornerAll).addClass(o.wijCSS.helperClearFix).attr("aria-activedescendant", o.wijCSS.activeMenuitem);
+                menucontainer.addClass(o.wijCSS.widget).addClass(o.wijCSS.header).addClass(o.wijCSS.wijmenu).addClass(o.wijCSS.cornerAll).addClass(o.wijCSS.helperClearFix);
                 if(o.orientation === "horizontal" && o.mode === "flyout") {
                     menucontainer.addClass(o.wijCSS.wijmenuHorizontal);
                 }
@@ -763,40 +768,45 @@ var wijmo;
                         self._initTrigger(triggerEle);
                     }
                 }
-                $(document).bind(self.clickNameSpace, function (e) {
+                self._bindDocClick();
+            };
+            wijmenu.prototype._bindDocClick = function () {
+                var self = this;
+                $(document).on(self.clickNameSpace, function (e) {
                     ///fixed when click the breadcrumb choose item link to show
                     /// the root menu in sliding menu.
-                    var t = o.trigger;
+                                        var o = self.options, t = o.trigger, menucontainer = self.domObject.menucontainer, triggerEle = self._getTriggerEle(), breadcrumb, obj;
                     if($(e.target).parent().is("." + o.wijCSS.wijmenuAllLists)) {
                         return;
                     }
                     // fix tfs issue 20650  by Chandler.Zheng on 2012-03-19
-                    if($(e.target).closest(o.trigger).is(o.trigger)) {
+                    if($(e.target).closest(t).is(t)) {
                         return;
                     }
                     //end comments
-                    var obj = $(e.target).closest("." + o.wijCSS.wijmenu);
-                    if(obj.length === 0) {
-                        if(o.mode === "sliding") {
-                            breadcrumb = $("." + o.wijCSS.wijmenuBreadcrumb, menucontainer);
-                            // fixed a bug, when the trigger is not seted.
-                            // when click the document, trigger this method!
-                            if(o.trigger === "") {
-                                return;
-                            }
-                            self._resetDrilldownMenu(breadcrumb);
-                        } else if(o.mode === "flyout" && o.triggerEvent !== "mouseenter") {
-                            self._hideAllMenus(e);
+                    obj = $(e.target).closest("." + o.wijCSS.wijmenu);
+                    if(obj.length > 0) {
+                        return;
+                    }
+                    if(o.mode === "sliding") {
+                        breadcrumb = $("." + o.wijCSS.wijmenuBreadcrumb, menucontainer);
+                        // fixed a bug, when the trigger is not seted.
+                        // when click the document, trigger this method!
+                        if(t === "") {
                             return;
                         }
-                        if(triggerEle && triggerEle.length > 0) {
-                            self._hideMenu(e);
-                        }
+                        self._resetDrilldownMenu(breadcrumb);
+                    } else if(o.mode === "flyout" && o.triggerEvent !== "mouseenter") {
+                        self._hideAllMenus(e);
+                        return;
+                    }
+                    if(triggerEle && triggerEle.length > 0) {
+                        self._hideMenu(e);
                     }
                 });
             };
             wijmenu.prototype._flyout = function () {
-                var container = this.domObject.menucontainer, o = this.options, items = this.getItems();
+                var self = this, container = self.domObject.menucontainer, o = self.options, items = self.getItems();
                 container.attr("role", "menu");
                 if(o.orientation === "horizontal") {
                     container.attr("role", "menubar");
@@ -807,7 +817,7 @@ var wijmo;
             };
             wijmenu.prototype._hideAllMenus = function (e) {
                 var self = this, container, outerTrigger, fnHideSubmenu = function (menuitem) {
-                    if(menuitem.getItems().length > 0) {
+                    if(menuitem.getItems && menuitem.getItems().length > 0) {
                         $.each(menuitem.getItems(), function (i, n) {
                             fnHideSubmenu(n);
                         });
@@ -822,9 +832,6 @@ var wijmo;
                     if(container.data("isAnimated")) {
                         return;
                     }
-                    /*if (container.is(":animated")) {
-                    return;
-                    }*/
                     // if the trigger is outer of the menu,
                     //when hide all menus hide the root menu.
                     outerTrigger = self._getTriggerEle();
@@ -846,8 +853,7 @@ var wijmo;
             wijmenu.prototype._killElement = function () {
                 var self = this, o = self.options, ele = self._getSublist();
                 ele.removeClass(o.wijCSS.wijmenuList).removeClass(o.wijCSS.helperReset).removeClass(o.wijCSS.wijmenuContent).removeClass(o.wijCSS.helperClearFix);
-                //self.domObject.menucontainer.removeClass("");
-                $(document).unbind(self.clickNameSpace);
+                $(document).off(self.clickNameSpace);
                 //remove warping
                 if(self.element.is("ul")) {
                     self.element.unwrap().unwrap();
@@ -857,15 +863,10 @@ var wijmo;
                 //For fix the tfs issue id 24830. js error: object is null or undefined
                 self.domObject = null;
                 self.element.removeData("topmenu").removeData("firstLeftValue").removeData("domObject");
-                //self.element.removeData("domObject").removeData("topmenu")
-                //.removeData("firstLeftValue");
                 ele.undelegate(".wijmenuEvent");
             };
             wijmenu.prototype._killMenuItems = function () {
                 var self = this, items = self.getItems(), i;
-                //$.each(self.getItems(), function (i, n) {
-                //	n.destroy(true);
-                //});
                 for(i = items.length - 1; i >= 0; i--) {
                     items[i].destroy(true);
                 }
@@ -921,12 +922,12 @@ var wijmo;
             wijmenu.prototype._hasScroll = function () {
                 var scroll = this.domObject.scrollcontainer;
                 //Fix for jQuery UI 1.10
-                return scroll.data("wijmoWijsuperpanel").vNeedScrollBar;
+                return scroll.data("wijmo-wijsuperpanel").vNeedScrollBar;
                 //return scroll.data("wijsuperpanel").vNeedScrollBar;
                             };
             wijmenu.prototype._resetDrillChildMenu = function (el) {
-                var o = this.options;
-                el.removeClass(o.wijCSS.wijmenuScroll).removeClass(o.wijCSS.wijmenuCurrent).height("auto");
+                var css = this.options.wijCSS;
+                el.removeClass(css.wijmenuScroll).removeClass(css.wijmenuCurrent).height("auto");
             };
             wijmenu.prototype._resetDrilldownMenu = function (breadcrumb, callback) {
                 var self = this, o = self.options, ele = self._getSublist(), container = self.domObject.menucontainer, crumbDefaultHeader = $('<li>' + o.crumbDefaultText + '</li>').addClass(o.wijCSS.wijmenuBreadcrumbText), fnResetSublists = function (items) {
@@ -955,8 +956,7 @@ var wijmo;
                 self._resetScroll(self);
             };
             wijmenu.prototype._drilldown = function () {
-                var self = this, ele = self._getSublist(), container = self.domObject.menucontainer.attr("role", "menu"), containerWidth, o = self.options, direction = //fixPadding,
-                o.direction, breadcrumb = $('<ul></ul>').addClass(o.wijCSS.wijmenuBreadcrumb).addClass(o.wijCSS.stateDefault).addClass(o.wijCSS.cornerAll).addClass(o.wijCSS.helperClearFix), crumbDefaultHeader = $('<li>' + o.crumbDefaultText + '</li>').addClass(o.wijCSS.wijmenuBreadcrumbText), firstCrumb = $('<li><a href="#">' + o.topLinkText + '</a></li>').addClass(o.wijCSS.wijmenuAllLists);
+                var self = this, ele = self._getSublist(), container = self.domObject.menucontainer.attr("role", "menu"), containerWidth, o = self.options, breadcrumb = $('<ul></ul>').addClass(o.wijCSS.wijmenuBreadcrumb).addClass(o.wijCSS.stateDefault).addClass(o.wijCSS.cornerAll).addClass(o.wijCSS.helperClearFix), crumbDefaultHeader = $('<li>' + o.crumbDefaultText + '</li>').addClass(o.wijCSS.wijmenuBreadcrumbText);
                 //wraping mycontainer
                 ele.wrap("<div>").parent().css("position", "relative");
                 container.addClass(o.wijCSS.wijmenuIpod).addClass(o.wijCSS.wijmenuContainer);
@@ -979,8 +979,12 @@ var wijmo;
                 self._initScrollCallback();
                 self._resetScroll(self);
                 self.element.data("firstLeftValue", parseFloat(ele.css('left')));
-                ele.delegate("li>." + o.wijCSS.wijmenuLink, "click", function (e, itemWidgetToActive) {
-                    var li = $(this).parent(), itemDisabled = li.attr("disabled"), nextList, parentUl, parentLeft, crumbText, newCrumb, nextLeftVal, footer, setPrevMenu, hasVisibleSubMenu, itemWidget = wijmenu._getItemWidget(li), backlinkIcon, backlinkText;
+                self._bindDrillDownClick(breadcrumb);
+            };
+            wijmenu.prototype._bindDrillDownClick = function (breadcrumb) {
+                var self = this, o = self.options, selector = "li>." + o.wijCSS.wijmenuLink, ele = self._getSublist();
+                ele.delegate(selector, "click", function (e, itemWidgetToActive) {
+                    var li = $(this).parent(), itemDisabled = li.attr("disabled"), nextList, parentUl, parentLeft, crumbText, newCrumb, nextLeftVal, footer, setPrevMenu, hasVisibleSubMenu, itemWidget = wijmenu._getItemWidget(li), backlinkIcon, backlinkText, direction = o.direction, container = self.domObject.menucontainer, firstCrumb = $('<li><a href="#">' + o.topLinkText + '</a></li>').addClass(o.wijCSS.wijmenuAllLists);
                     if(self._getDisabled() || itemDisabled) {
                         return;
                     }
@@ -998,7 +1002,6 @@ var wijmo;
                     if(nextList.hasAllClasses(o.wijCSS.wijmenuCurrent)) {
                         return;
                     }
-                    //end comments.
                     if(!self._trigger("showing", e, itemWidget)) {
                         return;
                     }
@@ -1020,7 +1023,6 @@ var wijmo;
                             prevList = current._getSublist();
                             widget = current;
                         } else {
-                            //prevList = c.parents('ul:eq(0)');
                             prevList = c.parent().closest("ul", container[0]);
                             widget = wijmenu._getItemWidget(c.parent())._getParentOrMenu();
                         }
@@ -1047,7 +1049,7 @@ var wijmo;
                     nextList.show().addClass(o.wijCSS.wijmenuCurrent).attr('aria-expanded', 'true');
                     // initialize "back" link
                     if(o.backLink) {
-                        if(footer.find('a').size() === 0) {
+                        if(footer.find('a').length === 0) {
                             footer.show();
                             backlinkIcon = $("<span></span>").addClass(o.wijCSS.icon).addClass(o.wijCSS.iconArrowLeft);
                             backlinkText = $('<span></span>').addClass(o.wijCSS.wijmenuBacklinktext);
@@ -1083,9 +1085,9 @@ var wijmo;
                             backlinkText.width(footer.width() - backlinkIcon.width());
                             backlinkText.text(o.backLinkText);
                         }
-                    } else// or initialize top breadcrumb
-                     {
-                        if(breadcrumb.find('li').size() === 1) {
+                    } else {
+                        // or initialize top breadcrumb
+                        if(breadcrumb.find('li').length === 1) {
                             breadcrumb.empty().append(firstCrumb);
                             firstCrumb.find('a').click(function (e, callback) {
                                 var targetCrumb = $(this).parent(), currentItemWidget = self._getCurrentItemInSliding();
@@ -1231,7 +1233,6 @@ var wijmo;
                 if(!self._trigger("showing", e, self)) {
                     return;
                 }
-                //self._trigger("showing", e, self);
                 menucontainer.show();
                 self._setPosition(triggerEle);
                 self.nowIndex++;
@@ -1252,7 +1253,6 @@ var wijmo;
                     //add the event shown
                     self._trigger("shown", e, self);
                 });
-                //$.wijmo.wijmenu._animateFlyoutMenu(showAnimation, animationOptions);
                 self._isClickToOpen = o.triggerEvent === "click";
                 this.element.data("shown", true);
             };
@@ -1323,16 +1323,6 @@ var wijmo;
                     top: '0',
                     position: 'absolute'
                 });
-                //now do not support the equal-height menu.
-                /*
-                if (tag) {
-                var parentUl = item.parent().parent();
-                if (!parentUl.is(".wijmo-wijmenu-child")) {
-                parentUl = this.element.data("domObject").menucontainer;
-                }
-                obj = { of: parentUl };
-                }
-                */
                 menuContainer.position($.extend(obj, pOption));
             };
             wijmenu.prototype._getPosition = function () {
@@ -1504,7 +1494,7 @@ var wijmo;
                 return false;
             };
             wijmenu._getFirstSelectableSubItem = function _getFirstSelectableSubItem(widget) {
-                var i, items = widget.getItems(), o;
+                var i, o, items = widget.getItems();
                 for(i = 0; i < items.length; i++) {
                     o = items[i].options;
                     if(o.displayVisible !== false && !o.header && !o.separator) {
@@ -1580,17 +1570,11 @@ var wijmo;
                 }
             };
             wijmenu._changeCollection = function _changeCollection(idx, menuItems, items, menuItemWidget) {
-                //var indexOfItem;
                 if(!menuItemWidget) {
                     menuItems.splice(idx, 1);
                     items.splice(idx, 1);
                     return;
                 }
-                //if the menuItemWidget has been in the array, remove it at first
-                //			indexOfItem = $.inArray(menuItemWidget, menuItems);
-                //			if (indexOfItem !== -1) {
-                //				menuItems.splice(indexOfItem, 1);
-                //			}
                 menuItems.splice(idx, 0, menuItemWidget);
                 items.splice(idx, 0, menuItemWidget.options);
             };
@@ -1601,7 +1585,6 @@ var wijmo;
                 }
             };
             wijmenu._getItemWidget = function _getItemWidget(li) {
-                //return li.data($.wijmo.wijmenu._itemWidgetName);
                 return li.data(li.data("wijmomenuitem"));
             };
             return wijmenu;
@@ -1642,9 +1625,9 @@ var wijmo;
                 };
                 /** @ignore*/
                 this.wijMobileCSS = {
-                    header: "ui-header ui-bar-c",
-                    content: "ui-body ui-body-c",
-                    stateDefault: "ui-btn-up-c",
+                    header: "ui-header ui-bar-b",
+                    content: "ui-body ui-body-b",
+                    stateDefault: "ui-btn ui-btn-b",
                     stateHover: "ui-btn-down-c",
                     stateActive: "ui-btn-down-c"
                 };
@@ -1665,6 +1648,12 @@ var wijmo;
                 * @remarks The value can be seted to 'click', 'mouseenter', 'dbclick', 'rtclick'
                 */
                 this.triggerEvent = 'click';
+                //submenuTriggerEvent option is planning to be added for #34581, it will be started after refactor some code.
+                /** The submenuTriggerEvent option specifies the mouse event used to show the submenu.
+                * If submenuTriggerEvent is not set, it will get value from triggerEvent option.
+                * @remarks The value can be seted to 'click', 'mouseenter', 'dbclick', 'rtclick'.
+                */
+                /*submenuTriggerEvent =  "";*/
                 /** The position option specifies the location and orientation of the menu relative to the button
                 * or link used to open it.
                 * @remarks Configuration for the Position Utility,Of option
@@ -1866,7 +1855,6 @@ var wijmo;
                 self._getOrSetOptionsValues();
                 self._createChildMenuItems();
                 self._initCssClass();
-                //invoke base create.
                 _super.prototype._create.call(this);
             };
             wijmenuitem.prototype._refresh = function () {
@@ -1876,8 +1864,7 @@ var wijmo;
                 self._set_displayVisible(o.displayVisible);
                 self._createChildMenuItems();
                 self._initCssClass();
-                //self._bindEvents();
-                            };
+            };
             wijmenuitem.prototype._setOption = function (key, value) {
                 var self = this, o = self.options, parent;
                 if(key === "items") {
@@ -1896,6 +1883,7 @@ var wijmo;
                 switch(key) {
                     case "header":
                     case "separator":
+                        self._resetMarkupValue();
                         self._refresh();
                         break;
                     case "displayVisible":
@@ -1920,7 +1908,7 @@ var wijmo;
                     self._getLink().toggleClass(o.wijCSS.stateActive, value);
                 } else {
                     //if not an link item set selected as false;
-                    self.options.selected = false;
+                    o.selected = false;
                 }
             };
             wijmenuitem.prototype._set_items = function (value) {
@@ -1930,8 +1918,7 @@ var wijmo;
                 if(value.length > 0) {
                     self._createChildMenuItems();
                     self._initUlCssClass();
-                    //self._initCssClass();
-                                    }
+                }
                 self._setSubmenuIcon(value.length > 0);
                 self._bindModeEvents(self, true);
                 self._resetMarkupValue();
@@ -1944,9 +1931,9 @@ var wijmo;
                     self._resetMarkupValue();
                 }
                 if(o.mode === "flyout") {
-                    //if created an ul means the event of the li
-                    //has been modified from an leaf to an node
-                    //so there must be kill flyout at first
+                    //Created an ul means the event of the li
+                    //has been modified from an leaf to an node,
+                    //so must kill flyout first.
                     if(createdUl) {
                         self._killFlyout();
                         self._flyout();
@@ -1955,14 +1942,11 @@ var wijmo;
                     }
                 } else {
                     self._setDrilldownUlStyle();
-                    //reset scroll only if is add to an visible ul
+                    //reset scroll only if widget is added to an visible ul
                     if(widget.element.parent().is(':visible')) {
                         menu._resetScroll(widget._getParentOrMenu());
                     }
                 }
-            };
-            wijmenuitem.prototype._set_value = function (value, writeOnly) {
-                this.options.value = value;
             };
             wijmenuitem.prototype._set_text = function (value, writeOnly) {
                 var self = this, o = self.options;
@@ -1992,6 +1976,14 @@ var wijmo;
                     }
                 }
             };
+            wijmenuitem.prototype._createIconSpan = function () {
+                var self = this, o = self.options, link = self._getLink(), iconSpan, textSpan;
+                iconSpan = $("<span>");
+                textSpan = link.children("." + o.wijCSS.wijmenuText).wrap("<span>").parent();
+                textSpan.addClass(o.wijCSS.wijmenuText);
+                textSpan.prepend(iconSpan);
+                return iconSpan;
+            };
             wijmenuitem.prototype._set_iconClass = function (value, writeOnly) {
                 var self = this, o = self.options, link, iconSpan, textSpan, text;
                 //is header or separator, do nothing
@@ -2003,10 +1995,7 @@ var wijmo;
                 if(value) {
                     //does not have the span, create it
                     if(iconSpan.length === 0) {
-                        iconSpan = $("<span>");
-                        textSpan = link.children("." + o.wijCSS.wijmenuText).wrap("<span>").parent();
-                        textSpan.addClass(o.wijCSS.wijmenuText);
-                        textSpan.prepend(iconSpan);
+                        iconSpan = self._createIconSpan();
                     }
                     //have specified value, set cssClass as user specified value
                     iconSpan.addClass(value).addClass(o.wijCSS.wijmenuIconLeft).addClass(o.wijCSS.wijmenuitemIcon);
@@ -2025,7 +2014,6 @@ var wijmo;
                 }
                 //add class to link to fix tfs issue 24238
                 if(self._getMenuItemType() === MarkupType.other) {
-                    //if (link && link.is("div")) {
                     link.addClass(o.wijCSS.wijmenuLink).addClass(o.wijCSS.cornerAll);
                 }
             };
@@ -2044,17 +2032,14 @@ var wijmo;
                 } else if(value === true || link.length === 0) {
                     o.separator = true;
                     o.header = false;
-                    //if is separator, modify html markup
-                    self._createMenuItemMarkup(MarkupType.separator);
+                    ele.html(self._createMenuItemMarkup(MarkupType.separator));
                 } else {
                     o.separator = false;
                 }
-                self._resetMarkupValue();
             };
             wijmenuitem.prototype._set_header = function (value, writeOnly) {
                 var self = this, ele = self.element, o = self.options, link = self._getLink();
                 if(writeOnly && value === false) {
-                    o.header = false;
                     ele.html("").removeClass(o.wijCSS.header).removeClass(o.wijCSS.cornerAll).removeClass(o.wijCSS.widget).removeClass(o.wijCSS.wijmenuItem).removeClass(o.wijCSS.stateDefault);
                     self._createMenuItemMarkup(MarkupType.link).appendTo(ele);
                 } else if(value === true || link.is("h1,h2,h3,h4,h5")) {
@@ -2070,7 +2055,6 @@ var wijmo;
                 } else {
                     o.header = false;
                 }
-                self._resetMarkupValue();
             };
             wijmenuitem.prototype._set_displayVisible = function (value) {
                 var self = this, ele = self.element;
@@ -2081,12 +2065,9 @@ var wijmo;
                 }
             };
             wijmenuitem.prototype._createMenuItemMarkup = function (markupType) {
-                var self = this, o = self.options, ele = self.element, result;
+                var self = this, o = self.options, result;
                 if(markupType === MarkupType.separator) {
-                    //just clear html markup
-                    //ele.html('');
-                    ele.html('<span class="' + o.wijCSS.wijmenuSeparatorContent + '">&nbsp;</span>');
-                    return null;
+                    result = $('<span class="' + o.wijCSS.wijmenuSeparatorContent + '">&nbsp;</span>');
                 } else if(markupType === MarkupType.header) {
                     result = $("<h3></h3>").text(o.text);
                 } else {
@@ -2198,8 +2179,7 @@ var wijmo;
                     }
                 }
                 $.each(self._getChildren(), function (idx, child) {
-                    var $li = $(child), options;
-                    options = wijmenu._getMenuItemOptions(self.options, idx);
+                    var $li = $(child), options = wijmenu._getMenuItemOptions(self.options, idx);
                     w = self._createItemWidget($li, options);
                     items.push(w);
                     self.options.items[idx] = w.options;
@@ -2207,14 +2187,12 @@ var wijmo;
             };
             wijmenuitem.prototype._createItemWidget = function ($li, options) {
                 var self = this, itemWidgetName = self.widgetName;
-                //itemWidgetName = $.wijmo.wijmenu._itemWidgetName;
                 $li[itemWidgetName](options);
                 //Fix for jQuery UI 1.10
                 return $li.data($.camelCase(self.widgetFullName));
-                //return $li.data(self.widgetName);
-                            };
+            };
             wijmenuitem.prototype._initCssClass = function () {
-                var self = this, li = this.element, o = self.options, link = self._getLink(), type = self._getMenuItemType();
+                var self = this, li = self.element, o = self.options, link = self._getLink(), type = self._getMenuItemType();
                 if(type !== MarkupType.separator) {
                     li.attr("role", "menuitem");
                 }
@@ -2239,11 +2217,11 @@ var wijmo;
                 self._initUlCssClass();
             };
             wijmenuitem.prototype._initUlCssClass = function () {
-                var o = this.options;
-                this._getSublist().addClass(o.wijCSS.wijmenuList).addClass(o.wijCSS.content).addClass(o.wijCSS.cornerAll).addClass(o.wijCSS.helperClearFix).addClass(o.wijCSS.wijmenuChild).addClass(o.wijCSS.helperReset).hide();
+                var css = this.options.wijCSS;
+                this._getSublist().addClass(css.wijmenuList).addClass(css.content).addClass(css.cornerAll).addClass(css.helperClearFix).addClass(css.wijmenuChild).addClass(css.helperReset).hide();
             };
             wijmenuitem.prototype._setSubmenuIcon = function (hasSubmenu) {
-                var self = this, o = this.options, link = self._getLink(), menu = self._getMenu(), direction = menu.options.direction, submenuIcon = direction === "rtl" ? link.children("span." + o.wijCSS.icon + ":first") : link.children("span." + o.wijCSS.icon + ":last");
+                var self = this, o = self.options, link = self._getLink(), menu = self._getMenu(), direction = menu.options.direction, submenuIcon = direction === "rtl" ? link.children("span." + o.wijCSS.icon + ":first") : link.children("span." + o.wijCSS.icon + ":last");
                 //if the arugment 'hasSubmenu' was not specified
                 if(hasSubmenu === undefined) {
                     hasSubmenu = wijmenu._hasVisibleSubMenus(self);
@@ -2271,9 +2249,9 @@ var wijmo;
             };
             wijmenuitem.prototype._killFlyout = function () {
                 var ele = this.element.attr("role", ""), o = this.options;
-                ele.removeClass(o.wijCSS.wijmenuParent).unbind(".wijmenuEvent").unbind(".wijmenuitem").children(":first").unbind(".wijmenuEvent").unbind(".wijmenuitem").attr("aria-haspopup", "");
+                ele.removeClass(o.wijCSS.wijmenuParent).off(".wijmenuEvent").off(".wijmenuitem").children(":first").off(".wijmenuEvent").off(".wijmenuitem").attr("aria-haspopup", "");
                 //add by chandler for unbinding ul mouseleave event
-                this._getSublist().unbind(".wijmenuEvent").unbind(".wijmenuitem");
+                this._getSublist().off(".wijmenuEvent").off(".wijmenuitem");
                 $.each(this.getItems(), function () {
                     this._killFlyout();
                 });
@@ -2303,9 +2281,9 @@ var wijmo;
                 return wijmenu._getOuterElement(menu.options.trigger, "." + menu.options.wijCSS.wijmenu).length > 0;
             };
             wijmenuitem.prototype._flyout = function () {
-                var self = this, menu = self._getMenu(), o = menu.options, nameSpace = ".wijmenuitem", li = $(self.element).attr("aria-haspopup", true), showTimer, hideTimer, triggerEvent = self._getItemTriggerEvent(), link = li.children('a.' + o.wijCSS.wijmenuLink), subList = self._getSublist(), itemDisabled;
+                var self = this, menu = self._getMenu(), o = menu.options, nameSpace = ".wijmenuitem", li = $(self.element).attr("aria-haspopup", true), triggerEvent = self._getItemTriggerEvent(), link = li.children('a.' + o.wijCSS.wijmenuLink), subList = self._getSublist(), itemDisabled, showTimer, hideTimer;
                 if(self.getItems().length > 0) {
-                    subList.bind("mouseleave" + nameSpace, function (e) {
+                    subList.on("mouseleave" + nameSpace, function (e) {
                         if(o.disabled) {
                             return;
                         }
@@ -2317,7 +2295,7 @@ var wijmo;
                     if(triggerEvent !== "default" && o.triggerEvent !== "mouseenter") {
                         switch(o.triggerEvent) {
                             case "click":
-                                link.bind("click" + nameSpace, function (e) {
+                                link.on("click" + nameSpace, function (e) {
                                     if(o.disabled || $(this).hasAllClasses(o.wijCSS.stateDisabled)) {
                                         return;
                                     }
@@ -2325,7 +2303,7 @@ var wijmo;
                                 });
                                 break;
                             case "dblclick":
-                                link.bind("dblclick" + nameSpace, function (e) {
+                                link.on("dblclick" + nameSpace, function (e) {
                                     if(o.disabled || $(this).hasAllClasses(o.wijCSS.stateDisabled)) {
                                         return;
                                     }
@@ -2333,7 +2311,7 @@ var wijmo;
                                 });
                                 break;
                             case "rtclick":
-                                link.bind("contextmenu" + nameSpace, function (e) {
+                                link.on("contextmenu" + nameSpace, function (e) {
                                     if(o.disabled || $(this).hasAllClasses(o.wijCSS.stateDisabled)) {
                                         return;
                                     }
@@ -2344,7 +2322,7 @@ var wijmo;
                         }
                         subList.data("notClose", true);
                     } else {
-                        link.bind("mouseenter.wijmenuEvent", function (e) {
+                        link.on("mouseenter.wijmenuEvent", function (e) {
                             if(o.disabled || $(this).hasAllClasses(o.wijCSS.stateDisabled)) {
                                 return;
                             }
@@ -2352,7 +2330,7 @@ var wijmo;
                             showTimer = setTimeout(function () {
                                 self._displaySubmenu(e, null);
                             }, o.showDelay);
-                        }).bind("mouseleave" + nameSpace, function (e) {
+                        }).on("mouseleave" + nameSpace, function (e) {
                             if(o.disabled || $(this).hasAllClasses(o.wijCSS.stateDisabled)) {
                                 return;
                             }
@@ -2365,7 +2343,7 @@ var wijmo;
                             }, o.hideDelay);
                         });
                         if(self.getItems().length > 0) {
-                            self._getSublist().bind("mouseenter" + nameSpace, function (e) {
+                            self._getSublist().on("mouseenter" + nameSpace, function (e) {
                                 if(o.disabled) {
                                     return;
                                 }
@@ -2376,10 +2354,10 @@ var wijmo;
                     }
                 }
                 ///when click the menu item hide the submenus.
-                link.bind("click.wijmenuEvent", function (e) {
+                link.on("click.wijmenuEvent", function (e) {
                     itemDisabled = link.hasAllClasses(o.wijCSS.stateDisabled);
                     if(o.disabled || itemDisabled) {
-                        return;
+                        return false;
                     }
                     if(link.is("a")) {
                         if(self._getSublist().length === 0) {
@@ -2407,7 +2385,7 @@ var wijmo;
                     if(link.attr("href") === "#") {
                         e.preventDefault();
                     }
-                }).bind("focusin.wijmenuEvent", function (e) {
+                }).on("focusin.wijmenuEvent", function (e) {
                     itemDisabled = link.hasAllClasses(o.wijCSS.stateDisabled);
                     if(o.disabled || itemDisabled) {
                         return;
@@ -2431,6 +2409,11 @@ var wijmo;
                 if(link.is("." + o.wijCSS.wijmenuLink)) {
                     link.data("subMenuOpened", false);
                     link.removeClass(o.wijCSS.stateActive);
+                }
+                // Case 46978: before hidding,
+                // the submenu should complete the current animation immediately.
+                if(sublist.is(":animated")) {
+                    sublist.stop(true, true);
                 }
                 if($.fn.wijhide && hideImmediately !== true) {
                     animationOptions = {
@@ -2473,7 +2456,7 @@ var wijmo;
                 if($.browser.msie) {
                     frame = self.element.children('iframe.bgiframe');
                     if(frame.length === 0) {
-                        frame = $('<iframe class="bgiframe" frameborder="0" tabindex="-1" src="javascript: false;" style="display:none;position:absolute;z-index:-1;top:0px;left:0px;opacity:0;" />');
+                        frame = $('<iframe class="bgiframe" frameborder="0" tabindex="-1" src="javascript: false;" style="display:none;position:absolute;z-index:-1;top:0px;left:0px;opacity:0;filter:alpha(opacity = 0);" />');
                         self.element.append(frame);
                     }
                 }
@@ -2521,7 +2504,6 @@ var wijmo;
                     if(sublist.is(":hidden")) {
                         self._hideSubmenu(true, e);
                     }
-                    //add the event 'shown'
                     menu._trigger("shown", e, self);
                     if(callback) {
                         callback();
@@ -2569,8 +2551,7 @@ var wijmo;
                 return pOption;
             };
             wijmenuitem.prototype._getChildren = function () {
-                return this._getSublist().children('li');//.filter('li');
-                
+                return this._getSublist().children('li');
             };
             wijmenuitem.prototype._setDrilldownUlStyle = function () {
                 var self = this, o = self.options, sublist = self._getSublist(), menu = self._getMenu(), width = menu.domObject.menucontainer.width();
@@ -2598,10 +2579,8 @@ var wijmo;
                 if(!result) {
                     parent = self.element.parent();
                     while(!parent.is('body') && parent.length > 0) {
-                        //tmp = parent.data($.wijmo.wijmenu._menuWidgetName);
                         tmp = parent.data("wijmomenu");
                         if(tmp) {
-                            //result = tmp;
                             result = parent.data(tmp);
                             self._menu = result;
                             return result;
@@ -2618,8 +2597,7 @@ var wijmo;
                 /// Gets the parent of the current item,
                 /// the method will return null when current item is a top item
                 /// </summary>
-                                var self = this, ele = self.element, menu, result, parent;
-                result = self._parent;
+                                var self = this, ele = self.element, result = self._parent, menu, parent;
                 if(result !== undefined) {
                     return result;
                 }
@@ -2633,7 +2611,6 @@ var wijmo;
                         return result;
                     }
                 }
-                // menu = self._getMenu();
                 //the element at the top level
                 if(menu._getSublist().get(0) === ele.parent().get(0)) {
                     self._parent = null;
@@ -2655,7 +2632,7 @@ var wijmo;
                 //remove all classses of li
                 item.removeClass(o.wijCSS.widget).removeClass(o.wijCSS.wijmenuItem).removeClass(o.wijCSS.stateDefault).removeClass(o.wijCSS.cornerAll).removeClass(o.wijCSS.wijmenuParent).removeClass(o.wijCSS.header).removeClass(o.wijCSS.wijmenuSeparator);
                 link = item.children("." + o.wijCSS.wijmenuLink);
-                link.removeClass(o.wijCSS.wijmenuLink).removeClass(o.wijCSS.cornerAll).removeClass(o.wijCSS.stateFocus).removeClass(o.wijCSS.stateHover).removeClass(o.wijCSS.stateActive).html(link.children("." + o.wijCSS.wijmenuText).html()).unbind(".wijmenuitem").unbind(".wijmenuEvent");
+                link.removeClass(o.wijCSS.wijmenuLink).removeClass(o.wijCSS.cornerAll).removeClass(o.wijCSS.stateFocus).removeClass(o.wijCSS.stateHover).removeClass(o.wijCSS.stateActive).html(link.children("." + o.wijCSS.wijmenuText).html()).off(".wijmenuitem").off(".wijmenuEvent");
                 item.children("ul").removeClass(o.wijCSS.wijmenuList).removeClass(o.wijCSS.content).removeClass(o.wijCSS.cornerAll).removeClass(o.wijCSS.helperClearFix).removeClass(o.wijCSS.wijmenuChild).removeClass(o.wijCSS.helperReset).attr("role", "").attr("aria-activedescendant", "").show().css({
                     left: "",
                     top: "",
@@ -2688,8 +2665,7 @@ var wijmo;
                 /// The destroy() method removes the wijmenu functionality completely
                 /// and returns the element back to its pre-init state.
                 /// </summary>
-                var self = this;
-                self._innerDestroy(invokedByParent);
+                this._innerDestroy(invokedByParent);
                 //end for disabled option
                 _super.prototype.destroy.call(this);
             };
@@ -2775,7 +2751,7 @@ var wijmo;
                 });
             };
             wijmenuitem.prototype._showFlyoutSubmenu = function (e, callback) {
-                var self = this, menu = this._getMenu(), curList = menu._currentMenuList, i;
+                var self = this, menu = self._getMenu(), curList = menu._currentMenuList, i;
                 if(curList !== undefined) {
                     for(i = curList.length; i > 0; i--) {
                         if(curList[i - 1] === self.getParent()) {
@@ -2796,14 +2772,14 @@ var wijmo;
             wijmenuitem.prototype._getSublist = function () {
                 var self = this;
                 if(!self._sublist) {
-                    self._sublist = this.element.children('ul:first');
+                    self._sublist = self.element.children('ul:first');
                 }
                 return self._sublist;
             };
             wijmenuitem.prototype._getLink = function () {
                 var self = this;
                 if(!self._link) {
-                    self._link = this.element.children(':first');
+                    self._link = self.element.children(':first');
                 }
                 return self._link;
             };
@@ -2820,26 +2796,26 @@ var wijmo;
             };
             wijmenuitem.prototype._setIframeBounds = /** set the bounds for the frame by the bounds and box-shadow setting of the sub menu */
             function (sublist, frame) {
-                var self = this, sublistShadowBox, leftOffset = 0, rightOffset = 0, topOffset = 0, bottomeOffset = 0, shadowRadius, shadowBlurRadius, yOffset, xOffSet, arrayLength, browser = $.browser;
+                var self = this, leftOffset = 0, rightOffset = 0, topOffset = 0, bottomeOffset = 0, sublistShadowBox, shadowRadius, shadowBlurRadius, yOffset, xOffSet, arrayLength, browser = $.browser;
                 if(!browser.msie) {
                     return;
                 }
-                if(!(browser.msie && parseFloat($.browser.version) < 9)) {
+                if(parseFloat($.browser.version) >= 9) {
                     sublistShadowBox = sublist.css("box-shadow").split(' ');
                     arrayLength = sublistShadowBox.length;
                     if(arrayLength > 1) {
-                        if(browser.msie && arrayLength < 4) {
+                        if(arrayLength < 4) {
                             shadowRadius = 0;
                         } else {
-                            shadowRadius = self._parsePxToNumber(browser.msie ? sublistShadowBox[3] : sublistShadowBox[arrayLength - 1]);
+                            shadowRadius = self._parsePxToNumber(sublistShadowBox[3]);
                         }
-                        if(browser.msie && arrayLength < 3) {
+                        if(arrayLength < 3) {
                             shadowBlurRadius = 0;
                         } else {
-                            shadowBlurRadius = 0.3 * self._parsePxToNumber(browser.msie ? sublistShadowBox[2] : sublistShadowBox[arrayLength - 2]);
+                            shadowBlurRadius = 0.3 * self._parsePxToNumber(sublistShadowBox[2]);
                         }
-                        yOffset = self._parsePxToNumber(browser.msie ? sublistShadowBox[1] : sublistShadowBox[arrayLength - 3]);
-                        xOffSet = self._parsePxToNumber(browser.msie ? sublistShadowBox[0] : sublistShadowBox[arrayLength - 4]);
+                        yOffset = self._parsePxToNumber(sublistShadowBox[1]);
+                        xOffSet = self._parsePxToNumber(sublistShadowBox[0]);
                         leftOffset = shadowBlurRadius + shadowRadius - xOffSet;
                         leftOffset = leftOffset >= 0 ? leftOffset : 0;
                         rightOffset = shadowBlurRadius + shadowRadius + xOffSet;
@@ -2891,7 +2867,7 @@ var wijmo;
             wijMobileCSS: {
                 header: "ui-header ui-bar-c",
                 content: "ui-body ui-body-c",
-                stateDefault: "ui-btn-up-c",
+                stateDefault: "ui-btn ui-btn-b",
                 stateHover: "ui-btn-down-c",
                 stateActive: "ui-btn-down-c"
             },

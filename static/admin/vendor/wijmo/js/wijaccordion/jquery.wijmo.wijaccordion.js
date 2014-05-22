@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20133.20
+ * Wijmo Library 3.20141.34
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -8,7 +8,8 @@
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * licensing@wijmo.com
  * http://wijmo.com/widgets/license/
- *
+ * ----
+ * Credits: Wijmo includes some MIT-licensed software, see copyright notices below.
  */
 var __extends = this.__extends || function (d, b) {
     function __() { this.constructor = d; }
@@ -103,7 +104,7 @@ var wijmo;
                 if(header.find("> a").length === 0) {
                     header.wrapInner('<a href="#"></a>');
                 }
-                if(header.find("> ." + wijCSS.icon).length === 0) {
+                if(header.find("> ." + wijmo.getCSSSelector(wijCSS.icon)).length === 0) {
                     $('<span></span>').addClass(wijCSS.icon).insertBefore($("> a", header)[0]);
                 }
                 if(index === o.selectedIndex) {
@@ -111,7 +112,7 @@ var wijmo;
                         "aria-expanded": "true",
                         tabIndex: 0
                     });
-                    header.find("> ." + wijCSS.icon).addClass(this._triangleIconOpened);
+                    header.find("> ." + wijmo.getCSSSelector(wijCSS.icon)).addClass(this._triangleIconOpened);
                     content.addClass(contentActiveClass).addClass(wijCSS.wijaccordionContentActive).addClass(this._contentCornerOpened).wijTriggerVisibility();
                 } else {
                     header.addClass(wijCSS.stateDefault).addClass(wijCSS.cornerAll).attr({
@@ -281,12 +282,7 @@ var wijmo;
                             nextContent.addClass(o.wijCSS.wijaccordionContentActive).addClass(contentActiveClass).wijTriggerVisibility();
                             prevContent.css('display', '');
                             nextContent.css('display', '');
-                            if($.fn.wijlinechart) {
-                                prevContent.find(".wijmo-wijlinechart").wijlinechart("redraw")//?
-                                ;
-                                nextContent.find(".wijmo-wijlinechart").wijlinechart("redraw")//?
-                                ;
-                            }
+                            this._redrawLineChart(nextContent, prevContent);
                             //prevContent.wijTriggerVisibility();
                             //nextContent.wijTriggerVisibility();
                             if(adjustWidth !== null && adjustWidth !== undefined && (o.expandDirection === 'left' || o.expandDirection === 'right')) {
@@ -333,12 +329,7 @@ var wijmo;
                     if(nextHeader.length > 0) {
                         nextContent.show().addClass(contentActiveClass).addClass(o.wijCSS.wijaccordionContentActive).addClass(this._contentCornerOpened).wijTriggerVisibility();
                     }
-                    if($.fn.wijlinechart) {
-                        prevContent.find(".wijmo-wijlinechart").wijlinechart("redraw")//?
-                        ;
-                        nextContent.find(".wijmo-wijlinechart").wijlinechart("redraw")//?
-                        ;
-                    }
+                    this._redrawLineChart(nextContent, prevContent);
                     //prevContent.wijTriggerVisibility();
                     //nextContent.wijTriggerVisibility();
                     if(adjustWidth !== null && adjustWidth !== undefined && (o.expandDirection === 'left' || o.expandDirection === 'right')) {
@@ -350,6 +341,13 @@ var wijmo;
                     });
                 }
                 this.options.selectedIndex = newIndex;
+            };
+            wijaccordion.prototype._redrawLineChart = function (nextContent, prevContent) {
+                if($.fn.wijlinechart) {
+                    var lineChartInNext = nextContent.find(".wijmo-wijlinechart"), lineChartInPrev = prevContent.find(".wijmo-wijlinechart");
+                    lineChartInPrev.wijlinechart("redraw");
+                    lineChartInNext.wijlinechart("redraw");
+                }
             };
             wijaccordion.prototype._bindLiveEvents = /** Private methods */
             function () {
@@ -510,7 +508,7 @@ var wijmo;
                 */
                 this.wijMobileCSS = {
                     header: "ui-header ui-bar-a",
-                    content: "ui-body ui-body-c"
+                    content: "ui-body ui-body-b"
                 };
                 /**
                 * Selector option for auto self initialization. This option is internal.

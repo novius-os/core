@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20133.20
+ * Wijmo Library 3.20141.34
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -8,7 +8,6 @@
  * Licensed under the Wijmo Commercial License. Also available under the GNU GPL Version 3 license.
  * licensing@wijmo.com
  * http://wijmo.com/widgets/license/
- *
  *
  */
 /*
@@ -29,8 +28,11 @@
  *
  * Optional dependencies for filtering feature:
  * jquery.ui.position.js
+ * jquery.wijmo.wijinputdateformat.js
  * jquery.wijmo.wijinputdate.js
+ * jquery.wijmo.wijinputtextformat.js
  * jquery.wijmo.wijinputtext.js
+ * jquery.wijmo.wijinputnumberformat.js
  * jquery.wijmo.wijinputnumber.js
  * jquery.wijmo.wijlist.js
  *
@@ -77,6 +79,7 @@ var wijmo;
     /// <reference path="../../../data/src/core.ts"/>
     /// <reference path="../../../data/src/dataView.ts"/>
     /// <reference path="../data/converters.ts"/>
+    /// <reference path="../data/koDataView.ts"/> // add reference, otherwise it will be not added to the grunt output.
     /// <reference path="../../../wijpager/jquery.wijmo.wijpager.ts"/>
     (function (grid) {
         "use strict";
@@ -104,6 +107,7 @@ var wijmo;
                 this.rowOuterHeight = -1;
                 this._windowResizeTimer = 0;
                 this.mEditSkechRowIndex = -1;
+                this.mCurrentCellLocker = false;
             }
             wijgrid.CSS = {
                 wijgrid: "wijmo-wijgrid",
@@ -114,6 +118,7 @@ var wijmo;
                 TH: "wijgridth",
                 TD: "wijgridtd",
                 cellContainer: "wijmo-wijgrid-innercell",
+                aggregateContainer: "wijmo-wijgrid-aggregate",
                 rowHeader: "wijmo-wijgrid-rowheader",
                 currentRowHeaderCell: "wijmo-wijgrid-current-rowheadercell",
                 currentHeaderCell: "wijmo-wijgrid-current-headercell",
@@ -136,6 +141,8 @@ var wijmo;
                 filterRow: "wijmo-wijgrid-filterrow",
                 groupHeaderRow: "wijmo-wijgrid-groupheaderrow",
                 groupFooterRow: "wijmo-wijgrid-groupfooterrow",
+                groupHeaderRowCollapsed: "wijmo-wijgrid-groupheaderrow-collapsed",
+                groupHeaderRowExpanded: "wijmo-wijgrid-groupheaderrow-expanded",
                 footerRow: "wijmo-wijgrid-footerrow",
                 loadingOverlay: "wijmo-wijgrid-overlay",
                 loadingText: "wijmo-wijgrid-loadingtext",
@@ -152,6 +159,7 @@ var wijmo;
                 dndArrowBottomContainer: "wijmo-wijgrid-dnd-arrow-bottom",
                 freezingHandleV: "wijmo-wijgrid-freezing-handle-v",
                 freezingHandleH: "wijmo-wijgrid-freezing-handle-h",
+                freezingHandleContent: "wijmo-wijgrid-freezing-handle-content",
                 resizingHandle: "wijmo-wijgrid-resizehandle",
                 headerCellSortIcon: "wijmo-wijgrid-sort-icon",
                 headerCellText: "wijmo-wijgrid-headertext",
@@ -159,16 +167,18 @@ var wijmo;
                 c1band: "wijmo-c1band",
                 c1field: "wijmo-c1field"
             };
-            wijgrid.prototype._createWidget = // stores the deficient filters (one of the filterOperator\ filterValue values ​​is unknown) during the dataView round trip by the dataKey.
+            wijgrid.prototype._createWidget = // stores the deficient filters (one of the filterOperator\ filterValue values is unknown) during the dataView round trip by the dataKey.
             // * override
             function (options, element) {
                 // Late binding, a fix for the case if options.data contains a complex object leading to stack overflow when $.extend is called in the widget factory.
                 var data = options && (wijmo).data.util.isClassInstance(options.data) && !((typeof wijdatasource === "function") && (options.data instanceof wijdatasource)) && options.data;
                 if(data) {
+                    options._lateBindingFlag = true;
                     delete options.data;
                 }
                 _super.prototype._createWidget.apply(this, arguments);
                 if(data) {
+                    delete options._lateBindingFlag;
                     options.data = data// restore option value (fixes an issue when a single options object is passed to multiple instances of the wijgrid: $("table").wijgrid({...});
                     ;
                     this.option("data", data);
@@ -179,6 +189,7 @@ var wijmo;
                 if(!this.element.is("table")) {
                     throw "invalid markup";
                 }
+                this.mCurrentCellLocker = false;
                 this._windowResizeTimer = 0;
                 this._dataOffset = 0;
                 this._scrollingState = {
@@ -443,7 +454,8 @@ var wijmo;
                         }
                         currentCell._clip(this._getDataCellsRange(grid.dataRowsRangeMode.sketch));
                         if(currentCell.rowIndex() >= 0) {
-                            if(!(view._getRowInfoBySketchRowIndex(currentCell.rowIndex()).type & wijmo.grid.rowType.data)) {
+                            var rowInfo = view._getRowInfoBySketchRowIndex(currentCell.rowIndex());
+                            if(!rowInfo || !(rowInfo.type & wijmo.grid.rowType.data)) {
                                 return;
                             }
                         }
@@ -476,6 +488,7 @@ var wijmo;
             wijgrid.prototype.doRefresh = /** Re-renders wijgrid.
             * @example
             * $("#element").wijgrid("doRefresh");
+            * @param {Object} userData Infrastructure, not intended to be used by user.
             */
             function (userData) {
                 var _this = this;
@@ -559,6 +572,13 @@ var wijmo;
                         userData
                     ]);
                 }
+                var view = this._view();
+                if(this.mEditSkechRowIndex >= 0 && (view._isRowRendered(this.mEditSkechRowIndex) >= 0)) {
+                    var rowInfo = view._getRowInfoBySketchRowIndex(this.mEditSkechRowIndex);
+                    if(rowInfo && (rowInfo.state & wijmo.grid.renderState.editing)) {
+                        view._makeRowEditable(rowInfo);
+                    }
+                }
                 this._onRendered(userData);
                 if(userData && $.isFunction(userData.afterRefresh)) {
                     userData.afterRefresh.apply(this, [
@@ -631,6 +651,8 @@ var wijmo;
                             ;
                             rowInfo = view._insertBodyRow(sketchRow, rowInfo.sectionRowIndex, rowInfo.dataItemIndex, -1)//  create and render a new one
                             ;
+                            view._makeRowEditable(rowInfo);
+                            this.selection()._ensureSelectionInRow(this.mEditSkechRowIndex);
                         }
                     }
                 }
@@ -688,6 +710,7 @@ var wijmo;
                             ;
                             rowInfo = view._insertBodyRow(sketchRow, rowInfo.sectionRowIndex, rowInfo.dataItemIndex, -1)//  create and render a new one
                             ;
+                            this.selection()._ensureSelectionInRow(this.mEditSkechRowIndex);
                         } else {
                             sketchRow.renderState &= ~wijmo.grid.renderState.editing;
                         }
@@ -719,6 +742,7 @@ var wijmo;
                             ;
                             rowInfo = view._insertBodyRow(sketchRow, rowInfo.sectionRowIndex, rowInfo.dataItemIndex, -1)//  create and render a new one
                             ;
+                            this.selection()._ensureSelectionInRow(this.mEditSkechRowIndex);
                         }
                     }finally {
                         this.mEditSkechRowIndex = -1;
@@ -769,7 +793,7 @@ var wijmo;
                         this._convertWidgetsToOptions();
                     }
                 } else {
-                    // this._prepareColumnOptions(false); // prepare static columns only
+                    // this._prepareColumnOptions(false); // prepare static columns only (to make a proper sorting or filtering request to remote service)
                     this._prepareColumnOptions(this.options.columns, this.options.columnsAutogenerationMode, this._dataViewWrapper.isDataLoaded() && this._dataViewWrapper.getFieldsInfo(), this._dataViewWrapper.isDataLoaded(), false);
                     if(!this._dataViewWrapper.isOwnDataView()) {
                         // map sorting\ filtering\ paging settings from external dataView to the grid's options during initialization stage
@@ -897,29 +921,57 @@ var wijmo;
             };
             wijgrid.prototype._onDataViewCurrentPositionChanged = // * public
             function (e, args) {
-                var cellInfo = this._currentCellFromDataView(this.currentCell().cellIndex()), selection = this.selection();
-                //if items from remote data is 0
-                /*if (cellInfo.cellIndex() === -1) {
-                return;
-                }*/
+                var cellInfo = this._currentCellFromDataView(this.currentCell().cellIndex());
                 // move currentCell to the new position
                 cellInfo = this.currentCell(cellInfo, null, true);
             };
+            wijgrid.prototype._resetColumns = function () {
+                this._ownerise(false);
+                wijmo.grid.traverse(this.options.columns, function (column, columns) {
+                    if(column.dynamic) {
+                        // remove autogenerated columns
+                        var idx = $.inArray(column, columns);
+                        if(idx >= 0) {
+                            columns.splice(idx, 1);
+                        }
+                    } else {
+                        // restore original values
+                        column.dataKey = column._originalDataKey;
+                        column.headerText = column._originalHeaderText;
+                    }
+                });
+                this._initialized = false// to generate columns when doRefresh() or ensureControl() methods will be called
+                ;
+            };
             wijgrid.prototype._resetDataProperties = function () {
                 this.options.pageIndex = 0;
+            };
+            wijgrid.prototype._resetVerticalBounds = function () {
                 var bounds = this._viewPortBounds();
-                bounds.start = bounds.end = 0;
+                //bounds.start = bounds.end = 0;
+                bounds.start = 0// #52058: reset the .start property only. Let wijgrid to update the .end property when the underlying data will be refreshed actually.
+                ;
+                this._scrollingState.index = 0;
+                this._scrollingState.y = 0;
             };
             wijgrid.prototype._onDataViewLoading = function () {
                 this._activateSpinner()// if data loading proccess was triggered outside the wijgrid.
                 ;
                 this._trigger("dataLoading");
             };
-            wijgrid.prototype._onDataViewReset = function (userData) {
-                (new wijmo.grid.settingsManager(this)).MapDVToWG();
-                this._trigger("dataLoaded");
-                this.doRefresh(userData);
-                this._loaded();
+            wijgrid.prototype._onDataViewReset = function (userData, resetColumns) {
+                if(!this.options._lateBindingFlag) {
+                    // ignore dataView reset during initialization (seee wijgrid._createWidget method)
+                    (new wijmo.grid.settingsManager(this)).MapDVToWG();
+                    this._trigger("dataLoaded");
+                    if(resetColumns) {
+                        this._resetColumns();
+                    }
+                    this.doRefresh(userData);
+                    this._loaded();
+                } else {
+                    delete this.options._lateBindingFlag;
+                }
             };
             wijgrid.prototype._onDataViewLoaded = function () {
             };
@@ -932,7 +984,7 @@ var wijmo;
                 this._trigger("loaded");
             };
             wijgrid.prototype._buildSketchRow = function (wrappedDataItem, leaves) {
-                var i, len, leaf, cellAttr, value, tmp, expando = wijmo.data.Expando.getFrom(wrappedDataItem.values, false), rowAttributes = expando ? expando[wijmo.grid.EXPANDO] : null, sketchRow = new wijmo.grid.SketchDataRow(wrappedDataItem.originalRowIndex, undefined, rowAttributes && rowAttributes.rowAttributes), cellAttributes = rowAttributes && rowAttributes.cellsAttributes;
+                var i, len, leaf, cellAttr, value, tmp, expando = wijmo.data.Expando.getFrom(wrappedDataItem.values, false), rowAttributes = expando ? expando[wijmo.grid.EXPANDO] : null, sketchRow = new grid.SketchDataRow(wrappedDataItem.originalRowIndex, wijmo.grid.renderState.rendering, rowAttributes && rowAttributes.rowAttributes), cellAttributes = rowAttributes && rowAttributes.cellsAttributes;
                 for(i = 0 , len = leaves.length; i < len; i++) {
                     leaf = leaves[i];
                     if(wijmo.grid.validDataKey(leaf.dataKey)) {
@@ -944,7 +996,7 @@ var wijmo;
                 return sketchRow;
             };
             wijgrid.prototype._buildSketchRowEmptyDataItem = function (dataItem, leaves, isLastRow) {
-                var i, len, sketchRow = new grid.SketchRow(wijmo.grid.rowType.emptyDataRow, undefined), leavesLen = leaves.length;
+                var i, len, sketchRow = new grid.SketchRow(wijmo.grid.rowType.emptyDataRow, wijmo.grid.renderState.rendering, null), leavesLen = leaves.length;
                 for(i = 0 , len = dataItem.length; i < len; i++) {
                     sketchRow.add(new grid.HtmlCell(dataItem[i], {
                         colSpan: (leavesLen > 0 && isLastRow) ? leavesLen : 1
@@ -1101,8 +1153,12 @@ var wijmo;
                 (this.options.editingMode === "cell") || (this.options.editingMode === "row");
             };
             wijgrid.prototype._allowCellEditing = function () {
+                var editingMode = this.options.editingMode;
+                if(editingMode === "row") {
+                    return false;
+                }
                 return (this.options.allowEditing === true) || // obsolete
-                (this.options.editingMode === "cell");
+                (editingMode === "cell");
             };
             wijgrid.prototype._allowVirtualScrolling = function () {
                 if(this.mAllowVirtualScrolling === undefined) {
@@ -1129,6 +1185,15 @@ var wijmo;
                         }
                     }
                 });
+            };
+            wijgrid.prototype._KeyDownEventListener = function () {
+                if(!this.mKeyDownEventListener) {
+                    var view = this._view(), $fe = view && view.focusableElement();
+                    if($fe) {
+                        this.mKeyDownEventListener = new grid.keyDownEventListener(this, $fe);
+                    }
+                }
+                return this.mKeyDownEventListener;
             };
             wijgrid.prototype._UIDragndrop = function (force) {
                 if(!this._dragndropui && force) {
@@ -1175,6 +1240,10 @@ var wijmo;
                     });
                 }
             };
+            wijgrid.prototype._postset_allowEditing = function (value, oldValue) {
+                // deprecated
+                this._postset_editingMode(this.options.editingMode, undefined);
+            };
             wijgrid.prototype._postset_allowSorting = function (value, oldValue) {
                 this.ensureControl(false);
             };
@@ -1191,27 +1260,14 @@ var wijmo;
                 }
             };
             wijgrid.prototype._postset_culture = function (value, oldValue) {
-                throw "read-only";
+                this.mClosestCulture = Globalize.findClosestCulture(value) || Globalize.findClosestCulture("default");
+                this.ensureControl(false);
             };
             wijgrid.prototype._postset_customFilterOperators = function (value, oldValue) {
                 var dataView = this._dataViewWrapper.dataView();
             };
             wijgrid.prototype._postset_data = function (value, oldValue) {
-                this._ownerise(false);
-                wijmo.grid.traverse(this.options.columns, function (column, columns) {
-                    if(column.dynamic) {
-                        // remove autogenerated columns
-                        var idx = $.inArray(column, columns);
-                        if(idx >= 0) {
-                            columns.splice(idx, 1);
-                        }
-                    } else {
-                        // restore original values
-                        column.dataKey = column._originalDataKey;
-                        column.headerText = column._originalHeaderText;
-                    }
-                });
-                this._initialized = false;
+                this._resetColumns();
                 // this._resetDataProperties();
                 if(this._dataViewWrapper) {
                     this._dataViewWrapper.dispose();
@@ -1229,6 +1285,13 @@ var wijmo;
                 });
                 if(view) {
                     view.ensureDisabledState();
+                }
+            };
+            wijgrid.prototype._postset_editingMode = function (value, oldValue) {
+                if(this.mKeyDownEventListener) {
+                    this.mKeyDownEventListener.dispose();
+                    this.mKeyDownEventListener = null;
+                    this._KeyDownEventListener();
                 }
             };
             wijgrid.prototype._postset_groupIndent = function (value, oldValue) {
@@ -1569,8 +1632,10 @@ var wijmo;
             wijgrid.prototype._ensureViewPortBoundsVisible = function (bounds) {
                 var visibleTotal = this._renderableRowsCount();
                 if(bounds.end >= visibleTotal) {
-                    bounds.start -= bounds.end - visibleTotal;
+                    bounds.start -= bounds.end - (visibleTotal - 1);
                     bounds.end = visibleTotal - 1;
+                    bounds.start = Math.max(0, bounds.start);
+                    bounds.end = Math.max(0, bounds.end);
                 }
                 return bounds;
             };
@@ -1599,7 +1664,7 @@ var wijmo;
                         // gets only visible rows from the sketchTable
                         for(var i = 0; i < this.sketchTable.count(); i++) {
                             var sketchItem = this.sketchTable.row(i);
-                            if(sketchItem.style("display") === "none") {
+                            if(sketchItem.extInfo.state & wijmo.grid.renderStateEx.hidden) {
                                 if(start >= 0) {
                                     this.mRenderableBoundsCollection.add({
                                         start: start,
@@ -1850,6 +1915,9 @@ var wijmo;
             wijgrid.prototype._isMobileEnv = function () {
                 return this._isMobile;
             };
+            wijgrid.prototype._isTouchEnv = function () {
+                return !!($.support.isTouchEnabled && $.support.isTouchEnabled());
+            };
             wijgrid.prototype._render = function () {
                 var view = this._view(), o = this.options, defCSS = wijmo.grid.wijgrid.CSS, wijCSS = this.options.wijCSS, content;
                 view.render();
@@ -1953,7 +2021,8 @@ var wijmo;
             wijgrid.prototype._attachEvents = function () {
                 var view = this._view(), $fe = view.focusableElement(), self = this;
                 $fe.bind("keydown." + this.widgetName, $.proxy(this._onKeyDown, this));
-                this.mKeyDownEventListener = new grid.keyDownEventListener(this, $fe);
+                $fe.bind("focusin." + this.widgetName, $.proxy(this._onFocusIn, this));
+                this._KeyDownEventListener();
                 $.each(view.subTables(), function (index, element) {
                     var domTable = element.element();
                     if(domTable) {
@@ -1973,7 +2042,7 @@ var wijmo;
                 $(window).unbind("resize." + this.widgetName + "." + this._eventUID);
                 if(view) {
                     $fe = view.focusableElement();
-                    $fe.unbind("keydown." + this.widgetName);
+                    $fe.unbind("." + this.widgetName);
                     $.each(view.subTables(), function () {
                         var domTable = this.element();// item (this) is a htmlTableAccessor instance
 
@@ -2149,6 +2218,7 @@ var wijmo;
                             column.options.filterValue = args.value;
                             column.options.filterOperator = args.operator;
                             this._resetDataProperties();
+                            this._resetVerticalBounds();
                             if(this._customPagingEnabled()) {
                                 this._convertWidgetsToOptions();
                                 this._onColumnFiltered({
@@ -2327,65 +2397,91 @@ var wijmo;
                 this._trigger("sorted", null, args);
             };
             wijgrid.prototype._onCurrentCellChanged = function (e, info) {
-                var o = this.options, currentCell = this.currentCell();
+                var _this = this;
+                var o = this.options, currentCell = this.currentCell(), rowInfo = currentCell.row(), completed = // can be null
+                function () {
+                    var currentCell = _this.currentCell(), dataRange = _this._getDataCellsRange(grid.dataRowsRangeMode.sketch);
+                    if(_this.options.highlightCurrentCell) {
+                        var oldCell = new wijmo.grid.cellInfo(info.changingEventArgs.oldCellIndex, info.changingEventArgs.oldRowIndex, _this);
+                        if(oldCell._isValid && dataRange._containsCellInfo(oldCell)) {
+                            _this._highlightCellPosition(oldCell, false)// remove the old one
+                            ;
+                        }
+                        _this._highlightCellPosition(currentCell, true)// highlight the current one
+                        ;
+                    }
+                    var domCell;
+                    if(info.setFocus && (domCell = currentCell.tableCell())) {
+                        _this._setFocusOnCell(info.hasFocusedChild ? $(e.target) : $(domCell), info.hasFocusedChild, currentCell.column());
+                    }
+                    _this._trigger("currentCellChanged");
+                    var eventType = (e && (e.type || "").toLowerCase()) || "";
+                    // ** set selection
+                    if(info.changeSelection) {
+                        var selection = _this.selection(), selectionMode = _this.options.selectionMode.toLowerCase(), extendMode = info.selectionExtendMode || wijmo.grid.cellRangeExtendMode.none;
+                        selection.beginUpdate();
+                        if(eventType) {
+                            if(currentCell._isValid()) {
+                                switch(eventType) {
+                                    case "focusin":
+                                    case "click":
+                                        if(!e.shiftKey || (!selection._multipleRangesAllowed() && selectionMode !== "singlerange")) {
+                                            selection._startNewTransaction(currentCell);
+                                        }
+                                        if(e.shiftKey && e.ctrlKey) {
+                                            selection._clearRange(new wijmo.grid.cellInfoRange(currentCell, currentCell), extendMode);
+                                        } else {
+                                            selection._selectRange(new wijmo.grid.cellInfoRange(selection._anchorCell(), currentCell), e.ctrlKey, e.shiftKey, extendMode, null);
+                                        }
+                                        break;
+                                    case "keydown":
+                                        if(!e.shiftKey || (!selection._multipleRangesAllowed() && selectionMode !== "singlerange")) {
+                                            selection._startNewTransaction(currentCell);
+                                        }
+                                        selection._selectRange(new wijmo.grid.cellInfoRange(selection._anchorCell(), currentCell), false, e.shiftKey, wijmo.grid.cellRangeExtendMode.none, null);
+                                        break;
+                                }
+                            }
+                        } else {
+                            // * move selection to the current position *
+                            selection.clear();
+                            if(currentCell._isValid()) {
+                                // attach selection to the current cell
+                                selection._startNewTransaction(currentCell);
+                                selection._selectRange(new wijmo.grid.cellInfoRange(currentCell, currentCell), false, false, wijmo.grid.cellRangeExtendMode.none, null);
+                            }
+                        }
+                        selection.endUpdate();
+                    }
+                    // set selection **
+                    // cell editing
+                    if(eventType === "click" && _this._editBySingleClick()) {
+                        _this._beginEditInternal(e);
+                    }
+                };
+                this.mCurrentCellLocker = true;
                 // notify dataView
-                var rowInfo = currentCell.row();// can be null
-
-                var dataItemIndex = (rowInfo && (rowInfo.type & wijmo.grid.rowType.data)) ? rowInfo.dataItemIndex : -1;
-                this._dataViewWrapper.currentPosition(dataItemIndex);
-                //if (o.allowKeyboardNavigation) {
+                this._dataViewWrapper.currentPosition((rowInfo && (rowInfo.type & wijmo.grid.rowType.data)) ? rowInfo.dataItemIndex : -1);
                 if(o.scrollMode !== "none" && currentCell && !currentCell.isEqual(wijmo.grid.cellInfo.outsideValue)) {
-                    var scrollToCell = currentCell;
-                    if(!(scrollToCell.row().type & wijmo.grid.rowType.data) && !scrollToCell.tableCell()) {
+                    var scrollToCell = currentCell, rowInfo = scrollToCell.row();
+                    if(rowInfo && !(rowInfo.type & wijmo.grid.rowType.data) && !scrollToCell.tableCell()) {
                         // test for groupFoooter\ groupHeader
                         scrollToCell = currentCell._clone();
                         scrollToCell.cellIndex(0);
                     }
-                    (this._view()).scrollTo(scrollToCell);
-                }
-                //}
-                this._trigger("currentCellChanged");
-                var eventType = (e && (e.type || "").toLowerCase()) || "";
-                // ** set selection
-                if(info.changeSelection) {
-                    var selection = this.selection(), selectionMode = this.options.selectionMode.toLowerCase(), extendMode = info.selectionExtendMode || wijmo.grid.cellRangeExtendMode.none;
-                    selection.beginUpdate();
-                    if(eventType) {
-                        if(currentCell._isValid()) {
-                            switch(eventType) {
-                                case "click":
-                                    if(!e.shiftKey || (!selection._multipleRangesAllowed() && selectionMode !== "singlerange")) {
-                                        selection._startNewTransaction(currentCell);
-                                    }
-                                    if(e.shiftKey && e.ctrlKey) {
-                                        selection._clearRange(new wijmo.grid.cellInfoRange(currentCell, currentCell), extendMode);
-                                    } else {
-                                        selection._selectRange(new wijmo.grid.cellInfoRange(selection._anchorCell(), currentCell), e.ctrlKey, e.shiftKey, extendMode, null);
-                                    }
-                                    break;
-                                case "keydown":
-                                    if(!e.shiftKey || (!selection._multipleRangesAllowed() && selectionMode !== "singlerange")) {
-                                        selection._startNewTransaction(currentCell);
-                                    }
-                                    selection._selectRange(new wijmo.grid.cellInfoRange(selection._anchorCell(), currentCell), false, e.shiftKey, wijmo.grid.cellRangeExtendMode.none, null);
-                                    break;
-                            }
+                    (this._view()).scrollTo(scrollToCell, function () {
+                        try  {
+                            completed();
+                        }finally {
+                            _this.mCurrentCellLocker = false;
                         }
-                    } else {
-                        // * move selection to the current position *
-                        selection.clear();
-                        if(currentCell._isValid()) {
-                            // attach selection to the current cell
-                            selection._startNewTransaction(currentCell);
-                            selection._selectRange(new wijmo.grid.cellInfoRange(currentCell, currentCell), false, false, wijmo.grid.cellRangeExtendMode.none, null);
-                        }
+                    }, info);
+                } else {
+                    try  {
+                        completed();
+                    }finally {
+                        this.mCurrentCellLocker = false;
                     }
-                    selection.endUpdate();
-                }
-                // set selection **
-                // cell editing
-                if(eventType === "click" && this._editBySingleClick()) {
-                    this._beginEditInternal(e);
                 }
             };
             wijgrid.prototype._onPageIndexChanging = function (args) {
@@ -2445,12 +2541,17 @@ var wijmo;
                         this._frozenerui.dispose();
                         this._frozenerui = null;
                     }
+                    if(this.mKeyDownEventListener) {
+                        this.mKeyDownEventListener.dispose();
+                        this.mKeyDownEventListener = null;
+                    }
                 }
                 this._trigger("rendering");
             };
             wijgrid.prototype._onRendered = function (userData) {
                 var view = this._view(), currentCell, hasSelection = this.selection().selectedCells().length() > 0;
                 this._rendered = true;
+                this._renderCounter++;
                 if(!userData.virtualScrollData) {
                     this._field("selection", null)// always recreate selection object
                     ;
@@ -2460,14 +2561,13 @@ var wijmo;
                     this._setAttr(view.focusableElement(), "tabIndex", 0)// to handle keyboard\ focus events
                     ;
                     var prevCurrentCell = this._field("currentCellPrevCycle");
-                    if(this._dataViewWrapper.isOwnDataView && (prevCurrentCell.dataItemIndex >= 0)) {
-                        // if own dataView is used then restore dataView.currentPosition() from currentCell.
-                        var cnt = this._dataViewWrapper.dataView().count();
-                        if(prevCurrentCell.dataItemIndex >= cnt) {
-                            prevCurrentCell.dataItemIndex = cnt - 1;
-                        }
-                        this._dataViewWrapper.currentPosition(prevCurrentCell.dataItemIndex);
-                    }
+                    //if (this._dataViewWrapper.isOwnDataView() && (prevCurrentCell.dataItemIndex >= 0)) { // if own dataView is used then restore dataView.currentPosition() from previous currentCell position.
+                    //	var cnt = this._dataViewWrapper.dataView().count();
+                    //	if (prevCurrentCell.dataItemIndex >= cnt) {
+                    //		prevCurrentCell.dataItemIndex = cnt - 1;
+                    //	}
+                    //	this._dataViewWrapper.currentPosition(prevCurrentCell.dataItemIndex);
+                    //}
                     currentCell = this._currentCellFromDataView(prevCurrentCell.x);
                     if(!currentCell._isValid() && this.options.showSelectionOnRender) {
                         currentCell = this._getFirstDataRowCell(0);
@@ -2485,29 +2585,35 @@ var wijmo;
                         }
                     });
                     this._resizerui = resizer;
-                    this._setSizeInternal(this._scrollingState)// restore value
+                    this._setSizeInternal(this._scrollingState)// set sizes, create wijsuperpanel, restore scrolling state.
                     ;
                     //frozener
                     if(this.options.scrollMode !== "none") {
                         this._frozenerui = new wijmo.grid.uiFrozener(this);
                     }
                 } else {
-                    this.currentCell(this.currentCell(), null, false);
+                    var currentCell = this.currentCell();
+                    this.currentCell(currentCell, null, false);
+                    if(currentCell._isEdit() && !currentCell.row()) {
+                        currentCell._isEdit(false)// reset editing if sketchRow is not available (C1GridView virtual scrolling)
+                        ;
+                    }
                     this.selection()._ensureSelection();
                 }
-                this._renderCounter++;
                 this._trigger("rendered");
             };
-            wijgrid.prototype._onClick = function (e) {
+            wijgrid.prototype._onClick = // note: can be called by the _onFocusIn method!
+            function (e) {
                 if(!this._canInteract() || !e.target) {
                     return;
                 }
                 var view = this._view(), clickedCell = this._findUntilOuterDiv(e.target, {
                     td: true,
                     th: true
-                }), $row, clickedCellInfo, extendMode = wijmo.grid.cellRangeExtendMode.none, currentCell, selection, clickedCellChanged = false;
-                if(clickedCell) {
-                    if($(e.target).hasClass(wijmo.grid.wijgrid.CSS.groupToggleVisibilityButton)) {
+                }), $row, clickedCellInfo, extendMode = wijmo.grid.cellRangeExtendMode.none, currentCell, selection, clickedCellChanged = false, clickEvent = !!(e && (e.type === "click"));
+                // real click event?
+                                if(clickedCell) {
+                    if(clickEvent && $(e.target).hasClass(wijmo.grid.wijgrid.CSS.groupToggleVisibilityButton)) {
                         this._onGroupBtnClick(e);
                         // #29676: stop event from bubbling up to the parent grid (if available)
                         e.stopPropagation();
@@ -2543,14 +2649,16 @@ var wijmo;
                         // change current cell and set focus to it (if the target element is not already focused)
                         this._changeCurrentCell(e, clickedCellInfo, {
                             changeSelection: true,
-                            setFocus: true,
+                            setFocus: clickEvent,
                             selectionExtendMode: extendMode
                         });
                     }
-                    var cellClickedArgs = {
-                        cell: clickedCellInfo
-                    };
-                    this._trigger("cellClicked", null, cellClickedArgs);
+                    if(clickEvent) {
+                        var cellClickedArgs = {
+                            cell: clickedCellInfo
+                        };
+                        this._trigger("cellClicked", null, cellClickedArgs);
+                    }
                 }
             };
             wijgrid.prototype._onDblClick = function (e) {
@@ -2585,8 +2693,8 @@ var wijmo;
                 }
             };
             wijgrid.prototype._onKeyDown = function (e) {
-                var isKeyDownListenerElement = this.mKeyDownEventListener.isHiddenInput($(e.target));
-                if(!this._canInteract() || (isKeyDownListenerElement && this.mKeyDownEventListener.canHandle(e))) {
+                var isKeyDownListenerElement = this._KeyDownEventListener().isHiddenInput($(e.target));
+                if(!this._canInteract() || (isKeyDownListenerElement && this._KeyDownEventListener().canHandle(e))) {
                     // the focus is inside the hidden input and the printable key has been pressed.
                     return true;
                 }
@@ -2622,6 +2730,13 @@ var wijmo;
                     case keyCodeEnum.HOME:
                     case keyCodeEnum.END:
                     case keyCodeEnum.TAB:
+                        if(e.which === keyCodeEnum.TAB) {
+                            var visibleLeaves = this._field("visibleLeaves");
+                            // There is no data in the grid, will bubble the keydown event out of the grid.
+                            if(!visibleLeaves || !visibleLeaves.length) {
+                                return true;
+                            }
+                        }
                         if(isKeyDownListenerElement || this._canMoveToAnotherCell(e.target, e.which)) {
                             var dataRange = this._getDataCellsRange(grid.dataRowsRangeMode.renderable);
                             nextCell = this._getNextCurrentCell(dataRange, currentCell, e.keyCode, e.shiftKey);
@@ -2629,31 +2744,23 @@ var wijmo;
                         break;
                 }
                 if(nextCell) {
-                    var isRendered = nextCell._isRendered(), scrollToIndex = this._renderableBoundsCollection().getRenderedIndex(nextCell.rowIndex()), visibleAreaBounds, $rows, handleLastRow = this._allowVirtualScrolling() && (scrollToIndex - this._viewPortBounds().start >= this._rows().length() - 1), self = // the last row in the current view port
-                    this;
-                    if(this._allowVirtualScrolling() && (!isRendered || (handleLastRow && (visibleAreaBounds = this._view().getVisibleAreaBounds(true)) && ($rows = nextCell.row().$rows) && ($rows.offset().top + $rows.outerHeight() > visibleAreaBounds.top + visibleAreaBounds.height))))// exceeded wijgrid bounds
-                     {
-                        if(nextCell.rowIndex() > currentCell.rowIndex()) {
-                            scrollToIndex -= this._rows().length() - 1;
-                            scrollToIndex += 1;
-                        }
-                        (this._view()).vsUI.scrollTo(scrollToIndex, function () {
-                            self._changeCurrentCell(e, nextCell, {
-                                changeSelection: true,
-                                setFocus: true
-                            });
-                        });
-                    } else {
-                        this._changeCurrentCell(e, nextCell, {
-                            changeSelection: true,
-                            setFocus: false
-                        })// change current cell and set focus to it
-                        ;
-                    }
+                    // change current cell and set focus to it (always set focus to change the IME mode).
+                    this._changeCurrentCell(e, nextCell, {
+                        changeSelection: true,
+                        setFocus: true
+                    });
                     return false;// stop bubbling
 
                 }
                 return true;
+            };
+            wijgrid.prototype._onFocusIn = function (e) {
+                if(this.options.allowKeyboardNavigation && e && e.target && $(e.target).is(":input") && // optimization, test for inputs only
+                !this._KeyDownEventListener().isHiddenInput($(e.target))) {
+                    // optimization, ignore IME hidden inputs
+                    this._onClick(e)// simulate a click
+                    ;
+                }
             };
             wijgrid.prototype._onMouseMove = function (e) {
                 var view = this._view(), frozener = this._frozenerui, hoveredCell, $hoveredRow, hoveredCellInfo, rowObj, rowInfo, $rs = wijmo.grid.renderState;
@@ -2760,45 +2867,47 @@ var wijmo;
                     this._trigger("columnResized", null, resizedArgs);
                 }
             };
-            wijgrid.prototype._changeCurrentCell = // * resizing
-            // * currentCell
+            wijgrid.prototype._setFocusOnCell = // * resizing
+            function (element, focusableChild, column) {
+                if(focusableChild) {
+                    //if (!element.is(":focus")) {
+                    //	element.focus(); // ensure that element still has focus.
+                    //}
+                                    } else {
+                    this._KeyDownEventListener().focus(element, column);
+                }
+            };
+            wijgrid.prototype._findFocusedChild = function (parent) {
+                var result = parent.find(":focus");
+                return result.length ? result : null;
+            };
+            wijgrid.prototype._changeCurrentCell = // * currentCell
             // returns false when currentCellChanging event was cancelled, otherwise true.
             function (e, cellInfo, info) {
-                var currentCell = this.currentCell(), dataRange = this._getDataCellsRange(grid.dataRowsRangeMode.sketch), currentCellChangingArgs, cellEditCompleted, highlight = this.options.highlightCurrentCell, domCell, cellHasFocusedChild = e && e.target && $(e.target).is(":focus"), self = this, setFocus = function (domCell) {
-                    if(cellHasFocusedChild) {
-                        $(e.target).focus()// ensure that element still has focus.
-                        ;
-                    } else {
-                        self.mKeyDownEventListener.focus($(domCell));
-                    }
-                };
+                if(this.mCurrentCellLocker === true) {
+                    // skip until the _onCurrentCellChanged will not be completed.
+                    return;
+                }
+                var currentCell = this.currentCell(), dataRange = this._getDataCellsRange(grid.dataRowsRangeMode.sketch);
                 // if cellInfo has a valid value
                 if((dataRange._isValid() && dataRange._containsCellInfo(cellInfo)) || (cellInfo.isEqual(wijmo.grid.cellInfo.outsideValue))) {
+                    var $target = e && e.target && $(e.target), domCell = cellInfo.tableCell(), $container = cellInfo.container(), $focusedChild = null;
+                    info.hasFocusedChild = !!(domCell && $target && ($target[0] !== domCell) && ($target[0] !== $container[0]) && !this._KeyDownEventListener().isHiddenInput($target) && /* $target.is(":focus") */ ($focusedChild = this._findFocusedChild($container)))// $focusedChild can differs from $target (#56472)
+                    ;
                     // other cell than current cell
                     if(currentCell.cellIndex() !== cellInfo.cellIndex() || currentCell.rowIndex() !== cellInfo.rowIndex()) {
-                        currentCellChangingArgs = {
+                        var currentCellChangingArgs = {
                             cellIndex: cellInfo.cellIndex(),
                             rowIndex: cellInfo.rowIndex(),
                             oldCellIndex: currentCell.cellIndex(),
                             oldRowIndex: currentCell.rowIndex()
                         };
                         if(this._trigger("currentCellChanging", null, currentCellChangingArgs)) {
-                            cellEditCompleted = false;
+                            var cellEditCompleted = false;
                             if(!this._allowCellEditing() || !currentCell._isEdit() || (cellEditCompleted = this._endEditInternal(null))) {
-                                if(dataRange._containsCellInfo(currentCell)) {
-                                    if(highlight) {
-                                        this._highlightCellPosition(currentCell, false)// remove the current one
-                                        ;
-                                    }
-                                }
+                                info.changingEventArgs = currentCellChangingArgs;
                                 currentCell = cellInfo._clone();
                                 currentCell._setGridView(this);
-                                if(highlight) {
-                                    this._highlightCellPosition(currentCell, true);
-                                }
-                                if(info.setFocus && (domCell = currentCell.tableCell())) {
-                                    setFocus(domCell);
-                                }
                                 this._field("currentCell", currentCell)// set currentCell
                                 ;
                                 this._onCurrentCellChanged(e, info);
@@ -2808,16 +2917,16 @@ var wijmo;
                         }
                     } else {
                         // the same cell
-                        if(highlight) {
+                        if(this.options.highlightCurrentCell) {
                             this._highlightCellPosition(currentCell, true)// ensure
                             ;
                         }
-                        if(!currentCell._isEdit() && (domCell = currentCell.tableCell())) {
+                        if(domCell && !currentCell._isEdit()) {
                             if(e && this._editBySingleClick()) {
                                 this._beginEditInternal(e);
                             } else {
                                 if(info.setFocus) {
-                                    setFocus(domCell);
+                                    this._setFocusOnCell(info.hasFocusedChild ? $focusedChild : $(domCell), info.hasFocusedChild, currentCell.column());
                                 }
                             }
                         }
@@ -2891,7 +3000,7 @@ var wijmo;
                         // set focus to listen keypress\ keydown event.
                         var domCell = cell.tableCell();
                         if(domCell) {
-                            this.mKeyDownEventListener.focus($(domCell));
+                            this._KeyDownEventListener().focus($(domCell), cell.column());
                         } else {
                             $(this._view().focusableElement()).focus();
                         }
@@ -2906,7 +3015,7 @@ var wijmo;
             };
             wijgrid.prototype._onViewInsertEmptyRow = // * editing
             // * view handlers
-            function (rowType, sectionRowIndex, dataRowIndex, dataItemIndex, virtualDataItemIndex) {
+            function (rowType, renderState, sectionRowIndex, dataRowIndex, dataItemIndex, virtualDataItemIndex, groupByValue) {
                 return null;// default action
 
             };
@@ -2916,7 +3025,7 @@ var wijmo;
             };
             wijgrid.prototype._onViewCellRendered = function (rowInfo, $cell, cellIndex, column) {
             };
-            wijgrid.prototype._onViewRowRendered = function (rowInfo) {
+            wijgrid.prototype._onViewRowRendered = function (rowInfo, rowAttr, rowStyle) {
             };
             wijgrid.prototype._getDataParser = // view handlers *
             // misc
@@ -3070,14 +3179,12 @@ var wijmo;
                 return cellInfo;
             };
             wijgrid.prototype._dataViewDataRowIndexToGrid = function (rowIndex) {
-                var $rt = wijmo.grid.rowType, view = this._view(), rows = this._rows(), i, len, rowInfo;
-                if(rowIndex < 0) {
-                    return -1;
-                }
-                for(i = 0 , len = rows.length(); i < len; i++) {
-                    rowInfo = view._getRowInfo(rows.item(i));
-                    if((rowInfo.type & $rt.data) && (rowInfo.dataItemIndex === rowIndex)) {
-                        return rowInfo.sectionRowIndex;
+                if(this.sketchTable) {
+                    for(var i = 0; i < this.sketchTable.count(); i++) {
+                        var sketchRow = this.sketchTable.row(i);
+                        if(sketchRow.isDataRow() && sketchRow.dataItemIndex() === rowIndex) {
+                            return i;
+                        }
                     }
                 }
                 return -1;
@@ -3124,14 +3231,20 @@ var wijmo;
                 return wijmo.grid.cellInfo.outsideValue;
             };
             wijgrid.prototype._getNextCurrentCell = function (dataRange, cellInfo, keyCode, shiftKeyPressed) {
-                var cellIndex = cellInfo.cellIndex(), rowIndex = cellInfo.rowIndex(), keyCodeEnum = wijmo.getKeyCodeEnum(), sketchTable = this.sketchTable, renderedRowIndex = this._renderableBoundsCollection().getRenderedIndex(rowIndex), rbc = this._renderableBoundsCollection(), tmp, dataRowsOnly = (keyCode === keyCodeEnum.TAB), findNextVisibleRow = function (further, startFrom, maxRowsToTouch, dataRowsOnly) {
+                var cellIndex = cellInfo.cellIndex(), rowIndex = cellInfo.rowIndex(), keyCodeEnum = wijmo.getKeyCodeEnum(), sketchTable = this.sketchTable, renderedRowIndex = this._renderableBoundsCollection().getRenderedIndex(rowIndex), rbc = this._renderableBoundsCollection(), tmp, dataRowsOnly = (keyCode === keyCodeEnum.TAB), self = this, sss = self._serverSideVirtualScrolling(), findNextVisibleRow = function (further, startFrom, maxRowsToTouch, dataRowsOnly) {
                     if (typeof dataRowsOnly === "undefined") { dataRowsOnly = false; }
                     var iterator = further ? rbc.forEachIndex : rbc.forEachIndexBackward, cnt = 0, result = null;
                     iterator.call(rbc, startFrom, -1, function (absIdx) {
-                        var sketchRow = sketchTable.row(absIdx), isDataRow = // this row is rendered, but we doesn't know whether it visible or not.
+                        var sketchIdx = absIdx - self._dataOffset;
+                        if(sss && (sketchIdx < 0 || sketchIdx >= sketchTable.count())) {
+                            // exceeded sketchTable bounds
+                            result = absIdx;
+                            return false;
+                        }
+                        var sketchRow = sketchTable.row(sketchIdx), isDataRow = // this row is rendered, but we doesn't know whether it visible or not.
                         sketchRow.isDataRow();
                         // test dataType and visibility
-                        if((!dataRowsOnly || isDataRow) && (sketchRow.style("display") !== "none")) {
+                        if((!dataRowsOnly || isDataRow) && (!(sketchRow.extInfo.state & wijmo.grid.renderStateEx.hidden))) {
                             result = absIdx;
                             if(++cnt >= maxRowsToTouch) {
                                 return false;// stop iteration
@@ -3213,11 +3326,11 @@ var wijmo;
                 return new wijmo.grid.cellInfo(cellIndex, rowIndex, this);
             };
             wijgrid.prototype._findUntilOuterDiv = function (start, tagsToFind) {
-                var current = start, stopper, nodeName, item = null;
+                var current = start, outerDiv = this.outerDiv[0], stopper, nodeName, item = null;
                 for(; current; current = current.parentNode) {
                     nodeName = current.nodeName && current.nodeName.toLowerCase();
                     if(nodeName) {
-                        if(current === this.outerDiv[0]) {
+                        if(current === outerDiv) {
                             stopper = current;
                             break;
                         }
@@ -3263,27 +3376,27 @@ var wijmo;
             };
             wijgrid.prototype._getRealStaticColumnIndex = // index of the fixed leaf inside the visibleLeaves collection.
             function () {
-                var leaves, len, offsetStaticIndex = this._getStaticOffsetIndex(true), staticColumnIndex = this._getStaticIndex(false), resultIndex, tmp;
-                resultIndex = staticColumnIndex + offsetStaticIndex;
+                var offsetStaticIndex = this._getStaticOffsetIndex(true), staticColumnIndex = this._getStaticIndex(false), realIndex = staticColumnIndex + offsetStaticIndex;
                 if(staticColumnIndex >= 0) {
-                    leaves = this._field("visibleLeaves");
-                    len = leaves.length;
-                    // If child column of some band is fixed then the top and right-most column of the root band contained current column will be fixed.
-                    tmp = resultIndex;
-                    for(; resultIndex < len; resultIndex++) {
-                        if(leaves[resultIndex].parentIdx === -1) {
-                            // resultIndex is the index of the first leaf which is not contained inside a band.
-                            if(resultIndex > tmp) {
-                                resultIndex--;
+                    var leaves = this._field("visibleLeaves"), allColumns = wijmo.grid.flatten(this.options.columns), len = leaves.length;
+                    if(realIndex < len - 1) {
+                        var parent = wijmo.grid.getTompostParent(leaves[realIndex], allColumns);
+                        // If child column of some band is fixed then the top and right-most column of the root band contained current column will be fixed.
+                        if(parent) {
+                            for(realIndex++; realIndex < len; realIndex++) {
+                                var nextParent = wijmo.grid.getTompostParent(leaves[realIndex], allColumns);
+                                if(nextParent !== parent) {
+                                    realIndex--;
+                                    break;
+                                }
                             }
-                            break;
                         }
                     }
-                    if(resultIndex >= len) {
-                        resultIndex = len - 1;
+                    if(realIndex >= len) {
+                        realIndex = len - 1;
                     }
                 }
-                return resultIndex;
+                return realIndex;
             };
             wijgrid.prototype._getRealStaticRowIndex = function () {
                 var offsetStaticIndex = this._getStaticOffsetIndex(false);
@@ -3415,9 +3528,10 @@ var wijmo;
                 /** @ignore */
                 this.wijMobileCSS = {
                     header: "ui-header ui-bar-a",
-                    content: "ui-body-c",
+                    content: "ui-body-b",
                     stateHover: "ui-btn-down-c",
-                    stateActive: "ui-btn-down-c"
+                    stateActive: "ui-btn-down-c",
+                    stateHighlight: "ui-btn-down-e"
                 };
                 this.wijCSS = {
                     wijgrid: "",
@@ -3447,6 +3561,8 @@ var wijmo;
                     wijgridFilterRow: "",
                     wijgridGroupHeaderRow: "",
                     wijgridGroupFooterRow: "",
+                    wijgridGroupHeaderRowCollapsed: "",
+                    wijgridGroupHeaderRowExpanded: "",
                     wijgridFooterRow: "",
                     wijgridLoadingOverlay: "",
                     wijgridLoadingText: "",
@@ -4766,6 +4882,7 @@ var wijmo;
     (function (grid) {
         "use strict";
         var $ = jQuery;
+        /** @ignore */
         var SketchObject = (function () {
             function SketchObject(attr) {
                 if(attr) {
@@ -4799,6 +4916,11 @@ var wijmo;
                     this.ensureStyle()[name] = newValue;
                 }
             };
+            SketchObject.prototype.deleteAttr = function (name) {
+                if(this.__attr) {
+                    delete this.__attr[name];
+                }
+            };
             SketchObject.prototype.deleteStyle = function (name) {
                 if(this.__style) {
                     delete this.__style[name];
@@ -4813,6 +4935,7 @@ var wijmo;
             return SketchObject;
         })();
         grid.SketchObject = SketchObject;
+        /** @ignore */
         var SketchCell = (function (_super) {
             __extends(SketchCell, _super);
             function SketchCell(attr) {
@@ -4828,7 +4951,8 @@ var wijmo;
             return SketchCell;
         })(SketchObject);
         grid.SketchCell = SketchCell;
-        /** A sketch cell with a value */
+        /** @ignore */
+        /* A sketch cell with a value */
         var ValueCell = (function (_super) {
             __extends(ValueCell, _super);
             function ValueCell(value, attr) {
@@ -4838,29 +4962,30 @@ var wijmo;
             return ValueCell;
         })(SketchCell);
         grid.ValueCell = ValueCell;
-        /** A sketch cell with raw html */
+        /** @ignore */
+        /* A sketch cell with raw html */
         var HtmlCell = (function (_super) {
             __extends(HtmlCell, _super);
             function HtmlCell(html, attr) {
-                if (typeof html === "undefined") { html = ""; }
                         _super.call(this, attr);
-                this.html = html;
+                this.html = html || "";
             }
             HtmlCell.nbsp = function nbsp() {
-                return new HtmlCell("&nbsp;");
+                return new HtmlCell("&nbsp;", null);
             };
             return HtmlCell;
         })(SketchCell);
         grid.HtmlCell = HtmlCell;
+        /** @ignore */
         var SketchRow = (function (_super) {
             __extends(SketchRow, _super);
             function SketchRow(rowType, renderState, attrs) {
                         _super.call(this, attrs);
                 this.rowType = rowType;
                 this.renderState = renderState;
-                if(!renderState) {
-                    this.renderState = wijmo.grid.renderState.rendering;
-                }
+                this.extInfo = {
+                    state: grid.renderStateEx.none
+                };
             }
             SketchRow.prototype.isDataRow = /** returns true if this is data row or data alternative row */
             function () {
@@ -4911,21 +5036,19 @@ var wijmo;
                     dataRowIndex: null,
                     virtualDataItemIndex: null,
                     dataItemIndex: this.dataItemIndex(),
-                    $rows: null
+                    $rows: null,
+                    _extInfo: this.extInfo
                 };
             };
             return SketchRow;
         })(SketchObject);
         grid.SketchRow = SketchRow;
+        /** @ignore */
         var SketchDataRow = (function (_super) {
             __extends(SketchDataRow, _super);
             function SketchDataRow(originalRowIndex, renderState, attrs) {
                         _super.call(this, wijmo.grid.rowType.data | ((originalRowIndex % 2) == 1 ? wijmo.grid.rowType.dataAlt : 0), renderState, attrs);
                 this.originalRowIndex = originalRowIndex;
-                this.renderState = renderState;
-                if(!renderState) {
-                    this.renderState = wijmo.grid.renderState.rendering;
-                }
             }
             SketchDataRow.prototype.dataItemIndex = function (offset) {
                 if (typeof offset === "undefined") { offset = 0; }
@@ -4937,14 +5060,14 @@ var wijmo;
             return SketchDataRow;
         })(SketchRow);
         grid.SketchDataRow = SketchDataRow;
+        /** @ignore */
         var SketchGroupRow = (function (_super) {
             __extends(SketchGroupRow, _super);
             function SketchGroupRow(header, attrs) {
-                if (typeof header === "undefined") { header = true; }
                 var rowType = header ? wijmo.grid.rowType.groupHeader : //"groupHeader"
                 wijmo.grid.rowType.groupFooter;// "groupFooter"
 
-                        _super.call(this, rowType, undefined, attrs);
+                        _super.call(this, rowType, wijmo.grid.renderState.rendering, attrs);
             }
             SketchGroupRow.prototype.getRowInfo = function () {
                 var info = _super.prototype.getRowInfo.call(this);
@@ -4956,6 +5079,7 @@ var wijmo;
             return SketchGroupRow;
         })(SketchRow);
         grid.SketchGroupRow = SketchGroupRow;
+        /** @ignore */
         var SketchTable = (function () {
             function SketchTable() {
                 this._table = [];
@@ -4993,7 +5117,10 @@ var wijmo;
                 this._table.splice(this._table.length - count, count);
             };
             SketchTable.prototype.replace = function (index, row) {
-                this._table.splice(index, 1, row);
+                var oldRows = this._table.splice(index, 1, row);
+                if(oldRows && oldRows.length && row) {
+                    row.extInfo = oldRows[0].extInfo;
+                }
             };
             SketchTable.prototype.updateIndexes = function () {
                 for(var i = 0; i < this._table.length; i++) {
@@ -5011,6 +5138,7 @@ var wijmo;
             return SketchTable;
         })();
         grid.SketchTable = SketchTable;
+        /** @ignore */
         var LazySketchTable = (function (_super) {
             __extends(LazySketchTable, _super);
             function LazySketchTable(source) {
@@ -5469,6 +5597,16 @@ var wijmo;
             c1field.prototype._postset_dataParser = function (value, oldValue) {
                 this._owner().ensureControl(false);
             };
+            c1field.prototype._postset_disabled = function (value, oldValue) {
+                if(this.$filterEditor) {
+                    $.each(this.$filterEditor.data(), function (key, widget) {
+                        // update the disabled option of the filter editor
+                        if(widget && widget.widgetName && widget.option) {
+                            widget.option("disabled", value);
+                        }
+                    });
+                }
+            };
             c1field.prototype._postset_dataFormatString = function (value, oldValue) {
                 this._owner().ensureControl(false);
             };
@@ -5586,8 +5724,20 @@ var wijmo;
 
                             }
                             return 2;
-                        })(this.options.dataFormatString)
+                        })(this.options.dataFormatString),
+                        imeMode: this.options.imeMode,
+                        triggerMouseUp: function (e) {
+                            if(wijgrid) {
+                                $.each(wijgrid.columns(), function (index, wijInstance) {
+                                    if(wijInstance.$dropDownFilterList) {
+                                        // close the dropdown list
+                                        wijInstance._removeDropDownFilterList();
+                                    }
+                                });
+                            }
+                        }
                     };
+                    this.$filterEditor.bind("keypress." + this.widgetName, $.proxy(this._onFilterEditorKeyPress, this));
                     // create editor
                     switch(editorType = this._getInputEditorType(this.options)) {
                         case "date":
@@ -5603,9 +5753,9 @@ var wijmo;
                             }
                             break;
                         case "text":
-                            this.$filterEditor.wijinputtext({
+                            this.$filterEditor.wijinputtext($.extend(editorOptions, {
                                 text: dataValue + ""
-                            });
+                            }));
                             break;
                         case "numberCurrency":
                             this.$filterEditor.wijinputnumber($.extend(editorOptions, {
@@ -5652,17 +5802,21 @@ var wijmo;
                         }
                     }).bind("mousedown." + this.widgetName, {
                         column: this
-                    }, this._onFilterBtnClick).bind("click." + this.widgetName, function (e) {
+                    }, $.proxy(this._onFilterBtnClick, this)).bind("click." + this.widgetName, function (e) {
                         e.preventDefault();
                     })// prevent # being added to url.
                     ;
                 }
             };
             c1field.prototype._createHtmlEditor = function (input, inputType, value) {
-                return input.wrap("<span class=\"" + wijmo.grid.wijgrid.CSS.filterNativeHtmlEditorWrapper + " " + this._owner().options.wijCSS.wijgridFilterNativeHtmlEditorWrapper + "\"></span").attr("type", inputType).val(value);
+                var defCSS = wijmo.grid.wijgrid.CSS, wijCSS = this._owner().options.wijCSS;
+                (input[0]).type = inputType// use it instead of .attr("type", inputType) to avoid the "'type' property/attribute cannot be changed." exception.
+                ;
+                return input.addClass(wijCSS.stateDefault).wrap("<span class=\"" + defCSS.filterNativeHtmlEditorWrapper + " " + wijCSS.wijgridFilterNativeHtmlEditorWrapper + "\"></span").val(value);
             };
             c1field.prototype._onFilterBtnClick = function (e) {
-                var column = e.data.column, maxItemsCount = 8, wijgrid = column._owner(), filterOpLowerCase, applicableFilters, args, items, key, operator, width, eventUID, inputType = wijmo.grid.HTML5InputSupport.getDefaultInputType(wijgrid._isMobileEnv(), column.options);
+                var _this = this;
+                var column = e.data.column, maxItemsCount = 8, wijgrid = column._owner(), filterOpLowerCase, applicableFilters, args, items, width, eventUID;
                 if(column.options.disabled) {
                     return false;
                 }
@@ -5671,7 +5825,7 @@ var wijmo;
                     column._removeDropDownFilterList();
                     return false;
                 }
-                e.target.focus()//TFS #24253: In IE9, wijgrid is distorted on opening filter drop-down in a scrollable grid
+                (e.target).focus()//TFS #24253: In IE9, wijgrid is distorted on opening filter drop-down in a scrollable grid
                 ;
                 filterOpLowerCase = wijmo.grid.filterHelper.getSingleOperatorName(column.options.filterOperator).toLowerCase();
                 applicableFilters = wijgrid.getFilterOperatorsByDataType(wijmo.grid.getDataType(column.options));
@@ -5694,36 +5848,10 @@ var wijmo;
                 column.$dropDownFilterList = $("<div />").addClass(wijmo.grid.wijgrid.CSS.filterList + " " + wijgrid.options.wijCSS.wijgridFilterList).appendTo(document.body).wijlist({
                     autoSize: true,
                     maxItemsCount: maxItemsCount,
-                    selected: function (data, arg) {
-                        var filterValue, editorType;
-                        switch(editorType = column._getInputEditorType(column.options)) {
-                            case "date":
-                                if(inputType === "text") {
-                                    filterValue = column.$filterEditor.wijinputdate("option", "date") || new Date()// current date
-                                    ;
-                                } else {
-                                    filterValue = wijmo.grid.HTML5InputSupport.parse(column.$filterEditor.val(), inputType) || new Date();
-                                }
-                                break;
-                            case "text":
-                                filterValue = column.$filterEditor.wijinputtext("option", "text");
-                                break;
-                            case "numberNumber":
-                                if(inputType !== "text") {
-                                    filterValue = wijmo.grid.HTML5InputSupport.parse(column.$filterEditor.val(), inputType) || 0;
-                                    break;
-                                }
-                                // fall through
-                                                            case "numberCurrency":
-                            case "numberPercent":
-                                filterValue = column.$filterEditor.wijinputnumber("option", "value");
-                                if(editorType === "numberPercent") {
-                                    filterValue /= 100;
-                                }
-                                break;
-                        }
+                    selected: function (e, data) {
+                        var filterValue = _this._getFilterValueFromEditor(column);
                         column._removeDropDownFilterList();
-                        wijgrid._handleFilter(column, arg.item.value, filterValue);
+                        wijgrid._handleFilter(column, data.item.value, filterValue);
                     }
                 });
                 // ** zIndex
@@ -5733,15 +5861,33 @@ var wijmo;
                 column.$dropDownFilterList.wijlist("setItems", items).wijlist("renderList");
                 width = column.$dropDownFilterList.width() | 150;
                 column.$dropDownFilterList.width(items.length > maxItemsCount ? width + 20 : width).wijlist("refreshSuperPanel").position({
-                    of: $(this),
+                    of: $(e.currentTarget),
                     my: "left top",
                     at: "left bottom"
                 });
-                (column.$dropDownFilterList).$button = $(this);
+                (column.$dropDownFilterList).$button = $(e.currentTarget);
                 eventUID = (column.$dropDownFilterList).eventUID = wijmo.grid.getUID();
                 $(document).bind("mousedown." + column.widgetName + "." + eventUID, {
                     column: column
                 }, column._onDocMouseDown);
+            };
+            c1field.prototype._onFilterEditorKeyPress = function (e) {
+                if(e && (e.which === 13)) {
+                    //if (e && (e.which === wijmo.getKeyCodeEnum().ENTER))
+                                        var wijgrid = this._owner(), filterValue = this._getFilterValueFromEditor(this), filterOperator = (this.options.filterOperator || "").toLowerCase();
+                    if(!filterValue) {
+                        // empty value - reset filtering
+                        filterValue = undefined;
+                        filterOperator = "nofilter";
+                    } else {
+                        if(!filterOperator || (filterOperator === "nofilter")) {
+                            // no filter operator - use default
+                            filterOperator = (wijmo.grid.getDataType(this.options) === "string") ? "contains" : "equals";
+                        }
+                    }
+                    this._removeDropDownFilterList();
+                    wijgrid._handleFilter(this, filterOperator, filterValue);
+                }
             };
             c1field.prototype._onDocMouseDown = function (e) {
                 var $target = $(e.target), defCSS = wijmo.grid.wijgrid.CSS, $filterList = $target.parents("." + defCSS.filterList + ":first"), $filterButton = $target.is("." + defCSS.filterTrigger) ? $target : $target.parents("." + defCSS.filterTrigger + ":first");
@@ -5781,6 +5927,35 @@ var wijmo;
                     default:
                         return "text";
                 }
+            };
+            c1field.prototype._getFilterValueFromEditor = function (column) {
+                var wijgrid = column._owner(), inputType = wijmo.grid.HTML5InputSupport.getDefaultInputType(wijgrid._isMobileEnv(), column.options), filterValue;
+                switch(column._getInputEditorType(column.options)) {
+                    case "date":
+                        if(inputType === "text") {
+                            filterValue = column.$filterEditor.wijinputdate("option", "date") || new Date()// current date
+                            ;
+                        } else {
+                            filterValue = wijmo.grid.HTML5InputSupport.parse(column.$filterEditor.val(), inputType) || new Date();
+                        }
+                        break;
+                    case "text":
+                        filterValue = column.$filterEditor.wijinputtext("option", "text");
+                        break;
+                    case "numberNumber":
+                        if(inputType !== "text") {
+                            filterValue = wijmo.grid.HTML5InputSupport.parse(column.$filterEditor.val(), inputType) || 0;
+                            break;
+                        }
+                        // fall through
+                                            case "numberCurrency":
+                        filterValue = column.$filterEditor.wijinputnumber("option", "value");
+                        break;
+                    case "numberPercent":
+                        filterValue = column.$filterEditor.wijinputnumber("option", "value") / 100;
+                        break;
+                }
+                return filterValue;
             };
             return c1field;
         })(grid.c1basefield);
@@ -5829,17 +6004,6 @@ var wijmo;
                 * "boolean": if using built-in parser only "true" and "false" (case-insensitive) values are acceptable, also "&nbsp;", "" and nullString which are considered as null. Any other value throws an exception.
                 */
                 this.dataType = undefined;
-                /**
-                * Determines the type of html editor for filter and cells.
-                * Possible values are: "number", "date", "datetime", "datetime-local", "month", "time", "text".
-                * @example
-                * $("#element").wijgrid({ columns: [{ inputType: "text" }]});
-                * @remarks
-                * If the value is set then input type element is used with "type" attribute set to the value. If the value is not set then:
-                *  - in desktop environment a "text" input element is used as the editor.
-                *  - in mobile environment a "number" input element is used for columns having "number" and "currency" dataType; for columns where dataType = "datetime" a "datetime" input element is used, otherwise a "text" input element is shown.
-                */
-                this.inputType = undefined;
                 /** Data converter that is able to translate values from a string representation to column data type and back.
                 * @example
                 * var myBoolParser = {
@@ -5886,6 +6050,20 @@ var wijmo;
                 * Please see the https://github.com/jquery/globalize for a full explanation and additional values.
                 */
                 this.dataFormatString = undefined;
+                /** A value indicating whether data values are HTML-encoded before they are displayed in a cell.
+                * @example
+                * $("#element").wijgrid({
+                *		data: [
+                *			[0, "<b>value</b>"],
+                *			[1, "&amp;"],
+                *		],
+                *		columns: [
+                *			{ headerText: "ID" },
+                *			{ headerText: "Value", encodeHtml: true }
+                *		]
+                * });
+                */
+                this.encodeHtml = false;
                 /** An operations set for filtering. Must be either one of the embedded operators or custom filter operator.
                 * Operator names are case insensitive.
                 *
@@ -5964,65 +6142,34 @@ var wijmo;
                     undefined,
                     groupSingleRow: // infrastructure
                     true,
-                    collapsedImageClass: /** Determines the CSS used to show collapsed nodes on the grid.
-                    * @default "ui-icon-triangle-1-e".
-                    * @example
-                    * $("#element").wijgrid({ columns: [{ groupInfo: { collapsedImageClass: "myClass" }}] });
-                    */
-                    undefined,
+                    collapsedImageClass: undefined,
                     expandedImageClass: /*$.wijmo.wijCSS.iconArrowRight*/
-                    /** Determines the CSS used to show expanded nodes on the grid.
-                    * @default "ui-icon-triangle-1-se".
-                    * @example
-                    * $("#element").wijgrid({ columns: [{ groupInfo: { expandedImageClass: "myClass" }}] });
-                    */
                     undefined,
                     position: /*$.wijmo.wijCSS.iconArrowRightDown*/
-                    /** Determines whether the grid should insert group header and/or group footer rows for this column.  Possible values are: "none", "header", "footer", "headerAndFooter".
-                    * @example
-                    * $("#element").wijgrid({ columns: [{ groupInfo: { position: "header" }}] });
-                    * @remarks
-                    * Possible values are:
-                    * "none": disables grouping for the column.
-                    * "header": inserts header rows.
-                    * "footer": inserts footer rows.
-                    * "headerAndFooter": inserts header and footer rows.
-                    */
                     "none",
-                    outlineMode: /** Determines whether the user will be able to collapse and expand the groups by clicking on the group headers, and also determines whether groups will be initially collapsed or expanded.
-                    * Possible values are: "none", "startCollapsed", "startExpanded".
-                    * @example
-                    * $("#element").wijgrid({ columns: [{ groupInfo: { outlineMode: "startExpanded" }}] });
-                    * @remarks
-                    * Possible values are:
-                    * "none": disables collapsing and expanding.
-                    * "startCollapsed": groups are initially collapsed.
-                    * "startExpanded": groups are initially expanded.
-                    */
-                    "startExpanded",
-                    headerText: /** Determines the text that is displayed in the group header rows.
-                    * @example
-                    * $("#element").wijgrid({ columns: [{ groupInfo: { headerText: "{1}: {0}" }}] });
-                    * @remarks
-                    * The text may include up to three placeholders:
-                    * "{0}" is replaced with the value being grouped on.
-                    * "{1}" is replaced with the group's column header.
-                    * "{2}" is replaced with the aggregate
-                    * The text may be set to "custom". Doing so causes the grid groupText event to be raised when processing a grouped header.
-                    */
-                    undefined,
-                    footerText: /** Determines the text that is displayed in the group footer rows.
-                    * @example
-                    * $("#element").wijgrid({ columns: [{ groupInfo: { footerText: "{1}: {0}" }}] });
-                    * @remarks
-                    * The text may include up to three placeholders:
-                    * "{0}" is replaced with the value being grouped on.
-                    * "{1}" is replaced with the group's column header.
-                    * "{2}" is replaced with the aggregate
-                    * The text may be set to "custom". Doing so causes the grid groupText event to be raised when processing a grouped footer.
-                    */
-                    undefined
+                    outlineMode: "startExpanded",
+                    headerText: undefined,
+                    footerText: undefined
                 };
+                /**
+                * Controls the state of the input method editor for text fields.
+                * Possible values are: "auto", "active", "inactive", "disabled".
+                * Please refer to https://developer.mozilla.org/en-US/docs/Web/CSS/ime-mode for more info.
+                * @example
+                * $("#element").wijgrid({ columns: [{ imeMode: "auto" }]});
+                */
+                this.imeMode = "auto";
+                /**
+                * Determines the type of html editor for filter and cells.
+                * Possible values are: "number", "date", "datetime", "datetime-local", "month", "time", "text".
+                * @example
+                * $("#element").wijgrid({ columns: [{ inputType: "text" }]});
+                * @remarks
+                * If the value is set then input type element is used with "type" attribute set to the value. If the value is not set then:
+                *  - in desktop environment a "text" input element is used as the editor.
+                *  - in mobile environment a "number" input element is used for columns having "number" and "currency" dataType; for columns where dataType = "datetime" a "datetime" input element is used, otherwise a "text" input element is shown.
+                */
+                this.inputType = undefined;
                 /** A value indicating whether the cells in the column can be edited.
                 * @example
                 * $("#element").wijgrid({ columns: [ { readOnly: false } ] });
@@ -6311,7 +6458,7 @@ var wijmo;
             wijMobileCSS: {
                 header: "ui-header ui-bar-a",
                 content: "ui-body-c",
-                stateDefault: "ui-btn-up-c",
+                stateDefault: "ui-btn ui-btn-b",
                 stateHover: "ui-btn-down-c",
                 stateActive: "ui-btn-down-c"
             },
@@ -6368,106 +6515,195 @@ var __extends = this.__extends || function (d, b) {
 };
 var wijmo;
 (function (wijmo) {
+    /// <reference path="../../../Base/jquery.wijmo.widget.ts"/>
     /// <reference path="interfaces.ts"/>
     (function (grid) {
         "use strict";
         var $ = jQuery;
         /** @ignore */
-        var wijgridCommandButtonBase = (function () {
-            function wijgridCommandButtonBase(settings) {
-                var self = this;
-                this.mSettings = $.extend(true, {
-                }, settings);
-                this.mElement = this._createButton(settings).addClass("wijmo-wijgrid-commandbutton").click(function (e) {
-                    if(!self.mSettings.disabled && $.isFunction(self.mSettings.click)) {
-                        self.mSettings.click.call(self, e);
+        var wijgridcommandbuttonbase = (function (_super) {
+            __extends(wijgridcommandbuttonbase, _super);
+            function wijgridcommandbuttonbase() {
+                _super.apply(this, arguments);
+
+            }
+            wijgridcommandbuttonbase.prototype._create = function () {
+                wijmo.grid.widgetName(this.element[0], this.widgetFullName);
+                this.element.css("display", "inline").addClass((this.options).wijCSS.widget);
+            };
+            wijgridcommandbuttonbase.prototype._destroy = function () {
+                this.mBtnElement = null;
+            };
+            wijgridcommandbuttonbase.prototype._init = function () {
+                var _this = this;
+                this.mBtnElement = this._createElement(this.options).addClass("wijmo-wijgrid-commandbutton").click(function (e) {
+                    if(!_this.options.disabled && $.isFunction(_this.options.click)) {
+                        _this.options.click.call(self, e);
                     }
                 });
-            }
-            wijgridCommandButtonBase.prototype._createButton = function (settings) {
+                this.element.append(this.mBtnElement);
+                this._attachWidget(this.mBtnElement, this.options);
+            };
+            wijgridcommandbuttonbase.prototype._setOption = function (key, value) {
+                var oldValue = this.options[key];
+                _super.prototype._setOption.apply(this, [
+                    key,
+                    value
+                ]);
+                if((oldValue !== value) && (key === "disabled")) {
+                    this._onDisabledChanged(value === true);
+                }
+            };
+            wijgridcommandbuttonbase.prototype._createElement = function (settings) {
                 throw "not implemented";
             };
-            wijgridCommandButtonBase.prototype.element = function () {
-                return this.mElement;
+            wijgridcommandbuttonbase.prototype._attachWidget = function (element, settings) {
+                throw "not implemented";
             };
-            return wijgridCommandButtonBase;
-        })();
-        grid.wijgridCommandButtonBase = wijgridCommandButtonBase;
+            wijgridcommandbuttonbase.prototype._btnElement = function () {
+                return this.mBtnElement;
+            };
+            wijgridcommandbuttonbase.prototype._onDisabledChanged = function (value) {
+            };
+            return wijgridcommandbuttonbase;
+        })(wijmo.wijmoWidget);
+        grid.wijgridcommandbuttonbase = wijgridcommandbuttonbase;
         /** @ignore */
-        var wijgridCommandLink = (function (_super) {
-            __extends(wijgridCommandLink, _super);
-            function wijgridCommandLink(settings) {
-                        _super.call(this, settings);
+        var wijgridcommandbuttonbase_options = (function () {
+            function wijgridcommandbuttonbase_options() {
+                this.text = undefined;
+                this.click = undefined;
+                this.iconClass = undefined;
+                this.disabled = false;
             }
-            wijgridCommandLink.prototype._createButton = function (settings) {
+            return wijgridcommandbuttonbase_options;
+        })();
+        grid.wijgridcommandbuttonbase_options = wijgridcommandbuttonbase_options;
+        wijgridcommandbuttonbase.prototype.options = wijmo.grid.extendWidgetOptions(wijmo.wijmoWidget.prototype.options, new wijgridcommandbuttonbase_options());
+        $.wijmo.registerWidget("wijgridcommandbuttonbase", wijgridcommandbuttonbase.prototype);
+        /** @ignore */
+        var wijgridcommandlink = (function (_super) {
+            __extends(wijgridcommandlink, _super);
+            function wijgridcommandlink() {
+                _super.apply(this, arguments);
+
+            }
+            wijgridcommandlink.prototype._createElement = function (settings) {
                 var anchor = $("<a href=\"#\" />").text(settings.text || "");
                 if(settings.disabled) {
                     anchor.prop("disabled", "disabled");
                 }
                 return anchor;
             };
-            return wijgridCommandLink;
-        })(wijgridCommandButtonBase);
-        grid.wijgridCommandLink = wijgridCommandLink;
+            wijgridcommandlink.prototype._attachWidget = function (element, settings) {
+            };
+            wijgridcommandlink.prototype._onDisabledChanged = function (value) {
+                var btn = this._btnElement();
+                if(btn) {
+                    btn.prop("disabled", value);
+                }
+            };
+            return wijgridcommandlink;
+        })(wijgridcommandbuttonbase);
+        grid.wijgridcommandlink = wijgridcommandlink;
+        $.wijmo.registerWidget("wijgridcommandlink", $.wijmo.wijgridcommandbuttonbase, wijgridcommandlink.prototype);
         /** @ignore */
-        var wijgridCommandButton = (function (_super) {
-            __extends(wijgridCommandButton, _super);
-            function wijgridCommandButton(settings) {
-                        _super.call(this, settings);
+        var wijgridcommandbutton = (function (_super) {
+            __extends(wijgridcommandbutton, _super);
+            function wijgridcommandbutton() {
+                _super.apply(this, arguments);
+
             }
-            wijgridCommandButton.prototype._createButton = function (settings) {
-                var button = $("<input type=\"button\" />").val(settings.text).button({
+            wijgridcommandbutton.prototype._createElement = function (settings) {
+                return $("<input type=\"button\" />").val(settings.text);
+            };
+            wijgridcommandbutton.prototype._attachWidget = function (element, settings) {
+                element.button({
                     disabled: settings.disabled
                 });
-                return button;
             };
-            return wijgridCommandButton;
-        })(wijgridCommandButtonBase);
-        grid.wijgridCommandButton = wijgridCommandButton;
+            wijgridcommandbutton.prototype._onDisabledChanged = function (value) {
+                var btn = this._btnElement();
+                if(btn) {
+                    btn.button({
+                        disabled: value
+                    });
+                }
+            };
+            return wijgridcommandbutton;
+        })(wijgridcommandbuttonbase);
+        grid.wijgridcommandbutton = wijgridcommandbutton;
+        $.wijmo.registerWidget("wijgridcommandbutton", $.wijmo.wijgridcommandbuttonbase, wijgridcommandbutton.prototype);
         /** @ignore */
-        var wijgridCommandImageButton = (function (_super) {
-            __extends(wijgridCommandImageButton, _super);
-            function wijgridCommandImageButton(settings) {
-                        _super.call(this, settings);
+        var wijgridcommandimagebutton = (function (_super) {
+            __extends(wijgridcommandimagebutton, _super);
+            function wijgridcommandimagebutton() {
+                _super.apply(this, arguments);
+
             }
-            wijgridCommandImageButton.prototype._createButton = function (settings) {
+            wijgridcommandimagebutton.prototype._createElement = function (settings) {
                 var button = $("<button />"), hasText = !!settings.text;
                 if(hasText) {
                     button.text(settings.text);
                 } else {
                     button.html("&nbsp;");
                 }
-                button.button({
+                return button;
+            };
+            wijgridcommandimagebutton.prototype._attachWidget = function (element, settings) {
+                var hasText = !!settings.text;
+                element.button({
                     disabled: settings.disabled,
                     icons: {
                         primary: settings.iconClass
                     },
                     text: hasText
                 });
+            };
+            wijgridcommandimagebutton.prototype._onDisabledChanged = function (value) {
+                var btn = this._btnElement();
+                if(btn) {
+                    btn.button({
+                        disabled: value
+                    });
+                }
+            };
+            return wijgridcommandimagebutton;
+        })(wijgridcommandbuttonbase);
+        grid.wijgridcommandimagebutton = wijgridcommandimagebutton;
+        $.wijmo.registerWidget("wijgridcommandimagebutton", $.wijmo.wijgridcommandbuttonbase, wijgridcommandimagebutton.prototype);
+        /** @ignore */
+        var wijgridcommandimage = (function (_super) {
+            __extends(wijgridcommandimage, _super);
+            function wijgridcommandimage() {
+                _super.apply(this, arguments);
+
+            }
+            wijgridcommandimage.prototype._createElement = function (settings) {
+                var button = $("<button />").html("&nbsp;");
                 return button;
             };
-            return wijgridCommandImageButton;
-        })(wijgridCommandButtonBase);
-        grid.wijgridCommandImageButton = wijgridCommandImageButton;
-        /** @ignore */
-        var wijgridCommandImage = (function (_super) {
-            __extends(wijgridCommandImage, _super);
-            function wijgridCommandImage(settings) {
-                        _super.call(this, settings);
-            }
-            wijgridCommandImage.prototype._createButton = function (settings) {
-                var button = $("<button />").html("&nbsp;").button({
+            wijgridcommandimage.prototype._attachWidget = function (element, settings) {
+                element.button({
                     disabled: settings.disabled,
                     icons: {
                         primary: settings.iconClass
                     },
                     text: false
                 });
-                return button;
             };
-            return wijgridCommandImage;
-        })(wijgridCommandButtonBase);
-        grid.wijgridCommandImage = wijgridCommandImage;
+            wijgridcommandimage.prototype._onDisabledChanged = function (value) {
+                var btn = this._btnElement();
+                if(btn) {
+                    btn.button({
+                        disabled: value
+                    });
+                }
+            };
+            return wijgridcommandimage;
+        })(wijgridcommandbuttonbase);
+        grid.wijgridcommandimage = wijgridcommandimage;
+        $.wijmo.registerWidget("wijgridcommandimage", $.wijmo.wijgridcommandbuttonbase, wijgridcommandimage.prototype);
     })(wijmo.grid || (wijmo.grid = {}));
     var grid = wijmo.grid;
 })(wijmo || (wijmo = {}));
@@ -6831,7 +7067,17 @@ var wijmo;
             return bandProcessor;
         })();
         grid.bandProcessor = bandProcessor;
-        /// returns both visible and invisible leaves.
+        /** @ignore */
+        function flatten(columns) {
+            var result = [];
+            wijmo.grid.traverse(columns, function (column) {
+                result.push(column);
+            });
+            return result;
+        }
+        grid.flatten = flatten;
+        // returns both visible and invisible leaves.
+        /** @ignore */
         function getAllLeaves(columns) {
             var leaves = [];
             _getAllLeaves(columns, leaves);
@@ -6857,6 +7103,7 @@ var wijmo;
             }
         }
         // returns null or { found (object), at (array) } object.
+        /** @ignore */
         function getColumnByTravIdx(columns, travIdx) {
             var i, len, column, result = null;
             if(columns && travIdx >= 0) {
@@ -6880,6 +7127,40 @@ var wijmo;
             return result;
         }
         grid.getColumnByTravIdx = getColumnByTravIdx;
+        /** @ignore */
+        function getLeaves(columns) {
+            var leaves = [];
+            _getLeaves(columns, leaves);
+            return leaves;
+        }
+        grid.getLeaves = getLeaves;
+        function _getLeaves(columns, leaves) {
+            var i, len, column;
+            if(columns) {
+                for(i = 0 , len = columns.length; i < len; i++) {
+                    column = columns[i];
+                    if(column.isLeaf) {
+                        leaves.push(column);
+                    }
+                    if(column.columns) {
+                        _getLeaves(column.columns, leaves);
+                    }
+                }
+            }
+        }
+        /** @ignore */
+        function getTompostParent(column, allColumnsTraverseList) {
+            if(!column || !allColumnsTraverseList || (column.parentIdx === -1)) {
+                return null;
+            }
+            var parent = allColumnsTraverseList[column.parentIdx];
+            if(parent.parentIdx === -1) {
+                return parent;
+            }
+            return wijmo.grid.getTompostParent(parent, allColumnsTraverseList);
+        }
+        grid.getTompostParent = getTompostParent;
+        /** @ignore */
         function isChildOf(columns, child, parent) {
             if(child.options) {
                 child = child.options;
@@ -6907,26 +7188,7 @@ var wijmo;
             return false;
         }
         grid.isChildOf = isChildOf;
-        function getLeaves(columns) {
-            var leaves = [];
-            _getLeaves(columns, leaves);
-            return leaves;
-        }
-        grid.getLeaves = getLeaves;
-        function _getLeaves(columns, leaves) {
-            var i, len, column;
-            if(columns) {
-                for(i = 0 , len = columns.length; i < len; i++) {
-                    column = columns[i];
-                    if(column.isLeaf) {
-                        leaves.push(column);
-                    }
-                    if(column.columns) {
-                        _getLeaves(column.columns, leaves);
-                    }
-                }
-            }
-        }
+        /** @ignore */
         function setTraverseIndex(columns) {
             return _setTraverseIndex(columns, 0, -1);// -> columns length
 
@@ -6951,15 +7213,8 @@ var wijmo;
             }
             return idx;
         }
-        function flatten(columns) {
-            var result = [];
-            wijmo.grid.traverse(columns, function (column) {
-                result.push(column);
-            });
-            return result;
-        }
-        grid.flatten = flatten;
-                        function traverse(columns, callback) {
+                        /** @ignore */
+        function traverse(columns, callback) {
             var i, len, column;
             if(columns && ($.isFunction(callback))) {
                 for(i = 0; i < columns.length; i++) {
@@ -7492,6 +7747,7 @@ var wijmo;
 (function (wijmo) {
     /// <reference path="../../../data/src/dataView.ts"/>
     /// <reference path="../data/dataViewAdapter.ts"/>
+    /// <reference path="../data/koDataView.ts"/>
     /// <reference path="interfaces.ts"/>
     /// <reference path="misc.ts"/>
     /// <reference path="wijgrid.ts"/>
@@ -7515,6 +7771,7 @@ var wijmo;
                 this._toDispose = [];
                 this._isOwnDataView = false;
                 this._isWijdatasource = false;
+                this._isKODataView = false;
                 this._isDynamicWijdatasource = false;
                 this._wijgrid = wijgrid;
                 this._createDataViewWrapper()// set _dataView
@@ -7603,6 +7860,26 @@ var wijmo;
                     if(this._isWijdatasource && !this._isDynamicWijdatasource && dataView.isLoaded()) {
                         local = true;
                     }
+                    // ** ensure pageIndex
+                                        var pagedDataView = wijmo.grid.asPagedDataView(dataView), totalItems = -1;
+                    // if paging is enabled and dataView provides totalItemCount then ensure that pageIndex is within[0; pageCount) range.
+                    if(pagedDataView && (loadParams.pageSize >= 0) && ((totalItems = pagedDataView.totalItemCount()) >= 0)) {
+                        // ** 47731: handle situation when underlying array was changed directly by user.
+                        if(this._isOwnDataView && !this._isKODataView && (pagedDataView.pageSize() > 0)) {
+                            // test if dataView is paged already
+                            var source = pagedDataView.getSource();
+                            if(source && (source.length < /*!==*/ totalItems)) {
+                                totalItems = source.length;
+                            }
+                        }
+                        // 47731 **
+                                                var pageCount = Math.ceil(totalItems / loadParams.pageSize) || 1, pageIndex = loadParams.pageIndex;
+                        if(pageIndex >= pageCount) {
+                            pageIndex = Math.max(0, pageCount - 1);
+                        }
+                        loadParams.pageIndex = pageIndex;
+                    }
+                    // ensure pageIndex **
                     this.ignoreCurrentChangedEvent(true)// The currentPositionChanged event fires before the change event, stop listening. Listening will  be restored in the _onDataViewReset method.
                     ;
                     dataView.refresh(loadParams, local);
@@ -7662,11 +7939,12 @@ var wijmo;
                     data = this._domSource.items;
                 }
                 isWijdatasource = (typeof (wijdatasource) !== "undefined" && (data instanceof wijdatasource));
-                this._isOwnDataView = ($.isArray(data) || isWijdatasource);
+                this._isKODataView = data instanceof wijmo.grid.koDataView;
+                this._isOwnDataView = ($.isArray(data) || isWijdatasource || this._isKODataView);
                 this._isWijdatasource = !!(this._isOwnDataView && isWijdatasource);
                 //this._isRemoteWijdatasource = !!(this._isOwnDataView && isWijdatasource && data.proxy);
                 this._isDynamicWijdatasource = !!(this._isOwnDataView && isWijdatasource && data.dynamic);
-                if(this._isOwnDataView) {
+                if(this._isOwnDataView && !this._isKODataView) {
                     if(!this._domSource && this._wijgrid.options.readAttributesFromData) {
                         this._moveAttributesToExpando(data);
                     }
@@ -7799,7 +8077,8 @@ var wijmo;
                     ;
                     this.makeDirty()// force to recreate  the _totals and _sharedDataItems fields when the this.data() method will be called.
                     ;
-                    this._wijgrid._onDataViewReset(this._userData);
+                    this._wijgrid._onDataViewReset(this._userData, this._isKODataView)// 47851: recreate columns each time if koDataView is used to handle situation when observable array value was changed completely: viewModel.property([]) -> viewModel.property([a, b, c]).
+                    ;
                 }finally {
                     this._userData = null;
                 }
@@ -8046,6 +8325,7 @@ var wijmo;
 
 var wijmo;
 (function (wijmo) {
+    /// <reference path="../../../wijutil/jquery.wijmo.wijutil.ts" />
     /// <reference path="interfaces.ts"/>
     /// <reference path="merger.ts"/>
     /// <reference path="wijgrid.ts"/>
@@ -8058,9 +8338,8 @@ var wijmo;
             function groupRange(expanded, range, sum, position, hasHeaderOrFooter) {
                 this.cr = new wijmo.grid.cellRange(-1, -1);
                 this.isExpanded = false;
-                this._value = -1;
+                this.position = "none";
                 this._sum = -1;
-                this._position = "none";
                 this._hasHeaderOrFooter = true;
                 if(expanded !== undefined) {
                     this.isExpanded = expanded;
@@ -8072,7 +8351,7 @@ var wijmo;
                     this._sum = sum;
                 }
                 if(position !== undefined) {
-                    this._position = position;
+                    this.position = position;
                 }
                 if(hasHeaderOrFooter !== undefined) {
                     this._hasHeaderOrFooter = hasHeaderOrFooter;
@@ -8083,14 +8362,6 @@ var wijmo;
             };
             groupRange.prototype.toString = function () {
                 return this.cr.r1 + "-" + this.cr.r2;
-            };
-            groupRange.prototype.getHeaderImageClass = function (expanded) {
-                var groupInfo, column, grid, result = null;
-                if((groupInfo = this.owner) && (column = groupInfo.owner) && (grid = column.owner)) {
-                    var wijCSS = grid.options.wijCSS;
-                    result = expanded ? groupInfo.expandedImageClass || wijCSS.iconArrowRightDown : groupInfo.collapsedImageClass || wijCSS.iconArrowRight;
-                }
-                return result;
             };
             groupRange.prototype.collapse = function () {
                 var groupInfo, column, grid, leaves, groupedColumnsCnt;
@@ -8121,41 +8392,36 @@ var wijmo;
                 switch(groupInfo.position) {
                     case "header":
                     case "headerAndFooter":
-                        this._toggleSketchRowVisibility(grid.sketchTable.row(groupRange.cr.r1), undefined);
+                        this._toggleSketchRowVisibility(grid.sketchTable.row(groupRange.cr.r1), undefined, false);
                         if(!virtualScrollingEnabled) {
-                            this._toggleRowVisibility(rowAccessor.item(groupRange.cr.r1), undefined, false);
+                            this._toggleRowVisibility(grid, rowAccessor.item(groupRange.cr.r1), undefined, false);
                         }
                         dataStart++;
                         break;
                 }
                 // hide child rows
                 for(i = dataStart; i <= dataEnd; i++) {
-                    this._toggleSketchRowVisibility(grid.sketchTable.row(i), false);
+                    this._toggleSketchRowVisibility(grid.sketchTable.row(i), false, undefined);
                     if(!virtualScrollingEnabled) {
-                        this._toggleRowVisibility(rowAccessor.item(i), false);
+                        this._toggleRowVisibility(grid, rowAccessor.item(i), false, undefined);
                     }
                 }
                 // update isExpanded property
                 groupRange.isExpanded = false;
-                if(!virtualScrollingEnabled) {
-                    this._updateHeaderIcon(rowAccessor, groupRange);
-                }
                 for(i = groupInfo.level + 1; i <= groupedColumnsCnt; i++) {
                     childRanges = wijmo.grid.groupHelper.getChildGroupRanges(leaves, groupRange.cr, /*groupRange.owner.level*/ i - 1);
                     for(j = 0 , len = childRanges.length; j < len; j++) {
                         childRange = childRanges[j];
                         childRange.isExpanded = false;
+                        // update groupHeader
                         switch(childRange.owner.position) {
                             case "header":
                             case "headerAndFooter":
-                                this._toggleSketchRowVisibility(grid.sketchTable.row(childRange.cr.r1), false);
+                                this._toggleSketchRowVisibility(grid.sketchTable.row(childRange.cr.r1), false, false);
                                 if(!virtualScrollingEnabled) {
-                                    this._toggleRowVisibility(rowAccessor.item(childRange.cr.r1), undefined, false);
+                                    this._toggleRowVisibility(grid, rowAccessor.item(childRange.cr.r1), false, false);
                                 }
                                 break;
-                        }
-                        if(!virtualScrollingEnabled) {
-                            this._updateHeaderIcon(rowAccessor, childRange);
                         }
                     }
                 }
@@ -8164,28 +8430,28 @@ var wijmo;
                 var groupInfo = groupRange.owner, dataStart = groupRange.cr.r1, dataEnd = groupRange.cr.r2, i, len, childRanges, childRange, childIsRoot;
                 switch(groupInfo.position) {
                     case "header":
-                        this._toggleSketchRowVisibility(grid.sketchTable.row(dataStart), true);
+                        this._toggleSketchRowVisibility(grid.sketchTable.row(dataStart), true, isRoot || expandChildren);
                         if(!virtualScrollingEnabled) {
-                            this._toggleRowVisibility(rowAccessor.item(dataStart), true, isRoot || expandChildren);
+                            this._toggleRowVisibility(grid, rowAccessor.item(dataStart), true, isRoot || expandChildren);
                         }
                         dataStart++;
                         break;
                     case "footer":
-                        this._toggleSketchRowVisibility(grid.sketchTable.row(dataEnd), true);
+                        this._toggleSketchRowVisibility(grid.sketchTable.row(dataEnd), true, undefined);
                         if(!virtualScrollingEnabled) {
-                            this._toggleRowVisibility(rowAccessor.item(dataEnd), true);
+                            this._toggleRowVisibility(grid, rowAccessor.item(dataEnd), true, undefined);
                         }
                         dataEnd--;
                         break;
                     case "headerAndFooter":
-                        this._toggleSketchRowVisibility(grid.sketchTable.row(dataStart), true);
+                        this._toggleSketchRowVisibility(grid.sketchTable.row(dataStart), true, isRoot || expandChildren);
                         if(!virtualScrollingEnabled) {
-                            this._toggleRowVisibility(rowAccessor.item(dataStart), true, isRoot || expandChildren);
+                            this._toggleRowVisibility(grid, rowAccessor.item(dataStart), true, isRoot || expandChildren);
                         }
                         if(isRoot) {
-                            this._toggleSketchRowVisibility(grid.sketchTable.row(dataEnd), true);
+                            this._toggleSketchRowVisibility(grid.sketchTable.row(dataEnd), true, undefined);
                             if(!virtualScrollingEnabled) {
-                                this._toggleRowVisibility(rowAccessor.item(dataEnd), true);
+                                this._toggleRowVisibility(grid, rowAccessor.item(dataEnd), true, undefined);
                             }
                         }
                         dataStart++;
@@ -8194,18 +8460,15 @@ var wijmo;
                 }
                 if(isRoot) {
                     groupRange.isExpanded = true;
-                    if(!virtualScrollingEnabled) {
-                        this._updateHeaderIcon(rowAccessor, groupRange);
-                    }
                 } else {
                     return;
                 }
                 if(groupRange.owner.level === groupedColumnsCnt) {
                     // show data rows
                     for(i = dataStart; i <= dataEnd; i++) {
-                        this._toggleSketchRowVisibility(grid.sketchTable.row(i), true);
+                        this._toggleSketchRowVisibility(grid.sketchTable.row(i), true, undefined);
                         if(!virtualScrollingEnabled) {
-                            this._toggleRowVisibility(rowAccessor.item(i), true);
+                            this._toggleRowVisibility(grid, rowAccessor.item(i), true, undefined);
                         }
                     }
                 } else {
@@ -8214,9 +8477,9 @@ var wijmo;
                         //
                         // a space between parent groupHeader and first child range - show single rows (groupSingleRow = false)
                         for(i = dataStart; i < childRanges[0].cr.r1; i++) {
-                            this._toggleSketchRowVisibility(grid.sketchTable.row(i), true);
+                            this._toggleSketchRowVisibility(grid.sketchTable.row(i), true, undefined);
                             if(!virtualScrollingEnabled) {
-                                this._toggleRowVisibility(rowAccessor.item(i), true);
+                                this._toggleRowVisibility(grid, rowAccessor.item(i), true, undefined);
                             }
                         }
                     }
@@ -8236,50 +8499,43 @@ var wijmo;
                     }
                 }
             };
-            groupRange.prototype._toggleRowVisibility = function (rowObj, visible, expanded) {
+            groupRange.prototype._toggleRowVisibility = function (grid, rowObj, visible, expanded) {
                 if(rowObj) {
-                    if(rowObj[0]) {
-                        if(visible !== undefined) {
-                            rowObj[0].style.display = visible ? "" : "none";
-                            rowObj[0]["aria-hidden"] = visible ? "false" : "true";
-                        }
-                        if(expanded !== undefined) {
-                            rowObj[0]["aria-expanded"] = expanded ? "true" : "false";
-                        }
-                    }
-                    if(rowObj[1]) {
-                        if(visible !== undefined) {
-                            rowObj[1].style.display = visible ? "" : "none";
-                            rowObj[1]["aria-hidden"] = visible ? "false" : "true";
-                        }
-                        if(expanded !== undefined) {
-                            rowObj[1]["aria-expanded"] = expanded ? "true" : "false";
+                    var rse = wijmo.grid.renderStateEx, view = grid._view(), rowInfo = view._getRowInfo(rowObj, false);
+                    if(visible !== undefined) {
+                        if(visible) {
+                            rowInfo._extInfo.state &= ~rse.hidden;
+                        } else {
+                            rowInfo._extInfo.state |= rse.hidden;
                         }
                     }
+                    if(expanded !== undefined) {
+                        if(expanded) {
+                            rowInfo._extInfo.state &= ~rse.collapsed;
+                        } else {
+                            rowInfo._extInfo.state |= rse.collapsed;
+                        }
+                    }
+                    view._setRowInfo(rowInfo.$rows, rowInfo);
+                    grid.rowStyleFormatter._groupFormatter(rowInfo);
                 }
             };
-            groupRange.prototype._toggleSketchRowVisibility = function (sketchRow, visible) {
-                if(sketchRow && visible !== undefined) {
-                    if(visible) {
-                        sketchRow.deleteStyle("display");
-                    } else {
-                        sketchRow.style("display", "none");
+            groupRange.prototype._toggleSketchRowVisibility = function (sketchRow, visible, expanded) {
+                if(sketchRow) {
+                    var rse = wijmo.grid.renderStateEx;
+                    if(visible !== undefined) {
+                        if(visible) {
+                            sketchRow.extInfo.state &= ~rse.hidden;
+                        } else {
+                            sketchRow.extInfo.state |= rse.hidden;
+                        }
                     }
-                }
-            };
-            groupRange.prototype._updateHeaderIcon = function (rowAccessor, groupRange) {
-                if(groupRange.owner.position !== "footer") {
-                    var rowObj = rowAccessor.item(groupRange.cr.r1);
-                    if(rowObj) {
-                        $.each(rowObj, function (i, row) {
-                            if(row) {
-                                var imageDiv = $(row).find("div." + wijmo.grid.wijgrid.CSS.groupToggleVisibilityButton);
-                                if(imageDiv && imageDiv.length) {
-                                    imageDiv.toggleClass(groupRange.getHeaderImageClass(!groupRange.isExpanded), false);
-                                    imageDiv.toggleClass(groupRange.getHeaderImageClass(groupRange.isExpanded), true);
-                                }
-                            }
-                        });
+                    if(expanded !== undefined) {
+                        if(expanded) {
+                            sketchRow.extInfo.state &= ~rse.collapsed;
+                        } else {
+                            sketchRow.extInfo.state |= rse.collapsed;
+                        }
                     }
                 }
             };
@@ -8328,7 +8584,7 @@ var wijmo;
                 });
             };
             grouper.prototype._processRowGroup = function (leaf, level) {
-                var firstVisibleLeafIdx = 0, hasHeaderOrFooter = true;
+                var firstVisibleLeafIdx = 0, hasHeaderOrFooter = true, rse = wijmo.grid.renderStateEx;
                 $.each(this._leaves, function (i, leaf) {
                     if(leaf.parentVis) {
                         firstVisibleLeafIdx = i;
@@ -8360,10 +8616,9 @@ var wijmo;
                             groupRange = this._addGroupRange(leaf.groupInfo, cellRange, isExpanded, hasHeaderOrFooter);
                             for(var i = cellRange.r1; i <= cellRange.r2; i++) {
                                 row = this._sketchTable.row(i);
-                                row.attr("aria-level", level + 1);
+                                row.extInfo.groupLevel = level + 1;
                                 if(!isExpanded) {
-                                    row.style("display", "none");
-                                    row.attr("aria-hidden", true);
+                                    row.extInfo.state |= rse.hidden;
                                 }
                             }
                             if(!hasHeaderOrFooter) {
@@ -8374,11 +8629,12 @@ var wijmo;
                             header = this._buildGroupRow(groupRange, cellRange, true, isParentCollapsed);
                             this._sketchTable.insert(cellRange.r1, header)// insert group header
                             ;
-                            header.attr("arial-level", level);
-                            header.attr("aria-expanded", isExpanded);
+                            header.extInfo.groupLevel = level;
+                            if(!isExpanded) {
+                                header.extInfo.state |= rse.collapsed;
+                            }
                             if(isParentCollapsed) {
-                                header.style("display", "none");
-                                header.attr("aria-hidden", true);
+                                header.extInfo.state |= rse.hidden;
                             }
                             rowIndex = cellRange.r2 + 1;
                             break;
@@ -8389,23 +8645,21 @@ var wijmo;
                             }
                             this._updateByGroupRange(groupRange, level);
                             footer = this._buildGroupRow(groupRange, cellRange, false, false);
-                            footer.attr("aria-level", level);
+                            footer.extInfo.groupLevel = level;
                             this._sketchTable.insert(cellRange.r2 + 1, footer);
                             rowIndex = cellRange.r2 + 1;
                             isParentCollapsed = wijmo.grid.groupHelper.isParentCollapsed(this._leaves, groupRange.cr, level);
                             if(isParentCollapsed) {
-                                footer.style("display", "none");
-                                footer.attr("aria-hidden", true);
+                                footer.extInfo.state |= rse.hidden;
                             }
                             break;
                         case "headerAndFooter":
                             groupRange = this._addGroupRange(leaf.groupInfo, cellRange, isExpanded, hasHeaderOrFooter);
                             for(i = cellRange.r1; i <= cellRange.r2; i++) {
                                 row = this._sketchTable.row(i);
-                                row.attr("aria-level", level + 1);
+                                row.extInfo.groupLevel = level + 1;
                                 if(!isExpanded) {
-                                    row.style("display", "none");
-                                    row.attr("aria-hidden", true);
+                                    row.extInfo.state |= rse.hidden;
                                 }
                             }
                             if(!hasHeaderOrFooter) {
@@ -8416,17 +8670,17 @@ var wijmo;
                             header = this._buildGroupRow(groupRange, cellRange, true, isParentCollapsed);
                             footer = this._buildGroupRow(groupRange, cellRange, false, false);
                             this._sketchTable.insert(cellRange.r2 + 1, footer);
-                            footer.attr("aria-level", level);
+                            footer.extInfo.groupLevel = level;
                             if(isParentCollapsed || !isExpanded) {
-                                footer.style("display", "none");
-                                footer.attr("aria-hidden", true);
+                                footer.extInfo.state |= rse.hidden;
                             }
                             this._sketchTable.insert(cellRange.r1, header);
-                            header.attr("aria-level", level);
-                            header.attr("aria-expanded", isExpanded);
+                            header.extInfo.groupLevel = level;
+                            if(!isExpanded) {
+                                header.extInfo.state |= rse.collapsed;
+                            }
                             if(isParentCollapsed) {
-                                footer.style("display", "none");
-                                footer.attr("aria-hidden", true);
+                                header.extInfo.state |= rse.hidden;
                             }
                             rowIndex = cellRange.r2 + 2;
                             break;
@@ -8438,9 +8692,9 @@ var wijmo;
             };
             grouper.prototype._buildGroupRow = function (groupRange, cellRange, isHeader, isParentCollapsed) {
                 //when some column is hidden, the group row is not correct.
-                                var groupInfo = groupRange.owner, leaf = groupInfo.owner, gridView = leaf.owner, id = ((isHeader) ? "GH" : "GF") + this._groupRowIdx + "-" + groupInfo.level, sketchRow = new wijmo.grid.SketchGroupRow(isHeader, {
-                    id: id
-                }), groupByValue = undefined, groupByText = "", aggregate = "", cell, tmp, cell, caption, args, span, col, bFirst, agg, defCSS = wijmo.grid.wijgrid.CSS, wijCSS = gridView.options.wijCSS;
+                                var groupInfo = groupRange.owner, leaf = groupInfo.owner, gridView = leaf.owner, sketchRow = new grid.SketchGroupRow(isHeader, null), groupByValue = undefined, groupByText = "", aggregate = "", cell, tmp, cell, caption, args, span, col, bFirst, agg, defCSS = wijmo.grid.wijgrid.CSS;
+                sketchRow.extInfo.groupIndex = this._groupRowIdx// to make a row ID.
+                ;
                 if((leaf.dataIndex >= 0) && ((groupByValue = this._sketchTable.valueAt(cellRange.r1, leaf.dataIndex)) !== null)) {
                     groupByText = gridView.toStr(leaf, groupByValue);
                 }
@@ -8449,11 +8703,7 @@ var wijmo;
                     sketchRow.add(grid.HtmlCell.nbsp());
                 }
                 // create the summary cell
-                cell = new grid.HtmlCell();
-                if(isHeader && groupInfo.outlineMode !== "none") {
-                    var icon = groupRange.getHeaderImageClass(groupRange.isExpanded);
-                    cell.html = "<div class=\"" + wijCSS.icon + " " + icon + " " + defCSS.groupToggleVisibilityButton + " " + wijCSS.wijgridGroupToggleVisibilityButton + "\">&nbsp;</div>";
-                }
+                cell = new grid.HtmlCell("", null);
                 sketchRow.add(cell);
                 // add group header text
                 if(leaf.aggregate && (leaf.aggregate !== "none")) {
@@ -8501,7 +8751,8 @@ var wijmo;
                             caption = caption ? caption + " {2}" : "{2}";
                         }
                     }
-                    caption = wijmo.grid.stringFormat(caption, groupByText, leaf && leaf.headerText ? leaf.headerText : "", aggregate.toString());
+                    caption = wijmo.grid.stringFormat(caption, leaf && leaf.encodeHtml ? wijmo.htmlEncode(groupByText) : groupByText, // wijmo.htmlEncode is dangerious
+                    leaf && leaf.headerText ? leaf.headerText : "", this._wrapAggregateValue(aggregate));
                 }
                 if(!caption) {
                     caption = "&nbsp;";
@@ -8540,7 +8791,7 @@ var wijmo;
                         if(!agg && (agg !== 0)) {
                             agg = "&nbsp;";
                         }
-                        sketchRow.add(new grid.HtmlCell(agg.toString(), {
+                        sketchRow.add(new grid.HtmlCell(this._wrapAggregateValue(agg), {
                             groupInfo: {
                                 leafIndex: // will be passed into the cellStyleFormatter
                                 tmp.leavesIdx,
@@ -8668,6 +8919,10 @@ var wijmo;
                     cellObj.ensureStyle().paddingLeft = (indent * level) + "px";
                 }
             };
+            grouper.prototype._wrapAggregateValue = function (value) {
+                return "<span class='" + wijmo.grid.wijgrid.CSS.aggregateContainer + "'>" + value.toString() + "</span>";
+                //return value.toString();
+                            };
             return grouper;
         })();
         grid.grouper = grouper;
@@ -8773,7 +9028,7 @@ var wijmo;
                 if(level === undefined) {
                     level = 0xFFFF;
                 }
-                if(level - 2 >= 0) {
+                if(cellRange && (level - 2 >= 0)) {
                     for(var i = leaves.length - 1; i >= 0; i--) {
                         var groupInfo = leaves[i].groupInfo;
                         if(!groupInfo || !groupInfo.expandInfo || (groupInfo.level < 0) || (groupInfo.level !== level - 1)) {
@@ -8794,7 +9049,10 @@ var wijmo;
                 }
                 for(var i = level; i > 1; i--) {
                     var parentGroupRange = wijmo.grid.groupHelper.getParentGroupRange(leaves, cellRange, i);
-                    if(parentGroupRange && !parentGroupRange.isExpanded) {
+                    if(!parentGroupRange) {
+                        return false;
+                    }
+                    if(!parentGroupRange.isExpanded) {
                         return true;
                     }
                     cellRange = parentGroupRange.cr;
@@ -8808,7 +9066,7 @@ var wijmo;
                 }
                 for(var i = level; i > 1; i--) {
                     var parentGroupRange = wijmo.grid.groupHelper.getParentGroupRange(leaves, cellRange, i);
-                    if(parentGroupRange && parentGroupRange.isExpanded) {
+                    if(!parentGroupRange || (parentGroupRange && parentGroupRange.isExpanded)) {
                         return true;
                     }
                     cellRange = parentGroupRange.cr;
@@ -8980,6 +9238,19 @@ var wijmo;
             renderState.editing = 16;
         })(grid.renderState || (grid.renderState = {}));
         var renderState = grid.renderState;
+        /**
+        * Infrastructure.
+        * @ignore
+        */
+        (function (renderStateEx) {
+            renderStateEx._map = [];
+            renderStateEx.none = 0;
+            renderStateEx.hidden = 1;// row is hidden
+
+            renderStateEx.collapsed = 2;
+        })(grid.renderStateEx || (grid.renderStateEx = {}));
+        var renderStateEx = grid.renderStateEx;
+        // row is collapsed (groupHeaders only)
         /**
         * Infrastructure.
         * @ignore
@@ -9253,6 +9524,7 @@ var wijmo;
             return null;
         }
         grid.bounds = bounds;
+        /** @ignore */
         function ensureBounds(bounds, max) {
             if(bounds) {
                 if(bounds.start < 0) {
@@ -9448,27 +9720,29 @@ var wijmo;
                 "month": "",
                 "time": ""
             };
+            HTML5InputSupport._supportedInputTypesCache = {
+            };
             HTML5InputSupport.isExtendSupportRequired = function isExtendSupportRequired(inputType) {
                 inputType = (inputType || "").toLowerCase();
                 return (inputType in wijmo.grid.HTML5InputSupport._requiresExtendedSupport);
             };
             HTML5InputSupport.getDefaultInputType = function getDefaultInputType(mobileEnvironment, column) {
-                var inputType = column.inputType;
-                if(!inputType) {
-                    // determine the editor's type automatically
-                    inputType = "text"// default
-                    ;
-                    if(mobileEnvironment) {
-                        switch(wijmo.grid.getDataType(column)) {
-                            case "number":
-                            case "currency":
-                                inputType = "number";
-                                break;
-                            case "datetime":
-                                inputType = "datetime";
-                                break;
-                        }
+                var inputType = (column.inputType || "").toLowerCase();
+                if(!inputType && mobileEnvironment) {
+                    // provide input type automatically
+                    switch(wijmo.grid.getDataType(column)) {
+                        case "number":
+                        case "currency":
+                            inputType = "number";
+                            break;
+                        case "datetime":
+                            inputType = "datetime";
+                            break;
                     }
+                }
+                if(!inputType || ((inputType !== "text") && !HTML5InputSupport._isSupportedByBrowser(inputType))) {
+                    inputType = "text"// fallback to "text"
+                    ;
                 }
                 return inputType;
             };
@@ -9556,9 +9830,27 @@ var wijmo;
                 }
                 return value;
             };
+            HTML5InputSupport._isSupportedByBrowser = function _isSupportedByBrowser(inputType) {
+                if(inputType) {
+                    if(this._supportedInputTypesCache[inputType] === undefined) {
+                        // value is not tested yet
+                        var success;
+                        try  {
+                            var $element = $("<input type='" + inputType + "' style='display:none' />");
+                            success = true;
+                        } catch (e) {
+                            success = false;
+                        }
+                        this._supportedInputTypesCache[inputType] = success && (($element[0]).type === inputType);
+                    }
+                    return this._supportedInputTypesCache[inputType];
+                }
+                return false;
+            };
             return HTML5InputSupport;
         })();
         grid.HTML5InputSupport = HTML5InputSupport;
+        /** @ignore */
         function getZIndex(element, minValue) {
             if (typeof minValue === "undefined") { minValue = 99; }
             var zIndex = 0;
@@ -9595,6 +9887,47 @@ var wijmo;
         }
         grid.getUID = getUID;
         // uid **
+        /** @ignore */
+        function isMobileSafari() {
+            return !!(navigator && navigator.userAgent && (navigator.userAgent.match(/Mobile.*Safari/)) !== null);
+        }
+        grid.isMobileSafari = isMobileSafari;
+        var __scrollBarSize = 0;
+        /** @ignore */
+        function getSuperPanelScrollBarSize() {
+            if(!(__scrollBarSize > 0)) {
+                if(document && document.body && $.support.isTouchEnabled && $.support.isTouchEnabled()) {
+                    // test for native wijsuperpanel mode
+                    var $div;
+                    try  {
+                        $div = $("<div></div>").css({
+                            overflow: "scroll",
+                            width: 30,
+                            height: 30,
+                            position: "absolute",
+                            visibility: "hidden"
+                        }).append($("<div></div>").css({
+                            width: 100,
+                            height: 100
+                        })).appendTo(// append a child
+                        document.body);
+                        __scrollBarSize = $div[0].offsetWidth - $div[0].clientWidth// measure
+                        ;
+                    } catch (ex) {
+                    }finally {
+                        if($div) {
+                            $div.remove();
+                        }
+                    }
+                }
+                if(!(__scrollBarSize > 0)) {
+                    __scrollBarSize = 18// use the default size of the wijsuperpanel' scrollbars
+                    ;
+                }
+            }
+            return __scrollBarSize;
+        }
+        grid.getSuperPanelScrollBarSize = getSuperPanelScrollBarSize;
         // * compatibility: export members to the $.wijmo.wijgrid "namespace" *
         $.extend($.wijmo.wijgrid, {
             rowType: wijmo.grid.rowType,
@@ -9757,6 +10090,7 @@ var wijmo;
             return TimeUnitConverter;
         })();
         grid.TimeUnitConverter = TimeUnitConverter;
+        /** @ignore */
         function lazy(eval, context) {
             var hasValue = false, value;
             return function () {
@@ -10082,7 +10416,11 @@ var wijmo;
                         };
                     }
                     for(ci = 0 , celLen = domRow.cells.length; ci < celLen; ci++) {
-                        row[ci] = $.trim((domRow.cells[ci]).innerHTML);
+                        var value = $.trim((domRow.cells[ci]).innerHTML);
+                        if(value == "&nbsp;") {
+                            value = "";
+                        }
+                        row[ci] = value;
                         if(readAttributes) {
                             rowAttributes.cellsAttributes[ci] = wijmo.grid.getAttributes(domRow.cells[ci], prevent) || {
                             };
@@ -10132,7 +10470,7 @@ var wijmo;
                 return this._width;
             };
             htmlTableAccessor.prototype.getCellIdx = function (colIdx, rowIdx) {
-                return (colIdx < this._width) ? this._offsets[rowIdx][colIdx].cellIdx : -1;
+                return (colIdx < this._width && rowIdx >= 0 && rowIdx < this._offsets.length) ? this._offsets[rowIdx][colIdx].cellIdx : -1;
             };
             htmlTableAccessor.prototype.getColumnIdx = function (cellIdx, rowIdx) {
                 if(typeof (cellIdx) !== "number") {
@@ -10530,7 +10868,7 @@ var wijmo;
             cellInfo.prototype._isRendered = function () {
                 var view;
                 if(this._wijgrid && (view = this._wijgrid._view()) && this._isValid()) {
-                    var bodyIndex = this._wijgrid._view()._isRowRendered(this.rowIndex());
+                    var bodyIndex = view._isRowRendered(this.rowIndex());
                     return bodyIndex >= 0;
                 }
                 return false;
@@ -10687,6 +11025,7 @@ var wijmo;
     /// <reference path="misc.ts" />
     /// <reference path="rowAccessor.ts" />
     /// <reference path="filterOperators.ts" />
+    /// <reference path="htmlTableAccessor.ts" />
     (function (grid) {
         "use strict";
         var $ = jQuery;
@@ -10943,42 +11282,44 @@ var wijmo;
                 }
             };
             baseView.prototype._renderHeader = function () {
-                var $rt = wijmo.grid.rowType, cht = this._wijgrid._columnsHeadersTable(), i, height, rowInfo;
+                var rt = wijmo.grid.rowType, rs = wijmo.grid.renderState, cht = this._wijgrid._columnsHeadersTable(), i, height, rowInfo;
                 if(cht && (height = cht.length)) {
                     for(i = 0; i < height; i++) {
-                        rowInfo = this._insertEmptyRow($rt.header, undefined, i, -1, -1, -1, undefined);
+                        rowInfo = this._insertEmptyRow(rt.header, rs.rendering, i, -1, -1, -1, undefined, {
+                        });
                         this._renderRow(rowInfo, null, cht[i]);
                     }
                 }
             };
             baseView.prototype._renderFilter = function () {
-                var rowInfo = this._insertEmptyRow(wijmo.grid.rowType.filter, undefined, -1, -1, -1, -1, undefined);
+                var rowInfo = this._insertEmptyRow(wijmo.grid.rowType.filter, wijmo.grid.renderState.rendering, -1, -1, -1, -1, undefined, {
+                });
                 this._renderRow(rowInfo, this._wijgrid._field("visibleLeaves"), null);
             };
             baseView.prototype._renderBody = function () {
-                var $rt = wijmo.grid.rowType, visibleLeaves = this._wijgrid._field("visibleLeaves"), sketch = this._wijgrid.sketchTable, dataRowIndex = -1, virtualDataItemIndexBase = 0, cnt = 0, dataOffset = this._wijgrid._dataOffset;
+                var rs = wijmo.grid.renderState, visibleLeaves = this._wijgrid._field("visibleLeaves"), sketch = this._wijgrid.sketchTable, dataRowIndex = -1, virtualDataItemIndexBase = 0, cnt = 0, dataOffset = this._wijgrid._dataOffset;
                 // >= 0 when server-side virtual scrolling is used.
                                 // render rows
                 var self = this;
                 if(this._bounds.start >= 0 && this._bounds.end >= 0) {
                     this._wijgrid._renderableBoundsCollection().forEachIndex(this._bounds.start, this._bounds.end - this._bounds.start + 1, function (idx) {
-                        var sketchRow = sketch.row(idx - dataOffset), isDataRow = sketchRow.isDataRow(), groupKey = (sketchRow).groupByValue, rowInfo = self._insertEmptyRow(sketchRow.rowType, undefined, // default renderState
-                        cnt++, // sectionRowIndex
-                        isDataRow ? ++dataRowIndex : -1, sketchRow.dataItemIndex(), sketchRow.dataItemIndex(virtualDataItemIndexBase), groupKey);
+                        var sketchRow = sketch.row(idx - dataOffset), isDataRow = sketchRow.isDataRow(), groupKey = (sketchRow).groupByValue, rowInfo = self._insertEmptyRow(sketchRow.rowType, rs.rendering, cnt++, // sectionRowIndex
+                        isDataRow ? ++dataRowIndex : -1, sketchRow.dataItemIndex(), sketchRow.dataItemIndex(virtualDataItemIndexBase), groupKey, sketchRow.extInfo);
                         self._renderRow(rowInfo, visibleLeaves, sketchRow);
                     });
                 }
             };
             baseView.prototype._renderFooter = function () {
-                var rowInfo = this._insertEmptyRow(wijmo.grid.rowType.footer, undefined, -1, -1, -1, -1, undefined);
+                var rowInfo = this._insertEmptyRow(wijmo.grid.rowType.footer, wijmo.grid.renderState.rendering, -1, -1, -1, -1, undefined, {
+                });
                 this._renderRow(rowInfo, this._wijgrid._field("visibleLeaves"), null);
             };
-            baseView.prototype._insertEmptyRow = function (rowType, renderState, sectionRowIndex, dataRowIndex, dataItemIndex, virtualDataItemIndex, groupByValue) {
+            baseView.prototype._insertEmptyRow = function (rowType, renderState, sectionRowIndex, dataRowIndex, dataItemIndex, virtualDataItemIndex, groupByValue, extInfo) {
                 var domRow = this._wijgrid._onViewInsertEmptyRow.apply(this._wijgrid, arguments), domRowArr = this._insertRow(rowType, sectionRowIndex, domRow);
                 if(renderState === undefined) {
                     renderState = wijmo.grid.renderState.rendering;
                 }
-                return this._createRowInfo(domRowArr, rowType, renderState, sectionRowIndex, dataRowIndex, dataItemIndex, virtualDataItemIndex, groupByValue);
+                return this._createRowInfo(domRowArr, rowType, renderState, sectionRowIndex, dataRowIndex, dataItemIndex, virtualDataItemIndex, groupByValue, extInfo);
             };
             baseView.prototype._createEmptyCell = function (rowInfo, dataCellIndex, column) {
                 var rt = wijmo.grid.rowType, domCell = this._wijgrid._onViewCreateEmptyCell.apply(this._wijgrid, arguments);
@@ -11136,10 +11477,7 @@ var wijmo;
                 //this._changeRowRenderState(rowInfo, $.wijmo.wijgrid.renderState.rendering, false);
                 rowInfo.state &= ~wijmo.grid.renderState.rendering;
                 this._setRowInfo(rowInfo.$rows, rowInfo);
-                this._wijgrid._onViewRowRendered(rowInfo);
-                if(rowInfo.state & wijmo.grid.renderState.editing) {
-                    this._makeRowEditable(rowInfo);
-                }
+                this._wijgrid._onViewRowRendered(rowInfo, rowAttr, rowStyle);
             };
             baseView.prototype._makeRowEditable = function (rowInfo) {
                 var leaves = this._wijgrid._field("visibleLeaves"), cellEditor = new wijmo.grid.cellEditorHelper();
@@ -11224,8 +11562,7 @@ var wijmo;
                 return widthArray;
             };
             baseView.prototype._getColumnWidth = function (index) {
-                var result, leaf, joinedTables, relIdx, i, table, rows, cell, row, j, len;
-                leaf = this._wijgrid._field("visibleLeaves")[index];
+                var result, leaf = this._wijgrid._field("visibleLeaves")[index];
                 if(leaf._realWidth !== undefined) {
                     result = {
                         width: leaf._realWidth,
@@ -11237,23 +11574,25 @@ var wijmo;
                         real: true
                     };
                 } else {
-                    var maxW = 0;
-                    joinedTables = this.getJoinedTables(true, index);
-                    relIdx = joinedTables[2];
-                    for(i = 0; i < 2; i++) {
-                        table = joinedTables[i];
+                    var maxW = 0, joinedTables = this.getJoinedTables(true, index), relIdx = joinedTables[2];
+                    for(var i = 0; i < 2; i++) {
+                        var table = joinedTables[i];
                         if(table !== null) {
-                            rows = table.element().rows;
-                            if(len = rows.length) {
+                            var rows = table.element().rows, row, len = rows.length;
+                            if(len > 0) {
                                 // try to find a row which doesn't contains a spanned cells
-                                for(j = len - 1 , row = null; j >= 0; j--) {
-                                    if(rows[j].cells.length === table.width()) {
+                                for(var j = len - 1, row = null; j >= 0; j--) {
+                                    if((rows[j]).cells.length === table.width()) {
                                         row = rows[j];
-                                        break;
+                                        if(row.style.display !== "none") {
+                                            break;// break on first visible row, skip invisible rows
+
+                                        }
                                     }
                                 }
                                 if(row) {
-                                    cell = row.cells[relIdx];
+                                    // can be invisible
+                                    var cell = row.cells[relIdx];
                                     maxW = Math.max(maxW, $(cell).outerWidth());
                                 }
                             }
@@ -11327,7 +11666,7 @@ var wijmo;
             };
             baseView.prototype._removeBodyRow = function (sectionRowIndex, changeOffsets) {
                 if (typeof changeOffsets === "undefined") { changeOffsets = true; }
-                var $rt = wijmo.grid.rowType, rows = this._wijgrid._rows(), i, len, rowInfo, absRowIdx, joinedTables;
+                var $rt = wijmo.grid.rowType, rows = this._wijgrid._rows(), i, len, rowInfo, absRowIdx;
                 if((sectionRowIndex >= 0) && (sectionRowIndex < (len = rows.length()))) {
                     // remove DOMRows
                     rowInfo = this._getRowInfo(rows.item(sectionRowIndex), false);
@@ -11335,34 +11674,34 @@ var wijmo;
                     rowInfo.$rows.remove();
                     // ** update offsets
                     if(changeOffsets) {
-                        joinedTables = this.getJoinedTables(false, absRowIdx);
-                        if(joinedTables[0]) {
-                            joinedTables[0].removeOffset(joinedTables[2]);
+                        var joinedTables = this.getJoinedTables(false, absRowIdx), ta;
+                        if(ta = joinedTables[0]) {
+                            ta.removeOffset(joinedTables[2]);
                         }
-                        if(joinedTables[1]) {
-                            joinedTables[1].removeOffset(joinedTables[2]);
+                        if(ta = joinedTables[1]) {
+                            ta.removeOffset(joinedTables[2]);
                         }
                     }
                     // update offsets **
                                     }
             };
             baseView.prototype._insertBodyRow = function (sketchRow, sectionRowIndex, dataItemIndex, virtualDataItemIndex) {
-                var visibleLeaves = this._wijgrid._field("visibleLeaves"), $rt = wijmo.grid.rowType, view = this._wijgrid._view(), rows = this._wijgrid._rows(), len = rows.length(), isDataRow = sketchRow.isDataRow(), rowInfo, absRowIdx, joinedTables;
+                var visibleLeaves = this._wijgrid._field("visibleLeaves"), $rt = wijmo.grid.rowType, view = this._wijgrid._view(), rows = this._wijgrid._rows(), len = rows.length(), isDataRow = sketchRow.isDataRow(), rowInfo, absRowIdx;
                 if(sectionRowIndex < 0 || sectionRowIndex >= len || (!sectionRowIndex && sectionRowIndex !== 0)) {
                     sectionRowIndex = len// append
                     ;
                 }
                 rowInfo = this._insertEmptyRow(sketchRow.rowType, sketchRow.renderState, sectionRowIndex, -1, // TODO: dataRowIndex
-                dataItemIndex, virtualDataItemIndex, (sketchRow).groupByValue);
+                dataItemIndex, virtualDataItemIndex, (sketchRow).groupByValue, sketchRow.extInfo);
                 this._renderRow(rowInfo, visibleLeaves, sketchRow);
                 // ** update offsets
                 absRowIdx = this.getAbsoluteRowIndex(rowInfo.$rows[0]);
-                joinedTables = this.getJoinedTables(false, absRowIdx);
-                if(joinedTables[0]) {
-                    joinedTables[0].insertOffset(absRowIdx);
+                var joinedTables = this.getJoinedTables(false, absRowIdx), ta;
+                if(ta = joinedTables[0]) {
+                    ta.insertOffset(absRowIdx);
                 }
-                if(joinedTables[1]) {
-                    joinedTables[1].insertOffset(absRowIdx);
+                if(ta = joinedTables[1]) {
+                    ta.insertOffset(absRowIdx);
                 }
                 // update offsets **
                 return rowInfo;
@@ -11442,7 +11781,7 @@ var wijmo;
                 }
                 return null;
             };
-            baseView.prototype._createRowInfo = function (row, type, state, sectionRowIndex, dataRowIndex, dataItemIndex, virtualDataItemIndex, groupByValue) {
+            baseView.prototype._createRowInfo = function (row, type, state, sectionRowIndex, dataRowIndex, dataItemIndex, virtualDataItemIndex, groupByValue, extInfo) {
                 var tmp, rowInfo = {
                     type: type,
                     state: state,
@@ -11450,7 +11789,8 @@ var wijmo;
                     dataRowIndex: dataRowIndex,
                     dataItemIndex: dataItemIndex,
                     virtualDataItemIndex: virtualDataItemIndex,
-                    $rows: row ? $(row) : null
+                    $rows: row ? $(row) : null,
+                    _extInfo: extInfo
                 };
                 if(groupByValue !== undefined) {
                     rowInfo.groupByValue = groupByValue;
@@ -11744,11 +12084,14 @@ var wijmo;
             __extends(fixedView, _super);
             function fixedView(wijgrid, renderBounds) {
                         _super.call(this, wijgrid, renderBounds);
-                this._verScrollBarSize = 18;
+                this._verScrollBarSize = wijmo.grid.getSuperPanelScrollBarSize();
                 this._viewTables = {
                 };
                 // rendered DOM tables
                 this._splitAreas = {
+                };
+                // scrolling div
+                this._superPanelElementsCache = {
                 };
                 this.element = wijgrid.element// table element
                 ;
@@ -11834,11 +12177,8 @@ var wijmo;
                     y: superPanelObj.options.vScroller.scrollValue
                 } : null;
             };
-            fixedView.prototype.getPanelContentWrapper = function () {
-                return this._wijgrid.outerDiv.find(".wijmo-wijsuperpanel-contentwrapper:first");
-            };
             fixedView.prototype.getVisibleAreaBounds = function (client) {
-                var bounds = wijmo.grid.bounds(this.getPanelContentWrapper(), client);
+                var bounds = this._isNativeSuperPanel() ? wijmo.grid.bounds(this._getSuperPanelStateContainer(), client) : wijmo.grid.bounds(this._getSuperPanelContentWrapper(), client);
                 if(!bounds) {
                     // .wijmo-wijsuperpanel-contentwrapper is not available -- grid is invisible.
                     bounds = wijmo.grid.bounds(this._wijgrid.outerDiv, client);
@@ -11846,7 +12186,7 @@ var wijmo;
                 return bounds;
             };
             fixedView.prototype.getVisibleContentAreaBounds = function () {
-                var visibleBounds = this.getVisibleAreaBounds(), b00 = // scrollable area
+                var visibleBounds = this.getVisibleAreaBounds(true), b00 = // scrollable area
                 wijmo.grid.bounds(this._viewTables.nw.element()) || {
                 }, b01 = wijmo.grid.bounds(this._viewTables.ne.element()) || {
                 }, b10 = wijmo.grid.bounds(this._viewTables.sw.element()) || {
@@ -11864,7 +12204,7 @@ var wijmo;
                 return contentBounds;
             };
             fixedView.prototype.getRowAreaHeight = function () {
-                var container = this.getPanelContentWrapper();
+                var container = this._getSuperPanelContentWrapper();
                 if(container.length == 0) {
                     container = this._wijgrid.outerDiv;
                 }
@@ -11916,22 +12256,11 @@ var wijmo;
                 return (this._wijgrid.options.rowHeight >= 0) ? this._wijgrid.options.rowHeight : fixedView.DEFAULT_ROW_HEIGHT_VIRTUAL;
             };
             fixedView.prototype.refreshPanel = function (scrollValue) {
-                var self = this, wijgrid = this._wijgrid, options = wijgrid.options, gridWidth = this._getGridWidth(options.scrollMode), panelModes = this._getMappedScrollMode(), needVBar = this._testNeedVBar(wijgrid.outerDiv, wijgrid.element, $(this._viewTables.ne.element()), options.scrollMode, wijgrid._autoHeight), excludeVBarWidth = needVBar && !isTouchEnabled, hScrollValue = scrollValue ? scrollValue.x : null, vScrollValue = scrollValue ? scrollValue.y : null, isTouchEnabled = ($.support.isTouchEnabled && $.support.isTouchEnabled()), firstRow = wijgrid._rows().item(0);
+                var self = this, wijgrid = this._wijgrid, options = wijgrid.options, panelModes = this._getMappedScrollMode(), hScrollValue = scrollValue ? scrollValue.x : null, vScrollValue = scrollValue ? scrollValue.y : null, firstRow = wijgrid._rows().item(0), recreateSuperPanel = false;
                 wijgrid.rowOuterHeight = firstRow && firstRow[0] ? $(firstRow[0]).outerHeight() : // use a real height
                 this.getDefaultRowHeight();
-                //this._scroller.width(gridWidth);
-                this._splitAreas.ne.width(gridWidth - options.splitDistanceX - (excludeVBarWidth ? this._verScrollBarSize : 0));
-                if(options.staticColumnsAlignment === "right") {
-                    this._splitAreas.nw.css({
-                        "left": "",
-                        "right": excludeVBarWidth ? this._verScrollBarSize : 0
-                    });
-                    this._splitAreas.sw.css({
-                        "left": "",
-                        "right": excludeVBarWidth ? this._verScrollBarSize : 0
-                    });
-                }
                 if(!this._scroller.data("wijmo-wijsuperpanel")) {
+                    recreateSuperPanel = true;
                     if(this._wijgrid._allowVirtualScrolling()) {
                         this.vsUI = new wijmo.grid.uiVirtualScroller(wijgrid, this._splitAreas.se, // content to scroll
                         options.splitDistanceY, // fixed area height
@@ -11950,36 +12279,49 @@ var wijmo;
                             scrollBarVisibility: panelModes.hScrollBarVisibility,
                             "scrollValue": scrollValue ? scrollValue.x : null
                         },
-                        hScrollerActivating: function (e, data) {
-                            // auto adjusting height with hscrollbar shown
-                            var diff;
-                            if(wijgrid._autoHeight) {
-                                diff = wijgrid.element.height() + options.splitDistanceY - data.contentLength;
-                                if(diff > 0) {
-                                    self._scroller.height(self._scroller.height() + diff);
-                                    self._scroller.wijsuperpanel("paintPanel");
-                                    return false;
-                                }
-                            }
-                            self._splitAreas.sw.height(data.contentLength - options.splitDistanceY);
-                        }
+                        hScrollerActivating: $.proxy(this._onHScrollerActivating, this)
                     });
-                    // issue #39166 - commented out.
-                    //this._scroller.find(".wijmo-wijsuperpanel-contentwrapper:first").scroll(function (e) {
-                    //	// * prevent native scrolling to avoid disalignment of the fixed and unfixed areas in IE\ Chrome when partially visible cell gets focus *
-                    //	if ((<Element>e.target).scrollLeft) {
-                    //		(<Element>e.target).scrollLeft = 0;
-                    //	}
-                    //	if ((<Element>e.target).scrollTop) {
-                    //		(<Element>e.target).scrollTop = 0;
-                    //	}
-                    //	e.preventDefault();
-                    //});
+                    // wijsuperpanel.hScrollerActivating event is not raised if touch environment is used, simulate it.
+                    if(this._isNativeSuperPanel()) {
+                        var container = this._getSuperPanelStateContainer();
+                        if(container.length && (container[0].offsetHeight !== container[0].clientHeight)) {
+                            this._onHScrollerActivating(null, {
+                                contentLength: container[0].clientHeight
+                            });
+                        }
+                    }
+                    if(!this._isNativeSuperPanel()) {
+                        this._getSuperPanelContentWrapper().bind("scroll", function (e) {
+                            // #50496: when a overflowing div contains focusable elements it will be scrolled automatically to fit the focused element into view.
+                            // Prevent native scrolling to avoid disalignment of the fixed and unfixed areas in IE\ Chrome when partially visible cell gets focus.
+                            (e.target).scrollLeft = 0;
+                            (e.target).scrollTop = 0;
+                            e.preventDefault();
+                        });
+                    }
                     if(this._wijgrid._allowVirtualScrolling()) {
                         this.vsUI.attach(this._scroller);
                     }
                 } else {
                     this._scroller.wijsuperpanel("paintPanel");
+                }
+                var needVBar = this._testNeedVBar(wijgrid.outerDiv, wijgrid.element, $(this._viewTables.ne.element()), options.scrollMode, wijgrid._autoHeight), excludeVBarWidth = needVBar && !this._testAutohiddenScrollbars();
+                var contentWidth = this.getVisibleContentAreaBounds().width;
+                this._splitAreas.ne.width(contentWidth - options.splitDistanceX);
+                if(recreateSuperPanel && (scrollValue && scrollValue.x)) {
+                    // synchronize unfixed areas: NE and SE (#47277)
+                    var hPxValue = this._scroller.wijsuperpanel("scrollValueToPx", scrollValue.x, "h");
+                    this._setFixedAreaPosition(this._splitAreas.ne, "h", hPxValue, null, true);
+                }
+                if(options.staticColumnsAlignment === "right") {
+                    this._splitAreas.nw.css({
+                        "left": "",
+                        "right": excludeVBarWidth ? this._verScrollBarSize : 0
+                    });
+                    this._splitAreas.sw.css({
+                        "left": "",
+                        "right": excludeVBarWidth ? this._verScrollBarSize : 0
+                    });
                 }
                 this._scroller.find(".wijmo-wijsuperpanel-hbarcontainer, .wijmo-wijsuperpanel-vbarcontainer").css("zIndex", 5);
                 if(this._wijgrid._allowVirtualScrolling()) {
@@ -11987,64 +12329,87 @@ var wijmo;
                     this._wijgrid._handleVirtualScrolling(this._bounds.start);
                 }
             };
-            fixedView.prototype.scrollTo = function (currentCell) {
-                if(!currentCell.tableCell()) {
-                    return;
+            fixedView.prototype.scrollTo = function (cell, callback, info) {
+                var grid = this._wijgrid, virtualScrollToIndex = null;
+                if(grid._allowVirtualScrolling()) {
+                    var rowIndex = grid._renderableBoundsCollection().getRenderedIndex(cell.rowIndex());
+                    var vab, rowsLen = grid._rows().length(), $rows, handleLastRow = (rowIndex - grid._viewPortBounds().start >= rowsLen - 1);
+                    // the last row in the current view port
+                                        // determine whether virtual scrolling is needed or not
+                    if(!cell._isRendered() || (handleLastRow && (vab = this.getVisibleAreaBounds(true)) && ($rows = cell.row().$rows) && ($rows.offset().top + $rows.outerHeight() > vab.top + vab.height))) {
+                        // exceeded wijgrid bounds
+                        virtualScrollToIndex = rowIndex;
+                        if(cell.rowIndex() > info.changingEventArgs.oldRowIndex) {
+                            virtualScrollToIndex -= rowsLen - 1;
+                            virtualScrollToIndex += 1;
+                        }
+                    }
                 }
-                var wijgrid = this._wijgrid, o = wijgrid.options, superPanelObj = this._getSuperPanel(), tableCell = currentCell.tableCell(), $tableCell = tableCell.nodeType ? $(tableCell) : tableCell, resultLeft = null, resultTop = null;
-                if(superPanelObj && $tableCell.is(":visible")) {
-                    var contentElement = (superPanelObj).getContentElement(), wrapperElement = contentElement.parent(), visibleLeft = parseInt((contentElement.css("left") + "").replace("px", ""), 10) * -1, visibleTop = parseInt((contentElement.css("top") + "").replace("px", ""), 10) * -1, visibleWidth = wrapperElement.outerWidth() - o.splitDistanceX, visibleHeight = wrapperElement.outerHeight() - o.splitDistanceY, elementPosition = $tableCell.position(), elementLeft = elementPosition.left, elementTop = elementPosition.top, elementWidth = $tableCell.outerWidth(), elementHeight = $tableCell.outerHeight(), staticRowIndex = wijgrid._getStaticIndex(true), staticColumnIndex = wijgrid._getStaticIndex(false), currentRowIndex = currentCell.rowIndex(), currentCellIndex = currentCell.cellIndex();
-                    if(currentRowIndex <= staticRowIndex) {
-                        if(currentCellIndex <= staticColumnIndex) {
-                            resultLeft = 0;
-                            resultTop = 0;
-                        } else {
-                            elementLeft += visibleLeft;
-                            if(elementLeft + elementWidth > visibleLeft + visibleWidth) {
-                                visibleLeft = resultLeft = elementLeft + elementWidth - visibleWidth;
-                            }
-                            if(elementLeft < visibleLeft) {
-                                resultLeft = elementLeft;
-                            }
-                            resultTop = 0;
-                        }
+                var superPanelObj = this._getSuperPanel();
+                if(virtualScrollToIndex !== null) {
+                    info.setFocus = true// to listen key events
+                    ;
+                    info.hasFocusedChild = false;
+                    if(superPanelObj) {
+                        (this).vsUI.scrollTo(virtualScrollToIndex, function () {
+                            callback();
+                        });
                     } else {
-                        if(currentCellIndex <= staticColumnIndex) {
-                            // elementTop += visibleTop;
-                            elementTop += this._splitAreas.sw.scrollTop();
-                            if(elementTop + elementHeight > visibleTop + visibleHeight) {
-                                visibleTop = resultTop = elementTop + elementHeight - visibleHeight;
+                        callback();
+                    }
+                } else {
+                    var o = grid.options, $tableCell = $(cell.tableCell()), resultLeft = null, resultTop = null;
+                    if(superPanelObj && $tableCell.is(":visible")) {
+                        var contentElement = (superPanelObj).getContentElement(), wrapperElement = contentElement.parent(), visibleLeft = parseInt((contentElement.css("left") + "").replace("px", ""), 10) * -1, visibleTop = parseInt((contentElement.css("top") + "").replace("px", ""), 10) * -1, visibleWidth = wrapperElement.outerWidth() - o.splitDistanceX, visibleHeight = wrapperElement.outerHeight() - o.splitDistanceY, elementPosition = $tableCell.position(), elementLeft = elementPosition.left, elementTop = elementPosition.top, elementWidth = $tableCell.outerWidth(), elementHeight = $tableCell.outerHeight(), staticRowIndex = grid._getStaticIndex(true), staticColumnIndex = grid._getStaticIndex(false), currentRowIndex = cell.rowIndex(), currentCellIndex = cell.cellIndex();
+                        if(currentRowIndex <= staticRowIndex) {
+                            if(currentCellIndex <= staticColumnIndex) {
+                                resultLeft = 0;
+                                resultTop = 0;
+                            } else {
+                                elementLeft += visibleLeft;
+                                if(elementLeft + elementWidth > visibleLeft + visibleWidth) {
+                                    visibleLeft = resultLeft = elementLeft + elementWidth - visibleWidth;
+                                }
+                                if(elementLeft < visibleLeft) {
+                                    resultLeft = elementLeft;
+                                }
+                                resultTop = 0;
                             }
-                            if(elementTop < visibleTop) {
-                                resultTop = elementTop;
-                            }
-                            resultLeft = 0;
                         } else {
-                            elementLeft -= o.splitDistanceX;
-                            if(elementTop + elementHeight > visibleTop + visibleHeight) {
-                                visibleTop = resultTop = elementTop + elementHeight - visibleHeight;
-                            }
-                            if(elementLeft + elementWidth > visibleLeft + visibleWidth) {
-                                visibleLeft = resultLeft = elementLeft + elementWidth - visibleWidth;
-                            }
-                            if(elementTop < visibleTop) {
-                                resultTop = elementTop;
-                            }
-                            if(elementLeft < visibleLeft) {
-                                resultLeft = elementLeft;
+                            if(currentCellIndex <= staticColumnIndex) {
+                                // elementTop += visibleTop;
+                                elementTop += this._splitAreas.sw.scrollTop();
+                                if(elementTop + elementHeight > visibleTop + visibleHeight) {
+                                    visibleTop = resultTop = elementTop + elementHeight - visibleHeight;
+                                }
+                                if(elementTop < visibleTop) {
+                                    resultTop = elementTop;
+                                }
+                                resultLeft = 0;
+                            } else {
+                                elementLeft -= o.splitDistanceX;
+                                if(elementTop + elementHeight > visibleTop + visibleHeight) {
+                                    visibleTop = resultTop = elementTop + elementHeight - visibleHeight;
+                                }
+                                if(elementLeft + elementWidth > visibleLeft + visibleWidth) {
+                                    visibleLeft = resultLeft = elementLeft + elementWidth - visibleWidth;
+                                }
+                                if(elementTop < visibleTop) {
+                                    resultTop = elementTop;
+                                }
+                                if(elementLeft < visibleLeft) {
+                                    resultLeft = elementLeft;
+                                }
                             }
                         }
-                    }
-                    if(resultLeft !== null) {
-                        (superPanelObj).hScrollTo(resultLeft);
-                    }
-                    if(resultTop !== null) {
-                        if(this._wijgrid._allowVirtualScrolling()) {
-                            //TODO: this.vsUI.scrollToRow(currentCell.row().virtualDataItemIndex);
-                                                    } else {
+                        if(resultLeft !== null) {
+                            (superPanelObj).hScrollTo(resultLeft);
+                        }
+                        if(resultTop !== null) {
                             (superPanelObj).vScrollTo(resultTop);
                         }
                     }
+                    callback();
                 }
             };
             fixedView.prototype.updateSplits = function (scrollValue) {
@@ -12222,7 +12587,7 @@ var wijmo;
             };
             fixedView.prototype.getInlineTotalWidth = function () {
                 if(this._scroller) {
-                    var stateContainer = this._scroller.find(".wijmo-wijsuperpanel-statecontainer");
+                    var stateContainer = this._getSuperPanelStateContainer();
                     if(stateContainer.length) {
                         var width = stateContainer[0].style.width;
                         if(width && (width !== "auto")) {
@@ -12302,7 +12667,7 @@ var wijmo;
                         }
                         cellIdx = table.getCellIdx(relColIdx, relRowIdx);
                         if(cellIdx >= 0) {
-                            return table.element().rows[relRowIdx].cells[cellIdx];
+                            return (table.element().rows[relRowIdx]).cells[cellIdx];
                         }
                     }
                 }
@@ -12444,19 +12809,9 @@ var wijmo;
                     this._viewTables.se
                 ];
             };
-            fixedView.prototype._getGridWidth = // DOMTable abstraction **
+            fixedView.prototype._getSuperPanel = // DOMTable abstraction **
             // ** private abstract
-            function (mode) {
-                var wijgrid = this._wijgrid, tableWidth = wijgrid.element.outerWidth(true) + wijgrid.options.splitDistanceX, outWidth = wijgrid.outerDiv.innerWidth();
-                if(this._testNeedVBar(wijgrid.outerDiv, wijgrid.element, $(this._viewTables.ne.element()), mode, wijgrid._autoHeight)) {
-                    tableWidth += this._verScrollBarSize;
-                }
-                if(tableWidth > outWidth) {
-                    tableWidth = outWidth;
-                }
-                return tableWidth;
-            };
-            fixedView.prototype._getSuperPanel = function () {
+            function () {
                 return this._scroller ? this._scroller.data("wijmo-wijsuperpanel") : null;
             };
             fixedView.prototype._ensureRenderBounds = // ** render
@@ -12783,10 +13138,12 @@ var wijmo;
                     if(this.vsUI) {
                         this.vsUI.dispose();
                     }
+                    this._superPanelElementsCache = {
+                    };
                     this._scroller.wijsuperpanel("destroy");
                 }
             };
-            fixedView.prototype._onScroll = function (event, data) {
+            fixedView.prototype._onScroll = function (e, data) {
                 var spInstance = this._getSuperPanel();
                 if(this._wijgrid._allowVirtualScrolling()) {
                     if(data.dir === "h") {
@@ -12798,6 +13155,18 @@ var wijmo;
                     this._setFixedAreaPosition(data.dir === "h" ? this._splitAreas.ne : this._splitAreas.sw, data.dir, data.position, data.animationOptions, true);
                 }
                 this._wijgrid._trackScrollingPosition(spInstance.options.hScroller.scrollValue, spInstance.options.vScroller.scrollValue);
+            };
+            fixedView.prototype._onHScrollerActivating = function (e, args) {
+                // auto adjusting height with hscrollbar shown
+                if(this._wijgrid._autoHeight) {
+                    var diff = this._wijgrid.element.height() + this._wijgrid.options.splitDistanceY - args.contentLength;
+                    if(diff > 0) {
+                        this._scroller.height(this._scroller.height() + diff);
+                        this._scroller.wijsuperpanel("paintPanel");
+                        return false;
+                    }
+                }
+                this._splitAreas.sw.height(args.contentLength - this._wijgrid.options.splitDistanceY);
             };
             fixedView.prototype._onMouseWheel = function (e, delta) {
                 // force superpanel to do scrolling when cursor is placed over then non-scrollable (fixed) areas of the wijgrid.
@@ -12920,10 +13289,38 @@ var wijmo;
                     this._splitAreas.se.css("marginTop", o.splitDistanceY);
                 }
             };
+            fixedView.prototype._getSuperPanelContentWrapper = // private specific **
+            // ** wijsuperpanel specific
+            function () {
+                if(!this._superPanelElementsCache.contentWrapper || !this._superPanelElementsCache.contentWrapper.length) {
+                    this._superPanelElementsCache.contentWrapper = this._wijgrid.outerDiv.find(".wijmo-wijsuperpanel-contentwrapper:first")// not available in native mode?
+                    ;
+                }
+                return this._superPanelElementsCache.contentWrapper;
+            };
+            fixedView.prototype._getSuperPanelStateContainer = function () {
+                if(!this._superPanelElementsCache.stateContainer || !this._superPanelElementsCache.stateContainer.length) {
+                    this._superPanelElementsCache.stateContainer = this._wijgrid.outerDiv.find(".wijmo-wijsuperpanel-statecontainer:first");
+                }
+                return this._superPanelElementsCache.stateContainer;
+            };
+            fixedView.prototype._isNativeSuperPanel = function () {
+                return this._wijgrid._isTouchEnv();
+            };
+            fixedView.prototype._testAutohiddenScrollbars = function () {
+                if(this._isNativeSuperPanel()) {
+                    var container = this._getSuperPanelStateContainer();
+                    if(container.length) {
+                        return container[0].offsetWidth === container[0].clientWidth;// no scrollbar or scrollbar is hidden (-ms-autohiding-scrollbar)
+
+                    }
+                }
+                return false;
+            };
             return fixedView;
         })(grid.baseView);
         grid.fixedView = fixedView;
-        // private specific **
+        // wijsuperpanel specific **
             })(wijmo.grid || (wijmo.grid = {}));
     var grid = wijmo.grid;
 })(wijmo || (wijmo = {}));
@@ -13268,6 +13665,21 @@ var wijmo;
                             prevRowIndex = cellInfo.rowIndex();
                         }
                         this.selectCell(cellInfo, rowInfo, view, true);
+                    }
+                }
+            };
+            selection.prototype._ensureSelectionInRow = function (sketchRowIndex) {
+                var _this = this;
+                var view = this._wijgrid._view();
+                if(view._isRowRendered(sketchRowIndex) >= 0) {
+                    var rowInfo = view._getRowInfoBySketchRowIndex(sketchRowIndex, false), selectedCells = this.selectedCells();
+                    if(rowInfo && selectedCells && (selectedCells.length() > 0)) {
+                        rowInfo.$rows.children("td, th").each(function (i, cell) {
+                            var idx = selectedCells.indexOf(i, sketchRowIndex);
+                            if(idx >= 0) {
+                                _this.selectCell(selectedCells.item(idx), rowInfo, view, true);
+                            }
+                        });
                     }
                 }
             };
@@ -13870,6 +14282,12 @@ var wijmo;
                 }
                 return null;
             };
+            rowAccessor.getCell$ = /** @ignore */
+            function getCell$(row, globCellIndex) {
+                var domCell = wijmo.grid.rowAccessor.getCell(row, globCellIndex);
+                return (domCell) ? $(domCell) : $([]);// an empty set
+
+            };
             rowAccessor.cellsCount = /** Gets the number of cells in a array of table row elements.
             * @param {Array} rowObj Array of table row elements.
             * @returns {Number} The number of cells in a array of table row elements.
@@ -14044,21 +14462,24 @@ var wijmo;
             };
             cellEditorHelper.prototype._defaultBeforeCellEdit = // private
             function (grid, args) {
-                var column = args.cell.column(), result = false, value, strValue, $container, $input, len, kbEvent, keyCodeEnum = wijmo.getKeyCodeEnum(), inputType = wijmo.grid.HTML5InputSupport.getDefaultInputType(grid._isMobileEnv(), column);
+                var column = args.cell.column(), result = false, $container, $input;
                 if(column.dataIndex >= 0) {
-                    value = args.cell.value();
+                    var value = args.cell.value(), keyCodeEnum = wijmo.getKeyCodeEnum(), inputType = wijmo.grid.HTML5InputSupport.getDefaultInputType(grid._isMobileEnv(), column), allowCellEditing = grid._allowCellEditing(), serverSideCheckbox = false;
                     result = true;
                     try  {
                         $container = args.cell.container();
                         if(wijmo.grid.getDataType(column) === "boolean") {
                             var $span = $container.children("span");
-                            if($span.length && $span.prop("disabled")) {
+                            if(serverSideCheckbox = !!($span.length && $span.prop("disabled"))) {
                                 // C1GridView support
-                                $.data($span[0], "disabledSpan", true);
+                                $.data($span[0], "serverSideCheckbox", true);
                                 $span.prop("disabled", false);
                             }
                             $input = $container.find(":checkbox");
-                            $input.prop("disabled", false);
+                            if(serverSideCheckbox || !allowCellEditing) {
+                                // c1gridview or editingMode="row"
+                                $input.prop("disabled", false);
+                            }
                             if(args.event && args.event.type === "keypress") {
                                 $input.one("keyup", function (e) {
                                     if(e.which === keyCodeEnum.SPACE) {
@@ -14068,7 +14489,7 @@ var wijmo;
                                 });
                             }
                         } else {
-                            $input = $("<input />").attr("type", inputType).addClass(wijmo.grid.wijgrid.CSS.inputMarker).addClass("wijmo-wijinput " + grid.options.wijCSS.stateFocus).bind("keydown", grid, $.proxy(this._checkBoxOrInputKeyDown, this));
+                            $input = $("<input type='" + inputType + "' />").css("ime-mode", column.imeMode || "auto").addClass(wijmo.grid.wijgrid.CSS.inputMarker).addClass("wijmo-wijinput " + grid.options.wijCSS.stateFocus).bind("keydown", grid, $.proxy(this._checkBoxOrInputKeyDown, this));
                             //the problem of inputing
                             $input.bind((($.support).selectstart ? "selectstart" : "mousedown"), function (event) {
                                 event.stopPropagation();
@@ -14097,16 +14518,20 @@ var wijmo;
                                 }
                             }
                             $container.empty().append($input);
-                            len = $input.val().length;
-                            if(inputType === "text") {
-                                // move caret to the end of the text
-                                new wijmo.grid.domSelection($input[0]).setSelection({
-                                    start: len,
-                                    end: len
-                                });
+                            if(allowCellEditing) {
+                                // don't change the focus on row editing.
+                                var len = $input.val().length;
+                                if(inputType === "text") {
+                                    // move caret to the end of the text
+                                    new wijmo.grid.domSelection($input[0]).setSelection({
+                                        start: len,
+                                        end: len
+                                    });
+                                }
                             }
                         }
-                        if(grid._allowCellEditing()) {
+                        if(allowCellEditing) {
+                            // don't change the focus on row editing.
                             $input.focus();
                             setTimeout(function () {
                                 // IE fix
@@ -14130,13 +14555,15 @@ var wijmo;
                         cellValue = grid.toStr(leafOpt, args.cell.value());
                         rowInfo = view._getRowInfoBySketchRowIndex(args.cell.rowIndex());
                         if(wijmo.grid.getDataType(leafOpt) === "boolean") {
-                            var $span = $container.children("span"), disable = $span.length && $.data($span[0], "disabledSpan");
+                            var $span = $container.children("span"), disable = $span.length && $.data($span[0], "serverSideCheckbox");
                             $input = $container.find(":checkbox");
-                            if(cellValue === "true") {
-                                $input.attr("checked", "checked");
-                            } else {
-                                $input.removeAttr("checked");
+                            $input.prop("checked", cellValue === "true");
+                            /*if (cellValue === "true") {
+                            $input.attr("checked", "checked");
                             }
+                            else {
+                            $input.removeAttr("checked");
+                            }*/
                             if(disable) {
                                 $span.prop("disabled", true);
                                 $input.prop("disabled", true);
@@ -14178,32 +14605,74 @@ var wijmo;
         grid.cellEditorHelper = cellEditorHelper;
         // private *
         // IME support.
+        /** @ignore */
         var keyDownEventListener = (function () {
             function keyDownEventListener(grid, container) {
                 this.mGrid = grid;
                 this.mWrapper = $("<div />");
-                this.mWrapper.append(this.mElement = $("<input type=\"text\" />").css("position", "relative").keydown($.proxy(this._onKeyDown, this))).css({
+                if(this.mGrid._allowCellEditing()) {
+                    this.mHiddenElement = $("<input type=\"text\" />").keydown($.proxy(this._onKeyDown, this));
+                } else {
+                    this.mHiddenElement = $("<input type=\"button\" />")// use any focusable element other than textbox (to avoid keyboard popup in mobile).
+                    ;
+                }
+                this.mHiddenElement.css({
+                    position: "relative",
+                    border: 0,
+                    padding: 0,
+                    margin: 0,
+                    width: 1,
+                    height: // if zero-dimension element is used then 1) a ghost caret will be displayed after editing in IE9. 2) IME is disabled in Chrome.
+                    1,
+                    "font-size": wijmo.grid.isMobileSafari() ? "0em" : // hide caret in MobileSafari.
+                    "1px"
+                });
+                // don't use zero value otherwise the IME will be disabled in Chrome.
+                this.mFakeFocusable = $("<input type=\"button\" />").css(// special element to resolve an issue with changing the IME in IE11 .
+                {
+                    position: "relative",
+                    width: 1,
+                    height: 1,
+                    border: 0,
+                    padding: 0,
+                    margin: 0
+                });
+                this.mWrapper.append(this.mHiddenElement).append(this.mFakeFocusable).css({
                     position: "absolute",
-                    width: 0,
-                    height: 0,
+                    width: "0px",
+                    height: "0px",
                     overflow: "hidden",
                     "z-index": 999999
                 });
                 // TFS issue #45934 (an element with absolute positioning affects the superpanel layout in IE).
                 container.append(this.mWrapper);
             }
-            keyDownEventListener.prototype.focus = function (at) {
-                if(at && at.length) {
-                    var offset = at.offset();
+            keyDownEventListener.prototype.dispose = function () {
+                if(this.mWrapper) {
+                    try  {
+                        this.mWrapper.remove();
+                    } catch (ex) {
+                    }finally {
+                        this.mWrapper = null;
+                        this.mHiddenElement = null;
+                        this.mGrid = null;
+                    }
+                }
+            };
+            keyDownEventListener.prototype.focus = function (coord, column) {
+                if(coord && coord.length) {
+                    var offset = coord.offset();
                     this.mWrapper.offset({
                         top: offset.top,
                         left: offset.left
                     });
-                    this.mElement.focus();
+                    this.mFakeFocusable.focus()// move focus out of the mHiddenElement first to resolve an issue with changing the IME in IE11
+                    ;
+                    this.mHiddenElement.css("ime-mode", (column && column.imeMode) || "auto").focus();
                 }
             };
             keyDownEventListener.prototype.isHiddenInput = function (element) {
-                return element && (element[0] === this.mElement[0]);
+                return element && ((element[0] === this.mHiddenElement[0]) || (element[0] === this.mFakeFocusable[0]));
             };
             keyDownEventListener.prototype.canHandle = function (e) {
                 return (this.mGrid._allowCellEditing() && this.isPrintableKeyCode(e));
@@ -14227,6 +14696,12 @@ var wijmo;
                     //if (targetOuterDiv.length && (targetOuterDiv[0] === this.outerDiv[0])) {
                     this.mGrid._beginEditInternal(e)// pass input (onKeyUp event) to the editor.
                     ;
+                } else {
+                    var keyCodeEnum = wijmo.getKeyCodeEnum();
+                    // #47873. IE workaround: if input element is inside form element then after double pressing the Esc key the whole form will be cleared.
+                    if(e.keyCode === keyCodeEnum.ESCAPE) {
+                        e.preventDefault();
+                    }
                 }
             };
             return keyDownEventListener;
@@ -14250,11 +14725,25 @@ var wijmo;
             function cellFormatterHelper() { }
             cellFormatterHelper._div = document.createElement("div");
             cellFormatterHelper.prototype.format = function ($cell, $container, column, formattedValue, rowInfo) {
-                if(rowInfo.type & wijmo.grid.rowType.footer) {
+                var grid = column.owner, rt = wijmo.grid.rowType, rse = wijmo.grid.renderStateEx;
+                if(rowInfo.type & rt.footer) {
                     if(column.aggregate && (column.aggregate !== "none")) {
                         formattedValue = wijmo.grid.stringFormat(column.footerText || "{0}", column._totalsValue || "");
                     } else {
                         formattedValue = column.footerText || column._footerTextDOM || "";
+                    }
+                }
+                // provide a toggle icon for the first cell of the groupHeader row
+                if((rowInfo.type & rt.groupHeader) && (column.visLeavesIdx == (grid.options.showRowHeader ? 1 : 0))) {
+                    // Provide a toggle icon
+                    // if grouped column is hidden then groupedColumn != column.
+                                        var groupedColumn = grid._groupedColumns()[rowInfo._extInfo.groupLevel - 1], gi;
+                    // groupLevel is 1-based
+                    if(groupedColumn && (gi = groupedColumn.groupInfo) && (gi.outlineMode !== "none")) {
+                        var defCSS = wijmo.grid.wijgrid.CSS, wijCSS = grid.options.wijCSS, icon = (rowInfo._extInfo.state & rse.collapsed) ? gi.collapsedImageClass || wijCSS.iconArrowRight : // collapsed
+                        gi.expandedImageClass || wijCSS.iconArrowRightDown;
+                        // expanded
+                                                formattedValue = "<div class=\"" + wijCSS.icon + " " + icon + " " + defCSS.groupToggleVisibilityButton + " " + wijCSS.wijgridGroupToggleVisibilityButton + "\">&nbsp;</div>" + formattedValue;
                     }
                 }
                 var useDefault = true, defaultFormatter = null, args = {
@@ -14264,7 +14753,7 @@ var wijmo;
                     formattedValue: formattedValue,
                     row: rowInfo,
                     afterDefaultCallback: null
-                }, grid = column.owner, rt = wijmo.grid.rowType, result = true;
+                }, result = true;
                 // apply rowHeight option to all tbody rows if virtual scrolling is used.
                 if(((rowInfo.type & rt.data) || (rowInfo.type === rt.groupFooter || rowInfo.type === rt.groupHeader)) && grid._allowVirtualScrolling()) {
                     var height = (grid._view()).getDefaultRowHeight();
@@ -14343,7 +14832,7 @@ var wijmo;
                 if(grid.parse(args.column, grid._dataViewWrapper.getValue(args.row.data, args.column.dataKey)) === true) {
                     $input.prop("checked", "checked");
                 }
-                args.$container.append($input);
+                args.$container.empty().append($input);
                 if(allowClickEditing) {
                     args.$container.children("input").bind("mousedown", function (e) {
                         targetElement = args.$container.parent()[0] , currentCell = grid.currentCell();
@@ -14371,7 +14860,7 @@ var wijmo;
                     column: args.column,
                     row: args.row
                 };
-                args.$container.append(this._buttonFactory(column.command, cmdArgs, null));
+                this._buttonFactory(args.$container, column.command, cmdArgs, null);
             };
             cellFormatterHelper.prototype._c1commandBtnFieldCellFormatter = function (args) {
                 var column = args.column, grid = column.owner, cmdArgs = {
@@ -14379,26 +14868,28 @@ var wijmo;
                     row: args.row
                 }, self = this;
                 if(args.row.state & wijmo.grid.renderState.editing) {
-                    args.$container.append(this._buttonFactory(column.updateCommand, cmdArgs, function (e, args) {
-                        grid.updateRow();
-                    }));
-                    args.$container.append(document.createTextNode("\u00A0"));
-                    args.$container.append(this._buttonFactory(column.cancelCommand, cmdArgs, function (e, args) {
-                        grid.cancelRowEditing();
-                    }));
+                    if(column.showEditButton) {
+                        this._buttonFactory(args.$container, column.updateCommand, cmdArgs, function (e, args) {
+                            grid.updateRow();
+                        });
+                        args.$container.append(document.createTextNode("\u00A0"));
+                        this._buttonFactory(args.$container, column.cancelCommand, cmdArgs, function (e, args) {
+                            grid.cancelRowEditing();
+                        });
+                    }
                 } else {
                     if(column.showEditButton) {
-                        args.$container.append(this._buttonFactory(column.editCommand, cmdArgs, function (e, args) {
+                        this._buttonFactory(args.$container, column.editCommand, cmdArgs, function (e, args) {
                             grid.editRow(cmdArgs.row.dataItemIndex);
-                        }));
+                        });
                     }
                     if(column.showDeleteButton) {
                         if(column.showEditButton) {
                             args.$container.append(document.createTextNode("\u00A0"));
                         }
-                        args.$container.append(this._buttonFactory(column.deleteCommand, cmdArgs, function (e, args) {
+                        this._buttonFactory(args.$container, column.deleteCommand, cmdArgs, function (e, args) {
                             grid.deleteRow(cmdArgs.row.dataItemIndex);
-                        }));
+                        });
                     }
                 }
                 args.$container.addClass("wijmo-wijgrid-innercell-command");
@@ -14413,17 +14904,26 @@ var wijmo;
                         domContainer.removeChild(domContainer.firstChild);
                     }
                 }
-                wijmo.grid.cellFormatterHelper._div.innerHTML = args.formattedValue || "&nbsp;";
+                if(args.column.encodeHtml) {
+                    if(wijmo.grid.cellFormatterHelper._div.textContent != undefined) {
+                        wijmo.grid.cellFormatterHelper._div.textContent = args.formattedValue || "";
+                    } else {
+                        wijmo.grid.cellFormatterHelper._div.innerText = args.formattedValue || ""// IE <= 8
+                        ;
+                    }
+                } else {
+                    wijmo.grid.cellFormatterHelper._div.innerHTML = args.formattedValue || "&nbsp;";
+                }
                 while(wijmo.grid.cellFormatterHelper._div.firstChild) {
                     domContainer.appendChild(wijmo.grid.cellFormatterHelper._div.firstChild);
                 }
             };
-            cellFormatterHelper.prototype._buttonFactory = function (cmd, args, clickCallback) {
+            cellFormatterHelper.prototype._buttonFactory = function (container, cmd, args, clickCallback) {
                 var btnOptions = $.extend({
                 }, {
                     text: cmd.text,
                     iconClass: cmd.iconClass,
-                    disabled: args.column.owner.disabled,
+                    disabled: args.column.owner.options.disabled,
                     click: function (e) {
                         var processDefault = true;
                         if($.isFunction(cmd.click)) {
@@ -14444,24 +14944,24 @@ var wijmo;
                         ;
                     }
                 });
-                var btnElement = null;
+                var btnContainer = $("<div />");
+                container.append(btnContainer);
                 switch(args.column.buttonType) {
                     case "link":
-                        btnElement = new grid.wijgridCommandLink(btnOptions).element();
+                        btnContainer.wijgridcommandlink(btnOptions);
                         break;
                     case "imageButton":
-                        btnElement = new grid.wijgridCommandImageButton(btnOptions).element();
+                        btnContainer.wijgridcommandimagebutton(btnOptions);
                         break;
                     case "button":
-                        btnElement = new grid.wijgridCommandButton(btnOptions).element();
+                        btnContainer.wijgridcommandbutton(btnOptions);
                         break;
                     case "image":
-                        btnElement = new grid.wijgridCommandImage(btnOptions).element();
+                        btnContainer.wijgridcommandimage(btnOptions);
                         break;
                     default:
                         throw "Unknown buttonType";
                 }
-                return btnElement;
             };
             return cellFormatterHelper;
         })();
@@ -14500,9 +15000,9 @@ var wijmo;
                 }
             };
             uiResizer.prototype.dispose = function () {
-                var self = this;
+                var _this = this;
                 $.each(this._elements, function (index, c1basefield) {
-                    c1basefield.element.unbind(self._eventKey("mousemove"), self._onMouseMove).unbind(self._eventKey("mousedown"), self._onMouseDown).unbind(self._eventKey("mouseout"), self._onMouseOut);
+                    c1basefield.element.unbind(_this._eventKey("mousemove"), _this._onMouseMove).unbind(_this._eventKey("mousedown"), _this._onMouseDown).unbind(_this._eventKey("mouseout"), _this._onMouseOut);
                 });
                 this._detachDocEvents();
             };
@@ -14549,7 +15049,7 @@ var wijmo;
                         document.body.style.cursor = "e-resize";
                         this._startLocation = this._lastLocation = wijmo.grid.bounds(this._hoveredField.element);
                         this._proxy = $("<div class=\"" + defCSS.resizingHandle + " " + wijCSS.wijgridResizingHandle + " " + wijCSS.stateHighlight + "\">&nbsp;</div>");
-                        var visibleAreaBounds = this._wijgrid._view().getVisibleAreaBounds();
+                        var visibleAreaBounds = this._wijgrid._view().getVisibleAreaBounds(true);
                         this._proxy.css({
                             "left": e.pageX,
                             "top": this._startLocation.top,
@@ -14629,7 +15129,9 @@ var wijmo;
                 return null;
             };
             uiResizer.prototype._eventKey = function (eventType) {
-                return wijmo.grid.stringFormat(this._evntFormat, eventType);
+                var prefix = (this._wijgrid._isTouchEnv()) ? "wij" : // 48214 [Win8.1, IE11] Column moving is performed instead of column sizing when resize a column.
+                "";
+                return prefix + wijmo.grid.stringFormat(this._evntFormat, eventType);
             };
             return uiResizer;
         })();
@@ -14660,7 +15162,7 @@ var wijmo;
             }
             uiDragndrop.prototype.attachGroupArea = function (element) {
                 var draggedWijField, self = this;
-                if(!($.ui).droppable || !($.ui).draggable) {
+                if(!$.ui || !($.ui).droppable || !($.ui).draggable) {
                     return;
                 }
                 element.droppable({
@@ -15151,9 +15653,33 @@ var wijmo;
                     this._wijgrid.options.rowStyleFormatter(args);
                 }
             };
+            rowStyleFormatterHelper.prototype._groupFormatter = function (rowInfo) {
+                var rse = wijmo.grid.renderStateEx, extInfo = rowInfo._extInfo, defCSS = wijmo.grid.wijgrid.CSS, wijCSS = this._wijgrid.options.wijCSS;
+                if(extInfo.state & rse.hidden) {
+                    rowInfo.$rows.css("display", "none");
+                    //rowInfo.$rows.attr("aria-hidden", true);
+                                    } else {
+                    rowInfo.$rows.css("display", "");
+                    //rowInfo.$rows.removeAttr("aria-hidden");
+                                    }
+                if(rowInfo.type & wijmo.grid.rowType.groupHeader) {
+                    var gi = this._wijgrid._groupedColumns()[rowInfo._extInfo.groupLevel - 1].groupInfo, expandedIcon = //1-based
+                    gi.expandedImageClass || wijCSS.iconArrowRightDown, collapsedIcon = gi.collapsedImageClass || wijCSS.iconArrowRight, toggleBtn = //toggleBtn = rowInfo.$rows.children("td, th").eq(this._wijgrid.options.showRowHeader ? 1 : 0).find("." + defCSS.groupToggleVisibilityButton);
+                    wijmo.grid.rowAccessor.getCell$(rowInfo.$rows, this._wijgrid.options.showRowHeader ? 1 : 0).find("." + defCSS.groupToggleVisibilityButton);
+                    if(extInfo.state & rse.collapsed) {
+                        rowInfo.$rows.attr("aria-expanded", false);
+                        rowInfo.$rows.removeClass(defCSS.groupHeaderRowExpanded + " " + wijCSS.wijgridGroupHeaderRowExpanded).addClass(defCSS.groupHeaderRowCollapsed + " " + wijCSS.wijgridGroupHeaderRowCollapsed);
+                        toggleBtn.removeClass(expandedIcon).addClass(collapsedIcon);
+                    } else {
+                        rowInfo.$rows.attr("aria-expanded", true);
+                        rowInfo.$rows.removeClass(defCSS.groupHeaderRowCollapsed + " " + wijCSS.wijgridGroupHeaderRowCollapsed).addClass(defCSS.groupHeaderRowExpanded + " " + wijCSS.wijgridGroupHeaderRowExpanded);
+                        toggleBtn.removeClass(collapsedIcon).addClass(expandedIcon);
+                    }
+                }
+            };
             rowStyleFormatterHelper.prototype._renderingStateFormatter = // * private
             function (args, rowAttr, rowStyle) {
-                var defCSS = wijmo.grid.wijgrid.CSS, wijCSS = this._wijgrid.options.wijCSS, className, contentClass = defCSS.row + " " + wijCSS.wijgridRow + " " + wijCSS.content, $rt = wijmo.grid.rowType, key;
+                var defCSS = wijmo.grid.wijgrid.CSS, wijCSS = this._wijgrid.options.wijCSS, className, contentClass = defCSS.row + " " + wijCSS.wijgridRow + " " + wijCSS.content, $rt = wijmo.grid.rowType, rse = wijmo.grid.renderStateEx, key;
                 args.$rows.attr("role", "row");
                 // copy attributes
                 if(rowAttr) {
@@ -15181,6 +15707,14 @@ var wijmo;
                         }
                     }
                 }
+                if(args._extInfo.groupLevel) {
+                    args.$rows.attr("aria-level", args._extInfo.groupLevel);
+                }
+                // hide collapsed row
+                if(args._extInfo.state & rse.hidden) {
+                    args.$rows.css("display", "none");
+                    // args.$rows.attr("aria-hidden", true);
+                                    }
                 switch(args.type & ~$rt.dataAlt) {
                     case // clear dataAlt modifier
                     ($rt.header):
@@ -15199,9 +15733,15 @@ var wijmo;
                         className = defCSS.filterRow + " " + wijCSS.wijgridFilterRow;
                         break;
                     case ($rt.groupHeader):
-                        className = contentClass + " " + defCSS.groupHeaderRow + " " + wijCSS.wijgridGroupHeaderRow;
+                        args.$rows.attr({
+                            "id": "GH" + args._extInfo.groupIndex + "-" + args._extInfo.groupLevel,
+                            "aria-expanded": ((args._extInfo.state & rse.collapsed) === 0)
+                        });
+                        className = contentClass + " " + defCSS.groupHeaderRow + " " + wijCSS.wijgridGroupHeaderRow + " ";
+                        className += (args._extInfo.state & rse.collapsed) ? defCSS.groupHeaderRowCollapsed + " " + wijCSS.wijgridGroupHeaderRowCollapsed : defCSS.groupHeaderRowExpanded + " " + wijCSS.wijgridGroupHeaderRowExpanded;
                         break;
                     case ($rt.groupFooter):
+                        args.$rows.attr("id", "GF" + args._extInfo.groupIndex + "-" + args._extInfo.groupLevel);
                         className = contentClass + " " + defCSS.groupFooterRow + " " + wijCSS.wijgridGroupFooterRow;
                         break;
                     case ($rt.footer):
@@ -15454,9 +15994,9 @@ var wijmo;
                 this._detachDocEvents();
             };
             uiFrozener.prototype._createVBar = function (visibleBounds, allFixedAreaBounds, containerBounds) {
-                var lAlign = (this._wijgrid.options.staticColumnsAlignment !== "right"), leftPos = lAlign ? allFixedAreaBounds.width + allFixedAreaBounds.left : allFixedAreaBounds.left - 2, self = this;
+                var lAlign = (this._wijgrid.options.staticColumnsAlignment !== "right"), leftPos = lAlign ? allFixedAreaBounds.width + allFixedAreaBounds.left : allFixedAreaBounds.left - 2, self = this, defCSS = wijmo.grid.wijgrid.CSS, wijCSS = this._wijgrid.options.wijCSS;
                 if(leftPos <= visibleBounds.left + visibleBounds.width) {
-                    this._$vBar = $("<div><div></div></div>").addClass(wijmo.grid.wijgrid.CSS.freezingHandleV + " " + this._wijgrid.options.wijCSS.wijgridFreezingHandleV).addClass(lAlign ? "" : "not-allowed").css(// remove "pointer" cursor (vbar dragging ability is disabled when staticColumnsAlignment == "right" is used)
+                    this._$vBar = $("<div><div></div></div>").addClass(defCSS.freezingHandleV + " " + wijCSS.wijgridFreezingHandleV).addClass(lAlign ? "" : "not-allowed").css(// remove "pointer" cursor (vbar dragging ability is disabled when staticColumnsAlignment == "right" is used)
                     {
                         left: leftPos - containerBounds.left,
                         top: allFixedAreaBounds.top - containerBounds.top,
@@ -15467,16 +16007,13 @@ var wijmo;
                         self._onBarMouseDown.apply(self, arguments);
                     }).appendTo(this._$outerDiv);
                     // content
-                    this._$vBar.find("div").addClass(this._wijgrid.options.wijCSS.header).css({
-                        width: 0,
-                        height: "100%"
-                    });
+                    this._$vBar.find("div").addClass(defCSS.freezingHandleContent + " " + wijCSS.header);
                 }
             };
             uiFrozener.prototype._createHBar = function (visibleBounds, allFixedAreaBounds, containerBounds) {
-                var topPos = allFixedAreaBounds.top + allFixedAreaBounds.height, lAlign = (this._wijgrid.options.staticColumnsAlignment !== "right"), self = this;
+                var topPos = allFixedAreaBounds.top + allFixedAreaBounds.height, lAlign = (this._wijgrid.options.staticColumnsAlignment !== "right"), self = this, defCSS = wijmo.grid.wijgrid.CSS, wijCSS = this._wijgrid.options.wijCSS;
                 if(topPos <= visibleBounds.top + visibleBounds.height) {
-                    this._$hBar = $("<div><div></div></div>").addClass(wijmo.grid.wijgrid.CSS.freezingHandleH + " " + this._wijgrid.options.wijCSS.wijgridFreezingHandleH).css({
+                    this._$hBar = $("<div><div></div></div>").addClass(defCSS.freezingHandleH + " " + wijCSS.wijgridFreezingHandleH).css({
                         left: lAlign ? allFixedAreaBounds.left - containerBounds.left : // 0?
                         0,
                         top: topPos - containerBounds.top,
@@ -15488,10 +16025,7 @@ var wijmo;
                         self._onBarMouseDown.apply(self, arguments);
                     }).appendTo(this._$outerDiv);
                     // content
-                    this._$hBar.find("div").addClass(this._wijgrid.options.wijCSS.header).css({
-                        width: "100%",
-                        height: 0
-                    });
+                    this._$hBar.find("div").addClass(defCSS.freezingHandleContent + " " + wijCSS.header);
                 }
             };
             uiFrozener.prototype._onBarMouseDown = // e.data: true = vertical, false = horizontal
@@ -15809,6 +16343,11 @@ var wijmo;
                 max += vScroller.scrollLargeChange - 1;
                 vScroller.scrollMax = max;
                 this._panelInst.option("vScroller", vScroller);
+                // TODO: rewrite!!
+                if(!this._view._isNativeSuperPanel() && ((this._panelInst)._scrollDrag != undefined)) {
+                    var f = (this._panelInst)._fields(), vbarContainer = f.vbarContainer, vbarDrag = f.vbarDrag;
+                    (this._panelInst)._scrollDrag("v", vbarContainer, vbarDrag, false);
+                }
             };
             uiVirtualScroller.prototype._changeVisibleRowsCount = function (visibleRowsCount) {
                 this._N = visibleRowsCount;
@@ -15895,6 +16434,7 @@ var wijmo;
 (function (wijmo) {
     /// <reference path="interfaces.ts" />
     (function (grid) {
+        /** @ignore */
         var renderBoundsCollection = (function () {
             function renderBoundsCollection(maxRowIndex) {
                 this._items = [];
@@ -16285,6 +16825,7 @@ var wijmo;
     /// <reference path="../../../external/declarations/globalize.d.ts"/>
     (function (data) {
         var $ = jQuery, glob = Globalize;
+        /** @ignore */
         function convert(val, fromType, toType, options) {
             var origValue = val;
             options = $.extend({
@@ -16324,6 +16865,7 @@ var wijmo;
             return val;
         }
         data.convert = convert;
+        /** @ignore */
         data.defaultParsers = {
             string: {
                 parse: // string -> string
@@ -16487,7 +17029,9 @@ var wijmo;
             *      { property: "age", operator: "<", value: 10 }]
             *   ]
             */
+            /** @ignore */
             (function (extended) {
+                /** @ignore */
                 extended.Connective = {
                     AND: "and",
                     OR: "or"
@@ -16572,6 +17116,7 @@ var wijmo;
                     }
                     return result;
                 }
+                /** @ignore */
                 function compile(filter) {
                     return compilAsExtended(filter) || data.filtering.compile(filter);
                 }
@@ -16593,6 +17138,7 @@ var wijmo;
         var wijdata = wijmo.data;
         var filterExt = wijdata.filtering.extended;
         // in fact implements IDataView in run-time, but not at compile-time
+        /** @ignore */
         var GridDataView = (function () {
             function GridDataView(real) {
                 this.real = real;
@@ -16735,5 +17281,69 @@ var wijmo;
         })();
         grid.GridDataView = GridDataView;
     })(wijmo.grid || (wijmo.grid = {}));
+    var grid = wijmo.grid;
+})(wijmo || (wijmo = {}));
+
+var __extends = this.__extends || function (d, b) {
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var wijmo;
+(function (wijmo) {
+    (function (grid) {
+        /** @ignore */
+        var koDataView = (function (_super) {
+            __extends(koDataView, _super);
+            function koDataView(observableArray) {
+                this.mObservableArray = observableArray;
+                var sourceArray = ko.utils.unwrapObservable(this.mObservableArray);
+                        _super.call(this, sourceArray, null);
+            }
+            koDataView.validSource = function validSource(source) {
+                return !!(ko && ko.isObservable(source) && $.isFunction(source.slice));// is there is a better way to detect?
+
+            };
+            koDataView.prototype.refresh = function (shape, local) {
+                if (typeof local === "undefined") { local = false; }
+                this.sourceArray = ko.utils.unwrapObservable(this.mObservableArray);
+                this.mPlainArray = ko.toJS(this.sourceArray);
+                // ** #53562: ensure that pageIndex is within [0; pageCount) range
+                var pageSize = shape && shape.pageSize !== undefined ? shape.pageSize : this.pageSize();
+                var pageIndex = shape && shape.pageIndex !== undefined ? shape.pageIndex : this.pageIndex();
+                if(pageSize > 0 && pageIndex > 0) {
+                    var pageCount = wijmo.data.util.pageCount(this.sourceArray.length, pageSize);
+                    if(pageIndex >= pageCount) {
+                        pageIndex = Math.max(0, pageCount - 1);
+                        if(!shape) {
+                            shape = {
+                            };
+                        }
+                        shape.pageIndex = pageIndex;
+                    }
+                }
+                // ** #53562: ensure that pageIndex is within[0; pageCount) range
+                return _super.prototype.refresh.apply(this, [
+                    shape,
+                    local
+                ]);
+            };
+            koDataView.prototype.getPlainSource = function () {
+                return this.mPlainArray;
+            };
+            koDataView.prototype.dispose = function () {
+                this.mObservableArray = null;
+                this.mPlainArray = null;
+                _super.prototype.dispose.apply(this, arguments);
+            };
+            return koDataView;
+        })(wijmo.data.ArrayDataView);
+        grid.koDataView = koDataView;
+        //wijmo.data.registerDataViewFactory(observableArray => {
+        //	if (wijmo.grid.koDataView.validSource(observableArray)) {
+        //		return new koDataView(observableArray);
+        //	}
+        //});
+            })(wijmo.grid || (wijmo.grid = {}));
     var grid = wijmo.grid;
 })(wijmo || (wijmo = {}));

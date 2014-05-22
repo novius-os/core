@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20133.20
+ * Wijmo Library 3.20141.34
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -8,7 +8,6 @@
  * Licensed under the Wijmo Commercial License. Also available under the GNU GPL Version 3 license.
  * licensing@wijmo.com
  * http://wijmo.com/widgets/license/
- *
  *
  */
 var __extends = this.__extends || function (d, b) {
@@ -18,8 +17,11 @@ var __extends = this.__extends || function (d, b) {
 };
 var wijmo;
 (function (wijmo) {
+    /// <reference path="jquery.wijmo.wijstringinfo.ts"/>
     /// <reference path="jquery.wijmo.wijinputcore.ts"/>
     /// <reference path="../wijcalendar/jquery.wijmo.wijcalendar.ts"/>
+    /// <reference path="jquery.wijmo.wijinputdateformat.ts"/>
+    /// <reference path="../wijtabs/jquery.wijmo.wijtabs.ts"/>
     /*globals  wijDateTextProvider wijinputcore wijInputResult window document Globalize jQuery*/
     /*
     * Depends:
@@ -33,7 +35,11 @@ var wijmo;
     *	jquery.mousewheel.js
     *	jquery.wijmo.wijpopup.js
     *	jquery.wijmo.wijcalendar.js
+    *	jquery.wijmo.wijcharex.js
+    *	jquery.wijmo.wijstringinfo.js
     *	jquery.wijmo.wijinputcore.js
+    *  jquery.wijmo.wijinputdateformat.js
+    *  jquery.wijmo.wijtabs.js
     *
     */
     (function (input) {
@@ -52,24 +58,18 @@ var wijmo;
         //		seven: 7,
         //		eight: 8
         //	}
-        function paddingZero(val, aCount) {
-            if (typeof aCount === "undefined") { aCount = 2; }
-            var text = '' + val + '';
-            if(text.length > aCount) {
-                text = text.substr(text.length - aCount);
-            } else {
-                while(text.length < aCount) {
-                    text = '0' + text;
-                }
-            }
-            return text;
-        }
         /** @widget */ var wijinputdate = (function (_super) {
             __extends(wijinputdate, _super);
             function wijinputdate() {
                 _super.apply(this, arguments);
 
             }
+            wijinputdate.prototype._create = function () {
+                if(input.Utility.chrome) {
+                    this.element.attr("type", "text");
+                }
+                _super.prototype._create.call(this);
+            };
             wijinputdate.prototype._createTextProvider = function () {
                 this._textProvider = new wijDateTextProvider(this, this.options.dateFormat, this.options.displayFormat);
             };
@@ -105,6 +105,9 @@ var wijmo;
                 }
                 if(strDate) {
                     date = this._strToDate(strDate);
+                    if(date === null) {
+                        date = new Date();
+                    }
                 }
                 if(date == null) {
                     date = this.options.date;
@@ -120,8 +123,8 @@ var wijmo;
                     }
                 }
                 this.element.data({
-                    defaultDate: date === null ? date : new Date(this.options.date.getTime()),
-                    preDate: date === null ? date : new Date(this.options.date.getTime())
+                    defaultDate: date === null ? date : new Date(date.getTime()),
+                    preDate: date === null ? date : new Date(date.getTime())
                 });
                 this._resetTimeStamp();
                 this._initPicker();
@@ -142,12 +145,15 @@ var wijmo;
                     var range = _this.element.wijtextselection();
                     _this._updateText();
                     _this.element.wijtextselection(range);
-                    _this._highLightCursor();
+                    if(_this.element.data('ignoreHighLight') != true) {
+                        _this._highLightCursor();
+                    }
                     if(input.Utility.chrome) {
                         if(_this.element.data('needResoteActiveField') == true) {
                             _this._setOption('activeField', oldActiveField);
                         }
                     }
+                    _this.element.data('ignoreHighLight', false);
                 });
             };
             wijinputdate.prototype._getInnerNullText = function () {
@@ -165,6 +171,13 @@ var wijmo;
             wijinputdate.prototype._getInnerPmDesignator = function () {
                 return this.options.pmDesignator == "" ? this._getStandardAMPM("PM") : this.options.pmDesignator;
             };
+            wijinputdate.prototype._getInnerIncrement = function () {
+                var increment = Number(this.options.increment);
+                if(isNaN(increment)) {
+                    increment = 1;
+                }
+                return increment;
+            };
             wijinputdate.prototype._getAllowSpinLoop = function () {
                 return !!this.options.allowSpinLoop;
             };
@@ -181,15 +194,15 @@ var wijmo;
             };
             wijinputdate.prototype._getRealEraMaxDate = function () {
                 if(this.options.maxDate) {
-                    return DateTimeInfo.GetEraMax() < this.options.maxDate ? DateTimeInfo.GetEraMax() : this.options.maxDate;
+                    return input.DateTimeInfo.GetEraMax() < this.options.maxDate ? input.DateTimeInfo.GetEraMax() : this.options.maxDate;
                 }
-                return DateTimeInfo.GetEraMax();
+                return input.DateTimeInfo.GetEraMax();
             };
             wijinputdate.prototype._getRealEraMinDate = function () {
                 if(this.options.minDate) {
-                    return DateTimeInfo.GetEraMin() > this.options.minDate ? DateTimeInfo.GetEraMin() : this.options.minDate;
+                    return input.DateTimeInfo.GetEraMin() > this.options.minDate ? input.DateTimeInfo.GetEraMin() : this.options.minDate;
                 }
-                return DateTimeInfo.GetEraMin();
+                return input.DateTimeInfo.GetEraMin();
             };
             wijinputdate.prototype._isEraFormatExist = function () {
                 return this._textProvider._isEraFormatExist();
@@ -197,7 +210,7 @@ var wijmo;
             wijinputdate.prototype._checkDate = function () {
                 var oldDate = this.options.date;
                 var newDate = this._checkRange(this.options.date);
-                if(!DateTimeInfo.Equal(oldDate, newDate)) {
+                if(!input.DateTimeInfo.Equal(oldDate, newDate)) {
                     this._setOption("date", newDate);
                     this._trigger('valueBoundsExceeded', null);
                 }
@@ -235,10 +248,6 @@ var wijmo;
                 return date;
             };
             wijinputdate.prototype._setOption = function (key, value) {
-                if(key == 'showTrigger') {
-                    this._setOption("showDropDownButton", value);
-                    return;
-                }
                 _super.prototype._setOption.call(this, key, value);
                 switch(key) {
                     case 'pickers':
@@ -330,7 +339,9 @@ var wijmo;
                         value = Math.max(value, 0);
                         this.options.activeField = value;
                         this._checkDate();
-                        this._highLightField();
+                        if(this.element.data('ignoreHighLight') != true) {
+                            this._highLightField();
+                        }
                         this._resetTimeStamp();
                         break;
                         //add for localization(calendar's tooltip)
@@ -385,12 +396,26 @@ var wijmo;
                 }
                 return val;
             };
+            wijinputdate.prototype._highLightAllField = function () {
+                if(this.isFocused()) {
+                    var range = this._textProvider.getAllRange();
+                    if(range) {
+                        try  {
+                            this.element.wijtextselection(range);
+                        } catch (e) {
+                        }
+                    }
+                }
+            };
             wijinputdate.prototype._highLightField = function (index) {
                 if (typeof index === "undefined") { index = this.options.activeField; }
                 if(this.isFocused()) {
                     var range = this._textProvider.getFieldRange(index);
                     if(range) {
-                        this.element.wijtextselection(range);
+                        try  {
+                            this.element.wijtextselection(range);
+                        } catch (e) {
+                        }
                     }
                 }
             };
@@ -431,12 +456,12 @@ var wijmo;
                     }, 1);
                 }
             };
-            wijinputdate.prototype.spinUp = /** Performs spin up by the specified field and increment value.
+            wijinputdate.prototype.spinUp = /** Performs spin up by the active field and increment value.
             */
             function () {
                 this._doSpin(true, false);
             };
-            wijinputdate.prototype.spinDown = /** Performs spin down by the specified field and increment value.
+            wijinputdate.prototype.spinDown = /** Performs spin down by the active field and increment value.
             */
             function () {
                 this._doSpin(false, false);
@@ -452,7 +477,11 @@ var wijmo;
                 _super.prototype.focus.call(this);
                 this._addState('focus', this.outerDiv);
                 this._updateText();
-                this._highLightField();
+                if(this.options.highlightText == "all") {
+                    this._highLightAllField();
+                } else {
+                    this._highLightField();
+                }
             };
             wijinputdate.prototype.isDateNull = /** Determines whether the date is a null value.
             */
@@ -480,13 +509,27 @@ var wijmo;
                     return;
                 }
                 this._updateText();
-                this._highLightField();
+                if(this.element.data('IsInSelectTextMethod') == true) {
+                    return;
+                }
                 if(input.Utility.chrome) {
                     var self = this;
                     self.element.data('needResoteActiveField', true);
                     window.setTimeout(function () {
                         self.element.data('needResoteActiveField', false);
+                        if(self.options.highlightText == "all") {
+                            self._highLightAllField();
+                        } else {
+                            self._highLightField();
+                        }
                     }, 200);
+                } else {
+                    if(this.options.highlightText == "all") {
+                        this._highLightAllField();
+                        this.element.data('ignoreHighLight', true);
+                    } else {
+                        this._highLightField();
+                    }
                 }
             };
             wijinputdate.prototype._simulate = function (text) {
@@ -501,9 +544,9 @@ var wijmo;
                         str = this.element.val().substring(start, end);
                     }
                 }
-                for(var era = 0; era < DateTimeInfo.GetEraCount(); era++) {
-                    if((str.toLowerCase() === DateTimeInfo.GetEraShortNames()[era].toLowerCase()) || (str.toLowerCase() === DateTimeInfo.GetEraAbbreviations()[era].toLowerCase()) || (str.toLowerCase() === DateTimeInfo.GetEraSymbols()[era].toLowerCase()) || (str.toLowerCase() === DateTimeInfo.GetEraNames()[era].toLowerCase())) {
-                        str = DateTimeInfo.GetEraShortNames()[era].toLowerCase();
+                for(var era = 0; era < input.DateTimeInfo.GetEraCount(); era++) {
+                    if((str.toLowerCase() === input.DateTimeInfo.GetEraShortNames()[era].toLowerCase()) || (str.toLowerCase() === input.DateTimeInfo.GetEraAbbreviations()[era].toLowerCase()) || (str.toLowerCase() === input.DateTimeInfo.GetEraSymbols()[era].toLowerCase()) || (str.toLowerCase() === input.DateTimeInfo.GetEraNames()[era].toLowerCase())) {
+                        str = input.DateTimeInfo.GetEraShortNames()[era].toLowerCase();
                         break;
                     }
                 }
@@ -526,7 +569,13 @@ var wijmo;
                     this._setDefaultDate(up);
                     return;
                 }
-                if(this._textProvider[up ? 'incEnumPart' : 'decEnumPart']()) {
+                var spinResult = false;
+                if(up) {
+                    spinResult = this._textProvider.incEnumPart();
+                } else {
+                    spinResult = this._textProvider.decEnumPart();
+                }
+                if(spinResult) {
                     this._updateText();
                     this._highLightField();
                 }
@@ -563,6 +612,8 @@ var wijmo;
             wijinputdate.prototype._onBlur = function (e) {
                 _super.prototype._onBlur.call(this, e);
                 this._checkDate();
+                this._removeState('focus', this.outerDiv);
+                this._updateText();
             };
             wijinputdate.prototype._keyDownPreview = function (e) {
                 if(_super.prototype._keyDownPreview.call(this, e)) {
@@ -586,6 +637,7 @@ var wijmo;
                     case jqKeyCode.LEFT:
                         if(this.options.activeField == 0 && (this.options.blurOnLeftRightKey.toLowerCase() == "left" || this.options.blurOnLeftRightKey.toLowerCase() == "both")) {
                             input.Utility.MoveFocus(this.element.get(0), false);
+                            this._trigger('keyExit');
                         } else {
                             this._toPrevField();
                         }
@@ -593,6 +645,7 @@ var wijmo;
                     case jqKeyCode.RIGHT:
                         if(this.options.activeField == this._textProvider.getFieldCount() - 1 && (this.options.blurOnLeftRightKey.toLowerCase() == "right" || this.options.blurOnLeftRightKey.toLowerCase() == "both")) {
                             input.Utility.MoveFocus(this.element.get(0), true);
+                            this._trigger('keyExit');
                         } else {
                             this._toNextField();
                         }
@@ -617,7 +670,8 @@ var wijmo;
                         }
                         break;
                     case jqKeyCode.TAB:
-                        if(this.options.tabAction !== "field") {
+                        if(this.options.tabAction !== "field" || this.options.highlightText !== "field") {
+                            this._trigger('keyExit');
                             break;
                         }
                         selRange = this.element.wijtextselection();
@@ -626,12 +680,14 @@ var wijmo;
                                 if(this.options.activeField > 0) {
                                     this._toPrevField();
                                 } else {
+                                    this._trigger('keyExit');
                                     break;
                                 }
                             } else {
                                 if(this.options.activeField < this._textProvider.getFieldCount() - 1) {
                                     this._toNextField();
                                 } else {
+                                    this._trigger('keyExit');
                                     break;
                                 }
                             }
@@ -725,6 +781,7 @@ var wijmo;
                 }
                 if(this._textProvider.needToMove(activeField, pos, ch)) {
                     input.Utility.MoveFocus(this.element.get(0), true);
+                    this._trigger('keyExit');
                 }
             };
             wijinputdate.prototype._keyPressPreview = function (e) {
@@ -770,8 +827,8 @@ var wijmo;
                     this.element.data('cursorPos', ++cursor);
                     var nullFlag = this.options.date == null;
                     ret = this._textProvider.addToField(input, this.options.activeField, pos);
+                    var activeField = this.options.activeField;
                     if(ret) {
-                        var activeField = this.options.activeField;
                         this._updateText();
                         this._autoMoveToNextField(cursor, ch);
                         this._highLightField();
@@ -783,7 +840,11 @@ var wijmo;
                         this._resetTimeStamp();
                         this._fireIvalidInputEvent();
                     }
-                    this.element.data("lastInputChar", ch);
+                    if(activeField != this.options.activeField) {
+                        this.element.data("lastInputChar", "");
+                    } else {
+                        this.element.data("lastInputChar", ch);
+                    }
                     this._stopEvent(e);
                     return true;
                 }
@@ -939,7 +1000,8 @@ var wijmo;
                 if(currentTab == "Calendar") {
                     tablePicker.css({
                         "width": pickerWidth + "px",
-                        "height": ""
+                        "height": "",
+                        "font-size": ""
                     });
                 } else if(currentTab == "Date" || currentTab == "Time") {
                     tdButton.css({
@@ -947,7 +1009,8 @@ var wijmo;
                     });
                     tablePicker.css({
                         "width": pickerWidth + "px",
-                        "height": pickerHeight + "px"
+                        "height": pickerHeight + "px",
+                        "font-size": "12px"
                     });
                     divPickers.css({
                         "height": pickerDivHeight + "px"
@@ -1193,7 +1256,6 @@ var wijmo;
                         if(pickers != undefined) {
                             pickers.wijpopup('hide');
                         }
-                        _this._trigger('dropDownClose', null);
                         if(selDate) {
                             if(curDate) {
                                 selDate.setHours(curDate.getHours());
@@ -1522,6 +1584,9 @@ var wijmo;
                 this.element.data('picker' + pickerType + 'ScrollTo', pickerScrollCurrent);
             };
             wijinputdate.prototype._touchMove = function (evt, pickerType) {
+                if(!this._allowEdit()) {
+                    return;
+                }
                 if(this.element.data("touch" + pickerType + "Started") != true) {
                     return;
                 }
@@ -1561,6 +1626,9 @@ var wijmo;
                 this._adjustTouchPosition(pickerType, newY);
             };
             wijinputdate.prototype._hourMouseWheel = function (e, arg) {
+                if(!this._allowEdit()) {
+                    return;
+                }
                 if(isNaN(arg)) {
                     return;
                 }
@@ -1594,6 +1662,9 @@ var wijmo;
                 }
             };
             wijinputdate.prototype._minuteMouseWheel = function (e, arg) {
+                if(!this._allowEdit()) {
+                    return;
+                }
                 if(isNaN(arg)) {
                     return;
                 }
@@ -1610,6 +1681,9 @@ var wijmo;
                 }
             };
             wijinputdate.prototype._amMouseWheel = function (e, arg) {
+                if(!this._allowEdit()) {
+                    return;
+                }
                 if(isNaN(arg)) {
                     return;
                 }
@@ -1626,6 +1700,9 @@ var wijmo;
                 }
             };
             wijinputdate.prototype._yearMouseWheel = function (e, arg) {
+                if(!this._allowEdit()) {
+                    return;
+                }
                 if(isNaN(arg)) {
                     return;
                 }
@@ -1645,6 +1722,9 @@ var wijmo;
                 }
             };
             wijinputdate.prototype._monthMouseWheel = function (e, arg) {
+                if(!this._allowEdit()) {
+                    return;
+                }
                 if(isNaN(arg)) {
                     return;
                 }
@@ -1662,6 +1742,9 @@ var wijmo;
                 }
             };
             wijinputdate.prototype._dayMouseWheel = function (e, arg) {
+                if(!this._allowEdit()) {
+                    return;
+                }
                 if(isNaN(arg)) {
                     return;
                 }
@@ -1788,7 +1871,7 @@ var wijmo;
                 var year = this.element.data("pickerYear");
                 var month = this.element.data("pickerMonth");
                 var day = this.element.data("pickerDay");
-                var maxDayCount = DateTimeInfo.DaysInMonth(year, month);
+                var maxDayCount = input.DateTimeInfo.DaysInMonth(year, month);
                 this._updateItemTransform("Year", year - minYear);
                 this._updateItemTransform("Month", month - 1);
                 this._updateItemTransform("Day", day - 1);
@@ -1807,7 +1890,7 @@ var wijmo;
                 var year = this.element.data("pickerYear");
                 var month = this.element.data("pickerMonth");
                 var day = this.element.data("pickerDay");
-                var maxDayCount = DateTimeInfo.DaysInMonth(year, month);
+                var maxDayCount = input.DateTimeInfo.DaysInMonth(year, month);
                 this.element.data('pickerDayMaxCount', maxDayCount);
                 var pickerDayArray = this.element.data('pickerDayArray');
                 for(var i = 29; i <= 31; i++) {
@@ -1972,7 +2055,6 @@ var wijmo;
                 if(pickers != undefined) {
                     pickers.wijpopup('hide');
                 }
-                this._trigger('dropDownClose', null);
                 if(this._allowEdit()) {
                     this.option('date', date);
                     this.selectText();
@@ -2350,9 +2432,6 @@ var wijmo;
                 calendar.wijcalendar('refresh');
             };
             wijinputdate.prototype._showPopup = function () {
-                if(!this._allowEdit()) {
-                    return false;
-                }
                 if(this._isDatePickerNeedReInit()) {
                     this._reInitPicker();
                 }
@@ -2424,8 +2503,6 @@ var wijmo;
                         if(this._getPickerCount() <= 1) {
                             pickers.css({
                                 "width": ""
-                            }).attr({
-                                "class": ""
                             });
                         }
                         pickers.css({
@@ -2552,12 +2629,33 @@ var wijmo;
                 var li = $("<li/>").appendTo(ul).css("line-height", "1px");
                 var a = $("<a/>").attr("href", href).html(tab).appendTo(li);
             };
+            wijinputdate.prototype._internalSetDate = function (date) {
+                var self = this, o = this.options, inputElement = this.element, typing = !!inputElement.data('typing'), chkBounds;
+                if(typing) {
+                    o.date = date;
+                    chkBounds = function () {
+                        var now = new Date(), lastTime = inputElement.data('timeStamp');
+                        if(lastTime) {
+                            if((now.getTime() - lastTime.getTime()) > o.keyDelay) {
+                                self._safeSetDate(o.date, true);
+                                self._updateText();
+                                self._highLightField();
+                            } else {
+                                window.setTimeout(chkBounds, o.keyDelay);
+                            }
+                        }
+                    };
+                    window.setTimeout(chkBounds, o.keyDelay);
+                } else {
+                    this._safeSetDate(date);
+                }
+            };
             wijinputdate.prototype.selectText = /** Selects a range of text in the widget.
             * @param {Number} start Start of the range.
             * @param {Number} end End of the range.
             * @example
-            * // Select first two symbols in a wijinputcore
-            * $(".selector").wijinputcore("selectText", 0, 2);
+            * // Select first two symbols in a wijinputdate
+            * $(".selector").wijinputdate("selectText", 0, 2);
             */
             function (start, end) {
                 if (typeof start === "undefined") { start = 0; }
@@ -2565,11 +2663,16 @@ var wijmo;
                 if(this.isFocused()) {
                     _super.prototype.selectText.call(this, start, end);
                 } else {
+                    this.element.data('IsInSelectTextMethod', true);
                     this.focus();
                     var obj = this;
                     setTimeout(function () {
-                        obj.selectText(start, end);
+                        try  {
+                            obj.selectText(start, end);
+                        } catch (e) {
+                        }
                     }, 0);
+                    this.element.data('IsInSelectTextMethod', false);
                 }
             };
             return wijinputdate;
@@ -2592,127 +2695,150 @@ var wijmo;
                 /** The format pattern to display the date value when control got focus.
                 *
                 * @remarks
-                * wijinputdate supports two types of formats:
-                * Standard Format and Custom Format.
+                * wijinputdate supports two types of formats:  <br />
+                * Standard Format and Custom Format. <br />
+                * <br />
+                * A standard date and time format string uses a single format specifier  <br />
+                * to define the text representation of a date and time value. <br />
+                * <br />
+                * Possible values for Standard Format are: <br />
+                * "d": ShortDatePattern <br />
+                * "D": LongDatePattern <br />
+                * "f": Full date and time (long date and short time)  <br />
+                * "F": FullDateTimePattern  <br />
+                * "g": General (short date and short time)  <br />
+                * "G": General (short date and long time)  <br />
+                * "m": MonthDayPattern  <br />
+                * "M": monthDayPattern  <br />
+                * "r": RFC1123Pattern   <br />
+                * "R": RFC1123Pattern   <br />
+                * "s": SortableDateTimePattern   <br />
+                * "t": shortTimePattern   <br />
+                * "T": LongTimePattern   <br />
+                * "u": UniversalSortableDateTimePattern  <br />
+                * "U": Full date and time (long date and long time) using universal time  <br />
+                * "y": YearMonthPattern   <br />
+                * "Y": yearMonthPattern   <br />
                 *
-                * A standard date and time format string uses a single format specifier
-                * to define the text representation of a date and time value.
-                *
-                * Possible values for Standard Format are:
-                * "d": ShortDatePattern
-                * "D": LongDatePattern
-                * "f": Full date and time (long date and short time)
-                * "F": FullDateTimePattern
-                * "g": General (short date and short time)
-                * "G": General (short date and long time)
-                * "m": MonthDayPattern
-                * "M": monthDayPattern
-                * "r": RFC1123Pattern
-                * "R": RFC1123Pattern
-                * "s": SortableDateTimePattern
-                * "t": shortTimePattern
-                * "T": LongTimePattern
-                * "u": UniversalSortableDateTimePattern
-                * "U": Full date and time (long date and long time) using universal time
-                * "y": YearMonthPattern
-                * "Y": yearMonthPattern
-                *
-                * Any date and time format string that contains more than one character,
+                * Any date and time format string that contains more than one character,  <br/>
                 * including white space, is interpreted as a custom date and time format
-                * string. For example:
+                * string. For example:    <br/>
                 * "mmm-dd-yyyy", "mmmm d, yyyy", "mm/dd/yyyy", "d-mmm-yyyy",
-                * "ddd, mmmm dd, yyyy" etc.
+                * "ddd, mmmm dd, yyyy" etc.   <br/>
                 *
-                * Below are the custom date and time format specifiers:
-                *
-                * "d": The day of the month, from 1 through 31.
-                * "dd": The day of the month, from 01 through 31.
-                * "ddd": The abbreviated name of the day of the week.
-                * "dddd": The full name of the day of the week.
-                * "m": The minute, from 0 through 59.
-                * "mm": The minute, from 00 through 59.
-                * "M": The month, from 1 through 12.
-                * "MM": The month, from 01 through 12.
-                * "MMM": The abbreviated name of the month.
-                * "MMMM": The full name of the month.
-                * "y": The year, from 0 to 99.
-                * "yy": The year, from 00 to 99
-                * "yyy": The year, with a minimum of three digits.
-                * "yyyy": The year as a four-digit number
-                * "h": The hour, using a 12-hour clock from 1 to 12.
-                * "hh": The hour, using a 12-hour clock from 01 to 12.
-                * "H": The hour, using a 24-hour clock from 0 to 23.
-                * "HH": The hour, using a 24-hour clock from 00 to 23.
-                * "s": The second, from 0 through 59.
-                * "ss": The second, from 00 through 59.
-                * "t": The first character of the AM/PM designator.
-                * "tt": The AM/PM designator.
+                * Below are the custom date and time format specifiers:  <br/>
+                *   <br/>
+                * "d": The day of the month, from 1 through 31.   <br />
+                * "dd": The day of the month, from 01 through 31.  <br />
+                * "ddd": The abbreviated name of the day of the week.  <br />
+                * "dddd": The full name of the day of the week.   <br />
+                * "m": The minute, from 0 through 59.   <br />
+                * "mm": The minute, from 00 through 59.  <br />
+                * "M": The month, from 1 through 12.  <br />
+                * "MM": The month, from 01 through 12.  <br />
+                * "MMM": The abbreviated name of the month.  <br />
+                * "MMMM": The full name of the month.  <br />
+                * "y": The year, from 0 to 99.   <br />
+                * "yy": The year, from 00 to 99   <br />
+                * "yyy": The year, with a minimum of three digits.  <br />
+                * "yyyy": The year as a four-digit number   <br />
+                * "h": The hour, using a 12-hour clock from 1 to 12.   <br />
+                * "hh": The hour, using a 12-hour clock from 01 to 12.   <br />
+                * "H": The hour, using a 24-hour clock from 0 to 23.   <br />
+                * "HH": The hour, using a 24-hour clock from 00 to 23.  <br />
+                * "s": The second, from 0 through 59.   <br />
+                * "ss": The second, from 00 through 59.   <br />
+                * "t": The first character of the AM/PM designator.   <br />
+                * "tt": The AM/PM designator.    <br />
                 */
                 this.dateFormat = 'd';
                 /** The format pattern to display the date value when control lost focus.
                 *
                 * @remarks
-                * wijinputdate supports two types of formats:
-                * Standard Format and Custom Format.
+                * wijinputdate supports two types of formats:   <br />
+                * Standard Format and Custom Format.   <br />
+                * <br />
+                * A standard date and time format string uses a single format specifier <br />
+                * to define the text representation of a date and time value.   <br />
                 *
-                * A standard date and time format string uses a single format specifier
-                * to define the text representation of a date and time value.
+                * Possible values for Standard Format are:  <br />
+                * "d": ShortDatePattern  <br />
+                * "D": LongDatePattern  <br />
+                * "f": Full date and time (long date and short time) <br />
+                * "F": FullDateTimePattern  <br />
+                * "g": General (short date and short time)  <br />
+                * "G": General (short date and long time)  <br />
+                * "m": MonthDayPattern   <br />
+                * "M": monthDayPattern  <br />
+                * "r": RFC1123Pattern   <br />
+                * "R": RFC1123Pattern   <br />
+                * "s": SortableDateTimePattern  <br />
+                * "t": shortTimePattern  <br />
+                * "T": LongTimePattern   <br />
+                * "u": UniversalSortableDateTimePattern  <br />
+                * "U": Full date and time (long date and long time) using universal time   <br />
+                * "y": YearMonthPattern  <br />
+                * "Y": yearMonthPattern  <br />
                 *
-                * Possible values for Standard Format are:
-                * "d": ShortDatePattern
-                * "D": LongDatePattern
-                * "f": Full date and time (long date and short time)
-                * "F": FullDateTimePattern
-                * "g": General (short date and short time)
-                * "G": General (short date and long time)
-                * "m": MonthDayPattern
-                * "M": monthDayPattern
-                * "r": RFC1123Pattern
-                * "R": RFC1123Pattern
-                * "s": SortableDateTimePattern
-                * "t": shortTimePattern
-                * "T": LongTimePattern
-                * "u": UniversalSortableDateTimePattern
-                * "U": Full date and time (long date and long time) using universal time
-                * "y": YearMonthPattern
-                * "Y": yearMonthPattern
-                *
-                * Any date and time format string that contains more than one character,
-                * including white space, is interpreted as a custom date and time format
-                * string. For example:
+                * Any date and time format string that contains more than one character, <br />
+                * including white space, is interpreted as a custom date and time format   <br />
+                * string. For example: <br />
                 * "mmm-dd-yyyy", "mmmm d, yyyy", "mm/dd/yyyy", "d-mmm-yyyy",
-                * "ddd, mmmm dd, yyyy" etc.
+                * "ddd, mmmm dd, yyyy" etc.  <br />
                 *
-                * Below are the custom date and time format specifiers:
+                * Below are the custom date and time format specifiers:  <br />
                 *
-                * "d": The day of the month, from 1 through 31.
-                * "dd": The day of the month, from 01 through 31.
-                * "ddd": The abbreviated name of the day of the week.
-                * "dddd": The full name of the day of the week.
-                * "m": The minute, from 0 through 59.
-                * "mm": The minute, from 00 through 59.
-                * "M": The month, from 1 through 12.
-                * "MM": The month, from 01 through 12.
-                * "MMM": The abbreviated name of the month.
-                * "MMMM": The full name of the month.
-                * "y": The year, from 0 to 99.
-                * "yy": The year, from 00 to 99
-                * "yyy": The year, with a minimum of three digits.
-                * "yyyy": The year as a four-digit number
-                * "h": The hour, using a 12-hour clock from 1 to 12.
-                * "hh": The hour, using a 12-hour clock from 01 to 12.
-                * "H": The hour, using a 24-hour clock from 0 to 23.
-                * "HH": The hour, using a 24-hour clock from 00 to 23.
-                * "s": The second, from 0 through 59.
-                * "ss": The second, from 00 through 59.
-                * "t": The first character of the AM/PM designator.
-                * "tt": The AM/PM designator.
+                * "d": The day of the month, from 1 through 31.   <br />
+                * "dd": The day of the month, from 01 through 31.   <br />
+                * "ddd": The abbreviated name of the day of the week.  <br />
+                * "dddd": The full name of the day of the week.  <br />
+                * "m": The minute, from 0 through 59.   <br />
+                * "mm": The minute, from 00 through 59.  <br />
+                * "M": The month, from 1 through 12.  <br />
+                * "MM": The month, from 01 through 12.   <br />
+                * "MMM": The abbreviated name of the month.  <br />
+                * "MMMM": The full name of the month. <br />
+                * "y": The year, from 0 to 99.  <br />
+                * "yy": The year, from 00 to 99  <br />
+                * "yyy": The year, with a minimum of three digits.  <br />
+                * "yyyy": The year as a four-digit number  <br />
+                * "h": The hour, using a 12-hour clock from 1 to 12.  <br />
+                * "hh": The hour, using a 12-hour clock from 01 to 12.  <br />
+                * "H": The hour, using a 24-hour clock from 0 to 23.   <br />
+                * "HH": The hour, using a 24-hour clock from 00 to 23.  <br />
+                * "s": The second, from 0 through 59.   <br />
+                * "ss": The second, from 00 through 59.  <br />
+                * "t": The first character of the AM/PM designator.  <br />
+                * "tt": The AM/PM designator.    <br />
+                * "E": Display the nengo year as a single digit number when possible (first year use Japanese name).  <br />
                 */
                 this.displayFormat = '';
                 /** Determines string designator for hours that are "ante meridiem" (before noon).
+                * @remarks
+                * The Text set in the amDesignator option is displayed in the position occupied by the keywords "tt" and "t"
+                * in the dateFormat or dipslayFormat.  <br />
+                * If the custom pattern includes the format pattern "tt" and the time is before noon,
+                * the value of amDesignator is displayed in place of the "tt" in the dateFormat or displayFormat pattern.   <br />
+                * If the custom pattern includes the format pattern "t", only the first character of amDesignator is displayed.   <br />
+                * If setting "tt" in format and not setting amDesignator/pmDesignator options,
+                * it will show the string getting from the specified culture.    <br />
+                * If not set, it will show "午前"/"午後" in Japanese culture and "AM"/"PM" in English culture.   <br />
+                * If setting "t" in format and not setting amDesignator/pmDesignator options, it will show the string getting from current culture.  <br />
+                * If not set, it will display "午" in Japanese culture and "A"/"P" in English culture.  <br />
                 */
                 this.amDesignator = "";
                 /** Determines the string designator for hours that are "post meridiem" (after noon).
+                * @remarks
+                * The Text set in the amDesignator option is displayed in the position occupied by the keywords "tt" and "t"
+                * in the dateFormat or dipslayFormat.  <br />
+                * If the custom pattern includes the format pattern "tt" and the time is after noon,
+                * the value of pmDesignator is displayed in place of the "tt" in the dateFormat or displayFormat pattern.   <br />
+                * If the custom pattern includes the format pattern "t", only the first character of pmDesignator is displayed.   <br />
+                * If setting "tt" in format and not setting amDesignator/pmDesignator options,
+                * it will show the string getting from the specified culture.    <br />
+                * If not set, it will show "午前"/"午後" in Japanese culture and "AM"/"PM" in English culture.   <br />
+                * If setting "t" in format and not setting amDesignator/pmDesignator options, it will show the string getting from current culture.  <br />
+                * If not set, it will display "午" in Japanese culture and "A"/"P" in English culture.  <br />
                 */
                 this.pmDesignator = "";
                 /** A bool value determines whether to express midnight as 24:00.
@@ -2741,19 +2867,29 @@ var wijmo;
                 * If the value is "control", the behavior is similar to the standard control.
                 */
                 this.tabAction = "field";
-                /** Determines how the control should interpret incomplete year information
+                /** Determines how the control should interpret 2-digits year inputted in year field.
                 * when the "smartInputMode" option is set to true.
                 * @remarks
-                * For example, if "startYear" is set to 1950 (the default),
-                * then years "0000" to "0050" will be converted to "2000" to "2050",
-                * and years "0051" to "0099" will be converted to "1951" to "1999".
+                * For example, if "startYear" is set to 1950 (the default value), and "smartInputMode" is true.   <br />
+                * Enter 2-digit year value which is greater than 50 [e.g., 88]  <br />
+                * ‘1988’ displays in year part.  <br />
+                * Enter 2-digit year value which is less than 50 [e.g., 12]  <br />
+                * ‘2012’ displays in year part.  <br />
                 */
                 this.startYear = 1950;
-                /** Determines whether the control should interpret incomplete year information
+                /** Determines whether the control should interpret 2-digits year inputted in year field.
                 * using the value provided in the "startYear" option.
                 * @remarks
-                * If this option is set to true, the control will interpret years in the format "00**" as "20**" or "19**",
-                * depending on the value of "startYear".
+                * For example, when "smartInputMode" is false (the default value), and "startYear" is 1950. <br />
+                * Enter 2-digit year value which is greater than 50 [e.g., 88]  <br />
+                * ‘0088’ displays in year part.    <br />
+                * Enter 2-digit year value which is less than 50 [e.g., 12]  <br />
+                * ‘0012’ displays in year part.  <br />
+                * Set "smartInputMode" to true.  <br />
+                * Enter 2-digit year value which is greater than 50 [e.g., 88]  <br />
+                * ‘1988’ displays in year part when smartInputMode is true.   <br />
+                * Enter 2-digit year value which is less than 50 [e.g., 12]  <br />
+                * ‘2012’ displays in year part. <br />
                 */
                 this.smartInputMode = false;
                 /** Determines the active field index.
@@ -2776,6 +2912,7 @@ var wijmo;
                 */
                 this.autoNextField = true;
                 /** This option will supply an element to init the calendar widget
+                * @ignore
                 * @remarks
                 * If the value is 'default', the widget will create a div and
                 * append it to body element, and using this element to init calendar.
@@ -2785,14 +2922,37 @@ var wijmo;
                 this.calendar = 'default';
                 /** Detemines the popup position of a calendar.
                 * See jQuery.ui.position for position options.
+                * @example
+                * // In the following example, the Y offset between the popup position and wijinputdate is 10 pixel.
+                * $("#textbox1").wijinputdate({
+                *     popupPosition: { offset: '0 10' },
+                *     comboItems: [{ label: "first Day", value: new Date(2013, 1, 1) },
+                *         { label: "second day", value: new Date(2013, 3, 3) },
+                *         { label: "third day", value: new Date(2013, 4, 5) }]
+                * });
                 */
                 this.popupPosition = {
                     offset: '0 4'
                 };
+                /** Gets or sets whether to highlight the control's Text on receiving input focus.
+                * possible values is "field", "all" .
+                * @example
+                * $("#textbox1").wijinputdate({
+                *     highlightText: "field"
+                * });
+                */
+                this.highlightText = "field";
+                /** Determines how much to increase/decrease the active field when performing spin on the the active field.
+                * @example
+                * $("#textbox1").wijinputdate({
+                *     increment: 2
+                * });
+                */
+                this.increment = 1;
                 /** Determines the input method setting of widget.
                 * Possible values are: 'auto', 'active', 'inactive', 'disabled'
                 * @remarks
-                * This property only take effect on IE browser.
+                * This property only take effect on IE and firefox browser.
                 */
                 this.imeMode = "auto";
                 /** Determines whether dropdown button is displayed.
@@ -2848,14 +3008,17 @@ var wijmo;
                 this.dateChanged = null;
                 /** The spinUp event handler.
                 * A function called when spin up event fired.
+                * @event
                 */
                 this.spinUp = null;
                 /** The spinDown event handler.
                 * A function called when spin down event fired.
+                * @event
                 */
                 this.spinDown = null;
                 /** The valueBoundsExceeded event hander.
                 * A function called when the valueBoundExceeded event fired.
+                * @event
                 */
                 this.valueBoundsExceeded = null;
             }
@@ -2864,697 +3027,70 @@ var wijmo;
         wijinputdate.prototype.options = $.extend(true, {
         }, input.wijinputcore.prototype.options, new wijinputdate_options());
         $.wijmo.registerWidget("wijinputdate", wijinputdate.prototype);
-        var DateTimeInfo = (function () {
-            function DateTimeInfo() { }
-            DateTimeInfo.EraDates = new Array(new Date(1868, 9 - 1, 8), new Date(1912, 7 - 1, 30), new Date(1926, 12 - 1, 25), new Date(1989, 1 - 1, 8));
-            DateTimeInfo.EraCount = 4;
-            DateTimeInfo.EraYears = new Array(45, 15, 64, 99);
-            DateTimeInfo.EraMax = new Date(2087, 12 - 1, 31, 23, 59, 59);
-            DateTimeInfo.EraMin = new Date(1868, 9 - 1, 8);
-            DateTimeInfo.EraKeys = new Array("1", "2", "3", "4", "m", "t", "s", "h");
-            DateTimeInfo.EraIndices = new Array(0, 1, 2, 3, 0, 1, 2, 3);
-            DateTimeInfo.DateLongFormat = "yyyyMMddHHmmss";
-            DateTimeInfo.EraNames = new Array("M", "T", "S", "H", "\u660E", "\u5927", "\u662D", "\u5E73", "\u660E\u6CBB", "\u5927\u6B63", "\u662D\u548C", "\u5E73\u6210");
-            DateTimeInfo.WeekDays = new Array("\u65e5\u66dc\u65e5", "\u6708\u66dc\u65e5", "\u706b\u66dc\u65e5", "\u6c34\u66dc\u65e5", "\u6728\u66dc\u65e5", "\u91d1\u66dc\u65e5", "\u571f\u66dc\u65e5");
-            DateTimeInfo.MonthNames = new Array("\u0031\u6708", "\u0032\u6708", "\u0033\u6708", "\u0034\u6708", "\u0035\u6708", "\u0036\u6708", "\u0037\u6708", "\u0038\u6708", "\u0039\u6708", "\u0031\u0030\u6708", "\u0031\u0031\u6708", "\u0031\u0032\u6708");
-            DateTimeInfo.ShortWeekDays = new Array("\u65e5", "\u6708", "\u706b", "\u6c34", "\u6728", "\u91d1", "\u571f");
-            DateTimeInfo.ShortMonthNames = new Array("\u0031", "\u0032", "\u0033", "\u0034", "\u0035", "\u0036", "\u0037", "\u0038", "\u0039", "\u0031\u0030", "\u0031\u0031", "\u0031\u0032");
-            DateTimeInfo.RokuyouTextArray = new Array("\u5148\u52dd", "\u53cb\u5f15", "\u5148\u8ca0", "\u4ecf\u6ec5", "\u5927\u5b89", "\u8d64\u53e3");
-            DateTimeInfo.RokuyouTextArrayEn = new Array("Senshou", "Tomobiki", "Senbu", "Butsumetsu", "Taian", "Shakkou");
-            DateTimeInfo.DefaultTwoDigitYear = 2029;
-            DateTimeInfo.Digits = 2;
-            DateTimeInfo.EraYearMax = 99;
-            DateTimeInfo.RokuyouMin = new Date(1960, 0, 28);
-            DateTimeInfo.RokuyouMax = new Date(2050, 0, 22);
-            DateTimeInfo.LunarInfo = new Array(0x0aea6, 0x0ab50, 0x04d60, 0x0aae4, 0x0a570, 0x05270, 0x07263, 0x0d950, 0x06b57, 0x056a0, 0x09ad0, 0x04dd5, 0x04ae0, 0x0a4e0, 0x0d4d4, 0x0d250, 0x0d598, 0x0b540, 0x0d6a0, 0x0195a6, 0x095b0, 0x049b0, 0x0a9b4, 0x0a4b0, 0x0b27a, 0x06a50, 0x06d40, 0x0b756, 0x02b60, 0x095b0, 0x04b75, 0x04970, 0x064b0, 0x074a3, 0x0ea50, 0x06d98, 0x055d0, 0x02b60, 0x096e5, 0x092e0, 0x0c960, 0x0e954, 0x0d4a0, 0x0da50, 0x07552, 0x056c0, 0x0abb7, 0x025d0, 0x092d0, 0x0cab5, 0x0a950, 0x0b4a0, 0x1b4a3, 0x0b550, 0x055d9, 0x04ba0, 0x0a5b0, 0x05575, 0x052b0, 0x0a950, 0x0b954, 0x06aa0, 0x0ad50, 0x06b52, 0x04b60, 0x0a6e6, 0x0a570, 0x05270, 0x06a65, 0x0d930, 0x05aa0, 0x0b6a3, 0x096d0, 0x04bd7, 0x04ae0, 0x0a4d0, 0x01d0d6, 0x0d250, 0x0d520, 0x0dd45, 0x0b6a0, 0x096d0, 0x055b2, 0x049b0, 0x0a577, 0x0a4b0, 0x0b250, 0x01b255, 0x06d40, 0x0ada0);
-            DateTimeInfo.IsValidEraDate = function IsValidEraDate(date) {
-                if(date < this.GetEraMin() || date > this.GetEraMax()) {
-                    return false;
-                }
-                return true;
-            };
-            DateTimeInfo.ConvertToGregorianYear = function ConvertToGregorianYear(era, eraYear, strict) {
-                if(era < 0 || era >= this.GetEraCount() || eraYear < 1 || strict && eraYear > this.GetEraYears()[era]) {
-                    return -1;
-                }
-                return this.GetEraDates()[era].getFullYear() + eraYear - 1;
-            };
-            DateTimeInfo.GetEraDates = function GetEraDates() {
-                if(window.eras != undefined) {
-                    var eraDates = new Array();
-                    for(var i = 0; i < window.eras.length; i++) {
-                        var date = new Date(window.eras[i].startDate.replace(/-/g, "/"));
-                        eraDates[i] = date;
-                    }
-                    return eraDates;
-                }
-                return this.EraDates;
-            };
-            DateTimeInfo.GetEraNames = function GetEraNames() {
-                var eraNames = new Array();
-                if(window.eras != undefined) {
-                    for(var i = 0; i < window.eras.length; i++) {
-                        eraNames[i] = window.eras[i].name;
-                    }
-                    return eraNames;
-                }
-                for(var i = 0; i < this.EraCount; i++) {
-                    eraNames[i] = this.EraNames[i + 2 * this.EraCount];
-                }
-                return eraNames;
-            };
-            DateTimeInfo.GetEraSymbols = function GetEraSymbols() {
-                var eraSymbol = new Array();
-                if(window.eras != undefined) {
-                    for(var i = 0; i < window.eras.length; i++) {
-                        eraSymbol[i] = window.eras[i].symbol;
-                    }
-                    return eraSymbol;
-                }
-                for(var i = 0; i < this.EraCount; i++) {
-                    eraSymbol[i] = this.EraNames[i];
-                    ;
-                }
-                return eraSymbol;
-            };
-            DateTimeInfo.GetEraAbbreviations = function GetEraAbbreviations() {
-                var eraAbbreviation = new Array();
-                if(window.eras != undefined) {
-                    for(var i = 0; i < window.eras.length; i++) {
-                        eraAbbreviation[i] = window.eras[i].abbreviation;
-                    }
-                    return eraAbbreviation;
-                }
-                for(var i = 0; i < this.EraCount; i++) {
-                    eraAbbreviation[i] = this.EraNames[i + this.EraCount];
-                }
-                return eraAbbreviation;
-            };
-            DateTimeInfo.GetEraShortNames = function GetEraShortNames() {
-                var eraShortName = new Array();
-                if(window.eras != undefined) {
-                    for(var i = 0; i < window.eras.length; i++) {
-                        eraShortName[i] = window.eras[i].shortcuts.split(',')[1];
-                    }
-                    return eraShortName;
-                }
-                for(var i = 0; i < this.EraCount; i++) {
-                    eraShortName[i] = this.EraNames[i];
-                }
-                return eraShortName;
-            };
-            DateTimeInfo.GetEraShortcuts = function GetEraShortcuts() {
-                var eraShortcuts = new Array();
-                if(window.eras != undefined) {
-                    for(var i = 0; i < window.eras.length; i++) {
-                        eraShortcuts[i] = window.eras[i].shortcuts.split(',')[0];
-                    }
-                    return eraShortcuts;
-                }
-                for(var i = 0; i < this.EraCount; i++) {
-                    eraShortcuts[i] = this.EraKeys[i];
-                }
-                return eraShortcuts;
-            };
-            DateTimeInfo.GetEraMax = function GetEraMax() {
-                if(window.eras != undefined) {
-                    if(window.eras.length > 0) {
-                        var date = new Date(window.eras[window.eras.length - 1].startDate.replace(/-/g, "/"));
-                        date.setFullYear(date.getFullYear() + 99);
-                        return date;
-                    }
-                }
-                return this.EraMax;
-            };
-            DateTimeInfo.GetEraMin = function GetEraMin() {
-                if(window.eras != undefined) {
-                    if(window.eras.length > 0) {
-                        var date = new Date(window.eras[0].startDate.replace(/-/g, "/"));
-                        return date;
-                    }
-                }
-                return this.EraMin;
-            };
-            DateTimeInfo.GetEraCount = function GetEraCount() {
-                if(window.eras != undefined) {
-                    return window.eras.length;
-                }
-                return this.EraCount;
-            };
-            DateTimeInfo.GetEraYears = function GetEraYears() {
-                if(window.eras != undefined) {
-                    var eraYears = new Array();
-                    for(var i = 1; i < window.eras.length; i++) {
-                        var date1 = new Date(window.eras[i - 1].startDate.replace(/-/g, "/"));
-                        var date2 = new Date(window.eras[i].startDate.replace(/-/g, "/"));
-                        eraYears[i - 1] = date2.getFullYear() - date1.getFullYear() + 1;
-                    }
-                    eraYears[i - 1] = 99;
-                    return eraYears;
-                }
-                return this.EraYears;
-            };
-            DateTimeInfo.ConvertToGregorianDate = function ConvertToGregorianDate(era, eraYear, month, day, hour, minute, second, strict) {
-                var year = this.ConvertToGregorianYear(era, eraYear, strict);
-                if(year < 1 || year > 9999) {
-                    return null;
-                }
-                if(month < 1 || month > 12) {
-                    return null;
-                }
-                var maxdays = this.DaysInMonth(year, month);
-                if(day < 1 || day > maxdays) {
-                    return null;
-                }
-                if(hour < 0 || hour > 23) {
-                    return null;
-                }
-                if(minute < 0 || minute > 59) {
-                    return null;
-                }
-                if(second < 0 || second > 59) {
-                    return null;
-                }
-                var dateTime = new Date(year, month - 1, day, hour, minute, second);
-                if(strict) {
-                    var startDate = this.GetEraDates()[era];
-                    var endDate = era + 1 != this.GetEraCount() ? this.AddMilliseconds(this.GetEraDates()[era + 1], -1) : this.GetEraMax();
-                    if(dateTime < startDate || dateTime > endDate) {
-                        return null;
-                    }
-                }
-                return dateTime;
-            };
-            DateTimeInfo.String2Date = function String2Date(value) {
-                if(value == null || value.Length == 0) {
-                    return null;
-                }
-                var date = new Date(Date.parse(value));
-                return date;
-            };
-            DateTimeInfo.Date2String = function Date2String(date, isJapan, IsjqDate, IsjqTime) {
-                var strDate = "";
-                try  {
-                    if(isJapan == true) {
-                        if(IsjqDate == true) {
-                            strDate = date.getFullYear() + "/" + (date.getMonth() + 1) + "/" + date.getDate();
-                        } else if(IsjqTime == true) {
-                            strDate = date.getHours() + ":" + input.Utility.ToString(date.getMinutes(), 2, "0") + ":" + input.Utility.ToString(date.getSeconds(), 2, "0");
-                        } else {
-                            strDate = date.getFullYear() + "/" + (date.getMonth() + 1) + "/" + date.getDate() + " " + date.getHours() + ":" + input.Utility.ToString(date.getMinutes(), 2, "0") + ":" + input.Utility.ToString(date.getSeconds(), 2, "0");
-                        }
-                    } else {
-                        if(IsjqDate == true) {
-                            strDate = (date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getFullYear();
-                        } else if(IsjqTime == true) {
-                            strDate = date.getHours() + ":" + input.Utility.ToString(date.getMinutes(), 2, "0") + ":" + input.Utility.ToString(date.getSeconds(), 2, "0");
-                        } else {
-                            strDate = (date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getFullYear() + " " + date.getHours() + ":" + input.Utility.ToString(date.getMinutes(), 2, "0") + ":" + input.Utility.ToString(date.getSeconds(), 2, "0");
-                        }
-                    }
-                } catch (ex) {
-                    strDate = "";
-                }
-                return strDate;
-            };
-            DateTimeInfo.Date2Long = function Date2Long(date) {
-                try  {
-                    return (date.getFullYear() * 100 + date.getMonth() + 1) * 100 + date.getDate();
-                } catch (ex) {
-                    return 0;
-                }
-            };
-            DateTimeInfo.Date2Number = function Date2Number(date) {
-                if(date == null) {
-                    return 0;
-                }
-                return ((((date.getFullYear() * 100 + date.getMonth() + 1) * 100 + date.getDate()) * 100 + date.getHours()) * 100 + date.getMinutes()) * 100 + date.getSeconds();
-            };
-            DateTimeInfo.Long2Date = function Long2Date(value) {
-                return new Date(Math.floor(value / 10000), Math.floor((value % 10000) / 100) - 1, value % 100);
-            };
-            DateTimeInfo.GetEraDate = function GetEraDate(date) {
-                var eraDate = new Object();
-                eraDate.era = -1;
-                eraDate.eraYear = -1;
-                if(!this.IsValidEraDate(date)) {
-                    return eraDate;
-                }
-                for(var i = 0; i < this.GetEraCount(); i++) {
-                    var nextDate = i + 1 != this.GetEraCount() ? this.GetEraDates()[i + 1] : this.AddMilliseconds(this.GetEraMax(), 1);
-                    if(date < nextDate) {
-                        eraDate.era = i;
-                        eraDate.eraYear = date.getFullYear() - this.GetEraDates()[i].getFullYear() + 1;
-                        break;
-                    }
-                }
-                return eraDate;
-            };
-            DateTimeInfo.MakeDate = function MakeDate(era, erayear, month, day) {
-                var date = new Date();
-                date = this.ConvertToGregorianDate(era, erayear, month, day, 0, 0, 0, true);
-                if(date == null) {
-                    return -1;
-                }
-                return date;
-            };
-            DateTimeInfo.GetValidMonthRange = function GetValidMonthRange(era, eraYear) {
-                var monthRange = {
-                };
-                monthRange.min = 1;
-                monthRange.max = 12;
-                if(era == -1 || eraYear == -1) {
-                    return monthRange;
-                }
-                if(eraYear == 1) {
-                    monthRange.min = this.GetEraDates()[era].getMonth() + 1;
-                } else if(eraYear == this.EraYears[era] && era < this.EraCount - 1) {
-                    monthRange.max = this.AddMilliseconds(this.GetEraDates()[era + 1], -1).getMonth() + 1;
-                }
-                return monthRange;
-            };
-            DateTimeInfo.GetValidDayRange = function GetValidDayRange(era, eraYear, month) {
-                var dayRange = new Object();
-                dayRange.min = 1;
-                dayRange.max = this.DaysInMonth(this.ConvertToGregorianYear(era, eraYear, true), month);
-                var eraMin = this.GetEraDates()[era];
-                var eraMax = era < this.GetEraCount() - 1 ? this.AddMilliseconds(this.GetEraDates()[era + 1], -1) : this.GetEraMax();
-                if(era == -1 || eraYear == -1) {
-                    return dayRange;
-                }
-                if(eraYear == 1 && month == eraMin.getMonth() + 1) {
-                    dayRange.min = eraMin.getDate();
-                } else if(eraYear == this.EraYears[era] && month == eraMax.getMonth() + 1) {
-                    dayRange.max = eraMax.getDate();
-                }
-                return dayRange;
-            };
-            DateTimeInfo.IsLeapYear = function IsLeapYear(year) {
-                if((year % 400 == 0) || ((year % 4 == 0) && (year % 100 != 0))) {
-                    return true;
-                } else {
-                    return false;
-                }
-            };
-            DateTimeInfo.DayOfYear = function DayOfYear(year, month, day) {
-                var sum = 0;
-                for(var i = 1; i < month; i++) {
-                    sum = sum + this.DaysInMonth(year, i);
-                }
-                sum = sum + day;
-                return sum;
-            };
-            DateTimeInfo.DaysInMonth = function DaysInMonth(year, month) {
-                if(month > 12) {
-                    year += Math.floor(month / 12);
-                    month = month % 12;
-                } else if(month < 0) {
-                    var zMonth = month * (-1);
-                    year -= Math.ceil(zMonth / 12);
-                    month = 12 - zMonth % 12;
-                }
-                switch(month) {
-                    case 2:
-                        if(this.IsLeapYear(year)) {
-                            return 29;
-                        } else {
-                            return 28;
-                        }
-                        break;
-                    case 4:
-                    case 6:
-                    case 9:
-                    case 11:
-                        return 30;
-                        break;
-                    default:
-                        return 31;
-                        break;
-                }
-            };
-            DateTimeInfo.Equal = function Equal(date1, date2, strict) {
-                if(date1 == null && date2 == null) {
-                    return true;
-                } else if(date1 == null) {
-                    return false;
-                } else if(date2 == null) {
-                    return false;
-                }
-                try  {
-                    if(!strict) {
-                        if(date1.getFullYear() == date2.getFullYear() && date1.getMonth() == date2.getMonth() && date1.getDate() == date2.getDate()) {
-                            return true;
-                        } else {
-                            return false;
-                        }
-                    }
-                    if(date1.getFullYear() == date2.getFullYear() && date1.getMonth() == date2.getMonth() && date1.getDate() == date2.getDate() && date1.getHours() == date2.getHours() && date1.getMinutes() == date2.getMinutes() && date1.getSeconds() == date2.getSeconds()) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                } catch (e) {
-                    return false;
-                }
-            };
-            DateTimeInfo.YearMonthEqual = function YearMonthEqual(date1, date2) {
-                if(date1 == null && date2 == null) {
-                    return true;
-                } else if(date1 == null) {
-                    return false;
-                } else if(date2 == null) {
-                    return false;
-                }
-                try  {
-                    if(date1.getFullYear() == date2.getFullYear() && date1.getMonth() == date2.getMonth()) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                } catch (e) {
-                    return false;
-                }
-            };
-            DateTimeInfo.SetDate = function SetDate(year, month, day) {
-                var newDate = new Date();
-                var maxMonth = 9999 * 12 + 12;
-                if(year * 12 + month > maxMonth) {
-                    newDate = new Date(9999, 11, 31);
-                } else if(year * 12 + month < 100) {
-                    newDate = new Date(100, 0, 1);
-                } else {
-                    var days = this.DaysInMonth(year, month);
-                    if(day > days) {
-                        day = days;
-                    }
-                    newDate = new Date(year, month - 1, day);
-                }
-                return newDate;
-            };
-            DateTimeInfo.SetFullDate = function SetFullDate(year, month, day) {
-                var newDate = new Date();
-                newDate.setDate(1);
-                var maxMonth = 9999 * 12 + 12;
-                var days = this.DaysInMonth(year, month);
-                if((month > 0) && (month < 12) && (day > days)) {
-                    day = days;
-                }
-                newDate.setFullYear(year);
-                newDate.setMonth(month - 1);
-                newDate.setDate(day);
-                return newDate;
-            };
-            DateTimeInfo.SetFullDateByDate = function SetFullDateByDate(date) {
-                var newDate = new Date();
-                newDate.setDate(1);
-                newDate.setFullYear(date.getFullYear());
-                newDate.setMonth(date.getMonth());
-                newDate.setDate(date.getDate());
-                newDate.setHours(0, 0, 0, 0);
-                return newDate;
-            };
-            DateTimeInfo.LYearDays = function LYearDays(y) {
-                var i, sum = 348;
-                for(i = 0x8000; i > 0x8; i >>= 1) {
-                    sum += (this.LunarInfo[y - 1960] & i) ? 1 : 0;
-                }
-                return (sum + this.leapDays(y));
-            };
-            DateTimeInfo.leapDays = function leapDays(y) {
-                if(this.LeapMonth(y)) {
-                    return ((this.LunarInfo[y - 1960] & 0x10000) ? 30 : 29);
-                } else {
-                    return (0);
-                }
-            };
-            DateTimeInfo.LeapDays = function LeapDays(y) {
-                if(this.LeapMonth(y)) {
-                    return ((this.LunarInfo[y - 1960] & 0x10000) ? 30 : 29);
-                } else {
-                    return (0);
-                }
-            };
-            DateTimeInfo.LeapMonth = function LeapMonth(y) {
-                return (this.LunarInfo[y - 1960] & 0xf);
-            };
-            DateTimeInfo.MonthDays = function MonthDays(y, m) {
-                return ((this.LunarInfo[y - 1960] & (0x10000 >> m)) ? 30 : 29);
-            };
-            DateTimeInfo.GetRokuyou = function GetRokuyou(date) {
-                if((date - this.RokuyouMin) < 0 || (date - this.RokuyouMax) > 0) {
-                    return;
-                }
-                var i, leap = 0, temp = 0;
-                var baseDate = new Date(1960, 0, 28);
-                var offset = Math.round((date - baseDate) / 86400000);
-                for(i = 1960; i < 2050 && offset > 0; i++) {
-                    temp = this.LYearDays(i);
-                    offset -= temp;
-                }
-                if(offset < 0) {
-                    offset += temp;
-                    i--;
-                }
-                this.year = i;
-                leap = this.LeapMonth(i);
-                this.isLeap = false;
-                for(i = 1; i < 13 && offset > 0; i++) {
-                    if(leap > 0 && i == (leap + 1) && this.isLeap == false) {
-                        --i;
-                        this.isLeap = true;
-                        temp = this.LeapDays(this.year);
-                    } else {
-                        temp = this.MonthDays(this.year, i);
-                    }
-                    if(this.isLeap == true && i == (leap + 1)) {
-                        this.isLeap = false;
-                    }
-                    offset -= temp;
-                }
-                if(offset == 0 && leap > 0 && i == leap + 1) {
-                    if(this.isLeap) {
-                        this.isLeap = false;
-                    } else {
-                        this.isLeap = true;
-                        --i;
-                    }
-                }
-                if(offset < 0) {
-                    offset += temp;
-                    --i;
-                }
-                this.month = i;
-                this.day = offset + 1;
-                var index = (this.month + this.day - 2) % 6;
-                var errorRange1Min = new Date(1996, 6, 15);
-                var errorRange1Max = new Date(1996, 7, 13);
-                if(this.IsDateInRange(date, errorRange1Min, errorRange1Max)) {
-                    index = (6 + index - 1) % 6;
-                }
-                var errorRange2Min = new Date(1996, 8, 12);
-                var errorRange2Max = new Date(1996, 9, 11);
-                if(this.IsDateInRange(date, errorRange2Min, errorRange2Max)) {
-                    index = (6 + index - 1) % 6;
-                }
-                var errorRange3Min = new Date(2033, 7, 25);
-                var errorRange3Max = new Date(2033, 11, 21);
-                if(this.IsDateInRange(date, errorRange3Min, errorRange3Max)) {
-                    index = (index + 1) % 6;
-                }
-                if(this.Equal(date, errorRange1Min)) {
-                    index = (6 + index - 1) % 6;
-                }
-                if(this.Equal(date, errorRange2Min)) {
-                    index = (6 + index - 1) % 6;
-                }
-                var rokuyou;
-                //switch (index) {
-                //    case 0:
-                //        rokuyou = GrapeCity.IM.Rokuyou.Senshou;
-                //        break;
-                //    case 1:
-                //        rokuyou = GrapeCity.IM.Rokuyou.Tomobiki;
-                //        break;
-                //    case 2:
-                //        rokuyou = GrapeCity.IM.Rokuyou.Senbu;
-                //        break;
-                //    case 3:
-                //        rokuyou = GrapeCity.IM.Rokuyou.Butsumetsu;
-                //        break;
-                //    case 4:
-                //        rokuyou = GrapeCity.IM.Rokuyou.Taian;
-                //        break;
-                //    case 5:
-                //        rokuyou = GrapeCity.IM.Rokuyou.Shakkou;
-                //        break;
-                //    default:
-                //        break;
-                //}
-                return rokuyou;
-            };
-            DateTimeInfo.IsDateInRange = function IsDateInRange(dt, min, max) {
-                var dtYear = dt.getYear();
-                var minYear = min.getYear();
-                var maxYear = max.getYear();
-                var dtMonth = dt.getMonth();
-                var minMonth = min.getMonth();
-                var maxMonth = max.getMonth();
-                var dtDay = dt.getDate();
-                var minDay = min.getDate();
-                var maxDay = max.getDate();
-                var dtValue = dtYear * 10000 + dtMonth * 100 + dtDay;
-                var minValue = minYear * 10000 + minMonth * 100 + minDay;
-                var maxValue = maxYear * 10000 + maxMonth * 100 + maxDay;
-                return dtValue >= minValue && dtValue <= maxValue;
-            };
-            DateTimeInfo.GetRokuyouText = function GetRokuyouText(rokuyou) {
-                var rokuyouArray = new Array();
-                //if (GrapeCity.IM.Localization.Region == "ja") {
-                rokuyouArray = this.RokuyouTextArray.slice(0);
-                //}
-                //else {
-                //    rokuyouArray = this.RokuyouTextArrayEn.slice(0);
-                //}
-                switch(rokuyou) {
-                    default:
-                        //case GrapeCity.IM.Rokuyou.None:
-                        //    return "";
-                        //    break;
-                        //case GrapeCity.IM.Rokuyou.Senshou:
-                        //    return rokuyouArray[0];
-                        //    break;
-                        //case GrapeCity.IM.Rokuyou.Tomobiki:
-                        //    return rokuyouArray[1];
-                        //    break;
-                        //case GrapeCity.IM.Rokuyou.Senbu:
-                        //    return rokuyouArray[2];
-                        //    break;
-                        //case GrapeCity.IM.Rokuyou.Butsumetsu:
-                        //    return rokuyouArray[3];
-                        //    break;
-                        //case GrapeCity.IM.Rokuyou.Taian:
-                        //    return rokuyouArray[4];
-                        //    break;
-                        //case GrapeCity.IM.Rokuyou.Shakkou:
-                        //    return rokuyouArray[5];
-                        //    break;
-                        return "";
-                        break;
-                }
-            };
-            DateTimeInfo.DaysInSpecialWeek = function DaysInSpecialWeek(year, month, weekFlay) {
-                var selections = new Array();
-                var days = this.DaysInMonth(year, month + 1);
-                var date = new Date(year, month, 1);
-                var firstDateOfWeekTitle;
-                //Get the firstDateOfWeekTitle, then break
-                for(var i = 1; i <= days; i++) {
-                    date.setDate(i);
-                    if(date.getDay() == weekFlay) {
-                        var selectedDate = new Date(year, month, i);
-                        selections.push(selectedDate);
-                        firstDateOfWeekTitle = i;
-                        break;
-                    }
-                }
-                firstDateOfWeekTitle += 7;
-                while(firstDateOfWeekTitle <= days) {
-                    date.setDate(firstDateOfWeekTitle);
-                    var followSelectedDate = new Date(year, month, firstDateOfWeekTitle);
-                    selections.push(followSelectedDate);
-                    firstDateOfWeekTitle += 7;
-                }
-                return selections;
-            };
-            DateTimeInfo.GetDaysByFirstWeekday = function GetDaysByFirstWeekday(firstWeekday) {
-                var days = new Array();
-                days.push(firstWeekday);
-                var date = new Date(firstWeekday);
-                while(date.getDate() + 7 <= this.DaysInMonth(firstWeekday.getFullYear(), firstWeekday.getMonth() + 1)) {
-                    date = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 7);
-                    days.push(date);
-                }
-                return days;
-            };
-            DateTimeInfo.AddMilliseconds = function AddMilliseconds(date, msec) {
-                var newDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds());
-                newDate.setMilliseconds(newDate.getMilliseconds() + msec);
-                return new Date(newDate.valueOf());
-            };
-            DateTimeInfo.GetWeekIndexByDate = function GetWeekIndexByDate(date) {
-                return Math.floor(date.getDate() / 7);
-            };
-            return DateTimeInfo;
-        })();
-        input.DateTimeInfo = DateTimeInfo;        
-        var wijDateTextProvider = (function (_super) {
-            __extends(wijDateTextProvider, _super);
+        /** @ignore */
+        var wijDateTextProvider = (function () {
             function wijDateTextProvider(inputWidget, format, displayFormat) {
-                        _super.call(this);
                 this.inputWidget = inputWidget;
-                this.maskPartsCount = 0;
-                this.pattern = 'M/d/yyyy';
-                this.displayPattern = 'M/d/yyyy';
                 this._disableSmartInputMode = false;
-                this.paddingZero = paddingZero;
-                this.descriptors = new Array(0);
-                this.desPostions = new Array(0);
-                this.fields = new Array(0);
-                this.displayDescriptors = new Array(0);
-                this.displayDesPostions = new Array(0);
-                this.displayFields = new Array(0);
-                this._setFormat(format);
+                this.paddingZero = input.paddingZero;
+                this.formatter = new input.wijDateTextFormatter(inputWidget, format, false);
                 displayFormat = displayFormat == "" ? format : displayFormat;
-                this._setDisplayFormat(displayFormat);
+                this.displayFormatter = new input.wijDateTextFormatter(inputWidget, displayFormat, true);
             }
             wijDateTextProvider.prototype.initialize = function () {
             };
             wijDateTextProvider.prototype.getFiledText = function (index) {
-                var desc = this.fields[index];
+                var desc = this.formatter.fields[index];
                 return desc.getText();
             };
             wijDateTextProvider.prototype.getFieldCount = function () {
-                return this.fields.length;
+                return this.formatter.fields.length;
             };
             wijDateTextProvider.prototype.getFieldRange = function (index) {
-                if(index >= this.fields.length) {
-                    index = this.fields.length - 1;
+                if(index >= this.formatter.fields.length) {
+                    index = this.formatter.fields.length - 1;
                 }
-                var desc = this.fields[index];
+                var desc = this.formatter.fields[index];
                 return {
                     start: desc.startIndex,
                     end: desc.startIndex + desc.getText().length
                 };
             };
+            wijDateTextProvider.prototype.getAllRange = function () {
+                return {
+                    start: 0,
+                    end: this.formatter.toString().length
+                };
+            };
             wijDateTextProvider.prototype.getCursorField = function (pos) {
-                if(this.desPostions.length == 0) {
+                if(this.formatter.desPostions.length == 0) {
                     return 0;
                 }
-                pos = Math.min(pos, this.desPostions.length - 1);
+                pos = Math.min(pos, this.formatter.desPostions.length - 1);
                 pos = Math.max(pos, 0);
-                var desc = this.desPostions[pos].desc, i;
+                var desc = this.formatter.desPostions[pos].desc, i;
                 if(desc.type === -1) {
-                    i = $.inArray(desc, this.descriptors);
-                    if(i > 0 && this.descriptors[i - 1].type !== -1) {
-                        desc = this.descriptors[i - 1];
+                    i = $.inArray(desc, this.formatter.descriptors);
+                    if(i > 0 && this.formatter.descriptors[i - 1].type !== -1) {
+                        desc = this.formatter.descriptors[i - 1];
                     } else {
                         return -1;// liternal
                         
                     }
                 }
-                return $.inArray(desc, this.fields);
+                return $.inArray(desc, this.formatter.fields);
             };
             wijDateTextProvider.prototype.needToMove = function (index, pos, ch) {
                 if(!this.inputWidget._isValidDate(this.inputWidget._safeGetDate(), true)) {
                     return false;
                 }
-                var desc = this.fields[index];
+                var desc = this.formatter.fields[index];
                 switch(desc.type) {
                     case 72:
                     case 73:
                     case 74:
-                        for(var i = 0; i < DateTimeInfo.GetEraCount(); i++) {
-                            if((ch.toLowerCase() === DateTimeInfo.GetEraShortcuts()[i].toLowerCase()) || (ch.toLowerCase() === DateTimeInfo.GetEraShortNames()[i].toLowerCase()) || (ch.toLowerCase() === DateTimeInfo.GetEraAbbreviations()[i].toLowerCase()) || (ch.toLowerCase() === DateTimeInfo.GetEraNames()[i].toLowerCase())) {
+                        for(var i = 0; i < input.DateTimeInfo.GetEraCount(); i++) {
+                            if((ch.toLowerCase() === input.DateTimeInfo.GetEraShortcuts()[i].toLowerCase()) || (ch.toLowerCase() === input.DateTimeInfo.GetEraShortNames()[i].toLowerCase()) || (ch.toLowerCase() === input.DateTimeInfo.GetEraAbbreviations()[i].toLowerCase()) || (ch.toLowerCase() === input.DateTimeInfo.GetEraNames()[i].toLowerCase())) {
                                 return true;
                             }
                         }
@@ -3610,12 +3146,7 @@ var wijmo;
                 return false;
             };
             wijDateTextProvider.prototype._isEraFormatExist = function () {
-                for(var i = 0; i < this.descriptors.length; i++) {
-                    if(this.descriptors[i].type >= 70 && this.descriptors[i].type <= 74) {
-                        return true;
-                    }
-                }
-                return false;
+                return this.formatter._isEraFormatExist();
             };
             wijDateTextProvider.prototype._getCulture = function () {
                 return this.inputWidget._getCulture();
@@ -3642,665 +3173,15 @@ var wijmo;
                 }
             };
             wijDateTextProvider.prototype._setFormat = function (format) {
-                var culture = this.inputWidget._getCulture();
-                if(culture == null) {
-                    return;
-                }
-                this.pattern = this._parseFormatToPattern(format);
-                this.descriptors = this._parseFormat(this.pattern);
-                this.fields = $.grep(this.descriptors, function (d) {
-                    return d.type !== -1;
-                });
+                return this.formatter._setFormat(format);
             };
             wijDateTextProvider.prototype._setDisplayFormat = function (displayFormat) {
-                var culture = this.inputWidget._getCulture();
-                if(culture == null) {
-                    return;
-                }
-                this.displayPattern = this._parseFormatToPattern(displayFormat);
-                this.displayDescriptors = this._parseFormat(this.displayPattern);
-                this.displayFields = $.grep(this.descriptors, function (d) {
-                    return d.type !== -1;
-                });
-            };
-            wijDateTextProvider.prototype._parseFormat = function (pattern) {
-                var descriptors = [];
-                var curPattern = '', prevCh = '', isBegin = false, liternalNext = false, i, ch;
-                for(i = 0; i < pattern.length; i++) {
-                    ch = pattern.charAt(i);
-                    if(liternalNext) {
-                        descriptors.push(this.createDescriptor(-1, ch));
-                        curPattern = '';
-                        liternalNext = false;
-                        continue;
-                    }
-                    if(ch === '\\') {
-                        liternalNext = true;
-                        if(curPattern.length > 0) {
-                            if(!this.handlePattern(curPattern, descriptors)) {
-                                descriptors.push(this.createDescriptor(-1, prevCh));
-                            }
-                            curPattern = '';
-                        }
-                        continue;
-                    }
-                    if(ch === '\'') {
-                        if(isBegin) {
-                            isBegin = false;
-                            curPattern = '';
-                        } else {
-                            isBegin = true;
-                            if(curPattern.length > 0) {
-                                if(!this.handlePattern(curPattern, descriptors)) {
-                                    descriptors.push(this.createDescriptor(-1, prevCh));
-                                }
-                                curPattern = '';
-                            }
-                        }
-                        continue;
-                    }
-                    if(isBegin) {
-                        descriptors.push(this.createDescriptor(-1, ch));
-                        curPattern = '';
-                        continue;
-                    }
-                    if(!i) {
-                        prevCh = ch;
-                    }
-                    if(prevCh !== ch && curPattern.length > 0) {
-                        if(!this.handlePattern(curPattern, descriptors)) {
-                            descriptors.push(this.createDescriptor(-1, prevCh));
-                        }
-                        curPattern = '';
-                    }
-                    curPattern += ch;
-                    prevCh = ch;
-                }
-                if(curPattern.length > 0) {
-                    if(!this.handlePattern(curPattern, descriptors)) {
-                        descriptors.push(this.createDescriptor(-1, prevCh));
-                    }
-                }
-                return descriptors;
-            };
-            wijDateTextProvider.prototype._parseFormatToPattern = function (format) {
-                var cf = this.inputWidget._getCulture().calendars.standard, pattern = cf.patterns.d;
-                if(format.length <= 1) {
-                    switch(format) {
-                        case "":
-                        case "d":
-                            // ShortDatePattern
-                            pattern = cf.patterns.d;
-                            break;
-                        case "D":
-                            // LongDatePattern
-                            pattern = cf.patterns.D;
-                            break;
-                        case "f":
-                            // Full date and time (long date and short time)
-                            pattern = cf.patterns.D + " " + cf.patterns.t;
-                            break;
-                        case "F":
-                            // Full date and time (long date and long time)
-                            pattern = cf.patterns.D + " " + cf.patterns.T;
-                            break;
-                        case "g":
-                            // General (short date and short time)
-                            pattern = cf.patterns.d + " " + cf.patterns.t;
-                            break;
-                        case "G":
-                            // General (short date and long time)
-                            pattern = cf.patterns.d + " " + cf.patterns.T;
-                            break;
-                        case "m":
-                            // MonthDayPattern
-                            pattern = cf.patterns.M;
-                            break;
-                        case "M":
-                            // monthDayPattern
-                            pattern = cf.patterns.M;
-                            break;
-                        case "s":
-                            // SortableDateTimePattern
-                            pattern = cf.patterns.S;
-                            break;
-                        case "t":
-                            // shortTimePattern
-                            pattern = cf.patterns.t;
-                            break;
-                        case "T":
-                            // LongTimePattern
-                            pattern = cf.patterns.T;
-                            break;
-                        case "u":
-                            // UniversalSortableDateTimePattern
-                            pattern = cf.patterns.S;
-                            break;
-                        case "U":
-                            // Full date and time (long date and long time) using universal time
-                            pattern = cf.patterns.D + " " + cf.patterns.T;
-                            break;
-                        case "y":
-                            // YearMonthPattern
-                            pattern = cf.patterns.Y;
-                            break;
-                        case "Y":
-                            // yearMonthPattern
-                            pattern = cf.patterns.Y;
-                            break;
-                    }
-                } else {
-                    pattern = format;
-                }
-                return pattern;
-            };
-            wijDateTextProvider.prototype.getDate = function () {
-                return (!!this.inputWidget) ? new Date(this.inputWidget._safeGetDate(true).getTime()) : undefined;
-            };
-            wijDateTextProvider.prototype.setDate = function (value) {
-                if(this.inputWidget) {
-                    this.inputWidget._setData(value);
-                }
+                return this.displayFormatter._setFormat(displayFormat);
             };
             wijDateTextProvider.prototype._internalSetDate = function (date) {
                 if(this.inputWidget) {
-                    var self = this, o = this.inputWidget.options, inputElement = this.inputWidget.element, typing = !!inputElement.data('typing'), chkBounds;
-                    if(typing) {
-                        o.date = date;
-                        chkBounds = function () {
-                            var now = new Date(), lastTime = inputElement.data('timeStamp');
-                            if(lastTime) {
-                                if((now.getTime() - lastTime.getTime()) > o.keyDelay) {
-                                    self.inputWidget._safeSetDate(o.date, true);
-                                    self.inputWidget._updateText();
-                                    self.inputWidget._highLightField();
-                                } else {
-                                    window.setTimeout(chkBounds, o.keyDelay);
-                                }
-                            }
-                        };
-                        window.setTimeout(chkBounds, o.keyDelay);
-                    } else {
-                        this.inputWidget._safeSetDate(date);
-                    }
+                    this.inputWidget._internalSetDate(date);
                 }
-            };
-            wijDateTextProvider.prototype.daysInMonth = function (m, y) {
-                m = m - 1;
-                var d = new Date(y, ++m, 1, -1).getDate();
-                return d;
-            };
-            wijDateTextProvider.prototype.setYear = function (val, resultObj, chkBounds) {
-                try  {
-                    if(resultObj && resultObj.isfullreset) {
-                        resultObj.offset = 1;
-                        val = '1970';
-                    }
-                    if(typeof val === 'string') {
-                        if(!this._isDigitString(val)) {
-                            return false;
-                        }
-                    }
-                    val = val * 1;
-                    var o = this.inputWidget.options, minYear = 1, maxYear = 9999, currentDate, testDate, mmm;
-                    if(chkBounds) {
-                        if(o.minDate) {
-                            minYear = Math.max(minYear, o.minDate.getFullYear());
-                        }
-                        if(o.maxDate) {
-                            maxYear = Math.min(maxYear, o.maxDate.getFullYear());
-                        }
-                    }
-                    if(resultObj && resultObj.isreset) {
-                        val = minYear;
-                    }
-                    if(val < minYear) {
-                        val = minYear;
-                    }
-                    if(val > maxYear) {
-                        val = maxYear;
-                    }
-                    currentDate = this.getDate();
-                    testDate = new Date(currentDate.getTime());
-                    testDate.setFullYear(val);
-                    if(this._isValidDate(testDate)) {
-                        mmm = this.daysInMonth(this.getMonth(), this.getYear());
-                        if(mmm === currentDate.getDate()) {
-                            testDate = new Date(currentDate.getTime());
-                            testDate.setDate(1);
-                            testDate.setFullYear(val);
-                            mmm = this.daysInMonth((testDate.getMonth() + 1), testDate.getFullYear());
-                            testDate.setDate(mmm);
-                            if(this._isValidDate(testDate)) {
-                                this._internalSetDate(testDate);
-                                return true;
-                            } else {
-                                return false;
-                            }
-                        }
-                        currentDate.setFullYear(val);
-                        this._internalSetDate(currentDate);
-                        return true;
-                    } else {
-                        if(resultObj && resultObj.isreset) {
-                            currentDate.setFullYear(1);
-                            this._internalSetDate(currentDate);
-                            return true;
-                        }
-                        return false;
-                    }
-                } catch (e) {
-                    return false;
-                }
-            };
-            wijDateTextProvider.prototype.getYear = function () {
-                return this.getDate().getFullYear();
-            };
-            wijDateTextProvider.prototype.setMonth = function (val, allowChangeOtherParts, resultObj) {
-                try  {
-                    if(resultObj && resultObj.isfullreset) {
-                        val = '1';
-                    }
-                    val = val * 1;
-                    var currentDate = this.getDate(), mmm, testDate;
-                    if(typeof (allowChangeOtherParts) !== 'undefined' && !allowChangeOtherParts) {
-                        if(val > 12 || val < 1) {
-                            if(resultObj && resultObj.isreset) {
-                                val = 1;
-                            } else {
-                                return false;
-                            }
-                        }
-                    }
-                    mmm = this.daysInMonth(this.getMonth(), this.getYear());
-                    if(mmm === this.getDate().getDate()) {
-                        testDate = new Date(currentDate.getTime());
-                        testDate.setDate(1);
-                        testDate.setMonth(val - 1);
-                        mmm = this.daysInMonth((testDate.getMonth() + 1), testDate.getFullYear());
-                        testDate.setDate(mmm);
-                        if(this._isValidDate(testDate)) {
-                            this._internalSetDate(testDate);
-                            return true;
-                        } else {
-                            return false;
-                        }
-                    } else {
-                        testDate = new Date(currentDate.getTime());
-                        testDate.setMonth(val - 1);
-                        if(this._isValidDate(testDate)) {
-                            this._internalSetDate(testDate);
-                            return true;
-                        } else {
-                            return false;
-                        }
-                    }
-                } catch (e) {
-                    return false;
-                }
-            };
-            wijDateTextProvider.prototype.getMonth = function () {
-                return (this.getDate().getMonth() + 1);
-            };
-            wijDateTextProvider.prototype.setDayOfMonth = function (val, allowChangeOtherParts, resultObj) {
-                try  {
-                    if(resultObj && resultObj.isfullreset) {
-                        return this.setDayOfMonth(1, allowChangeOtherParts);
-                    }
-                    var currentDate = this.getDate(), mmm, testDate;
-                    val = val * 1;
-                    if(typeof (allowChangeOtherParts) !== 'undefined' && !allowChangeOtherParts) {
-                        mmm = this.daysInMonth(this.getMonth(), this.getYear());
-                        if(val > mmm || val < 1) {
-                            if(resultObj && resultObj.isreset) {
-                                return this.setDayOfMonth(1, allowChangeOtherParts, resultObj);
-                            }
-                            return false;
-                        }
-                    }
-                    testDate = new Date(currentDate.getTime());
-                    testDate.setDate(val);
-                    if(this._isValidDate(testDate)) {
-                        this._internalSetDate(testDate);
-                        return true;
-                    } else {
-                        return false;
-                    }
-                } catch (e) {
-                    return false;
-                }
-            };
-            wijDateTextProvider.prototype.getDayOfMonth = function () {
-                return this.getDate().getDate();
-            };
-            wijDateTextProvider.prototype.setHours = function (val, allowChangeOtherParts) {
-                try  {
-                    val = val * 1;
-                    if(typeof (allowChangeOtherParts) !== 'undefined' && !allowChangeOtherParts) {
-                        if(val > 24) {
-                            return false;
-                        }
-                    }
-                    var testDate = new Date(this.getDate().getTime());
-                    testDate.setHours(val);
-                    if(this._isValidDate(testDate)) {
-                        this._internalSetDate(testDate);
-                        return true;
-                    } else {
-                        return false;
-                    }
-                } catch (e) {
-                    return false;
-                }
-            };
-            wijDateTextProvider.prototype.getHours = function () {
-                return this.getDate().getHours();
-            };
-            wijDateTextProvider.prototype.setMinutes = function (val, allowChangeOtherParts) {
-                try  {
-                    val = val * 1;
-                    if(typeof (allowChangeOtherParts) !== 'undefined' && !allowChangeOtherParts) {
-                        if(val > 60) {
-                            return false;
-                        }
-                    }
-                    var testDate = new Date(this.getDate().getTime());
-                    testDate.setMinutes(val);
-                    if(this._isValidDate(testDate)) {
-                        this._internalSetDate(testDate);
-                        return true;
-                    } else {
-                        return false;
-                    }
-                } catch (e) {
-                    return false;
-                }
-            };
-            wijDateTextProvider.prototype.getMinutes = function () {
-                return this.getDate().getMinutes();
-            };
-            wijDateTextProvider.prototype.setSeconds = function (val, allowChangeOtherParts) {
-                try  {
-                    val = val * 1;
-                    if(typeof (allowChangeOtherParts) !== 'undefined' && !allowChangeOtherParts) {
-                        if(val > 60) {
-                            return false;
-                        }
-                    }
-                    var testDate = new Date(this.getDate().getTime());
-                    testDate.setSeconds(val);
-                    if(this._isValidDate(testDate)) {
-                        this._internalSetDate(testDate);
-                        return true;
-                    } else {
-                        return false;
-                    }
-                } catch (e) {
-                    return false;
-                }
-            };
-            wijDateTextProvider.prototype.getSeconds = function () {
-                return this.getDate().getSeconds();
-            };
-            wijDateTextProvider.prototype.setDayOfWeek = function (val) {
-                try  {
-                    val = val * 1;
-                    var aDif = val - this.getDayOfWeek();
-                    return this.setDayOfMonth(this.getDayOfMonth() + aDif, true);
-                } catch (e) {
-                    return false;
-                }
-            };
-            wijDateTextProvider.prototype.getDayOfWeek = function () {
-                return (this.getDate().getDay() + 1);
-            };
-            wijDateTextProvider.prototype.handlePattern = function (p, descriptors) {
-                var reg = new RegExp('y{3,4}'), suc = reg.test(p);
-                if(suc) {
-                    descriptors.push(this.createDescriptor(10));
-                    return true;
-                }
-                reg = new RegExp('y{2,2}');
-                suc = reg.test(p);
-                if(suc) {
-                    descriptors.push(this.createDescriptor(2));
-                    return true;
-                }
-                reg = new RegExp('y{1,1}');
-                suc = reg.test(p);
-                if(suc) {
-                    descriptors.push(this.createDescriptor(1));
-                    return true;
-                }
-                reg = new RegExp('d{4,4}');
-                suc = reg.test(p);
-                if(suc) {
-                    descriptors.push(this.createDescriptor(101));
-                    return true;
-                }
-                reg = new RegExp('d{3,3}');
-                suc = reg.test(p);
-                if(suc) {
-                    descriptors.push(this.createDescriptor(100));
-                    return true;
-                }
-                reg = new RegExp('d{2,2}');
-                suc = reg.test(p);
-                if(suc) {
-                    descriptors.push(this.createDescriptor(30));
-                    return true;
-                }
-                reg = new RegExp('d{1,1}');
-                suc = reg.test(p);
-                if(suc) {
-                    descriptors.push(this.createDescriptor(31));
-                    return true;
-                }
-                reg = new RegExp('M{4,4}');
-                suc = reg.test(p);
-                if(suc) {
-                    descriptors.push(this.createDescriptor(27));
-                    return true;
-                }
-                reg = new RegExp('M{3,3}');
-                suc = reg.test(p);
-                if(suc) {
-                    descriptors.push(this.createDescriptor(26));
-                    return true;
-                }
-                reg = new RegExp('M{2,2}');
-                suc = reg.test(p);
-                if(suc) {
-                    descriptors.push(this.createDescriptor(20));
-                    return true;
-                }
-                reg = new RegExp('M{1,1}');
-                suc = reg.test(p);
-                if(suc) {
-                    descriptors.push(this.createDescriptor(25));
-                    return true;
-                }
-                reg = new RegExp('h{2,2}');
-                suc = reg.test(p);
-                if(suc) {
-                    descriptors.push(this.createDescriptor(46));
-                    return true;
-                }
-                reg = new RegExp('h{1,1}');
-                suc = reg.test(p);
-                if(suc) {
-                    descriptors.push(this.createDescriptor(45));
-                    return true;
-                }
-                reg = new RegExp('H{2,2}');
-                suc = reg.test(p);
-                if(suc) {
-                    descriptors.push(this.createDescriptor(48));
-                    return true;
-                }
-                reg = new RegExp('H{1,1}');
-                suc = reg.test(p);
-                if(suc) {
-                    descriptors.push(this.createDescriptor(47));
-                    return true;
-                }
-                reg = new RegExp('m{2,2}');
-                suc = reg.test(p);
-                if(suc) {
-                    descriptors.push(this.createDescriptor(50));
-                    return true;
-                }
-                reg = new RegExp('m{1,1}');
-                suc = reg.test(p);
-                if(suc) {
-                    descriptors.push(this.createDescriptor(51));
-                    return true;
-                }
-                reg = new RegExp('s{2,2}');
-                suc = reg.test(p);
-                if(suc) {
-                    descriptors.push(this.createDescriptor(60));
-                    return true;
-                }
-                reg = new RegExp('s{1,1}');
-                suc = reg.test(p);
-                if(suc) {
-                    descriptors.push(this.createDescriptor(61));
-                    return true;
-                }
-                reg = new RegExp('t{2,2}');
-                suc = reg.test(p);
-                if(suc) {
-                    descriptors.push(this.createDescriptor(251));
-                    return true;
-                }
-                reg = new RegExp('t{1,1}');
-                suc = reg.test(p);
-                if(suc) {
-                    descriptors.push(this.createDescriptor(250));
-                    return true;
-                }
-                reg = new RegExp('e{2,10}');
-                suc = reg.test(p);
-                if(suc) {
-                    descriptors.push(this.createDescriptor(71));
-                    return true;
-                }
-                reg = new RegExp('e{1,1}');
-                suc = reg.test(p);
-                if(suc) {
-                    descriptors.push(this.createDescriptor(70));
-                    return true;
-                }
-                reg = new RegExp('g{3,10}');
-                suc = reg.test(p);
-                if(suc) {
-                    descriptors.push(this.createDescriptor(74));
-                    return true;
-                }
-                reg = new RegExp('g{2,2}');
-                suc = reg.test(p);
-                if(suc) {
-                    descriptors.push(this.createDescriptor(73));
-                    return true;
-                }
-                reg = new RegExp('g{1,1}');
-                suc = reg.test(p);
-                if(suc) {
-                    descriptors.push(this.createDescriptor(72));
-                    return true;
-                }
-                return false;
-            };
-            wijDateTextProvider.prototype.createDescriptor = function (t, liternal) {
-                var desc = null, id = this.maskPartsCount++;
-                switch(t) {
-                    case -1:
-                        desc = new _dateDescriptor(this, id);
-                        desc.liternal = liternal;
-                        break;
-                    case 20:
-                        desc = new _dateDescriptor20(this, id);
-                        break;
-                    case 25:
-                        desc = new _dateDescriptor25(this, id);
-                        break;
-                    case 26:
-                        desc = new _dateDescriptor26(this, id);
-                        break;
-                    case 27:
-                        desc = new _dateDescriptor27(this, id);
-                        break;
-                    case 30:
-                        desc = new _dateDescriptor30(this, id);
-                        break;
-                    case 31:
-                        desc = new _dateDescriptor31(this, id);
-                        break;
-                    case 100:
-                        desc = new _dateDescriptor100(this, id);
-                        break;
-                    case 101:
-                        desc = new _dateDescriptor101(this, id);
-                        break;
-                    case 10:
-                        desc = new _dateDescriptor10(this, id);
-                        break;
-                    case 1:
-                        desc = new _dateDescriptor1(this, id);
-                        break;
-                    case 2:
-                        desc = new _dateDescriptor2(this, id);
-                        break;
-                    case 45:
-                        desc = new _dateDescriptor45(this, id);
-                        break;
-                    case 46:
-                        desc = new _dateDescriptor46(this, id);
-                        break;
-                    case 47:
-                        desc = new _dateDescriptor47(this, id);
-                        break;
-                    case 48:
-                        desc = new _dateDescriptor48(this, id);
-                        break;
-                    case 250:
-                        desc = new _dateDescriptor250(this, id);
-                        break;
-                    case 251:
-                        desc = new _dateDescriptor251(this, id);
-                        break;
-                    case 50:
-                        desc = new _dateDescriptor50(this, id);
-                        break;
-                    case 51:
-                        desc = new _dateDescriptor51(this, id);
-                        break;
-                    case 60:
-                        desc = new _dateDescriptor60(this, id);
-                        break;
-                    case 61:
-                        desc = new _dateDescriptor61(this, id);
-                        break;
-                    case 70:
-                        desc = new _dateDescriptor70(this, id);
-                        break;
-                    case 71:
-                        desc = new _dateDescriptor71(this, id);
-                        break;
-                    case 72:
-                        desc = new _dateDescriptor72(this, id);
-                        break;
-                    case 73:
-                        desc = new _dateDescriptor73(this, id);
-                        break;
-                    case 74:
-                        desc = new _dateDescriptor74(this, id);
-                        break;
-                    default:
-                        break;
-                }
-                return desc;
             };
             wijDateTextProvider.prototype.toString = function () {
                 if(this.inputWidget._isEraFormatExist()) {
@@ -4316,72 +3197,35 @@ var wijmo;
                     if(this.inputWidget.isDateNull() && this.inputWidget._getInnerNullText() != null) {
                         return this.inputWidget._getInnerNullText();
                     } else {
-                        return this.getDisplayString();
+                        return this.displayFormatter.toString();
                     }
                 }
-                var s = '', l = 0, i, txt, j;
-                this.desPostions = new Array(0);
-                for(i = 0; i < this.descriptors.length; i++) {
-                    this.descriptors[i].startIndex = s.length;
-                    txt = '' || this.descriptors[i].getText();
-                    s += txt;
-                    for(j = 0; j < txt.length; j++) {
-                        this.desPostions.push({
-                            desc: this.descriptors[i],
-                            pos: j,
-                            text: txt,
-                            length: txt.length
-                        });
-                        l++;
-                        if(this.desPostions.length !== l) {
-                            throw 'Fatal Error !!!!!!!!!!!!!!!';
-                        }
-                    }
-                }
-                return s;
-            };
-            wijDateTextProvider.prototype.getDisplayString = function () {
-                var s = '', l = 0, i, txt, j;
-                var desPostions = new Array(0);
-                for(i = 0; i < this.displayDescriptors.length; i++) {
-                    this.displayDescriptors[i].startIndex = s.length;
-                    txt = '' || this.displayDescriptors[i].getText();
-                    s += txt;
-                    for(j = 0; j < txt.length; j++) {
-                        desPostions.push({
-                            desc: this.displayDescriptors[i],
-                            pos: j,
-                            text: txt,
-                            length: txt.length
-                        });
-                        l++;
-                        if(desPostions.length !== l) {
-                            throw 'Fatal Error !!!!!!!!!!!!!!!';
-                        }
-                    }
-                }
-                return s;
+                return this.formatter.toString();
             };
             wijDateTextProvider.prototype.parseDate = function (str) {
                 var date;
-                if(this.pattern === 'dddd' || this.pattern === 'ddd' || typeof str === 'object') {
-                    try  {
-                        date = new Date(str);
-                        if(isNaN(date)) {
-                            date = new Date();
-                        }
-                    } catch (e) {
-                        date = new Date();
-                    }
-                } else {
-                    date = Globalize.parseDate(str, this.pattern, this._getCulture());
-                    if(!date) {
-                        date = this._tryParseDate(str, this.pattern);
-                    }
-                    if(!date) {
-                        date = null;
-                    }
-                }
+                //if (this.formatter.pattern === 'dddd' ||
+                //    this.formatter.pattern === 'ddd' ||
+                //    typeof str === 'object') {
+                //    try {
+                //        date = new Date(str);
+                //        if (isNaN(date)) {
+                //            date = new Date();
+                //        }
+                //    }
+                //    catch (e) {
+                //        date = new Date();
+                //    }
+                //} else {
+                //    date = Globalize.parseDate(str, this.formatter.pattern, this._getCulture());
+                //    if (!date) {
+                //        date = this._tryParseDate(str, this.formatter.pattern);
+                //    }
+                //    if (!date) {
+                //        date = null;
+                //    }
+                //}
+                date = $.wijinputcore.parseDate(str, this.formatter.pattern, this._getCulture());
                 return date;
             };
             wijDateTextProvider.prototype.setText = function (input) {
@@ -4419,24 +3263,10 @@ var wijmo;
                 }
                 return aText.length - 1;
             };
-            wijDateTextProvider.prototype.findAlikeArrayItemIndex = function (arr, txt) {
-                var index = -1, pos = 99999, i, k;
-                for(i = 0; i < arr.length; i++) {
-                    k = arr[i].toLowerCase().indexOf(txt.toLowerCase());
-                    if(k !== -1 && k < pos) {
-                        pos = k;
-                        index = i;
-                    }
-                }
-                return index;
-            };
-            wijDateTextProvider.prototype._isValidDate = function (dt) {
-                return this.inputWidget._isValidDate(dt);
-            };
             wijDateTextProvider.prototype.isFieldSep = function (input, activeField) {
                 var nextField = activeField++, desc;
-                if(nextField < this.descriptors.length) {
-                    desc = this.descriptors[nextField];
+                if(nextField < this.formatter.descriptors.length) {
+                    desc = this.formatter.descriptors[nextField];
                     if(desc.type !== -1) {
                         return false;
                     }
@@ -4445,11 +3275,11 @@ var wijmo;
                 return false;
             };
             wijDateTextProvider.prototype.getPositionType = function (pos) {
-                var desPos = this.desPostions[pos];
+                var desPos = this.formatter.desPostions[pos];
                 return desPos.desc.type;
             };
             wijDateTextProvider.prototype.addToField = function (input, activeField, pos) {
-                var desc = this.fields[activeField], txt, resultObj, ret;
+                var desc = this.formatter.fields[activeField], txt, resultObj, ret;
                 txt = input;
                 resultObj = {
                     val: input,
@@ -4458,7 +3288,7 @@ var wijmo;
                     isreset: false
                 };
                 this.inputWidget.element.data('typing', true);
-                ret = desc.setText(txt, ((input.length === 1) ? false : true), resultObj);
+                ret = desc.setText(txt, ((input.length === 1) ? false : true), resultObj, this._isSmartInputMode());
                 this.inputWidget.element.data('typing', false);
                 return ret;
             };
@@ -4467,7 +3297,7 @@ var wijmo;
                 rh.testPosition = -1;
                 var desPos, oldTxt, pos, txt, tryToExpandAtRight, result, tryToExpandAtLeft, curInsertTxt, resultObj, prevTextLength, posAdjustValue, altInsertText, newTextLength, diff, s, delimOrEndPos, delta;
                 if(strInput.length === 1) {
-                    desPos = this.desPostions[position];
+                    desPos = this.formatter.desPostions[position];
                     if(desPos && desPos.desc.type === -1) {
                         if(desPos.text === strInput) {
                             rh.testPosition = position;
@@ -4485,7 +3315,7 @@ var wijmo;
                 if(pos > 0 && txt.length === 1) {
                     pos--;
                     position = pos;
-                    desPos = this.desPostions[pos];
+                    desPos = this.formatter.desPostions[pos];
                     tryToExpandAtRight = true;
                     if(desPos && (desPos.desc.type === -1 || desPos.desc.getText().length !== 1)) {
                         position++;
@@ -4494,8 +3324,8 @@ var wijmo;
                     }
                 }
                 result = false;
-                while(txt.length > 0 && pos < this.desPostions.length) {
-                    desPos = this.desPostions[pos];
+                while(txt.length > 0 && pos < this.formatter.desPostions.length) {
+                    desPos = this.formatter.desPostions[pos];
                     if(desPos.desc.type === -1) {
                         pos = pos + desPos.length;
                         continue;
@@ -4596,9 +3426,9 @@ var wijmo;
                 }
                 return result;
             };
-            wijDateTextProvider.prototype.removeAt = function (start, end, rh) {
+            wijDateTextProvider.prototype.removeAt = function (start, end, rh, skipCheck) {
                 try  {
-                    var desPos = this.desPostions[start], curInsertTxt, pos, resultObj, result, widget = this.inputWidget, element = widget.element, dateLength = element.val().length;
+                    var desPos = this.formatter.desPostions[start], curInsertTxt, pos, resultObj, result, widget = this.inputWidget, element = widget.element, dateLength = element.val().length;
                     if(dateLength === end + 1 && start === 0) {
                         widget.isDeleteAll = true;
                     }
@@ -4628,7 +3458,7 @@ var wijmo;
                             start = start + desPos.length;
                             pos = start;
                         }
-                        result = desPos.desc.setText(curInsertTxt, false, resultObj);
+                        result = desPos.desc.setText(curInsertTxt, false, resultObj, this._isSmartInputMode());
                         if(result) {
                             rh.hint = rh.success;
                             rh.testPosition = pos;
@@ -4648,25 +3478,18 @@ var wijmo;
                 }
             };
             wijDateTextProvider.prototype.incEnumPart = function () {
-                var desc = this.fields[this.inputWidget.options.activeField];
+                var desc = this.formatter.fields[this.inputWidget.options.activeField];
                 if(desc) {
                     desc.inc();
                 }
                 return true;
             };
-            wijDateTextProvider.prototype.decEnumPart = function (pos) {
-                var desc = this.fields[this.inputWidget.options.activeField];
+            wijDateTextProvider.prototype.decEnumPart = function () {
+                var desc = this.formatter.fields[this.inputWidget.options.activeField];
                 if(desc) {
                     desc.dec();
                 }
                 return true;
-            };
-            wijDateTextProvider.prototype.setValue = function (val) {
-                this.setDate(new Date(val instanceof Date ? val.getTime() : val));
-                return true;
-            };
-            wijDateTextProvider.prototype.getValue = function () {
-                return this.getDate();
             };
             wijDateTextProvider.prototype._isSmartInputMode = function () {
                 if(this._disableSmartInputMode) {
@@ -4731,7 +3554,7 @@ var wijmo;
                     var h;
                     switch(match) {
                         case 'yyyy':
-                            return paddingZero(date.getFullYear(), 4);
+                            return input.paddingZero(date.getFullYear(), 4);
                         case 'MMMM':
                             return culture.dateTimeFormat.monthNames[date.getMonth()];
                         case 'MMM':
@@ -4777,1375 +3600,19 @@ var wijmo;
                 });
                 return sRes;
             };
+            wijDateTextProvider.prototype.replaceWith = function (range, text) {
+                var index = range.start;
+                var result = new input.wijInputResult();
+                if(range.start < range.end) {
+                    this.removeAt(range.start, range.end - 1, result, true);
+                    index = result.testPosition;
+                }
+                return this.insertAt(text, index, result) ? result : null;
+            };
             return wijDateTextProvider;
-        })(input.wijTextProvider);
+        })();
         input.wijDateTextProvider = wijDateTextProvider;        
         ;
-        (function (DescriptorType) {
-            DescriptorType._map = [];
-            DescriptorType.liternal = -1;
-            DescriptorType.OneDigitYear = 1;
-            DescriptorType.TwoDigitYear = 2;
-            DescriptorType.FourDigitYear = 10;
-            DescriptorType.TwoDigitMonth = 20;
-            DescriptorType.Month = 25;
-            DescriptorType.AbbreviatedMonthNames = 26;
-            DescriptorType.MonthNames = 27;
-            DescriptorType.EraYear = 70;
-            DescriptorType.TwoEraYear = 71;
-            DescriptorType.EraName = 72;
-            DescriptorType.TwoEraName = 73;
-            DescriptorType.ThreeEraName = 74;
-            DescriptorType.TwoDigityDayOfMonth = 30;
-            DescriptorType.DayOfMonth = 31;
-            DescriptorType.AbbreviatedDayNames = 100;
-            DescriptorType.DayNames = 101;
-            DescriptorType.h = 45;
-            DescriptorType.hh = 46;
-            DescriptorType.H = 47;
-            DescriptorType.HH = 48;
-            DescriptorType.ShortAmPm = 250;
-            DescriptorType.AmPm = 251;
-            DescriptorType.mm = 50;
-            DescriptorType.m = 51;
-            DescriptorType.ss = 60;
-            DescriptorType.s = 61;
-        })(input.DescriptorType || (input.DescriptorType = {}));
-        var DescriptorType = input.DescriptorType;
-        ////////////////////////////////////////////////////////////////////////////////
-        // _iDateDescriptor
-        var _iDateDescriptor = (function () {
-            function _iDateDescriptor(textProvider, id) {
-                this.id = id;
-                this.startIndex = 0;
-                this.name = null;
-                this.type = DescriptorType.liternal;
-                this.maxLen = 2;
-                this.formatString = "";
-                this._txtProvider = textProvider;
-                this.startIndex = 0;
-            }
-            _iDateDescriptor.prototype.getText = function () {
-                return null;
-            };
-            _iDateDescriptor.prototype.getRealText = function (text) {
-                if(this._txtProvider.inputWidget.options.date == null) {
-                    return this.formatString;
-                }
-                return text;
-            };
-            _iDateDescriptor.prototype.setText = function (value, allowchangeotherpart, result) {
-                return false;
-            };
-            _iDateDescriptor.prototype.inc = function () {
-            };
-            _iDateDescriptor.prototype.dec = function () {
-            };
-            _iDateDescriptor.prototype.needAdjustInsertPos = function () {
-                return true;
-            };
-            _iDateDescriptor.prototype.reachMaxLen = function () {
-                var t = this.getText();
-                do {
-                    if(t.charAt(0) === '0') {
-                        t = t.slice(1);
-                    } else {
-                        break;
-                    }
-                }while(t.length > 0);
-                return t.length >= this.maxLen;
-            };
-            return _iDateDescriptor;
-        })();
-        input._iDateDescriptor = _iDateDescriptor;        
-        ////////////////////////////////////////////////////////////////////////////////
-        // _dateDescriptor
-        var _dateDescriptor = (function (_super) {
-            __extends(_dateDescriptor, _super);
-            function _dateDescriptor(owner, id) {
-                        _super.call(this, owner, id);
-                this.liternal = '';
-                this.maxLen = 100;
-            }
-            _dateDescriptor.prototype.getText = function () {
-                return this.liternal;
-            };
-            return _dateDescriptor;
-        })(_iDateDescriptor);        
-        var EraYearDescriptor = (function (_super) {
-            __extends(EraYearDescriptor, _super);
-            function EraYearDescriptor(owner, id) {
-                        _super.call(this, owner, id);
-            }
-            EraYearDescriptor.prototype.inc = function () {
-                var date = this._txtProvider.getDate();
-                var minDate = this._txtProvider.inputWidget._getRealEraMinDate();
-                var maxDate = this._txtProvider.inputWidget._getRealEraMaxDate();
-                if(DateTimeInfo.Equal(date, maxDate)) {
-                    if(this._txtProvider.inputWidget._getAllowSpinLoop()) {
-                        this._txtProvider.setDate(new Date(minDate.valueOf()));
-                    }
-                } else {
-                    this._txtProvider.setYear(this._txtProvider.getYear() + 1, null, true);
-                    if(this._txtProvider.getDate() > maxDate) {
-                        this._txtProvider.setDate(new Date(maxDate.valueOf()));
-                    }
-                }
-            };
-            EraYearDescriptor.prototype.dec = function () {
-                var date = this._txtProvider.getDate();
-                var minDate = this._txtProvider.inputWidget._getRealEraMinDate();
-                var maxDate = this._txtProvider.inputWidget._getRealEraMaxDate();
-                if(DateTimeInfo.Equal(date, minDate)) {
-                    if(this._txtProvider.inputWidget._getAllowSpinLoop()) {
-                        this._txtProvider.setDate(new Date(maxDate.valueOf()));
-                    }
-                } else {
-                    this._txtProvider.setYear(this._txtProvider.getYear() - 1, null, true);
-                    if(this._txtProvider.getDate() < minDate) {
-                        this._txtProvider.setDate(new Date(minDate.valueOf()));
-                    }
-                }
-            };
-            return EraYearDescriptor;
-        })(_iDateDescriptor);        
-        ////////////////////////////////////////////////////////////////////////////////
-        // _dateDescriptor70
-        var _dateDescriptor70 = (function (_super) {
-            __extends(_dateDescriptor70, _super);
-            function _dateDescriptor70(owner, id) {
-                        _super.call(this, owner, id);
-                this.name = 'Era Year';
-                this.formatString = "e";
-                this.type = DescriptorType.EraYear;
-            }
-            _dateDescriptor70.prototype.getText = function () {
-                var eraDate = DateTimeInfo.GetEraDate(this._txtProvider.getDate());
-                if(eraDate.eraYear === -1) {
-                    return "";
-                }
-                eraDate.eraYear = eraDate.eraYear > 99 ? 99 : eraDate.eraYear;
-                return this.getRealText(String(eraDate.eraYear));
-            };
-            _dateDescriptor70.prototype.setText = function (value, allowchangeotherpart, result) {
-                if(isNaN(parseInt(value))) {
-                    return false;
-                }
-                var date = this._txtProvider.getDate();
-                var eraDate = DateTimeInfo.GetEraDate(date);
-                if(eraDate.eraYear !== -1) {
-                    var eraYear = parseInt(value);
-                    if(eraYear >= DateTimeInfo.GetEraYears()[eraDate.era]) {
-                        eraYear = DateTimeInfo.GetEraYears()[eraDate.era];
-                    }
-                    var nullFlag = this._txtProvider.inputWidget.options.date == null;
-                    if(nullFlag) {
-                        eraYear = parseInt(value);
-                    }
-                    var newDate = DateTimeInfo.ConvertToGregorianDate(eraDate.era, eraYear, date.getMonth() + 1, date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds(), false);
-                    if(eraDate.era < DateTimeInfo.GetEraCount() - 1) {
-                        var maxEraDate = DateTimeInfo.GetEraDates()[eraDate.era + 1];
-                        if(newDate > maxEraDate) {
-                            eraYear = DateTimeInfo.GetEraYears()[eraDate.era] - 1;
-                            newDate = DateTimeInfo.ConvertToGregorianDate(eraDate.era, eraYear, date.getMonth() + 1, date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds(), false);
-                        }
-                    }
-                    this._txtProvider.setDate(newDate);
-                    return true;
-                }
-                return false;
-            };
-            return _dateDescriptor70;
-        })(EraYearDescriptor);        
-        ////////////////////////////////////////////////////////////////////////////////
-        // _dateDescriptor71
-        var _dateDescriptor71 = (function (_super) {
-            __extends(_dateDescriptor71, _super);
-            function _dateDescriptor71(owner, id) {
-                        _super.call(this, owner, id);
-                this.name = 'Two Era Year';
-                this.formatString = "ee";
-                this.type = DescriptorType.TwoEraYear;
-            }
-            _dateDescriptor71.prototype.getText = function () {
-                var eraDate = DateTimeInfo.GetEraDate(this._txtProvider.getDate());
-                if(eraDate.eraYear === -1) {
-                    return "";
-                }
-                eraDate.eraYear = eraDate.eraYear > 99 ? 99 : eraDate.eraYear;
-                return this.getRealText(paddingZero(eraDate.eraYear, 2));
-            };
-            _dateDescriptor71.prototype.setText = function (value, allowchangeotherpart, result) {
-                if(isNaN(parseInt(value))) {
-                    return false;
-                }
-                var date = this._txtProvider.getDate();
-                var eraDate = DateTimeInfo.GetEraDate(date);
-                if(eraDate.eraYear !== -1) {
-                    var newValue = String(eraDate.eraYear) + value;
-                    var eraYear = parseInt(newValue.substring(newValue.length - 2, newValue.length));
-                    if(eraYear > DateTimeInfo.GetEraYears()[eraDate.era]) {
-                        eraYear = DateTimeInfo.GetEraYears()[eraDate.era];
-                    }
-                    var nullFlag = this._txtProvider.inputWidget.options.date == null;
-                    if(nullFlag) {
-                        eraYear = parseInt(value);
-                    }
-                    var newDate = DateTimeInfo.ConvertToGregorianDate(eraDate.era, eraYear, date.getMonth() + 1, date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds(), false);
-                    if(eraDate.era < DateTimeInfo.GetEraCount() - 1) {
-                        var maxEraDate = DateTimeInfo.GetEraDates()[eraDate.era + 1];
-                        if(newDate > maxEraDate) {
-                            eraYear = DateTimeInfo.GetEraYears()[eraDate.era] - 1;
-                            newDate = DateTimeInfo.ConvertToGregorianDate(eraDate.era, eraYear, date.getMonth() + 1, date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds(), false);
-                        }
-                    }
-                    this._txtProvider.setDate(newDate);
-                    return true;
-                }
-                return false;
-            };
-            return _dateDescriptor71;
-        })(EraYearDescriptor);        
-        var EraNameDescriptor = (function (_super) {
-            __extends(EraNameDescriptor, _super);
-            function EraNameDescriptor(owner, id) {
-                        _super.call(this, owner, id);
-            }
-            EraNameDescriptor.prototype.inc = function () {
-                var date = this._txtProvider.getDate();
-                var eraDate = DateTimeInfo.GetEraDate(date);
-                if(eraDate.era === -1) {
-                    return;
-                }
-                var minDate = this._txtProvider.inputWidget._getRealEraMinDate();
-                var maxDate = this._txtProvider.inputWidget._getRealEraMaxDate();
-                if(DateTimeInfo.Equal(date, maxDate)) {
-                    if(this._txtProvider.inputWidget._getAllowSpinLoop()) {
-                        this._txtProvider.setDate(new Date(minDate.valueOf()));
-                    }
-                } else {
-                    if(eraDate.era >= DateTimeInfo.GetEraCount() - 1) {
-                        this._txtProvider.setDate(new Date(maxDate.valueOf()));
-                    } else {
-                        var era = eraDate.era + 1;
-                        var eraYear = eraDate.eraYear > DateTimeInfo.GetEraYears()[era] ? DateTimeInfo.GetEraYears()[era] : eraDate.eraYear;
-                        var newDate = DateTimeInfo.ConvertToGregorianDate(era, eraYear, date.getMonth() + 1, date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds(), true);
-                        newDate = newDate == null ? DateTimeInfo.GetEraDates()[era] : newDate;
-                        if(newDate > maxDate) {
-                            this._txtProvider.setDate(new Date(maxDate.valueOf()));
-                        } else {
-                            this._txtProvider.setDate(newDate);
-                        }
-                    }
-                }
-            };
-            EraNameDescriptor.prototype.dec = function () {
-                var date = this._txtProvider.getDate();
-                var eraDate = DateTimeInfo.GetEraDate(date);
-                if(eraDate.era === -1) {
-                    return;
-                }
-                var minDate = this._txtProvider.inputWidget._getRealEraMinDate();
-                var maxDate = this._txtProvider.inputWidget._getRealEraMaxDate();
-                if(DateTimeInfo.Equal(date, minDate)) {
-                    if(this._txtProvider.inputWidget._getAllowSpinLoop()) {
-                        this._txtProvider.setDate(new Date(maxDate.valueOf()));
-                    }
-                } else {
-                    if(eraDate.era == 0) {
-                        this._txtProvider.setDate(new Date(minDate.valueOf()));
-                    } else {
-                        var era = eraDate.era - 1;
-                        var eraYear = eraDate.eraYear > DateTimeInfo.GetEraYears()[era] ? DateTimeInfo.GetEraYears()[era] : eraDate.eraYear;
-                        var newDate = DateTimeInfo.ConvertToGregorianDate(era, eraYear, date.getMonth() + 1, date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds(), true);
-                        if(newDate == null) {
-                            newDate = new Date(DateTimeInfo.GetEraDates()[era + 1]);
-                            ;
-                            newDate.setDate(newDate.getDate() - 1);
-                        }
-                        if(newDate > maxDate) {
-                            this._txtProvider.setDate(new Date(minDate.valueOf()));
-                        } else {
-                            this._txtProvider.setDate(newDate);
-                        }
-                    }
-                }
-            };
-            return EraNameDescriptor;
-        })(_iDateDescriptor);        
-        ////////////////////////////////////////////////////////////////////////////////
-        // _dateDescriptor72
-        var _dateDescriptor72 = (function (_super) {
-            __extends(_dateDescriptor72, _super);
-            function _dateDescriptor72(owner, id) {
-                        _super.call(this, owner, id);
-                this.name = 'Era Name';
-                this.formatString = "g";
-                this.type = DescriptorType.EraName;
-            }
-            _dateDescriptor72.prototype.getText = function () {
-                var eraDate = DateTimeInfo.GetEraDate(this._txtProvider.getDate());
-                if(eraDate.era === -1) {
-                    return "";
-                }
-                return this.getRealText(DateTimeInfo.GetEraSymbols()[eraDate.era]);
-            };
-            _dateDescriptor72.prototype.setText = function (value, allowchangeotherpart, result) {
-                var singleValue = value.substr(value.length - 1, 1);
-                var era = 0;
-                for(era = 0; era < DateTimeInfo.GetEraCount(); era++) {
-                    if((singleValue.toLowerCase() === DateTimeInfo.GetEraShortcuts()[era].toLowerCase()) || (value.toLowerCase() === DateTimeInfo.GetEraShortNames()[era].toLowerCase())) {
-                        break;
-                    }
-                }
-                if(era == DateTimeInfo.GetEraCount()) {
-                    return true;
-                }
-                var date = this._txtProvider.getDate();
-                var eraDate = DateTimeInfo.GetEraDate(date);
-                if(eraDate.era === -1) {
-                    return true;
-                }
-                var eraYear = eraDate.eraYear > DateTimeInfo.GetEraYears()[era] ? DateTimeInfo.GetEraYears()[era] : eraDate.eraYear;
-                var newDate = DateTimeInfo.ConvertToGregorianDate(era, eraYear, date.getMonth() + 1, date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds(), true);
-                newDate = newDate == null ? DateTimeInfo.GetEraDates()[era] : newDate;
-                if(era < DateTimeInfo.GetEraCount() - 1) {
-                    var maxEraDate = DateTimeInfo.GetEraDates()[era + 1];
-                    newDate = newDate > maxEraDate ? maxEraDate : newDate;
-                }
-                this._txtProvider.setDate(newDate);
-                return true;
-            };
-            return _dateDescriptor72;
-        })(EraNameDescriptor);        
-        ////////////////////////////////////////////////////////////////////////////////
-        // _dateDescriptor73
-        var _dateDescriptor73 = (function (_super) {
-            __extends(_dateDescriptor73, _super);
-            function _dateDescriptor73(owner, id) {
-                        _super.call(this, owner, id);
-                this.name = 'Two Era Name';
-                this.formatString = "gg";
-                this.type = DescriptorType.TwoEraName;
-            }
-            _dateDescriptor73.prototype.getText = function () {
-                var eraDate = DateTimeInfo.GetEraDate(this._txtProvider.getDate());
-                if(eraDate.era === -1) {
-                    return "";
-                }
-                return this.getRealText(DateTimeInfo.GetEraAbbreviations()[eraDate.era]);
-            };
-            _dateDescriptor73.prototype.setText = function (value, allowchangeotherpart, result) {
-                var singleValue = value.substr(value.length - 1, 1);
-                var era = 0;
-                for(era = 0; era < DateTimeInfo.GetEraCount(); era++) {
-                    if((singleValue.toLowerCase() === DateTimeInfo.GetEraShortcuts()[era].toLowerCase()) || (value.toLowerCase() === DateTimeInfo.GetEraShortNames()[era].toLowerCase()) || (value.toLowerCase() === DateTimeInfo.GetEraAbbreviations()[era].toLowerCase())) {
-                        break;
-                    }
-                }
-                if(era == DateTimeInfo.GetEraCount()) {
-                    return true;
-                }
-                var date = this._txtProvider.getDate();
-                var eraDate = DateTimeInfo.GetEraDate(date);
-                if(eraDate.era === -1) {
-                    return true;
-                }
-                var eraYear = eraDate.eraYear > DateTimeInfo.GetEraYears()[era] ? DateTimeInfo.GetEraYears()[era] : eraDate.eraYear;
-                var newDate = DateTimeInfo.ConvertToGregorianDate(era, eraYear, date.getMonth() + 1, date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds(), true);
-                newDate = newDate == null ? DateTimeInfo.GetEraDates()[era] : newDate;
-                if(era < DateTimeInfo.GetEraCount() - 1) {
-                    var maxEraDate = DateTimeInfo.GetEraDates()[era + 1];
-                    newDate = newDate > maxEraDate ? maxEraDate : newDate;
-                }
-                this._txtProvider.setDate(newDate);
-                return true;
-            };
-            return _dateDescriptor73;
-        })(EraNameDescriptor);        
-        ////////////////////////////////////////////////////////////////////////////////
-        // _dateDescriptor74
-        var _dateDescriptor74 = (function (_super) {
-            __extends(_dateDescriptor74, _super);
-            function _dateDescriptor74(owner, id) {
-                        _super.call(this, owner, id);
-                this.name = 'Three Era Name';
-                this.formatString = "ggg";
-                this.type = DescriptorType.ThreeEraName;
-            }
-            _dateDescriptor74.prototype.getText = function () {
-                var eraDate = DateTimeInfo.GetEraDate(this._txtProvider.getDate());
-                if(eraDate.era === -1) {
-                    return "";
-                }
-                return this.getRealText(DateTimeInfo.GetEraNames()[eraDate.era]);
-            };
-            _dateDescriptor74.prototype.setText = function (value, allowchangeotherpart, result) {
-                var singleValue = value.substr(value.length - 1, 1);
-                var era = 0;
-                for(era = 0; era < DateTimeInfo.GetEraCount(); era++) {
-                    if((singleValue.toLowerCase() === DateTimeInfo.GetEraShortcuts()[era].toLowerCase()) || (value.toLowerCase() === DateTimeInfo.GetEraShortNames()[era].toLowerCase()) || (value.toLowerCase() === DateTimeInfo.GetEraAbbreviations()[era].toLowerCase()) || (value.toLowerCase() === DateTimeInfo.GetEraNames()[era].toLowerCase())) {
-                        break;
-                    }
-                }
-                if(era == DateTimeInfo.GetEraCount()) {
-                    return true;
-                }
-                var date = this._txtProvider.getDate();
-                var eraDate = DateTimeInfo.GetEraDate(date);
-                if(eraDate.era === -1) {
-                    return true;
-                }
-                var eraYear = eraDate.eraYear > DateTimeInfo.GetEraYears()[era] ? DateTimeInfo.GetEraYears()[era] : eraDate.eraYear;
-                var newDate = DateTimeInfo.ConvertToGregorianDate(era, eraYear, date.getMonth() + 1, date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds(), true);
-                newDate = newDate == null ? DateTimeInfo.GetEraDates()[era] : newDate;
-                if(era < DateTimeInfo.GetEraCount() - 1) {
-                    var maxEraDate = DateTimeInfo.GetEraDates()[era + 1];
-                    newDate = newDate > maxEraDate ? maxEraDate : newDate;
-                }
-                this._txtProvider.setDate(newDate);
-                return true;
-            };
-            return _dateDescriptor74;
-        })(EraNameDescriptor);        
-        var MonthDateDescriptor = (function (_super) {
-            __extends(MonthDateDescriptor, _super);
-            function MonthDateDescriptor(owner, id) {
-                        _super.call(this, owner, id);
-            }
-            MonthDateDescriptor.prototype.inc = function () {
-                _super.prototype.inc.call(this);
-                var newDate = new Date(this._txtProvider.getDate().valueOf());
-                var newMonth = newDate.getMonth() + 1;
-                newDate.setMonth(newMonth);
-                if(this._txtProvider.inputWidget._isEraFormatExist()) {
-                    var minDate = this._txtProvider.inputWidget._getRealEraMinDate();
-                    var maxDate = this._txtProvider.inputWidget._getRealEraMaxDate();
-                    if(!DateTimeInfo.Equal(this._txtProvider.getDate(), maxDate)) {
-                        this._txtProvider.setDate(maxDate);
-                    } else if(newDate > maxDate) {
-                        if(this._txtProvider.inputWidget._getAllowSpinLoop()) {
-                            this._txtProvider.setDate(minDate);
-                        }
-                    } else {
-                        this._txtProvider.setDate(newDate);
-                    }
-                } else {
-                    var minDate = this._txtProvider.inputWidget._getRealMinDate();
-                    var maxDate = this._txtProvider.inputWidget._getRealMaxDate();
-                    if(!this._txtProvider.inputWidget._isValidDate(newDate, true)) {
-                        if(!DateTimeInfo.Equal(this._txtProvider.getDate(), maxDate)) {
-                            this._txtProvider.setDate(maxDate);
-                        } else if(this._txtProvider.inputWidget._getAllowSpinLoop()) {
-                            this._txtProvider.setDate(minDate);
-                        }
-                    } else {
-                        this._txtProvider.setDate(newDate);
-                    }
-                }
-            };
-            MonthDateDescriptor.prototype.dec = function () {
-                _super.prototype.inc.call(this);
-                var newDate = new Date(this._txtProvider.getDate().valueOf());
-                var newMonth = newDate.getMonth() - 1;
-                newDate.setMonth(newMonth);
-                if(this._txtProvider.inputWidget._isEraFormatExist()) {
-                    var minDate = this._txtProvider.inputWidget._getRealEraMinDate();
-                    var maxDate = this._txtProvider.inputWidget._getRealEraMaxDate();
-                    if(newDate < minDate) {
-                        if(!DateTimeInfo.Equal(this._txtProvider.getDate(), minDate)) {
-                            this._txtProvider.setDate(minDate);
-                        } else if(this._txtProvider.inputWidget._getAllowSpinLoop()) {
-                            this._txtProvider.setDate(maxDate);
-                        }
-                    } else {
-                        this._txtProvider.setDate(newDate);
-                    }
-                } else {
-                    var minDate = this._txtProvider.inputWidget._getRealMinDate();
-                    var maxDate = this._txtProvider.inputWidget._getRealMaxDate();
-                    if(!this._txtProvider.inputWidget._isValidDate(newDate, true)) {
-                        if(!DateTimeInfo.Equal(this._txtProvider.getDate(), minDate)) {
-                            this._txtProvider.setDate(minDate);
-                        } else if(this._txtProvider.inputWidget._getAllowSpinLoop()) {
-                            this._txtProvider.setDate(maxDate);
-                        }
-                    } else {
-                        this._txtProvider.setDate(newDate);
-                    }
-                }
-            };
-            MonthDateDescriptor.prototype.setText = function (value, allowchangeotherpart, result) {
-                if(parseInt(value) > 12) {
-                    value = value.substr(value.length - 1, 1);
-                }
-                return this._txtProvider.setMonth(value, allowchangeotherpart, result);
-            };
-            return MonthDateDescriptor;
-        })(_iDateDescriptor);        
-        ////////////////////////////////////////////////////////////////////////////////
-        // _dateDescriptor20
-        var _dateDescriptor20 = (function (_super) {
-            __extends(_dateDescriptor20, _super);
-            function _dateDescriptor20(owner, id) {
-                        _super.call(this, owner, id);
-                this.name = 'Two-digit month';
-                this.formatString = "MM";
-                this.type = DescriptorType.TwoDigitMonth;
-            }
-            _dateDescriptor20.prototype.getText = function () {
-                var m = '' + this._txtProvider.getMonth() + '';
-                return this.getRealText(m.length === 1 ? ('0' + m) : m);
-            };
-            return _dateDescriptor20;
-        })(MonthDateDescriptor);        
-        ////////////////////////////////////////////////////////////////////////////////
-        // _dateDescriptor25
-        var _dateDescriptor25 = (function (_super) {
-            __extends(_dateDescriptor25, _super);
-            function _dateDescriptor25(owner, id) {
-                        _super.call(this, owner, id);
-                this.name = 'month';
-                this.formatString = "M";
-                this.type = DescriptorType.Month;
-            }
-            _dateDescriptor25.prototype.getText = function () {
-                var m = '' + this._txtProvider.getMonth() + '';
-                return this.getRealText(m);
-            };
-            return _dateDescriptor25;
-        })(MonthDateDescriptor);        
-        ////////////////////////////////////////////////////////////////////////////////
-        // _dateDescriptor26
-        var _dateDescriptor26 = (function (_super) {
-            __extends(_dateDescriptor26, _super);
-            function _dateDescriptor26(owner, id) {
-                        _super.call(this, owner, id);
-                this.name = 'AbbreviatedMonthNames';
-                this.formatString = "MMM";
-                this.type = DescriptorType.AbbreviatedMonthNames;
-                this.maxLen = DescriptorType.AbbreviatedMonthNames;
-            }
-            _dateDescriptor26.prototype.getText = function () {
-                var m = this._txtProvider.getMonth(), culture = this._txtProvider._getCulture();
-                return this.getRealText(culture.calendars.standard.months.namesAbbr[m - 1]);
-            };
-            _dateDescriptor26.prototype.setText = function (value, allowchangeotherpart, result) {
-                var m = -1, cf = this._txtProvider.inputWidget._getCulture().calendars.standard;
-                m = this._txtProvider.findAlikeArrayItemIndex(cf.months.namesAbbr, value);
-                if(m === -1) {
-                    return false;
-                }
-                return this._txtProvider.setMonth(m + 1, allowchangeotherpart, result);
-            };
-            return _dateDescriptor26;
-        })(MonthDateDescriptor);        
-        ////////////////////////////////////////////////////////////////////////////////
-        // _dateDescriptor27
-        var _dateDescriptor27 = (function (_super) {
-            __extends(_dateDescriptor27, _super);
-            function _dateDescriptor27(owner, id) {
-                        _super.call(this, owner, id);
-                this.name = 'MonthNames';
-                this.formatString = "MMMM";
-                this.type = DescriptorType.MonthNames;
-                this.maxLen = 100;
-            }
-            _dateDescriptor27.prototype.getText = function () {
-                var m = this._txtProvider.getMonth(), culture = this._txtProvider._getCulture();
-                return this.getRealText(culture.calendars.standard.months.names[m - 1]);
-            };
-            _dateDescriptor27.prototype.setText = function (value, allowchangeotherpart, result) {
-                var m = -1, culture;
-                if(result && result.isfullreset) {
-                    m = 1;
-                } else {
-                    culture = this._txtProvider._getCulture();
-                    m = this._txtProvider.findAlikeArrayItemIndex(culture.calendars.standard.months.names, value);
-                    if(m === -1) {
-                        return false;
-                    }
-                }
-                return this._txtProvider.setMonth(m + 1, allowchangeotherpart, result);
-            };
-            return _dateDescriptor27;
-        })(MonthDateDescriptor);        
-        var DayOfMonthDescriptor = (function (_super) {
-            __extends(DayOfMonthDescriptor, _super);
-            function DayOfMonthDescriptor(owner, id) {
-                        _super.call(this, owner, id);
-            }
-            DayOfMonthDescriptor.prototype.inc = function () {
-                var newDay = this._txtProvider.getDayOfMonth() + 1;
-                var newDate = new Date(this._txtProvider.getDate().valueOf());
-                newDate.setDate(newDay);
-                if(this._txtProvider.inputWidget._isEraFormatExist()) {
-                    var minDate = this._txtProvider.inputWidget._getRealEraMinDate();
-                    var maxDate = this._txtProvider.inputWidget._getRealEraMaxDate();
-                    if(newDate > maxDate) {
-                        if(this._txtProvider.inputWidget._getAllowSpinLoop()) {
-                            this._txtProvider.setDate(minDate);
-                        }
-                    } else {
-                        this._txtProvider.setDate(newDate);
-                    }
-                } else {
-                    var minDate = this._txtProvider.inputWidget._getRealMinDate();
-                    var maxDate = this._txtProvider.inputWidget._getRealMaxDate();
-                    if(!this._txtProvider.inputWidget._isValidDate(newDate, true)) {
-                        if(this._txtProvider.inputWidget._getAllowSpinLoop()) {
-                            this._txtProvider.setDate(minDate);
-                        }
-                    } else {
-                        this._txtProvider.setDate(newDate);
-                    }
-                }
-            };
-            DayOfMonthDescriptor.prototype.dec = function () {
-                var newDay = this._txtProvider.getDayOfMonth() - 1;
-                var newDate = new Date(this._txtProvider.getDate().valueOf());
-                newDate.setDate(newDay);
-                if(this._txtProvider.inputWidget._isEraFormatExist()) {
-                    var minDate = this._txtProvider.inputWidget._getRealEraMinDate();
-                    var maxDate = this._txtProvider.inputWidget._getRealEraMaxDate();
-                    if(newDate < minDate) {
-                        if(this._txtProvider.inputWidget._getAllowSpinLoop()) {
-                            this._txtProvider.setDate(maxDate);
-                        }
-                    } else {
-                        this._txtProvider.setDate(newDate);
-                    }
-                } else {
-                    var minDate = this._txtProvider.inputWidget._getRealMinDate();
-                    var maxDate = this._txtProvider.inputWidget._getRealMaxDate();
-                    if(!this._txtProvider.inputWidget._isValidDate(newDate, true)) {
-                        if(this._txtProvider.inputWidget._getAllowSpinLoop()) {
-                            this._txtProvider.setDate(maxDate);
-                        }
-                    } else {
-                        this._txtProvider.setDate(newDate);
-                    }
-                }
-            };
-            DayOfMonthDescriptor.prototype.setText = function (value, allowchangeotherpart, result) {
-                var date = this._txtProvider.getDate();
-                var dayCount = DateTimeInfo.DaysInMonth(date.getFullYear(), date.getMonth() + 1);
-                if(parseInt(value) > dayCount) {
-                    value = dayCount + "";
-                }
-                return this._txtProvider.setDayOfMonth(value, allowchangeotherpart, result);
-            };
-            return DayOfMonthDescriptor;
-        })(_iDateDescriptor);        
-        ////////////////////////////////////////////////////////////////////////////////
-        // _dateDescriptor30
-        var _dateDescriptor30 = (function (_super) {
-            __extends(_dateDescriptor30, _super);
-            function _dateDescriptor30(owner, id) {
-                        _super.call(this, owner, id);
-                this.name = 'Two-digit day of month';
-                this.formatString = "dd";
-                this.type = DescriptorType.TwoDigityDayOfMonth;
-            }
-            _dateDescriptor30.prototype.getText = function () {
-                return this.getRealText(paddingZero(this._txtProvider.getDayOfMonth()));
-            };
-            return _dateDescriptor30;
-        })(DayOfMonthDescriptor);        
-        ////////////////////////////////////////////////////////////////////////////////
-        // _dateDescriptor31
-        var _dateDescriptor31 = (function (_super) {
-            __extends(_dateDescriptor31, _super);
-            function _dateDescriptor31(owner, id) {
-                        _super.call(this, owner, id);
-                this.name = 'Day of month';
-                this.formatString = "d";
-                this.type = DescriptorType.DayOfMonth;
-            }
-            _dateDescriptor31.prototype.getText = function () {
-                var dom = this._txtProvider.getDayOfMonth();
-                return this.getRealText('' + dom + '');
-            };
-            return _dateDescriptor31;
-        })(DayOfMonthDescriptor);        
-        ////////////////////////////////////////////////////////////////////////////////
-        // _dateDescriptor100
-        var _dateDescriptor100 = (function (_super) {
-            __extends(_dateDescriptor100, _super);
-            function _dateDescriptor100(owner, id) {
-                        _super.call(this, owner, id);
-                this.name = 'AbbreviatedDayNames';
-                this.formatString = "ddd";
-                this.type = DescriptorType.AbbreviatedDayNames;
-                this.maxLen = 100;
-            }
-            _dateDescriptor100.prototype.getText = function () {
-                var dw = this._txtProvider.getDayOfWeek(), culture = this._txtProvider._getCulture();
-                return this.getRealText(culture.calendars.standard.days.namesShort[dw - 1]);
-            };
-            _dateDescriptor100.prototype.setText = function (value, allowchangeotherpart, result) {
-                var dw = -1, culture = this._txtProvider._getCulture();
-                dw = this._txtProvider.findAlikeArrayItemIndex(culture.calendars.standard.days.namesShort, value);
-                if(dw === -1) {
-                    return false;
-                }
-                return this._txtProvider.setDayOfWeek(dw + 1);
-            };
-            _dateDescriptor100.prototype.needAdjustInsertPos = function () {
-                return false;
-            };
-            return _dateDescriptor100;
-        })(DayOfMonthDescriptor);        
-        ////////////////////////////////////////////////////////////////////////////////
-        // _dateDescriptor101
-        var _dateDescriptor101 = (function (_super) {
-            __extends(_dateDescriptor101, _super);
-            function _dateDescriptor101(owner, id) {
-                        _super.call(this, owner, id);
-                this.name = 'DayNames';
-                this.formatString = "dddd";
-                this.type = DescriptorType.DayNames;
-                this.maxLen = 100;
-            }
-            _dateDescriptor101.prototype.getText = function () {
-                var dw = this._txtProvider.getDayOfWeek(), culture = this._txtProvider._getCulture();
-                return this.getRealText(culture.calendars.standard.days.names[dw - 1]);
-            };
-            _dateDescriptor101.prototype.setText = function (value, allowchangeotherpart, result) {
-                var dw = -1, culture = this._txtProvider._getCulture();
-                dw = this._txtProvider.findAlikeArrayItemIndex(culture.calendars.standard.days.names, value);
-                if(dw === -1) {
-                    return false;
-                }
-                return this._txtProvider.setDayOfWeek(dw + 1);
-            };
-            _dateDescriptor101.prototype.needAdjustInsertPos = function () {
-                return false;
-            };
-            return _dateDescriptor101;
-        })(DayOfMonthDescriptor);        
-        var YearDateDescriptor = (function (_super) {
-            __extends(YearDateDescriptor, _super);
-            function YearDateDescriptor(owner, id) {
-                        _super.call(this, owner, id);
-            }
-            YearDateDescriptor.prototype.inc = function () {
-                var newYear = this._txtProvider.getYear() + 1;
-                var newDate = new Date(this._txtProvider.getDate().valueOf());
-                newDate.setFullYear(newYear);
-                if(this._txtProvider.inputWidget._isEraFormatExist()) {
-                    var minDate = this._txtProvider.inputWidget._getRealEraMinDate();
-                    var maxDate = this._txtProvider.inputWidget._getRealEraMaxDate();
-                    if(newDate > maxDate) {
-                        if(!DateTimeInfo.Equal(this._txtProvider.getDate(), maxDate)) {
-                            this._txtProvider.setDate(maxDate);
-                        } else if(this._txtProvider.inputWidget._getAllowSpinLoop()) {
-                            this._txtProvider.setDate(minDate);
-                        }
-                    } else {
-                        this._txtProvider.setDate(newDate);
-                    }
-                } else {
-                    var minDate = this._txtProvider.inputWidget._getRealMinDate();
-                    var maxDate = this._txtProvider.inputWidget._getRealMaxDate();
-                    if(!this._txtProvider.inputWidget._isValidDate(newDate, true)) {
-                        if(!DateTimeInfo.Equal(this._txtProvider.getDate(), maxDate)) {
-                            this._txtProvider.setDate(maxDate);
-                        } else if(this._txtProvider.inputWidget._getAllowSpinLoop()) {
-                            this._txtProvider.setDate(minDate);
-                        }
-                    } else {
-                        this._txtProvider.setDate(newDate);
-                    }
-                }
-            };
-            YearDateDescriptor.prototype.dec = function () {
-                var newYear = this._txtProvider.getYear() - 1;
-                var newDate = new Date(this._txtProvider.getDate().valueOf());
-                newDate.setFullYear(newYear);
-                if(this._txtProvider.inputWidget._isEraFormatExist()) {
-                    var minDate = this._txtProvider.inputWidget._getRealEraMinDate();
-                    var maxDate = this._txtProvider.inputWidget._getRealEraMaxDate();
-                    if(newDate < minDate) {
-                        if(!DateTimeInfo.Equal(this._txtProvider.getDate(), minDate)) {
-                            this._txtProvider.setDate(minDate);
-                        } else if(this._txtProvider.inputWidget._getAllowSpinLoop()) {
-                            this._txtProvider.setDate(maxDate);
-                        }
-                    } else {
-                        this._txtProvider.setDate(newDate);
-                    }
-                } else {
-                    var minDate = this._txtProvider.inputWidget._getRealMinDate();
-                    var maxDate = this._txtProvider.inputWidget._getRealMaxDate();
-                    if(!this._txtProvider.inputWidget._isValidDate(newDate, true)) {
-                        if(!DateTimeInfo.Equal(this._txtProvider.getDate(), minDate)) {
-                            this._txtProvider.setDate(minDate);
-                        } else if(this._txtProvider.inputWidget._getAllowSpinLoop()) {
-                            this._txtProvider.setDate(maxDate);
-                        }
-                    } else {
-                        this._txtProvider.setDate(newDate);
-                    }
-                }
-            };
-            return YearDateDescriptor;
-        })(_iDateDescriptor);        
-        var TwoDigitYearDescriptor = (function (_super) {
-            __extends(TwoDigitYearDescriptor, _super);
-            function TwoDigitYearDescriptor(owner, id) {
-                        _super.call(this, owner, id);
-            }
-            TwoDigitYearDescriptor.prototype.setText = function (value, allowchangeotherpart, result) {
-                value = paddingZero(value);
-                var y = paddingZero(this._txtProvider.getYear(), 4), m, dom, h, min, s;
-                if(value === '00') {
-                    m = this._txtProvider.getMonth();
-                    dom = this._txtProvider.getDayOfMonth();
-                    h = this._txtProvider.getHours();
-                    min = this._txtProvider.getMinutes();
-                    s = this._txtProvider.getSeconds();
-                    if(m === 1 && dom === 1 && !h && !min && !s) {
-                        y = '0001';
-                        value = '01';
-                    }
-                }
-                if(y.length >= 2) {
-                    y = y.substr(0, 2) + value.substr(0, 2);
-                }
-                return this._txtProvider.setYear(parseInt(y), result, false);
-            };
-            return TwoDigitYearDescriptor;
-        })(YearDateDescriptor);        
-        ////////////////////////////////////////////////////////////////////////////////
-        // _dateDescriptor10
-        var _dateDescriptor10 = (function (_super) {
-            __extends(_dateDescriptor10, _super);
-            function _dateDescriptor10(owner, id) {
-                        _super.call(this, owner, id);
-                this.name = 'Four-digit year';
-                this.formatString = "yyyy";
-                this.type = DescriptorType.FourDigitYear;
-                this.maxLen = 4;
-            }
-            _dateDescriptor10.prototype.getText = function () {
-                return this.getRealText(paddingZero(this._txtProvider.getYear(), 4));
-            };
-            _dateDescriptor10.prototype.setText = function (value, allowchangeotherpart, result) {
-                if(this._txtProvider._isSmartInputMode() && result) {
-                    value = value * 1;
-                    value = value % 100;
-                    var startYear = 1900 + 100;
-                    if(this._txtProvider.inputWidget.options.startYear) {
-                        startYear = this._txtProvider.inputWidget.options.startYear;
-                    }
-                    var lastYear = startYear % 100;
-                    var firstYear = startYear - lastYear;
-                    if(value >= lastYear) {
-                        value = firstYear + value;
-                    } else {
-                        value = firstYear + value + 100;
-                    }
-                    //    startYearStr: string,
-                    //    endYear, curDate, thisYear, inputNum, century, addYear, s;
-                    //endYear = startYear + 100 - 1;
-                    //startYearStr = this._txtProvider.paddingZero(startYear, 4);
-                    //endYear = this._txtProvider.paddingZero(endYear, 4);
-                    //if (result.pos === 0 || result.pos === 1) {
-                    //    curDate = new Date();
-                    //    thisYear = this._txtProvider
-                    //        .paddingZero(this._txtProvider.getYear(), 4);
-                    //    if (thisYear.charAt(0) === '0' &&
-                    //        thisYear.charAt(1) === '0' && result.pos <= 1) {
-                    //        inputNum = result.val;
-                    //        century = '00';
-                    //        if (inputNum >= 5) {
-                    //            century = startYearStr.slice(0, 2);
-                    //        }
-                    //        else {
-                    //            century = endYear.slice(0, 2);
-                    //        }
-                    //        addYear = result.val + thisYear.slice(3, 4);
-                    //        s = century + addYear;
-                    //        result.offset = 2 - result.pos;
-                    //        this._txtProvider.setYear(s, result);
-                    //        return true;
-                    //    }
-                    //}
-                                    }
-                return this._txtProvider.setYear(value, result, false);
-            };
-            return _dateDescriptor10;
-        })(YearDateDescriptor);        
-        ////////////////////////////////////////////////////////////////////////////////
-        // _dateDescriptor1
-        var _dateDescriptor1 = (function (_super) {
-            __extends(_dateDescriptor1, _super);
-            function _dateDescriptor1(owner, id) {
-                        _super.call(this, owner, id);
-                this.name = 'One-digit year';
-                this.formatString = "y";
-                this.type = DescriptorType.OneDigitYear;
-            }
-            _dateDescriptor1.prototype.getText = function () {
-                var y = paddingZero(this._txtProvider.getYear());
-                if(y[0] === '0') {
-                    y = y[1];
-                }
-                return this.getRealText(y);
-            };
-            return _dateDescriptor1;
-        })(TwoDigitYearDescriptor);        
-        ////////////////////////////////////////////////////////////////////////////////
-        // _dateDescriptor2
-        var _dateDescriptor2 = (function (_super) {
-            __extends(_dateDescriptor2, _super);
-            function _dateDescriptor2(owner, id) {
-                        _super.call(this, owner, id);
-                this.name = 'Two-digit year';
-                this.formatString = "yy";
-                this.type = DescriptorType.TwoDigitYear;
-            }
-            _dateDescriptor2.prototype.getText = function () {
-                if(this._txtProvider.inputWidget.isFocused() && this._txtProvider.inputWidget.options.date == null) {
-                    return "yy";
-                }
-                return this.getRealText(paddingZero(this._txtProvider.getYear(), 2));
-            };
-            return _dateDescriptor2;
-        })(TwoDigitYearDescriptor);        
-        var HourDescriptor = (function (_super) {
-            __extends(HourDescriptor, _super);
-            function HourDescriptor(owner, id) {
-                        _super.call(this, owner, id);
-            }
-            HourDescriptor.prototype.inc = function () {
-                var newHour = this._txtProvider.getHours() + 1;
-                var newDate = new Date(this._txtProvider.getDate().valueOf());
-                newDate.setHours(newHour);
-                if(this._txtProvider.inputWidget._isEraFormatExist()) {
-                    var minDate = this._txtProvider.inputWidget._getRealEraMinDate();
-                    var maxDate = this._txtProvider.inputWidget._getRealEraMaxDate();
-                    if(newDate > maxDate) {
-                        if(this._txtProvider.inputWidget._getAllowSpinLoop()) {
-                            this._txtProvider.setDate(minDate);
-                        }
-                    } else {
-                        this._txtProvider.setDate(newDate);
-                    }
-                } else {
-                    var minDate = this._txtProvider.inputWidget._getRealMinDate();
-                    var maxDate = this._txtProvider.inputWidget._getRealMaxDate();
-                    if(!this._txtProvider.inputWidget._isValidDate(newDate, true)) {
-                        if(this._txtProvider.inputWidget._getAllowSpinLoop()) {
-                            this._txtProvider.setDate(minDate);
-                        }
-                    } else {
-                        this._txtProvider.setDate(newDate);
-                    }
-                }
-            };
-            HourDescriptor.prototype.dec = function () {
-                var newHour = this._txtProvider.getHours() - 1;
-                var newDate = new Date(this._txtProvider.getDate().valueOf());
-                newDate.setHours(newHour);
-                if(this._txtProvider.inputWidget._isEraFormatExist()) {
-                    var minDate = this._txtProvider.inputWidget._getRealEraMinDate();
-                    var maxDate = this._txtProvider.inputWidget._getRealEraMaxDate();
-                    if(newDate < minDate) {
-                        if(this._txtProvider.inputWidget._getAllowSpinLoop()) {
-                            this._txtProvider.setDate(maxDate);
-                        }
-                    } else {
-                        this._txtProvider.setDate(newDate);
-                    }
-                } else {
-                    var minDate = this._txtProvider.inputWidget._getRealMinDate();
-                    var maxDate = this._txtProvider.inputWidget._getRealMaxDate();
-                    if(!this._txtProvider.inputWidget._isValidDate(newDate, true)) {
-                        if(this._txtProvider.inputWidget._getAllowSpinLoop()) {
-                            this._txtProvider.setDate(maxDate);
-                        }
-                    } else {
-                        this._txtProvider.setDate(newDate);
-                    }
-                }
-            };
-            return HourDescriptor;
-        })(_iDateDescriptor);        
-        var TwelveHourDescriptor = (function (_super) {
-            __extends(TwelveHourDescriptor, _super);
-            function TwelveHourDescriptor(owner, id) {
-                        _super.call(this, owner, id);
-            }
-            TwelveHourDescriptor.prototype.setText = function (value, allowchangeotherpart, result) {
-                var h = this._txtProvider.getHours();
-                if(h > 12) {
-                    value = ((value * 1) + 12);
-                }
-                return this._txtProvider.setHours(value, allowchangeotherpart);
-            };
-            return TwelveHourDescriptor;
-        })(HourDescriptor);        
-        ////////////////////////////////////////////////////////////////////////////////
-        // _dateDescriptor45
-        var _dateDescriptor45 = (function (_super) {
-            __extends(_dateDescriptor45, _super);
-            function _dateDescriptor45(owner, id) {
-                        _super.call(this, owner, id);
-                this.name = 'h';
-                this.formatString = "h";
-                this.type = DescriptorType.h;
-            }
-            _dateDescriptor45.prototype.getText = function () {
-                if(this._txtProvider.inputWidget.isFocused() && this._txtProvider.inputWidget.options.date == null) {
-                    return "h";
-                }
-                var h = this._txtProvider.getHours();
-                if(h > 12) {
-                    h = h - 12;
-                } else if(h === 0) {
-                    h = 12;
-                }
-                if(h == 12 && this._txtProvider.inputWidget.options.hour12As0) {
-                    h = 0;
-                }
-                return this.getRealText('' + h + '');
-            };
-            return _dateDescriptor45;
-        })(TwelveHourDescriptor);        
-        ////////////////////////////////////////////////////////////////////////////////
-        // _dateDescriptor46
-        var _dateDescriptor46 = (function (_super) {
-            __extends(_dateDescriptor46, _super);
-            function _dateDescriptor46(owner, id) {
-                        _super.call(this, owner, id);
-                this.name = 'hh';
-                this.formatString = "hh";
-                this.type = DescriptorType.hh;
-            }
-            _dateDescriptor46.prototype.getText = function () {
-                var h = this._txtProvider.getHours();
-                if(h > 12) {
-                    h -= 12;
-                } else if(h === 0) {
-                    h = 12;
-                }
-                if(h == 12 && this._txtProvider.inputWidget.options.hour12As0) {
-                    h = 0;
-                }
-                return this.getRealText(paddingZero(h, 2));
-            };
-            return _dateDescriptor46;
-        })(TwelveHourDescriptor);        
-        var TwentyFourHourDescriptor = (function (_super) {
-            __extends(TwentyFourHourDescriptor, _super);
-            function TwentyFourHourDescriptor(owner, id) {
-                        _super.call(this, owner, id);
-            }
-            TwentyFourHourDescriptor.prototype.setText = function (value, allowchangeotherpart, result) {
-                return this._txtProvider.setHours(value, allowchangeotherpart);
-            };
-            return TwentyFourHourDescriptor;
-        })(HourDescriptor);        
-        ////////////////////////////////////////////////////////////////////////////////
-        // _dateDescriptor47
-        var _dateDescriptor47 = (function (_super) {
-            __extends(_dateDescriptor47, _super);
-            function _dateDescriptor47(owner, id) {
-                        _super.call(this, owner, id);
-                this.name = 'H';
-                this.formatString = "H";
-                this.type = DescriptorType.H;
-            }
-            _dateDescriptor47.prototype.getText = function () {
-                var h = this._txtProvider.getHours();
-                if(h == 0 && !this._txtProvider.inputWidget.options.midnightAs0) {
-                    h = 24;
-                }
-                return this.getRealText('' + h + '');
-            };
-            return _dateDescriptor47;
-        })(TwentyFourHourDescriptor);        
-        ////////////////////////////////////////////////////////////////////////////////
-        // _dateDescriptor48
-        var _dateDescriptor48 = (function (_super) {
-            __extends(_dateDescriptor48, _super);
-            function _dateDescriptor48(owner, id) {
-                        _super.call(this, owner, id);
-                this.name = 'HH';
-                this.formatString = "HH";
-                this.type = DescriptorType.HH;
-            }
-            _dateDescriptor48.prototype.getText = function () {
-                var h = this._txtProvider.getHours();
-                if(h == 0 && !this._txtProvider.inputWidget.options.midnightAs0) {
-                    h = 24;
-                }
-                return this.getRealText(paddingZero(h, 2));
-            };
-            return _dateDescriptor48;
-        })(TwentyFourHourDescriptor);        
-        var AmPmDescriptor = (function (_super) {
-            __extends(AmPmDescriptor, _super);
-            function AmPmDescriptor(owner, id) {
-                        _super.call(this, owner, id);
-            }
-            AmPmDescriptor.prototype.inc = function () {
-                var h = (this._txtProvider.getHours() + 12) % 24;
-                this._txtProvider.setHours(h, true);
-            };
-            AmPmDescriptor.prototype.dec = function () {
-                var h = (this._txtProvider.getHours() + 12) % 24;
-                this._txtProvider.setHours(h, true);
-            };
-            AmPmDescriptor.prototype.setText = function (value, allowchangeotherpart, result) {
-                var h;
-                if(value.toLowerCase().indexOf('a') >= 0) {
-                    h = this._txtProvider.getHours() % 12;
-                    this._txtProvider.setHours(h, true);
-                } else if(value.toLowerCase().indexOf('p') >= 0) {
-                    h = this._txtProvider.getHours() % 12 + 12;
-                    this._txtProvider.setHours(h, true);
-                }
-                return true;
-            };
-            return AmPmDescriptor;
-        })(_iDateDescriptor);        
-        ////////////////////////////////////////////////////////////////////////////////
-        // _dateDescriptor250
-        var _dateDescriptor250 = (function (_super) {
-            __extends(_dateDescriptor250, _super);
-            function _dateDescriptor250(owner, id) {
-                        _super.call(this, owner, id);
-                this.name = 't';
-                this.formatString = "t";
-                this.type = DescriptorType.ShortAmPm;
-            }
-            _dateDescriptor250.prototype.getText = function () {
-                var hours = this._txtProvider.getHours();
-                var culture = this._txtProvider._getCulture();
-                var am = this._txtProvider.inputWidget._getInnerAmDesignator();
-                var pm = this._txtProvider.inputWidget._getInnerPmDesignator();
-                var designator = hours < 12 ? am : pm;
-                return this.getRealText(designator.charAt(0) || " ");
-            };
-            return _dateDescriptor250;
-        })(AmPmDescriptor);        
-        ////////////////////////////////////////////////////////////////////////////////
-        // _dateDescriptor251
-        var _dateDescriptor251 = (function (_super) {
-            __extends(_dateDescriptor251, _super);
-            function _dateDescriptor251(owner, id) {
-                        _super.call(this, owner, id);
-                this.name = 'tt';
-                this.formatString = "tt";
-                this.type = DescriptorType.AmPm;
-            }
-            _dateDescriptor251.prototype.getText = function () {
-                var hours = this._txtProvider.getHours();
-                var culture = this._txtProvider._getCulture();
-                var am = this._txtProvider.inputWidget._getInnerAmDesignator();
-                var pm = this._txtProvider.inputWidget._getInnerPmDesignator();
-                var designator = hours < 12 ? am : pm;
-                if(designator.length <= 0) {
-                    designator = ' ';
-                }
-                return this.getRealText(designator);
-            };
-            return _dateDescriptor251;
-        })(AmPmDescriptor);        
-        var MinuteDescriptor = (function (_super) {
-            __extends(MinuteDescriptor, _super);
-            function MinuteDescriptor(owner, id) {
-                        _super.call(this, owner, id);
-            }
-            MinuteDescriptor.prototype.inc = function () {
-                var newMinute = this._txtProvider.getMinutes() + 1;
-                var newDate = new Date(this._txtProvider.getDate().valueOf());
-                newDate.setMinutes(newMinute);
-                if(this._txtProvider.inputWidget._isEraFormatExist()) {
-                    var minDate = this._txtProvider.inputWidget._getRealEraMinDate();
-                    var maxDate = this._txtProvider.inputWidget._getRealEraMaxDate();
-                    if(newDate > maxDate) {
-                        if(this._txtProvider.inputWidget._getAllowSpinLoop()) {
-                            this._txtProvider.setDate(minDate);
-                        }
-                    } else {
-                        this._txtProvider.setDate(newDate);
-                    }
-                } else {
-                    var minDate = this._txtProvider.inputWidget._getRealMinDate();
-                    var maxDate = this._txtProvider.inputWidget._getRealMaxDate();
-                    if(!this._txtProvider.inputWidget._isValidDate(newDate, true)) {
-                        if(this._txtProvider.inputWidget._getAllowSpinLoop()) {
-                            this._txtProvider.setDate(minDate);
-                        }
-                    } else {
-                        this._txtProvider.setDate(newDate);
-                    }
-                }
-            };
-            MinuteDescriptor.prototype.dec = function () {
-                var newMinite = this._txtProvider.getMinutes() - 1;
-                var newDate = new Date(this._txtProvider.getDate().valueOf());
-                newDate.setMinutes(newMinite);
-                if(this._txtProvider.inputWidget._isEraFormatExist()) {
-                    var minDate = this._txtProvider.inputWidget._getRealEraMinDate();
-                    var maxDate = this._txtProvider.inputWidget._getRealEraMaxDate();
-                    if(newDate < minDate) {
-                        if(this._txtProvider.inputWidget._getAllowSpinLoop()) {
-                            this._txtProvider.setDate(maxDate);
-                        }
-                    } else {
-                        this._txtProvider.setDate(newDate);
-                    }
-                } else {
-                    var minDate = this._txtProvider.inputWidget._getRealMinDate();
-                    var maxDate = this._txtProvider.inputWidget._getRealMaxDate();
-                    if(!this._txtProvider.inputWidget._isValidDate(newDate, true)) {
-                        if(this._txtProvider.inputWidget._getAllowSpinLoop()) {
-                            this._txtProvider.setDate(maxDate);
-                        }
-                    } else {
-                        this._txtProvider.setDate(newDate);
-                    }
-                }
-            };
-            MinuteDescriptor.prototype.setText = function (value, allowchangeotherpart, result) {
-                if(result && result.isfullreset) {
-                    value = '0';
-                }
-                return this._txtProvider.setMinutes(value, allowchangeotherpart);
-            };
-            return MinuteDescriptor;
-        })(_iDateDescriptor);        
-        ////////////////////////////////////////////////////////////////////////////////
-        // _dateDescriptor50
-        var _dateDescriptor50 = (function (_super) {
-            __extends(_dateDescriptor50, _super);
-            function _dateDescriptor50(owner, id) {
-                        _super.call(this, owner, id);
-                this.name = 'mm';
-                this.formatString = "mm";
-                this.type = DescriptorType.mm;
-            }
-            _dateDescriptor50.prototype.getText = function () {
-                return this.getRealText(paddingZero(this._txtProvider.getMinutes()));
-            };
-            return _dateDescriptor50;
-        })(MinuteDescriptor);        
-        ////////////////////////////////////////////////////////////////////////////////
-        // _dateDescriptor51
-        var _dateDescriptor51 = (function (_super) {
-            __extends(_dateDescriptor51, _super);
-            function _dateDescriptor51(owner, id) {
-                        _super.call(this, owner, id);
-                this.name = 'm';
-                this.formatString = "m";
-                this.type = DescriptorType.m;
-                this.delta = 12;
-            }
-            _dateDescriptor51.prototype.getText = function () {
-                return this.getRealText(this._txtProvider.getMinutes().toString());
-            };
-            return _dateDescriptor51;
-        })(MinuteDescriptor);        
-        var SecondDescriptor = (function (_super) {
-            __extends(SecondDescriptor, _super);
-            function SecondDescriptor(owner, id) {
-                        _super.call(this, owner, id);
-            }
-            SecondDescriptor.prototype.inc = function () {
-                var newSecond = this._txtProvider.getSeconds() + 1;
-                var newDate = new Date(this._txtProvider.getDate().valueOf());
-                newDate.setSeconds(newSecond);
-                if(this._txtProvider.inputWidget._isEraFormatExist()) {
-                    var minDate = this._txtProvider.inputWidget._getRealEraMinDate();
-                    var maxDate = this._txtProvider.inputWidget._getRealEraMaxDate();
-                    if(newDate > maxDate) {
-                        if(this._txtProvider.inputWidget._getAllowSpinLoop()) {
-                            this._txtProvider.setDate(minDate);
-                        }
-                    } else {
-                        this._txtProvider.setDate(newDate);
-                    }
-                } else {
-                    var minDate = this._txtProvider.inputWidget._getRealMinDate();
-                    var maxDate = this._txtProvider.inputWidget._getRealMaxDate();
-                    if(!this._txtProvider.inputWidget._isValidDate(newDate, true)) {
-                        if(this._txtProvider.inputWidget._getAllowSpinLoop()) {
-                            this._txtProvider.setDate(minDate);
-                        }
-                    } else {
-                        this._txtProvider.setDate(newDate);
-                    }
-                }
-            };
-            SecondDescriptor.prototype.dec = function () {
-                var newSecond = this._txtProvider.getSeconds() - 1;
-                var newDate = new Date(this._txtProvider.getDate().valueOf());
-                newDate.setSeconds(newSecond);
-                if(this._txtProvider.inputWidget._isEraFormatExist()) {
-                    var minDate = this._txtProvider.inputWidget._getRealEraMinDate();
-                    var maxDate = this._txtProvider.inputWidget._getRealEraMaxDate();
-                    if(newDate < minDate) {
-                        if(this._txtProvider.inputWidget._getAllowSpinLoop()) {
-                            this._txtProvider.setDate(maxDate);
-                        }
-                    } else {
-                        this._txtProvider.setDate(newDate);
-                    }
-                } else {
-                    var minDate = this._txtProvider.inputWidget._getRealMinDate();
-                    var maxDate = this._txtProvider.inputWidget._getRealMaxDate();
-                    if(!this._txtProvider.inputWidget._isValidDate(newDate, true)) {
-                        if(this._txtProvider.inputWidget._getAllowSpinLoop()) {
-                            this._txtProvider.setDate(maxDate);
-                        }
-                    } else {
-                        this._txtProvider.setDate(newDate);
-                    }
-                }
-            };
-            SecondDescriptor.prototype.setText = function (value, allowchangeotherpart, result) {
-                if(result && result.isfullreset) {
-                    value = '0';
-                }
-                return this._txtProvider.setSeconds(value, allowchangeotherpart);
-            };
-            return SecondDescriptor;
-        })(_iDateDescriptor);        
-        ////////////////////////////////////////////////////////////////////////////////
-        // _dateDescriptor60
-        var _dateDescriptor60 = (function (_super) {
-            __extends(_dateDescriptor60, _super);
-            function _dateDescriptor60(owner, id) {
-                        _super.call(this, owner, id);
-                this.name = 'ss';
-                this.formatString = "ss";
-                this.type = DescriptorType.ss;
-            }
-            _dateDescriptor60.prototype.getText = function () {
-                return this.getRealText(paddingZero(this._txtProvider.getSeconds()));
-            };
-            return _dateDescriptor60;
-        })(SecondDescriptor);        
-        ////////////////////////////////////////////////////////////////////////////////
-        // _dateDescriptor61
-        var _dateDescriptor61 = (function (_super) {
-            __extends(_dateDescriptor61, _super);
-            function _dateDescriptor61(owner, id) {
-                        _super.call(this, owner, id);
-                this.name = 's';
-                this.formatString = "s";
-                this.type = DescriptorType.s;
-            }
-            _dateDescriptor61.prototype.getText = function () {
-                return this.getRealText(this._txtProvider.getSeconds().toString());
-            };
-            return _dateDescriptor61;
-        })(SecondDescriptor);        
     })(wijmo.input || (wijmo.input = {}));
     var input = wijmo.input;
 })(wijmo || (wijmo = {}));

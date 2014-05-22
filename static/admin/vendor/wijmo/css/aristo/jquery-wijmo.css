@@ -1913,13 +1913,13 @@ button.ui-button::-moz-focus-inner {
     text-shadow: 0px 1px 0px rgba(255,255,255,0.7);
 }
 
-.ui-widget-header a {
-    color: #4f4f4f;
-}
+    .ui-widget-header a {
+        color: #4f4f4f;
+    }
 
-.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {
-    text-shadow: 0px 1px 0px rgba(255,255,255,0.7);
-}
+    .ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {
+        text-shadow: 0px 1px 0px rgba(255,255,255,0.7);
+    }
 
 .ui-state-default {
     -moz-box-shadow: inset 0px 1px 0px rgba(255,255,255,0.25);
@@ -1927,9 +1927,9 @@ button.ui-button::-moz-focus-inner {
     box-shadow: inset 0px 1px 0px rgba(255,255,255,0.25);
 }
 
-.ui-state-default a, .ui-state-default a:link, .ui-state-default a:visited {
-    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
-}
+    .ui-state-default a, .ui-state-default a:link, .ui-state-default a:visited {
+        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+    }
 
 .ui-state-hover, .ui-widget-content .ui-state-hover, .ui-widget-header .ui-state-hover, .ui-state-focus, .ui-widget-content .ui-state-focus, .ui-widget-header .ui-state-focus {
     background: #83b0ca url(images/ui-bg_highlight-soft_100_83b0ca_1x100.png) repeat-x top;
@@ -2363,8 +2363,6 @@ button.ui-button::-moz-focus-inner {
     -moz-border-radius: 0;
     -webkit-border-radius: 0;
     border-radius: 0;
-    padding-left: 9px !important;
-    margin: 1px -4px !important;
 }
 
 .wijmo-wijmenu-child .wijmo-wijmenu-link.ui-state-hover, .wijmo-wijmenu-child .wijmo-wijmenu-link.ui-state-active {
@@ -2611,6 +2609,10 @@ div.ui-tabs-bottom .ui-tabs-nav li.ui-tabs-selected {
     border-top: none;
 }
 
+.ui-widget.wijmo-c1basefield.ui-state-default.wijmo-c1field {
+    position: inherit !important;
+}
+
 .wijmo-wijmenu-footer {
     height: 23px;
     line-height: 22px;
@@ -2831,4 +2833,9 @@ div.wijmo-wijribbon .ui-icon, .wijmo-wijribbon-abbrevicon, div.wijmo-wijribbon-s
     margin-left: -9px;
     margin-top: 0;
 }
+
+.wijmo-wijcombobox-list .wijmo-wijlist-item .wijmo-wijcombobox-row li[class='wijmo-wijcombobox-cell ui-state-default'] {
+    background: inherit !important;
+}
+
 /*@wijmo*/

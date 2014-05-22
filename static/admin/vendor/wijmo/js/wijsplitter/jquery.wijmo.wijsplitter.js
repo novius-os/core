@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20133.20
+ * Wijmo Library 3.20141.34
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -8,7 +8,8 @@
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * licensing@wijmo.com
  * http://wijmo.com/widgets/license/
- *
+ * ----
+ * Credits: Wijmo includes some MIT-licensed software, see copyright notices below.
  */
 var __extends = this.__extends || function (d, b) {
     function __() { this.constructor = d; }
@@ -228,7 +229,7 @@ var wijmo;
                         opacity: 0.1
                     });
                 }
-                return $("<div></div>").addClass("ui-disabled").css(css);
+                return $("<div></div>").addClass(self.options.wijCSS.stateDisabled).css(css);
             };
             wijsplitter.prototype._splitterify = function () {
                 var self = this, element = self.element, o = self.options, fields = self._fields, wrapper, bar, expander, icon, pnl1 = {
@@ -875,8 +876,8 @@ var wijmo;
                 */
                 this.wijMobileCSS = {
                     header: "ui-header ui-bar-a",
-                    content: "ui-body ui-body-c",
-                    stateDefault: "ui-btn-up-c"
+                    content: "ui-body ui-body-b",
+                    stateDefault: "ui-btn ui-btn-b"
                 };
             }
             return wijsplitter_options;
@@ -884,7 +885,7 @@ var wijmo;
         wijsplitter.prototype.options = $.extend(true, {
         }, wijmo.wijmoWidget.prototype.options, new wijsplitter_options());
         $.wijmo.registerWidget("wijsplitter", wijsplitter.prototype);
-        if($.ui != null && $.ui.plugin != null) {
+        if(!wijsplitter.prototype._isMobile && $.ui != null && $.ui.plugin != null) {
             $.ui.plugin.add("resizable", "wijanimate", {
                 stop: function (event, ui) {
                     var self = $(this).data("uiResizable"), o = self.options, element = self.element, pr = self._proportionallyResizeElements, ista = pr.length && (/textarea/i).test(pr[0].nodeName), soffseth = ista && $.ui.hasScroll(pr[0], 'left') ? 0 : self.sizeDiff.height, soffsetw = ista ? 0 : self.sizeDiff.width, style, left, top;

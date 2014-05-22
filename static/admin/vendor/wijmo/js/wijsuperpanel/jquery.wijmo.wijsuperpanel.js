@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20133.20
+ * Wijmo Library 3.20141.34
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -8,7 +8,8 @@
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * licensing@wijmo.com
  * http://wijmo.com/widgets/license/
- *
+ * ----
+ * Credits: Wijmo includes some MIT-licensed software, see copyright notices below.
  */
 var __extends = this.__extends || function (d, b) {
     function __() { this.constructor = d; }
@@ -61,8 +62,8 @@ var wijmo;
                 */
                 this.wijMobileCSS = {
                     header: "ui-header ui-bar-a",
-                    content: "ui-body-c",
-                    stateDefault: "ui-btn-up-c",
+                    content: "ui-body-b",
+                    stateDefault: "ui-btn ui-btn-b",
                     stateHover: "ui-btn-down-c",
                     stateActive: "ui-btn-down-c"
                 };
@@ -451,6 +452,15 @@ var wijmo;
             */
             function (px, dir) {
             };
+            wijsuperpanel.prototype.scrollValueToPx = /**
+            * Convert scroll value to pixel.
+            * For example, scroll value is 1
+            * which makes wijsuperpanel scrolled 50px after conversion.
+            * @param {number} scroll value.
+            * @param {string} dir Scrolling direction. Options are: "h" and "v".
+            */
+            function (value, dir) {
+            };
             wijsuperpanel.prototype.scrollTo = /**
             * Scroll to the specified position.
             * which is value 1 after conversion.
@@ -500,11 +510,13 @@ var wijmo;
                             self._autoHLarge = false;
                         }
                         value = $.extend(o.hScroller, value);
+                        self._adjustScrollValue("h");
                         self.refresh();
                     } else if(key === "vScroller") {
                         if(value.scrollLargeChange !== undefined && value.scrollLargeChange !== null) {
                             self._autoVLarge = false;
                         }
+                        self._adjustScrollValue("v");
                         value = $.extend(o.vScroller, value);
                         self.refresh();
                     } else if(key === "resizableOptions") {
@@ -553,7 +565,7 @@ var wijmo;
                     o.vScroller.dir = "v";
                     o.hScroller.dir = "h";
                     self._initMarkup();
-                    self.paintPanel();
+                    self.paintPanel(o.unfocus);
                     self._initResizer();
                     if(self.options.disabled) {
                         self.disable();
@@ -1028,8 +1040,11 @@ var wijmo;
                     if(!value) {
                         value = vMin;
                     }
+                    vTopValue = scroller.scrollMax - largeChange + 1;
+                    if(value > vTopValue) {
+                        value = vTopValue;
+                    }
                     if(isAdd) {
-                        vTopValue = scroller.scrollMax - largeChange + 1;
                         if(Math.abs(value - vTopValue) < 0.001) {
                             self._clearInterval();
                             return false;
@@ -1268,6 +1283,34 @@ var wijmo;
                     }
                     return ret;
                 },
+                scrollValueToPx: /**
+                * Convert scroll value to pixel.
+                * For example, scroll value is 1
+                * which makes wijsuperpanel scrolled 50px after conversion.
+                * @param {number} scroll value.
+                * @param {string} dir Scrolling direction. Options are: "h" and "v".
+                */
+                function (value, dir) {
+                    var self = this, o = self.options, f = self._fields(), h = dir === "h", outerDir, contentDir, scroller, cWrapper, size, contentSize, min, max, largeChange, maxv, px;
+                    outerDir = h ? "outerWidth" : "outerHeight";
+                    contentDir = h ? "contentWidth" : "contentHeight";
+                    scroller = h ? "hScroller" : "vScroller";
+                    largeChange = h ? self._getHScrollBarLargeChange() : self._getVScrollBarLargeChange();
+                    cWrapper = f.contentWrapper;
+                    size = f[contentDir];
+                    contentSize = cWrapper[outerDir]();
+                    min = o[scroller].scrollMin;
+                    max = o[scroller].scrollMax;
+                    maxv = (max - min) - largeChange + 1;
+                    if(value === undefined || value < min) {
+                        value = min;
+                    }
+                    if(value > maxv) {
+                        value = maxv;
+                    }
+                    px = (size - contentSize) * (value / maxv);
+                    return Math.round(px);
+                },
                 scrollTo: /**
                 * Scroll to the specified position.
                 * which is value 1 after conversion.
@@ -1339,6 +1382,19 @@ var wijmo;
                         return true;
                     }
                     return false;
+                },
+                _adjustScrollValue: function (dir) {
+                    var isHori = dir === "h", self = this, o = this.options, needScroll = isHori ? self.hNeedScrollBar : self.vNeedScrollBar, scroller = isHori ? o.hScroller : o.vScroller, max = scroller.scrollMax, min = scroller.scrollMin, largeChange, topValue;
+                    if(needScroll) {
+                        largeChange = isHori ? self._getHScrollBarLargeChange() : self._getVScrollBarLargeChange();
+                        topValue = max - largeChange + 1;
+                        if(scroller.scrollValue > topValue) {
+                            scroller.scrollValue = topValue;
+                        }
+                        if(scroller.scrollValue < min) {
+                            scroller.scrollValue = min;
+                        }
+                    }
                 },
                 _resetLargeChange: function (self, f, o) {
                     var handle;
@@ -1522,19 +1578,21 @@ var wijmo;
                     // "v" - Vertical scroll track.
                     // "h" - Horizontal scroll track.
                     // </param>
-                                        var self = this, f = self._fields(), key = dir + "TrackLen", hbarContainer = f.hbarContainer, vbarContainer = f.vbarContainer, track = 0, padding = 0;
+                                        var self = this, f = self._fields(), key = dir + "TrackLen", hbarContainer = f.hbarContainer, vbarContainer = f.vbarContainer, track = 0, padding = 0, border = 0;
                     if(f[key] !== undefined) {
                         return f[key];
                     }
                     if(dir === "h") {
                         padding = self._getScrollContainerPadding("h");
+                        border = self._getScrollContainerBorders("h");
                         track = hbarContainer.innerWidth();
                     }
                     if(dir === "v") {
                         padding = self._getScrollContainerPadding("v");
+                        border = self._getScrollContainerBorders("v");
                         track = vbarContainer.innerHeight();
                     }
-                    f[key] = (track - padding);
+                    f[key] = (track - padding - border);
                     return f[key];
                 },
                 _getScrollContainerPadding: function (paddingType) {
@@ -1562,6 +1620,66 @@ var wijmo;
                     }
                     return padding;
                 },
+                _getScrollContainerBorders: function (dir) {
+                    // Get the border width of the scroll bar container.
+                                        var self = this, f = self._fields(), borders = 0, key;
+                    key = dir + "Borders";
+                    if(f[key] !== undefined) {
+                        borders = f[key];
+                        return borders;
+                    }
+                    if(dir === "h") {
+                        borders = self._getScrollContainerBorder("left") + self._getScrollContainerBorder("right");
+                    } else if(dir === "v") {
+                        borders = self._getScrollContainerBorder("top") + self._getScrollContainerBorder("bottom");
+                    }
+                    f[key] = borders;
+                    return borders;
+                },
+                _getScrollContainerBorder: function (borderType) {
+                    var self = this, f = self._fields(), border = 0, container, key, borderStyle, borderWidth;
+                    if(borderType === "left" || borderType === "right") {
+                        container = f.hbarContainer;
+                    } else {
+                        container = f.vbarContainer;
+                    }
+                    key = borderType + "Border";
+                    if(f[key] !== undefined) {
+                        border = f[key];
+                        return border;
+                    }
+                    if(container && container.css) {
+                        borderWidth = container.css("border-" + borderType + "-width").toLowerCase();
+                        border = parseFloat(borderWidth);
+                        if(isNaN(border)) {
+                            borderStyle = container.css("border-" + borderType + "-style").toLowerCase();
+                            switch(borderStyle) {
+                                case "none":
+                                case "hidden":
+                                    border = 0;
+                                    break;
+                                default:
+                                    switch(borderWidth) {
+                                        case "thin":
+                                            border = 1;
+                                            break;
+                                        case "medium":
+                                            border = 3;
+                                            break;
+                                        case "thick":
+                                            border = 5;
+                                            break;
+                                        default:
+                                            border = 0;
+                                            break;
+                                    }
+                                    break;
+                            }
+                        }
+                    }
+                    f[key] = border;
+                    return border;
+                },
                 _triggerScroll: function (contentLeft, dir, contentAnimationOptions) {
                     var data = {
                         position: contentLeft,
@@ -1571,15 +1689,8 @@ var wijmo;
                     this._trigger("scroll", null, data);
                 },
                 _contentDragAnimate: function (dir, animated, hbarContainer, hbarDrag, stop, fireScrollEvent, dragging) {
-                    var self = this, o = self.options, v = dir === "v", scroller = v ? o.vScroller : o.hScroller, tempKey = v ? "outerHeight" : "outerWidth", wrapKey = v ? "innerHeight" : "innerWidth", contentKey = v ? "contentHeight" : "contentWidth", paddingKey = v ? "top" : "left", hMin = scroller.scrollMin, hMax = scroller.scrollMax, hRange = hMax - hMin, hValue = scroller.scrollValue === undefined ? hMin : (scroller.scrollValue - hMin), hLargeChange = self._getLargeChange(dir), max = hRange - hLargeChange + 1, f = self._fields(), cWrapper = f.contentWrapper, tempWrapper = f.templateWrapper, contentLeft, dragleft, track, drag, r, padding, dragAnimationOptions, properties, contentAnimationOptions, userComplete, properties1, key;
-                    if(hValue > max) {
-                        hValue = max;
-                    }
-                    contentLeft = (f[contentKey] - cWrapper[wrapKey]()) * (hValue / max);
-                    if(Math.abs(contentLeft) < 0.001) {
-                        contentLeft = 0;
-                    }
-                    contentLeft = Math.round(contentLeft);
+                    var self = this, o = self.options, v = dir === "v", scroller = v ? o.vScroller : o.hScroller, tempKey = v ? "outerHeight" : "outerWidth", paddingKey = v ? "top" : "left", hMin = scroller.scrollMin, hMax = scroller.scrollMax, hRange = hMax - hMin, hValue = scroller.scrollValue === undefined ? hMin : scroller.scrollValue, hLargeChange = self._getLargeChange(dir), max = hRange - hLargeChange + 1, f = self._fields(), tempWrapper = f.templateWrapper, contentLeft, dragleft, track, drag, r, padding, dragAnimationOptions, properties, contentAnimationOptions, userComplete, properties1, key;
+                    contentLeft = self.scrollValueToPx(hValue, dir);
                     dragleft = -1;
                     if(hbarContainer !== undefined) {
                         if(animated && hbarDrag.is(":animated") && stop !== "nonestop") {
@@ -1754,10 +1865,11 @@ var wijmo;
                     }
                 },
                 _setScrollbarPosition: function (wrapper, self, content, targetBarContainer, referBarContainer, targetNeedScrollBar, referNeedScrollBar, targetScrollBarPosition, referScrollBarPosition, dir, scrollingNeed) {
-                    var hbar = dir === "h", targetBarLen, targetPadding, targetBarPosition, barPosition1, contentPosition1, barPosition2, contentPosition2, contentLength2, referBarWidth, css = self.options.wijCSS;
+                    var hbar = dir === "h", targetBarLen, targetPadding, targetBorder, targetBarPosition, barPosition1, contentPosition1, barPosition2, contentPosition2, contentLength2, referBarWidth, css = self.options.wijCSS;
                     if(targetNeedScrollBar) {
                         targetBarLen = targetBarContainer[0][hbar ? "offsetHeight" : "offsetWidth"];
                         targetPadding = self._getScrollContainerPadding(dir);
+                        targetBorder = self._getScrollContainerBorders(dir);
                         targetBarPosition = hbar ? "top" : "left";
                         barPosition1 = hbar ? {
                             top: "0px",
@@ -1835,7 +1947,8 @@ var wijmo;
                         if(!hbar/*vbar*/  && referNeedScrollBar) {
                             referBarWidth = 0;
                         }
-                        targetBarContainer[hbar ? "width" : "height"](contentLength2 - targetPadding);
+                        // When calculate the height or width of the scroll barcontainer, the border widht of the scroll bar container shall be removed too.
+                        targetBarContainer[hbar ? "width" : "height"](contentLength2 - targetPadding - targetBorder);
                         self._enableDisableScrollBar(dir, targetBarContainer, !scrollingNeed);
                     } else {
                         wrapper.css(hbar ? "left" : "top", "");
@@ -2018,17 +2131,26 @@ var wijmo;
             $.wijmo.registerWidget("wijsuperpanel", wijsuperpanel.prototype);
         } else {
             //use native scrollbar
-                        var scrollerHandle = "wijmo-wijsuperpanel-handle", innerElementHtml = "<div class='wijmo-wijsuperpanel-statecontainer'>" + "<div class='wijmo-wijsuperpanel-contentwrapper-touch'>" + "</div></div>";
+                        var scrollerHandle = "wijmo-wijsuperpanel-handle", innerElementHtml = "<div class='wijmo-wijsuperpanel-statecontainer' " + "style='float: left; height: 100%; -webkit-overflow-scrolling: auto;'>" + "<div class='wijmo-wijsuperpanel-contentwrapper-touch'>" + "</div></div>", panelContainerClass = "wijmo-wijsuperpanel-panelContainer", assistContainerClass = "wijmo-wijsuperpanel-assistContainer", simulateScrollClass = "wijmo-wijsuperpanel-simulateScrollBar", scrollBarEleClass = "wijmo-wijsuperpanel-scrollBarEle", isIOS = window.navigator.userAgent.match(/iPhone|iPad|iPod/i), isWIN = window.navigator.userAgent.match(/Windows/i), scrollBarEleHtml = isIOS ? "<div class='" + scrollBarEleClass + "' style='position: absolute; width: 3px; background:#7E7E7E; -webkit-border-radius: 1px; display: none'></div>" : "", assistElementHtml = "<div class='" + assistContainerClass + "' style='position: absolute;'><div class='" + simulateScrollClass + "' " + "style='position: absolute; overflow-x: hidden; -webkit-overflow-scrolling: touch; -ms-overflow-style: -ms-autohiding-scrollbar'>" + "<div></div></div>" + scrollBarEleHtml + "</div>", scrollWidth = isWIN ? 18 : 4;
             wijsuperpanel.prototype = $.extend(true, {
             }, $.Widget.prototype, {
                 widgetEventPrefix: "wijsuperpanel",
                 _setOption: function (key, value) {
-                    var self = this, o = self.options, f = self._fields();
+                    var self = this, ele = self.element, o = self.options, f = self._fields();
                     if(key === "animationOptions" || key === "resizableOptions") {
                         value = $.extend(o[key], value);
                     } else if(key === "hScroller" || key === "vScroller") {
+                        var dir = key === "hScroller" ? "h" : "v";
                         value = $.extend(o[key], value);
+                        self._adjustScrollValue(dir);
                         self.refresh();
+                    }
+                    if(key === "customScrolling") {
+                        if(o[key] !== value) {
+                            o[key] = value;
+                            self._initialize(f, ele, self);
+                            self._bindElementEvents();
+                        }
                     }
                     $.Widget.prototype._setOption.apply(self, arguments);
                     switch(key) {
@@ -2098,12 +2220,21 @@ var wijmo;
                     }, o = this.options, hs = o.hScroller.scrollBarVisibility, vs = o.vScroller.scrollBarVisibility;
                     css["overflow-x"] = hs;
                     css["overflow-y"] = vs;
-                    // for 38140: ie10 don't support that setting overflow-x and
-                    // overflow-y to "visible" at same time.
-                    if($.support.isTouchEnabled && $.support.isTouchEnabled()) {
-                        if(hs === "visible" && vs === "visible") {
-                            css["overflow-x"] = "auto";
-                            css["overflow-y"] = "auto";
+                    if(hs === "visible" && vs === "visible") {
+                        css["overflow-x"] = "auto";
+                        css["overflow-y"] = "auto";
+                    }
+                    css["touch-action"] = "";
+                    css["ms-touch-action"] = "";
+                    if(o.customScrolling) {
+                        // ** Enable native horizontal scroll bar **
+                        //css["overflow-x"] = "hidden";
+                        css["overflow-y"] = "hidden";
+                        css["touch-action"] = "none";
+                        css["ms-touch-action"] = "none";
+                        if(css["overflow-x"] === "auto") {
+                            css["touch-action"] = "pan-x";
+                            css["ms-touch-action"] = "pan-x";
                         }
                     }
                     stateContainer.css(css);
@@ -2113,8 +2244,7 @@ var wijmo;
                         ele.attr("tabindex", "-1");
                         f.tabindex = true;
                     }
-                    var stateContainer = f.stateContainer = $(innerElementHtml), templateW, wijCSS = self.options.wijCSS;
-                    self._applyOverflow(f.stateContainer);
+                    var container = $("<div class='" + panelContainerClass + "'></div>"), customScrolling = self.options.customScrolling, stateContainer = f.stateContainer = $(innerElementHtml), assistContainer = f.assistContainer = $(assistElementHtml), simulateScroll = f.simulateScroll = assistContainer.find("." + simulateScrollClass), customScrollBarEle = f.customScrollBarEle = assistContainer.find("." + scrollBarEleClass), wijCSS = self.options.wijCSS, containerCreated = false;
                     // move child element to content wrapper div of wijsuperpanel.
                     f.contentWrapper = stateContainer.children();
                     ele.contents().each(function (index, el) {
@@ -2127,81 +2257,221 @@ var wijmo;
                             f.footer = jel;
                             return;
                         }
+                        if(jel.hasClass(panelContainerClass)) {
+                            containerCreated = true;
+                            return false;
+                        }
                         f.contentWrapper[0].appendChild(el);
                     });
                     // append header to first element.
                     if(f.header !== undefined) {
                         ele.prepend(f.header);
                     }
-                    ele[0].appendChild(stateContainer[0]);
-                    // append footer to first element.
-                    if(f.footer !== undefined) {
-                        f.footer.insertAfter(stateContainer);
+                    if(containerCreated) {
+                        container = ele.children("." + panelContainerClass);
+                        stateContainer = f.stateContainer = container.find(".wijmo-wijsuperpanel-statecontainer");
+                        f.contentWrapper = stateContainer.children();
+                    }
+                    container[0].appendChild(stateContainer[0]);
+                    ele[0].appendChild(container[0]);
+                    // Ensure assist div stay behind the state contianer.
+                    if(container.children("." + assistContainerClass).length > 0) {
+                        f.assistContainer = container.children("." + assistContainerClass);
+                        f.simulateScroll = f.assistContainer.find("." + simulateScrollClass);
+                        f.customScrollBar = f.assistContainer.find("." + scrollBarEleClass);
+                    }
+                    if(customScrolling) {
+                        container[0].appendChild(f.assistContainer[0]);
+                    } else {
+                        f.assistContainer.remove();
                     }
                     self._resetDom();
+                    container.height(stateContainer.height()).width(stateContainer.width() + scrollWidth);
+                    // append footer to first element.
+                    if(f.footer !== undefined) {
+                        f.footer.insertAfter(container);
+                    }
                     f.contentWrapper.css("float", "left");
                     f.contentWidth = f.contentWrapper.width();
                     f.contentHeight = f.contentWrapper.height();
                     f.contentWrapper.css("float", "");
+                    if(customScrolling) {
+                        self._setAssistElementStyle(f);
+                    }
+                    self._applyOverflow(f.stateContainer);
                 },
-                _bindElementEvents: function () {
-                    var self = this, ele = self.element, o = self.options, wn = self.widgetName, scrollEle = ele.find(".wijmo-wijsuperpanel-statecontainer"), scrollTop = scrollEle.scrollTop(), scrollLeft = scrollEle.scrollLeft();
-                    scrollEle.bind("scroll", function (event, data) {
-                        var curScrollTop = $(this).scrollTop(), curScrollLeft = $(this).scrollLeft(), direction, dir, oldValue, newValue, scrollPx;
-                        if(curScrollTop === scrollTop && curScrollLeft === scrollLeft) {
+                _setAssistElementStyle: function (f) {
+                    var self = this, vs = self.options.vScroller.scrollBarVisibility, stateContainer = f.stateContainer, assistContainer = f.assistContainer, sumitScroll = f.simulateScroll, stateContainer, containterHeight, contentHeight, scrollDiv, left;
+                    containterHeight = stateContainer.height();
+                    contentHeight = f.contentHeight;
+                    left = stateContainer.position().left + stateContainer.width() - scrollWidth;
+                    scrollDiv = sumitScroll.children();
+                    sumitScroll.css("width", scrollWidth).css("height", containterHeight).css("overflow-y", vs);
+                    assistContainer.css("left", (left) + "px").css("width", scrollWidth).css("height", containterHeight);
+                    scrollDiv.css("width", scrollWidth + 2).css("height", contentHeight).css("background", "transparent");
+                    self._setCustomScrollDragLengthForIOS(self.options, f);
+                },
+                _setCustomScrollDragLengthForIOS: function (o, f) {
+                    if(!isIOS) {
+                        return;
+                    }
+                    var self = this, scrollBarEle = f.customScrollBarEle, range = o.vScroller.scrollMax - o.vScroller.scrollMin, largeChange = self._getVScrollBarLargeChange(), track = f.stateContainer.height(), divide = range / largeChange, dragLength = track / divide, minidrag = o.vScroller.scrollMinDragLength || 6;
+                    if(dragLength < minidrag) {
+                        dragLength = minidrag;
+                    } else if((dragLength + 1) >= track) {
+                        dragLength = track - 1;
+                    }
+                    dragLength = Math.round(dragLength);
+                    scrollBarEle.height(dragLength);
+                },
+                _elementScrolled: function (curScrollLeft, curScrollTop, originalScrollLeft, originalScrollTop, customScrolling) {
+                    var self = this, o = self.options, ele = self.element, direction, dir, oldValue, newValue, scrollPx;
+                    if(curScrollTop === originalScrollTop && curScrollLeft === originalScrollLeft) {
+                        return;
+                    }
+                    if(curScrollTop === originalScrollTop) {
+                        if(customScrolling) {
                             return;
                         }
-                        if(curScrollTop === scrollTop) {
-                            dir = "h";
-                            if(curScrollLeft > scrollLeft) {
-                                direction = "right";
-                            } else {
-                                direction = "left";
-                            }
-                            oldValue = o.hScroller.scrollValue;
-                            scrollPx = curScrollLeft;
+                        dir = "h";
+                        if(curScrollLeft > originalScrollLeft) {
+                            direction = "right";
                         } else {
-                            dir = "v";
-                            if(curScrollTop > scrollTop) {
-                                direction = "bottom";
-                            } else {
-                                direction = "top";
-                            }
-                            oldValue = o.vScroller.scrollValue;
-                            scrollPx = curScrollTop;
+                            direction = "left";
                         }
-                        newValue = self.scrollPxToValue(scrollPx, dir);
-                        //TODO: if scrolling event can be cancelled, reset scrollTop, scrollLeft.
-                        //scrolling event
-                        self._trigger("scrolling", null, {
-                            dir: dir,
-                            direction: direction,
-                            oldValue: oldValue,
-                            newValue: newValue,
-                            beforePosition: {
-                                left: -scrollLeft,
-                                top: -scrollTop
+                        oldValue = o.hScroller.scrollValue;
+                        scrollPx = curScrollLeft;
+                    } else {
+                        dir = "v";
+                        if(curScrollTop > originalScrollTop) {
+                            direction = "bottom";
+                        } else {
+                            direction = "top";
+                        }
+                        oldValue = o.vScroller.scrollValue;
+                        scrollPx = curScrollTop;
+                    }
+                    newValue = self.scrollPxToValue(scrollPx, dir);
+                    newValue = Math.round(newValue);
+                    self._trigger("scrolling", null, {
+                        dir: dir,
+                        direction: direction,
+                        oldValue: oldValue,
+                        newValue: newValue,
+                        beforePosition: {
+                            left: -originalScrollLeft,
+                            top: -originalScrollTop
+                        }
+                    });
+                    //scroll event
+                    self._triggerScroll(scrollPx, dir);
+                    //update scroll value
+                    self._updateScrollValue(scrollPx, dir);
+                    //scrolled event
+                    self._trigger("scrolled", null, {
+                        dir: dir,
+                        beforePosition: {
+                            left: -originalScrollLeft,
+                            top: -originalScrollTop
+                        },
+                        afterPosition: {
+                            left: -curScrollLeft,
+                            top: -curScrollTop
+                        },
+                        newValue: newValue
+                    });
+                },
+                _bindElementEvents: function () {
+                    var self = this, ele = self.element, o = self.options, f = self._fields(), wn = self.widgetName, scrollEle = f.stateContainer, originalScrollLeft = scrollEle.scrollLeft(), originalScrollTop = scrollEle.scrollTop(), simulateScroll = f.simulateScroll, currentTop, currentLeft, scrollBarEle = f.customScrollBarEle, scrollBarEleTop, scrollBarEleHeight, innerHeight, scrollHeight, startPointY, endPointY, y_Offset, startPointX, endPointX, x_Offset, horizontalMove = false, hasMouseDown = false, fadeTime, hasScrollBarEle = isIOS && (scrollBarEle.length > 0);
+                    simulateScroll.unbind();
+                    scrollEle.unbind("." + wn);
+                    $(document).unbind("mouseup." + wn);
+                    if(o.customScrolling) {
+                        if(simulateScroll.length > 0) {
+                            innerHeight = simulateScroll.children().height();
+                            scrollHeight = simulateScroll.height();
+                            originalScrollTop = simulateScroll.scrollTop();
+                            if(hasScrollBarEle) {
+                                scrollBarEle.css("display", "block");
+                                scrollBarEleHeight = scrollBarEle.height();
+                                scrollBarEle.css("display", "none");
+                                scrollBarEleTop = scrollBarEle.position().top;
                             }
-                        });
-                        //scroll event
-                        self._triggerScroll(scrollPx, dir);
-                        //update scroll value
-                        self._updateScrollValue(scrollPx, dir);
-                        //scrolled event
-                        self._trigger("scrolled", null, {
-                            dir: dir,
-                            beforePosition: {
-                                left: -scrollLeft,
-                                top: -scrollTop
-                            },
-                            afterPosition: {
-                                left: -curScrollLeft,
-                                top: -curScrollTop
-                            },
-                            newValue: newValue
-                        });
-                        scrollLeft = curScrollLeft;
-                        scrollTop = curScrollTop;
+                            simulateScroll.bind("scroll", function (event, data) {
+                                currentTop = simulateScroll.scrollTop();
+                                currentLeft = scrollEle.scrollLeft();
+                                if(hasScrollBarEle) {
+                                    scrollBarEleTop = self._getCustomScrollOffset(currentTop, innerHeight, scrollHeight, scrollBarEleHeight);
+                                    if(scrollBarEleTop < 0) {
+                                        scrollBarEleTop = 0;
+                                    }
+                                    scrollBarEle.css("top", scrollBarEleTop + "px");
+                                }
+                                self._elementScrolled(currentLeft, currentTop, originalScrollLeft, originalScrollTop, true);
+                                originalScrollLeft = currentLeft;
+                                originalScrollTop = currentTop;
+                            });
+                            scrollEle.bind("wijmousedown." + wn, function (event) {
+                                startPointY = event.pageY;
+                                startPointX = event.pageX;
+                                hasMouseDown = true;
+                                if(fadeTime) {
+                                    clearTimeout(fadeTime);
+                                }
+                                if(hasScrollBarEle) {
+                                    scrollBarEle.stop().fadeIn(100);
+                                }
+                            });
+                            scrollEle.bind("wijmousemove." + wn, function (event) {
+                                if(hasMouseDown) {
+                                    endPointY = event.pageY;
+                                    y_Offset = endPointY - startPointY;
+                                    endPointX = event.pageX;
+                                    x_Offset = endPointX - startPointX;
+                                    horizontalMove = (Math.abs(y_Offset) < Math.abs(x_Offset));
+                                    if(y_Offset) {
+                                        if(!horizontalMove) {
+                                            currentTop = simulateScroll.scrollTop();
+                                            simulateScroll.scrollTop(currentTop - y_Offset);
+                                        }
+                                        startPointY = endPointY;
+                                    }
+                                }
+                                if(!$.browser.msie && !horizontalMove) {
+                                    event.stopPropagation();
+                                    event.preventDefault();
+                                }
+                            });
+                            scrollEle.bind("wijmouseup." + wn, function (event) {
+                                startPointY = event.pageY;
+                                startPointX = event.pageX;
+                                hasMouseDown = false;
+                                horizontalMove = false;
+                                if(hasScrollBarEle) {
+                                    fadeTime = setTimeout(function () {
+                                        scrollBarEle.fadeOut("slow");
+                                    }, 1000);
+                                }
+                            });
+                            $(document).bind("mouseup." + wn, function (event) {
+                                hasMouseDown = false;
+                                horizontalMove = false;
+                                startPointY = event.pageY;
+                                startPointX = event.pageX;
+                            });
+                        }
+                        scrollEle.bind("mousewheel." + wn, self, self._panelMouseWheel);
+                    }
+                    scrollEle.bind("scroll", function (event, data) {
+                        if(o.customScrolling && simulateScroll.length > 0) {
+                            currentTop = simulateScroll.scrollTop();
+                        } else {
+                            currentTop = scrollEle.scrollTop();
+                        }
+                        currentLeft = scrollEle.scrollLeft();
+                        self._elementScrolled(currentLeft, currentTop, originalScrollLeft, originalScrollTop, false);
+                        originalScrollLeft = currentLeft;
+                        originalScrollTop = currentTop;
                     });
                     if(o.keyboardSupport) {
                         if(self._keyboardBind === undefined) {
@@ -2219,7 +2489,153 @@ var wijmo;
                         });
                     }
                 },
-                _setScrollingInterval: function (f, dir, self, large) {
+                _getCustomScrollOffset: function (scrollOffset, innerScrollHeight, scrollHeight, customScrollHeight) {
+                    var customOffset, divide;
+                    divide = (scrollHeight - customScrollHeight) / (innerScrollHeight - scrollHeight);
+                    return scrollOffset * divide;
+                },
+                _panelMouseWheel: // ** Add private methods for customize mouse wheel event. ** //
+                // ** Copy code from Default Superpanel ** //
+                function (e, delta) {
+                    var self = e.data, o = self.options, originalElement, dir = "", onHbar, hScroller = o.hScroller, vScroller = o.vScroller, scrollEnd, vSmall, vLarge, vSCrollValue, vScrollPx, assistDiv;
+                    if(!o.mouseWheelSupport || o.disabled) {
+                        return;
+                    }
+                    originalElement = $(e.srcElement || e.originalEvent.target);
+                    onHbar = originalElement.closest("." + hbarContainerCSS, self.element).size() > 0;
+                    if(onHbar) {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        return;
+                    }
+                    if(delta > 0) {
+                        dir = "top";
+                    } else {
+                        dir = "bottom";
+                    }
+                    if(dir.length > 0) {
+                        vSmall = self._getVScrollBarSmallChange();
+                        vLarge = self._getVScrollBarLargeChange();
+                        if(!self._setScrollerValue(dir, vScroller, vSmall, vLarge, dir === "bottom", false, self)) {
+                            return;
+                        }
+                        vSCrollValue = vScroller.scrollValue;
+                        vScrollPx = vSCrollValue ? self._scrollValueToPx(vSCrollValue, "v") : 0;
+                        if(vSCrollValue !== undefined) {
+                            self._fields().assistContainer.find("." + simulateScrollClass).prop("scrollTop", vScrollPx);
+                        }
+                    }
+                    scrollEnd = false;
+                    if(dir === "top") {
+                        scrollEnd = !self.vNeedScrollBar || Math.abs(vScroller.scrollValue - vScroller.scrollMin) < 0.001;
+                    }
+                    if(dir === "bottom") {
+                        scrollEnd = !self.vNeedScrollBar || Math.abs(vScroller.scrollValue - (vScroller.scrollMax - self._getVScrollBarLargeChange() + 1)) < 0.001;
+                    }
+                    if(!scrollEnd || !o.bubbleScrollingEvent) {
+                        e.stopPropagation();
+                        e.preventDefault();
+                    }
+                },
+                _getVScrollBarSmallChange: function () {
+                    var o = this.options, va;
+                    if(!o.vScroller.scrollSmallChange) {
+                        va = this._getVScrollBarLargeChange();
+                        o.vScroller.scrollSmallChange = va / 2;
+                    }
+                    return o.vScroller.scrollSmallChange;
+                },
+                _getVScrollBarLargeChange: function () {
+                    var self = this, o = self.options, f = self._fields(), scroller = o.vScroller, autoKey = "_autoVLarge", vMax, vMin, vRange, content, contentHeight, wrapperHeight, percent, large;
+                    if(scroller.scrollLargeChange) {
+                        return scroller.scrollLargeChange;
+                    }
+                    // calculate large change if empty
+                    vMax = scroller.scrollMax;
+                    vMin = scroller.scrollMin;
+                    vRange = vMax - vMin;
+                    content = f.simulateScroll;
+                    contentHeight = content["innerHeight"]();
+                    wrapperHeight = f["contentHeight"];
+                    percent = contentHeight / (wrapperHeight - contentHeight);
+                    large = ((vRange + 1) * percent) / (1 + percent);
+                    if(isNaN(large)) {
+                        large = 0;
+                    }
+                    scroller.scrollLargeChange = large;
+                    self[autoKey] = true;
+                    return scroller.scrollLargeChange;
+                },
+                _setScrollerValue: function (dir, scroller, smallChange, largeChange, isAdd, isLarge, self) {
+                    var o = this.options, vMin = scroller.scrollMin, change = isLarge ? largeChange : smallChange, value = scroller.scrollValue, t = 0, vTopValue, firstStepChangeFix, data, scrollValue, val, ev;
+                    if(!value) {
+                        value = vMin;
+                    }
+                    vTopValue = scroller.scrollMax - largeChange + 1;
+                    if(value > vTopValue) {
+                        value = vTopValue;
+                    }
+                    if(isAdd) {
+                        if(Math.abs(value - vTopValue) < 0.0001) {
+                            self._clearInterval();
+                            return false;
+                        }
+                        firstStepChangeFix = scroller.firstStepChangeFix;
+                        t = value + change;
+                        if(!isLarge && Math.abs(value - vMin) < 0.0001 && !isNaN(firstStepChangeFix)) {
+                            t += firstStepChangeFix;
+                        }
+                        if(t > vTopValue) {
+                            t = vTopValue;
+                        }
+                    } else {
+                        if(Math.abs(value - vMin) < 0.0001) {
+                            self._clearInterval();
+                            return false;
+                        }
+                        t = value - change;
+                        if(t < 0) {
+                            t = vMin;
+                        }
+                    }
+                    data = {
+                        oldValue: scroller.scrollValue,
+                        newValue: t,
+                        direction: dir,
+                        dir: scroller.dir
+                    };
+                    if(!self._scrolling(true, self, data)) {
+                        return false;
+                    }
+                    if(self.customScroll) {
+                        val = Math.abs(self.customScroll);
+                        scrollValue = self.scrollPxToValue(val, scroller.dir);
+                    }
+                    scroller.scrollValue = scrollValue || t;
+                    ev = $.Event("scrollValueChanged");
+                    this._trigger("scrollValueChanged", ev, scroller);
+                    self.customScroll = undefined;
+                    return true;
+                },
+                _clearInterval: function () {
+                    var f = this._fields(), intervalID = f.internalFuncID;
+                    if(intervalID > 0) {
+                        window.clearInterval(intervalID);
+                        f.internalFuncID = -1;
+                    }
+                },
+                _scrolling: function (fireEvent, self, d) {
+                    var r = true;
+                    if(fireEvent) {
+                        d.beforePosition = self.getContentElement().position();
+                        self._beforePosition = d.beforePosition;
+                        r = self._trigger("scrolling", null, d);
+                        self.customScroll = d.customScroll;
+                    }
+                    return r;
+                },
+                _setScrollingInterval: // ** End ** //
+                function (f, dir, self, large) {
                     var o = self.options;
                     if(dir.length > 0) {
                         f.internalFuncID = window.setInterval(function () {
@@ -2255,7 +2671,7 @@ var wijmo;
                     e.preventDefault();
                 },
                 _doScrolling: function (dir, self, large) {
-                    var value, orient, func, f = self._fields(), ele = f.stateContainer[0], animateOpt = {
+                    var value, orient, func, f = self._fields(), ele = self.options.customScrolling ? f.simulateScroll[0] : f.stateContainer[0], animateOpt = {
                     }, scrollVal;
                     if(dir === "top" || dir === "bottom") {
                         orient = "v";
@@ -2342,6 +2758,19 @@ var wijmo;
                         f.resizer = null;
                     }
                 },
+                _adjustScrollValue: function (dir) {
+                    var isHori = dir === "h", self = this, o = this.options, needScroll = isHori ? self.hNeedScrollBar : self.vNeedScrollBar, scroller = isHori ? o.hScroller : o.vScroller, max = scroller.scrollMax, min = scroller.scrollMin, largeChange, topValue;
+                    if(needScroll) {
+                        largeChange = isHori ? self._getHScrollBarLargeChange() : self._getVScrollBarLargeChange();
+                        topValue = max - largeChange + 1;
+                        if(scroller.scrollValue > topValue) {
+                            scroller.scrollValue = topValue;
+                        }
+                        if(scroller.scrollValue < min) {
+                            scroller.scrollValue = min;
+                        }
+                    }
+                },
                 _resetDom: function () {
                     var self = this, o = self.options, ele = self.element, f = self._fields(), width = ele.width(), height = ele.height();
                     //minus header and footer's height if they exist.
@@ -2360,6 +2789,7 @@ var wijmo;
                         f.clientWidth = f.stateContainer[0].clientWidth;
                         f.clientHeight = f.stateContainer[0].clientHeight;
                     }
+                    self._initScrollPosition();
                 },
                 _fields: function () {
                     var self = this, ele = self.element, key = self.widgetName + "-fields", d = self._fieldsStore;
@@ -2425,12 +2855,12 @@ var wijmo;
                     self._initScrollPosition();
                 },
                 _initScrollPosition: function () {
-                    var o = this.options, hScroller = o.hScroller, vScroller = o.vScroller, hScrollValue = hScroller.scrollValue, vSCrollValue = vScroller.scrollValue, f = this._fields(), hScrollPx = hScrollValue ? this._scrollValueToPx(hScrollValue, "h") : 0, vScrollPx = vSCrollValue ? this._scrollValueToPx(vSCrollValue, "v") : 0;
+                    var o = this.options, hScroller = o.hScroller, vScroller = o.vScroller, hScrollValue = hScroller.scrollValue, vSCrollValue = vScroller.scrollValue, f = this._fields(), vScrollElement = o.customScrolling ? f.simulateScroll : f.stateContainer, hScrollPx = hScrollValue ? this._scrollValueToPx(hScrollValue, "h") : 0, vScrollPx = vSCrollValue ? this._scrollValueToPx(vSCrollValue, "v") : 0;
                     if(hScrollValue) {
                         f.stateContainer.prop("scrollLeft", hScrollPx);
                     }
                     if(vSCrollValue) {
-                        f.stateContainer.prop("scrollTop", vScrollPx);
+                        vScrollElement.prop("scrollTop", vScrollPx);
                     }
                 },
                 _updateScrollValue: function (px, dir) {
@@ -2446,19 +2876,61 @@ var wijmo;
                 * @param {string} dir Scrolling direction. Options are: "h" and "v".
                 */
                 function (px, dir) {
-                    var o = this.options, clientLengthKey = (dir === "h" ? "clientWidth" : "clientHeight"), scrollLengthKey = (dir === "h" ? "scrollWidth" : "scrollHeight"), scroller = (dir === "h" ? "hScroller" : "vScroller"), f = this._fields(), cWrapper = f.stateContainer[0], clientLengthValue = cWrapper[clientLengthKey], scrollLengthValue = cWrapper[scrollLengthKey], vMin = o[scroller].scrollMin, vMax = o[scroller].scrollMax, vRange = vMax - vMin, ret = vRange * px / (scrollLengthValue - clientLengthValue) + vMin;
+                    var self = this, o = self.options, f = self._fields(), clientLengthKey, scrollLengthKey, scroller, vScrollElement, hScrollElement, cWrapper, clientLengthValue, scrollLengthValue, vMin, vMax, vRange, ret;
+                    clientLengthKey = (dir === "h" ? "clientWidth" : "clientHeight");
+                    scrollLengthKey = (dir === "h" ? "scrollWidth" : "scrollHeight");
+                    scroller = (dir === "h" ? "hScroller" : "vScroller");
+                    hScrollElement = f.stateContainer[0];
+                    vScrollElement = o.customScrolling ? f.simulateScroll[0] : hScrollElement , cWrapper = dir === "h" ? hScrollElement : vScrollElement;
+                    clientLengthValue = cWrapper[clientLengthKey];
+                    scrollLengthValue = cWrapper[scrollLengthKey];
+                    vMin = o[scroller].scrollMin;
+                    vMax = o[scroller].scrollMax - self._getVScrollBarLargeChange() + 1;
+                    vRange = vMax - vMin;
+                    ret = vRange * px / (scrollLengthValue - clientLengthValue) + vMin;
                     return ret;
                 },
+                scrollValueToPx: /**
+                * Convert scroll value to pixel.
+                * For example, scroll value is 1
+                * which makes wijsuperpanel scroll 50px after conversion.
+                * @param {number} value of scrolling.
+                * @param {string} dir Scrolling direction. Options are: "h" and "v".
+                */
+                function (value, dir) {
+                    return this._scrollValueToPx(value, dir);
+                },
                 _scrollValueToPx: function (value, dir) {
-                    var o = this.options, clientLengthKey = (dir === "h" ? "clientWidth" : "clientHeight"), scrollLengthKey = (dir === "h" ? "scrollWidth" : "scrollHeight"), scroller = (dir === "h" ? "hScroller" : "vScroller"), f = this._fields(), cWrapper = f.stateContainer[0], clientLengthValue = cWrapper[clientLengthKey], scrollLengthValue = cWrapper[scrollLengthKey], vMin = o[scroller].scrollMin, vMax = o[scroller].scrollMax, vRange = vMax - vMin, ret = (value - vMin) * (scrollLengthValue - clientLengthValue) / vRange;
+                    var self = this, o = self.options, f = self._fields(), clientLengthKey, scrollLengthKey, scroller, cWrapper, clientLengthValue, scrollLengthValue, vMin, vMax, vRange, ret, vScrollElement, hScrollElement;
+                    clientLengthKey = (dir === "h" ? "clientWidth" : "clientHeight");
+                    scrollLengthKey = (dir === "h" ? "scrollWidth" : "scrollHeight");
+                    scroller = (dir === "h" ? "hScroller" : "vScroller");
+                    hScrollElement = f.stateContainer[0];
+                    vScrollElement = o.customScrolling ? f.simulateScroll[0] : hScrollElement , cWrapper = (dir === "h" ? hScrollElement : vScrollElement);
+                    clientLengthValue = cWrapper[clientLengthKey];
+                    scrollLengthValue = cWrapper[scrollLengthKey];
+                    vMin = o[scroller].scrollMin;
+                    vMax = o[scroller].scrollMax - self._getVScrollBarLargeChange() + 1;
+                    vRange = vMax - vMin;
+                    if(value === undefined || value < vMin) {
+                        value = vMin;
+                    }
+                    if(value > vMax) {
+                        value = vMax;
+                    }
+                    ret = (value - vMin) * (scrollLengthValue - clientLengthValue) / vRange;
                     return ret;
                 },
                 _animateTo: function (to) {
                     var self = this, ele = self.element, o = self.options, ao = o.animationOptions, f = self._fields();
-                    f.stateContainer.animate(to, ao);
+                    if(o.customScrolling) {
+                        f.simulateScroll.animate(to, ao);
+                    } else {
+                        f.stateContainer.animate(to, ao);
+                    }
                 },
                 destroy: function () {
-                    var self = this, ele = self.element, o = self.options, f = self._fields(), cWrapper, wijCSS = o.wijCSS;
+                    var self = this, ele = self.element, o = self.options, f = self._fields(), cWrapper, container, wijCSS = o.wijCSS;
                     if(self.disabledDiv) {
                         self.disabledDiv.remove();
                         self.disabledDiv = null;
@@ -2473,11 +2945,14 @@ var wijmo;
                         wijCSS.content,
                         wijCSS.cornerAll
                     ].join(' '));
+                    container = ele.find("." + panelContainerClass);
                     cWrapper = f.contentWrapper;
                     cWrapper.contents().each(function (index, e) {
                         ele.append(e);
                     });
                     f.stateContainer.remove();
+                    f.assistContainer.remove();
+                    container.remove();
                     $.Widget.prototype.destroy.apply(self, arguments);
                 },
                 doScrolling: function (dir, large) {
@@ -2642,8 +3117,8 @@ var wijmo;
                 },
                 wijMobileCSS: {
                     header: "ui-header ui-bar-a",
-                    content: "ui-body-c",
-                    stateDefault: "ui-btn-up-c",
+                    content: "ui-body-b",
+                    stateDefault: "ui-btn ui-btn-b",
                     stateHover: "ui-btn-down-c",
                     stateActive: "ui-btn-down-c"
                 },

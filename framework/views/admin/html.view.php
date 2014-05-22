@@ -74,7 +74,7 @@ if (hash.substr(0, 4) == 'tab=') {
 <meta name="msapplication-wide310x150logo" content="static/novius-os/admin/novius-os/img/favicon/mstile-310x150.png">
 
 <link rel="stylesheet" href="static/novius-os/admin/vendor/wijmo/css/aristo/jquery-wijmo.min.css">
-<link rel="stylesheet" href="static/novius-os/admin/vendor/wijmo/css/jquery.wijmo-pro.all.3.20133.20.min.css">
+<link rel="stylesheet" href="static/novius-os/admin/vendor/wijmo/css/jquery.wijmo-pro.all.3.20141.34.min.css">
 <?php
 if ($assets_minified) {
     ?>

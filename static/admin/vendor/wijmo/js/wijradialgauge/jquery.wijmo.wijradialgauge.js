@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20133.20
+ * Wijmo Library 3.20141.34
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -8,7 +8,6 @@
  * Licensed under the Wijmo Commercial License. Also available under the GNU GPL Version 3 license.
  * licensing@wijmo.com
  * http://wijmo.com/widgets/license/
- *
  *
  */
 var __extends = this.__extends || function (d, b) {
@@ -47,10 +46,8 @@ var wijmo;
             };
             wijradialgauge.prototype._set_radius = function () {
                 var self = this;
-                self._redrawMarksAndLabels();
-                self.pointer.wijRemove();
-                self._paintPointer();
-                self._setPointer();
+                self._autoCalculate();
+                self.redraw();
             };
             wijradialgauge.prototype._set_startAngle = function () {
                 var self = this;
@@ -81,9 +78,22 @@ var wijmo;
             };
             wijradialgauge.prototype._set_cap = function () {
                 var self = this;
-                self.pointer.wijRemove();
-                self._paintPointer();
+                if(self.cap) {
+                    self.cap.wijRemove();
+                    self.cap = null;
+                }
+                self._paintCap();
+                self._positionCapWithBehindPointer();
+            };
+            wijradialgauge.prototype._set_pointer = function () {
+                var self = this;
+                if(self.pointer) {
+                    self.pointer.wijRemove();
+                    self.pointer = null;
+                }
+                self._paintPointerExcludeCap();
                 self._setPointer();
+                self._positionCapWithBehindPointer();
             };
             wijradialgauge.prototype._clearState = function () {
                 _super.prototype._clearState.call(this);
@@ -345,15 +355,20 @@ var wijmo;
                 return face;
             };
             wijradialgauge.prototype._paintPointer = function () {
+                var self = this, o = self.options;
+                self._paintPointerExcludeCap();
+                if(o.cap && o.cap.visible) {
+                    self._paintCap();
+                    self._positionCapWithBehindPointer();
+                }
+            };
+            wijradialgauge.prototype._paintPointerExcludeCap = function () {
                 var self = this, o = self.options, pointerInfo = o.pointer, length = self.radius * pointerInfo.length, startLocation = {
                     x: self.centerPoint.x - length + pointerInfo.offset * self.radius,
                     y: self.centerPoint.y - pointerInfo.width / 2
                 }, point;
                 if(!pointerInfo.visible) {
                     return;
-                }
-                if(o.cap && o.cap.behindPointer && o.cap.visible) {
-                    self._paintCap();
                 }
                 if(pointerInfo.template && $.isFunction(pointerInfo.template)) {
                     point = pointerInfo.template.call(self.canvas, startLocation, $.extend({
@@ -370,9 +385,6 @@ var wijmo;
                 }
                 self.pointer = point;
                 $.wijraphael.addClass($(point.node), o.wijCSS.radialGaugePointer);
-                if((!o.cap || !o.cap.behindPointer) && o.cap.visible) {
-                    self._paintCap();
-                }
             };
             wijradialgauge.prototype._paintCap = function () {
                 var self = this, o = self.options, capInfo = o.cap, ui;
@@ -395,6 +407,20 @@ var wijmo;
                 return self.cap;
                 //
                             };
+            wijradialgauge.prototype._positionCapWithBehindPointer = function () {
+                var self = this, o = self.options;
+                if(o.cap && o.cap.visible) {
+                    if(!o.cap.behindPointer) {
+                        if(self.cap) {
+                            self.cap.toFront();
+                        }
+                    } else {
+                        if(self.pointer) {
+                            self.pointer.toFront();
+                        }
+                    }
+                }
+            };
             wijradialgauge.prototype._paintRange = function (range) {
                 var self = this, o = self.options, calculateFrom = isNaN(range.startValue) ? 0 : range.startValue, calculateTo = isNaN(range.endValue) ? 0 : range.endValue, calculateStartWidth = isNaN(range.startWidth) ? (isNaN(range.width) ? 0 : range.width) : range.startWidth, calculateEndWidth = isNaN(range.endWidth) ? (isNaN(range.width) ? 0 : range.width) : range.endWidth, startDistance = range.startDistance || 1, endDistance = range.endDistance || 1, coercedFrom, coercedTo;
                 if(calculateFrom !== calculateTo) {

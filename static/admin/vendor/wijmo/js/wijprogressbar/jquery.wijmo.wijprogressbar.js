@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20133.20
+ * Wijmo Library 3.20141.34
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -8,7 +8,8 @@
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * licensing@wijmo.com
  * http://wijmo.com/widgets/license/
- *
+ * ----
+ * Credits: Wijmo includes some MIT-licensed software, see copyright notices below.
  */
 var __extends = this.__extends || function (d, b) {
     function __() { this.constructor = d; }
@@ -272,7 +273,7 @@ var wijmo;
                         opacity: 0.1
                     });
                 }
-                return $("<div></div>").addClass("ui-disabled").css(css);
+                return $("<div></div>").addClass(self.options.wijCSS.stateDisabled).css(css);
             };
             wijprogressbar.prototype._triggerEvent = function (eventName, oldValue, newValue, isFireEvent) {
                 if(!isFireEvent) {

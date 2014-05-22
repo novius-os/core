@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20133.20
+ * Wijmo Library 3.20141.34
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -8,7 +8,6 @@
  * Licensed under the Wijmo Commercial License. Also available under the GNU GPL Version 3 license.
  * licensing@wijmo.com
  * http://wijmo.com/widgets/license/
- *
  *
  */
 var __extends = this.__extends || function (d, b) {
@@ -120,6 +119,28 @@ var wijmo;
             };
             ChartUtil.sector = function sector(cx, cy, r, startAngle, endAngle) {
                 var start = $.wijraphael.getPositionByAngle(cx, cy, r, startAngle), end = $.wijraphael.getPositionByAngle(cx, cy, r, endAngle);
+                var largeArcFlag, sweepFlag, angleDiff, isConvex;
+                if(endAngle > startAngle) {
+                    angleDiff = endAngle - startAngle;
+                    isConvex = angleDiff > 180;
+                    if(isConvex) {
+                        largeArcFlag = 1;
+                        sweepFlag = 0;
+                    } else {
+                        largeArcFlag = +isConvex;
+                        sweepFlag = +isConvex;
+                    }
+                } else {
+                    angleDiff = startAngle - endAngle;
+                    isConvex = angleDiff > 180;
+                    if(isConvex) {
+                        largeArcFlag = 1;
+                        sweepFlag = 1;
+                    } else {
+                        largeArcFlag = +isConvex;
+                        sweepFlag = +!isConvex;
+                    }
+                }
                 return [
                     "M", 
                     cx, 
@@ -131,8 +152,8 @@ var wijmo;
                     r, 
                     r, 
                     0, 
-                    +(endAngle - startAngle > 180), 
-                    0, 
+                    largeArcFlag, 
+                    sweepFlag, 
                     end.x, 
                     end.y, 
                     "z"
@@ -140,6 +161,38 @@ var wijmo;
             };
             ChartUtil.donut = function donut(cx, cy, outerR, innerR, startAngle, endAngle) {
                 var outerS = $.wijraphael.getPositionByAngle(cx, cy, outerR, startAngle), outerE = $.wijraphael.getPositionByAngle(cx, cy, outerR, endAngle), innerS = $.wijraphael.getPositionByAngle(cx, cy, innerR, startAngle), innerE = $.wijraphael.getPositionByAngle(cx, cy, innerR, endAngle), largeAngle = endAngle - startAngle > 180;
+                var largeArcFlagStart, sweepFlagStart, largeArcFlagEnd, sweepFlagEnd, angleDiff, isConvex;
+                // if direction is counter clockwise
+                if(endAngle > startAngle) {
+                    angleDiff = endAngle - startAngle;
+                    isConvex = angleDiff > 180;
+                    if(isConvex) {
+                        largeArcFlagStart = 1;
+                        sweepFlagStart = 0;
+                        largeArcFlagEnd = 1;
+                        sweepFlagEnd = 1;
+                    } else {
+                        largeArcFlagStart = 0;
+                        sweepFlagStart = 0;
+                        largeArcFlagEnd = 0;
+                        sweepFlagEnd = 1;
+                    }
+                } else// if direction is clockwise
+                 {
+                    angleDiff = startAngle - endAngle;
+                    isConvex = angleDiff > 180;
+                    if(isConvex) {
+                        largeArcFlagStart = 1;
+                        sweepFlagStart = 1;
+                        largeArcFlagEnd = 1;
+                        sweepFlagEnd = 0;
+                    } else {
+                        largeArcFlagStart = 0;
+                        sweepFlagStart = 1;
+                        largeArcFlagEnd = 0;
+                        sweepFlagEnd = 0;
+                    }
+                }
                 return [
                     "M", 
                     outerS.x, 
@@ -148,8 +201,8 @@ var wijmo;
                     outerR, 
                     outerR, 
                     0, 
-                    +largeAngle, 
-                    0, 
+                    largeArcFlagStart, 
+                    sweepFlagStart, 
                     outerE.x, 
                     outerE.y, 
                     "L", 
@@ -159,8 +212,8 @@ var wijmo;
                     innerR, 
                     innerR, 
                     0, 
-                    +largeAngle, 
-                    1, 
+                    largeArcFlagEnd, 
+                    sweepFlagEnd, 
                     innerS.x, 
                     innerS.y, 
                     "L", 
@@ -2001,6 +2054,7 @@ var wijmo;
                     self.seriesList = $.arrayClone(value);
                     self._trigger("seriesChanged", null, value);
                     self.seriesTransition = true;
+                    self._seriesListSeted();
                     self._init();
                 } else {
                     if($.isPlainObject(o[key])) {
@@ -2100,6 +2154,10 @@ var wijmo;
                     self._handleDisabledOption(value, self.chartElement);
                 }
                 // end for disabled option
+                if(key === "autoResize") {
+                    self._unbindResizeEvent();
+                    self._bindResizeEvent();
+                }
                 // fixed a issue that when set the disabled option,
                 // because the chart is paint by
                 // wij***chart plugin, and the disabled set to the plugin
@@ -2142,6 +2200,8 @@ var wijmo;
                 self.redraw();
             };
             wijchartcore.prototype._preHandleSeriesData = function () {
+            };
+            wijchartcore.prototype._seriesListSeted = function () {
             };
             wijchartcore.prototype._initStyles = function () {
                 var o = this.options, styles = o.seriesStyles, hoverStyles = o.seriesHoverStyles, stylesLen, seriesLen, hoverStylesLen, i;
@@ -2394,29 +2454,29 @@ var wijmo;
                 return disabledDiv;
             };
             wijchartcore.prototype._bindData = function () {
-                var self = this, o = self.options, dataSource = o.dataSource, seriesList = o.seriesList, shareData = o.data, sharedXList;
+                var _this = this;
+                var self = this, o = self.options, dataSource = o.dataSource, seriesList = o.seriesList, shareData = o.data, cacheObj = {
+                };
                 $.each(seriesList, function (i, series) {
-                    var data = series.data, dataX, dataY, dataY1, ds = series.dataSource || dataSource;
-                    if(ds && data) {
-                        dataX = data.x;
-                        dataY = data.y;
-                        dataY1 = data.y1;
-                        if(dataX && dataX.bind) {
-                            data.x = self._getBindData(ds, dataX.bind);
-                        } else if(shareData && shareData.x && shareData.x.bind) {
-                            if(sharedXList === undefined) {
-                                sharedXList = self._getBindData(ds, shareData.x.bind);
-                            }
-                            data.x = sharedXList;
-                        }
-                        if(dataY && dataY.bind) {
-                            data.y = self._getBindData(ds, dataY.bind);
-                        }
-                        if(dataY1 && dataY1.bind) {
-                            data.y1 = self._getBindData(ds, dataY1.bind);
-                        }
+                    var ds = series.dataSource || dataSource;
+                    if(ds && series.data) {
+                        _this._bindSeriesData(ds, series, cacheObj);
                     }
                 });
+            };
+            wijchartcore.prototype._bindSeriesData = function (ds, series, cacheObj) {
+                var data = series.data, dataX = data.x, dataY = data.y, shareData = this.options.data;
+                if(dataX && dataX.bind) {
+                    data.x = this._getBindData(ds, dataX.bind);
+                } else if(shareData && shareData.x && shareData.x.bind) {
+                    if(cacheObj.sharedXList === undefined) {
+                        cacheObj.sharedXList = this._getBindData(ds, shareData.x.bind);
+                    }
+                    data.x = cacheObj.sharedXList;
+                }
+                if(dataY && dataY.bind) {
+                    data.y = this._getBindData(ds, dataY.bind);
+                }
             };
             wijchartcore.prototype._getBindData = function (dataSource, bind) {
                 if($.isArray(dataSource)) {
@@ -2866,7 +2926,7 @@ var wijmo;
                     $.wijraphael.addClass($(legendTitle.node), o.wijCSS.legendTitle);
                     textStyle = $.extend(true, {
                     }, o.textStyle, legend.textStyle, legend.titleStyle);
-                    legendTitle.attr(textStyle);
+                    legendTitle.wijAttr(textStyle);
                     self.legendEles.push(legendTitle);
                 }
                 if(legend.reversed) {
@@ -2894,7 +2954,7 @@ var wijmo;
                     // series = $.extend(true, { legendEntry: true }, series);
                     // end comments.
                     function drawSeriesLegend(series) {
-                        var index = legend.reversed ? totalLengedLength - 1 - idx : idx, seriesStyle = seriesStyles[index], chartStyle = $.extend(true, {
+                        var index = legend.reversed ? totalLengedLength - 1 - idx : idx, seriesStyle = self._getLegendStyle(seriesStyles[index]), chartStyle = $.extend(true, {
                             fill: "none",
                             opacity: 1,
                             stroke: "black"
@@ -2911,7 +2971,7 @@ var wijmo;
                                 text = self.canvas.wrapText(0, 0, series.label, legend.textWidth, "far", textStyle);
                             } else {
                                 text = self._text(0, 0, series.label);
-                                text.attr(textStyle);
+                                text.wijAttr(textStyle);
                             }
                             $.wijraphael.addClass($(text.node), o.wijCSS.legendText + " " + o.wijCSS.legend);
                             self.legends.push(text);
@@ -2965,13 +3025,10 @@ var wijmo;
                     } else if(self._isPieChart()) {
                         //fix tfs issue 20705
                         drawSeriesLegend(series);
-                    } else if(self._isStockChart() && self._validateSeriesData(series)) {
-                        drawSeriesLegend(series);
                     } else {
-                        if((series.data.x === undefined && series.data.xy === undefined) || (series.data.xy === undefined && series.data.y === undefined)) {
-                            return true;
+                        if(!self._checkSeriesDataEmpty(series)) {
+                            drawSeriesLegend(series);
                         }
-                        drawSeriesLegend(series);
                     }
                 });
                 legendLen = self.legends.length;
@@ -3161,17 +3218,30 @@ var wijmo;
                 }
                 return textBounds;
             };
-            wijchartcore.prototype._isSeriesDataEmpty = function () {
-                var self = this, sl = self.options.seriesList;
-                if(!sl || sl.length === 0) {
-                    return true;
-                }
+            wijchartcore.prototype._isSeriesListDataEmpty = function () {
+                var _this = this;
+                var self = this, sl = self.options.seriesList, isEmpty = true;
                 $.each(sl, function (idx, s) {
-                    if(!s.data || ((!s.data.x || !s.data.y) && !s.data.xy)) {
-                        return true;
+                    if(!_this._checkSeriesDataEmpty(s)) {
+                        isEmpty = false;
+                        return false;
                     }
                 });
+                return isEmpty;
+            };
+            wijchartcore.prototype._checkEmptyData = function (arr) {
+                if(!arr || !$.isArray(arr)) {
+                    return true;
+                }
                 return false;
+            };
+            wijchartcore.prototype._checkSeriesDataEmpty = function (series) {
+                var checkEmptyData = this._checkEmptyData, data = series.data;
+                if(!data || ((checkEmptyData(data.x) || checkEmptyData(data.y)) && checkEmptyData(data.xy))) {
+                    return true;
+                } else {
+                    return false;
+                }
             };
             wijchartcore.prototype._setTooltipContent = function (obj) {
                 var self = this, tooltipObjs, title, content, tooltip = self.tooltip, hintOptions, newOptions = {
@@ -3270,6 +3340,13 @@ var wijmo;
                     return val;
                 }
             };
+            wijchartcore.prototype._setDefaultTooltipText = function (data) {
+                var label = data.label;
+                if(data.lineSeries && data.lineSeries.label) {
+                    label = data.lineSeries.label;
+                }
+                return label + ":" + this._fotmatTooltip(data.y);
+            };
             wijchartcore.prototype._paintTooltip = function () {
                 var self = this, o = self.options, hint = o.hint, hintEnable = !o.disabled && hint.enable, hintEx = hint, title, content, isFunction = $.isFunction;
                 if(hintEnable && !self.tooltip) {
@@ -3287,19 +3364,11 @@ var wijmo;
                             if($.isArray(this)) {
                                 var str = "";
                                 $.each(this, function (i, data) {
-                                    label = data.label;
-                                    if(data.lineSeries && data.lineSeries.label) {
-                                        label = data.lineSeries.label;
-                                    }
-                                    str += label + ":" + self._fotmatTooltip(data.y) + "\n";
+                                    str += self._setDefaultTooltipText(data) + "\n";
                                 });
                                 return str;
                             } else {
-                                label = this.label;
-                                if(this.lineSeries && this.lineSeries.label) {
-                                    label = this.lineSeries.label;
-                                }
-                                return label + ":" + self._fotmatTooltip(this.y);
+                                return self._setDefaultTooltipText(this);
                             }
                         };
                     }
@@ -3343,7 +3412,7 @@ var wijmo;
                 }, maxtries = 5, offsetX = 0, offsetY = 0, isMultiYAxis = $.isArray(axisOption.y), yAxisCount = 0, yIdx, yaxisOpt, key;
                 self._applyMargins();
                 self.isMultiYAxis = isMultiYAxis;
-                if(self._isSeriesDataEmpty()) {
+                if(self._isSeriesListDataEmpty()) {
                     return;
                 }
                 if(isMultiYAxis) {
@@ -3781,6 +3850,9 @@ var wijmo;
                 axisInfo.majorTickRect = self._getTickRect(axisInfo, axisOptions, true, true, axisRect);
                 axisInfo.minorTickRect = self._getTickRect(axisInfo, axisOptions, false, true, axisRect);
                 majorTickValues = self._getMajorTickValues(axisInfo, axisOptions);
+                if(axisInfo.id === "x") {
+                    majorTickValues = this._adjustTickValuesForCandlestickChart(majorTickValues);
+                }
                 if(!axisOptions.textVisible) {
                     return maxExtent;
                 }
@@ -3835,6 +3907,9 @@ var wijmo;
                             }
                         } else if(axisInfo.annoMethod === "values") {
                             //} else if (axisOptions.annoMethod === "values") {
+                            if(axisInfo.id === "x") {
+                                mtv = self._getXTickText(mtv);
+                            }
                             if(formatString && formatString.length) {
                                 if(isTime) {
                                     mtv = $.fromOADate(mtv);
@@ -4192,7 +4267,7 @@ var wijmo;
                 }
             };
             wijchartcore.prototype._paintAxis = function (axisOptions, axisInfo) {
-                var self = this, o = self.options, canvasBounds = // for stock composite chart, get the bounds from axis
+                var self = this, o = self.options, canvasBounds = // for hloc composite chart, get the bounds from axis
                 axisInfo.bounds || self.canvasBounds, startPoint = {
                     x: 0,
                     y: 0
@@ -4212,6 +4287,9 @@ var wijmo;
                 tempMinorTickValues = self._getMinorTickValues(axisInfo, axisOptions);
                 minorTickValues = self._resetMinorTickValues(tempMinorTickValues, majorTickValues);
                 //}
+                if(axisInfo.id === "x") {
+                    majorTickValues = this._adjustTickValuesForCandlestickChart(majorTickValues);
+                }
                 //add comments here to fix tfs issue 20415,paint the axis inside the plotarea.
                 switch(compass) {
                     case "south":
@@ -4234,7 +4312,7 @@ var wijmo;
                         startPoint.y = canvasBounds.endY;
                         //endPoint.x = canvasBounds.endX;
                         endPoint.x = canvasBounds.endX - thickness;
-                        endPoint.y = canvasBounds.startY;
+                        endPoint.y = canvasBounds.startY + self._getOffsetOfAxis(axisOptions);
                         if(axisInfo.preStartOffset) {
                             startPoint.x += axisInfo.preStartOffset;
                             endPoint.x += axisInfo.preStartOffset;
@@ -4246,7 +4324,7 @@ var wijmo;
                         startPoint.y = canvasBounds.endY;
                         //endPoint.x = canvasBounds.startX - thickness;
                         endPoint.x = canvasBounds.startX;
-                        endPoint.y = canvasBounds.startY;
+                        endPoint.y = canvasBounds.startY + self._getOffsetOfAxis(axisOptions);
                         if(axisInfo.preStartOffset) {
                             startPoint.x -= axisInfo.preStartOffset;
                             endPoint.x -= axisInfo.preStartOffset;
@@ -4291,6 +4369,9 @@ var wijmo;
                         }
                     } else if(axisInfo.annoMethod === "values") {
                         //} else if (axisOptions.annoMethod === "values") {
+                        if(axisInfo.id === "x") {
+                            text = self._getXTickText(text);
+                        }
                         if(formatString && formatString.length) {
                             if(isTime) {
                                 text = $.fromOADate(val);
@@ -4307,9 +4388,6 @@ var wijmo;
                     */
                     textStyle = $.extend(true, {
                     }, o.textStyle, axisOptions.textStyle, labels.style, axisInfo.textStyle);
-                    if(axisInfo.id === "x") {
-                        text = self._getTickText(text);
-                    }
                     retInfo = self._paintMajorMinor(axisOptions.origin, max, min, val, tickMajor, unitMajor, tickRectMajor, compass, startPoint, endPoint, axisSize, axisTextOffset, tickMajorStyle, text, gridMajor, axisOptions.textVisible, textStyle, labels.textAlign, labels.width ? axisInfo.labelWidth : null, vlGridLine, vlGridLineStyle);
                     if(retInfo) {
                         if(retInfo.elements) {
@@ -4354,7 +4432,7 @@ var wijmo;
                     axisElements.push(self.canvas.path([
                         "M", 
                         startPoint.x.toString(), 
-                        startPoint.y.toString() + (axisInfo.vOffset / 2).toString, 
+                        (startPoint.y + axisInfo.vOffset / 2).toString(), 
                         "H", 
                         (startPoint.x + axisInfo.maxExtent * 2).toString()
                     ].join()));
@@ -4443,8 +4521,11 @@ var wijmo;
                 }
                 return minorTickValues;
             };
-            wijchartcore.prototype._getTickText = function (txt) {
+            wijchartcore.prototype._getXTickText = function (txt) {
                 return txt;
+            };
+            wijchartcore.prototype._adjustTickValuesForCandlestickChart = function (tickValues) {
+                return tickValues;
             };
             wijchartcore.prototype._paintMajorMinor = function (origin, max, min, val, tick, unit, tickRect, compass, startPoint, endPoint, axisSize, axisTextOffset, tickStyle, text, grid, textVisible, textStyle, textAlign, labelWidth, vlGridLine, vlGridLineStyle) {
                 var self = this, x = startPoint.x, y = startPoint.y, o = self.options, tickX = -1, tickY = -1, isVertical = true, bs = self.canvasBounds, textInfo = null, tickElement = null, pathArr = [], arrPath = [], p = null, style = {
@@ -4531,7 +4612,8 @@ var wijmo;
                         if((y !== bs.startY || !axisCompass["north"]) && (y !== bs.endY || !axisCompass["south"]) || origin !== val) {
                             p = self.canvas.path(arrPath.join(" "));
                             $.wijraphael.addClass($(p.node), o.wijCSS.axisGridLine);
-                            p.attr($.extend(true, grid.style, vlGridLineStyle));
+                            p.attr($.extend(true, {
+                            }, grid.style, vlGridLineStyle));
                             self.axisEles.push(p);
                         }
                     }
@@ -4743,6 +4825,9 @@ var wijmo;
                     offsetY: offsetY
                 };
             };
+            wijchartcore.prototype._isTouchEnabled = function () {
+                return $.support.isTouchEnabled && $.support.isTouchEnabled();
+            };
             wijchartcore.prototype._mouseDown = function (e, args) {
                 this._trigger("mouseDown", e, args);
             };
@@ -4952,11 +5037,32 @@ var wijmo;
             wijchartcore.prototype._bindLiveEvents = function () {
                 this._bindLegendEvents();
                 this._bindCanvasEvents();
+                this._bindResizeEvent();
+            };
+            wijchartcore.prototype._bindResizeEvent = function () {
+                var _this = this;
+                this.resizeIntent = 250;
+                if(this.options.autoResize) {
+                    this.chartElement.on("resize." + this.widgetName, function () {
+                        clearTimeout(_this.resizeTimer);
+                        _this.resizeTimer = setTimeout(function () {
+                            _this.redraw();
+                        }, _this.resizeIntent);
+                    });
+                }
+            };
+            wijchartcore.prototype._unbindResizeEvent = function () {
+                this.chartElement.off("resize." + this.widgetName);
             };
             wijchartcore.prototype._bindCanvasEvents = function () {
                 var self = this, element = self.chartElement, touchEventPre = "", namespace = "." + this.widgetName;
-                if(window.navigator.msPointerEnabled) {
-                    element.css("-ms-touch-action", "none");
+                // In IE11, the -ms-touch-action changed to touch-action.
+                if($.support.isTouchEnabled && $.support.isTouchEnabled()) {
+                    if(window.navigator["pointerEnabled"]) {
+                        element.css("touch-action", "none");
+                    } else if(window.navigator.msPointerEnabled) {
+                        element.css("-ms-touch-action", "none");
+                    }
                 }
                 // if support touch.
                 if($.support.isTouchEnabled && $.support.isTouchEnabled()) {
@@ -4972,10 +5078,25 @@ var wijmo;
                     }
                     if(mousePos.left >= cBounds.startX && mousePos.left <= cBounds.endX && mousePos.top >= cBounds.startY && mousePos.top <= cBounds.endY) {
                         self._mouseMoveInsidePlotArea(e, mousePos);
+                    }
+                });
+                // Mousemove event may not catch quick moving,
+                // in this condition, bind mouseout event to hide the tooltip.
+                element.bind(touchEventPre + "mouseout" + namespace, function (e) {
+                    var elePos = element.offset(), cBounds = self.canvasBounds, mousePos = {
+                        left: e.pageX - elePos.left,
+                        top: e.pageY - elePos.top
+                    }, disabled = self.options.disabled;
+                    if(disabled) {
+                        return;
+                    }
+                    if(mousePos.left >= cBounds.startX && mousePos.left <= cBounds.endX && mousePos.top >= cBounds.startY && mousePos.top <= cBounds.endY) {
+                        return;
                     } else {
                         self._mouseMoveOutsidePlotArea(e, mousePos);
                     }
                 });
+                // End comments
                 if(self.options.indicator && self.options.indicator.visible) {
                     element.bind(touchEventPre + "mousedown" + namespace, function (e) {
                         var elePos = element.offset(), cBounds = self.canvasBounds, mousePos = {
@@ -5003,8 +5124,13 @@ var wijmo;
                 }
             };
             wijchartcore.prototype._unbindCanvasEvents = function () {
-                if(window.navigator.msPointerEnabled) {
-                    this.element.css("-ms-touch-action", "");
+                // In IE11, the -ms-touch-action changed to touch-action.
+                if($.support.isTouchEnabled && $.support.isTouchEnabled()) {
+                    if(window.navigator["pointerEnabled"]) {
+                        this.element.css("touch-action", "");
+                    } else if(window.navigator.msPointerEnabled) {
+                        this.element.css("-ms-touch-action", "");
+                    }
                 }
                 this.element.unbind("." + this.widgetName);
             };
@@ -5047,9 +5173,11 @@ var wijmo;
                     idx = self.legends.length - 1 - i;
                 }
                 seriesEle = seriesEles[idx];
-                if(seriesEle) {
+                if(self.legends.length) {
                     if(!legendNode.data("hidden")) {
-                        self._hideSerieEles(seriesEle);
+                        if(seriesEle) {
+                            self._hideSerieEles(seriesEle);
+                        }
                         if(!legendNode.data("textOpacity")) {
                             if(l.textWidth) {
                                 legendNode.data("textOpacity", legend[0].attr("opacity") || 1);
@@ -5070,7 +5198,9 @@ var wijmo;
                         }
                         legendNode.data("hidden", true);
                     } else {
-                        self._showSerieEles(seriesEle);
+                        if(seriesEle) {
+                            self._showSerieEles(seriesEle);
+                        }
                         legend.attr("opacity", legendNode.data("textOpacity"));
                         legendIcon.attr("opacity", legendNode.data("iconOpacity"));
                         if(legendDot) {
@@ -5088,16 +5218,18 @@ var wijmo;
                 var self = this, o = self.options, element = this.chartElement, widgetName = self.widgetName;
                 element.undelegate("." + o.wijCSS.legend, ".wijchartcore").undelegate("." + o.wijCSS.legend, "wijchartcore");
                 this._unbindCanvasEvents();
+                this._unbindResizeEvent();
             };
             wijchartcore.prototype._isBarChart = function () {
                 return false;
             };
             wijchartcore.prototype._isPieChart = function () {
             };
-            wijchartcore.prototype._isStockChart = function () {
-            };
             wijchartcore.prototype._validateSeriesData = function (series) {
                 return false;
+            };
+            wijchartcore.prototype._getOffsetOfAxis = function (axisOptions) {
+                return 0;
             };
             wijchartcore.prototype._calculateParameters = // methods for Axis
             function (axisInfo, axisOptions) {
@@ -5234,7 +5366,7 @@ var wijmo;
                 var self = this, o = self.options, seriesList = o.seriesList, stacked = o.stacked && self._supportStacked(), is100Percent = o.is100Percent, axis = o.axis, axisInfo = self.axisInfo, valuesX = [], lastValuesY = [], valueLabels = [], validValue, valGroup = {
                     y: {
                     }
-                }, xValueLabels = axis.x.valueLabels, xAnnoMethod = axisInfo.x.annoMethod, yAnnoMethod = axisInfo.y.annoMethod;
+                }, xValueLabels = axis.x.valueLabels, xAnnoMethod = axisInfo.x.annoMethod, yAnnoMethod = axisInfo.y.annoMethod, seriesIndex = 0;
                 if(!seriesList || seriesList.length === 0) {
                     return val;
                 }
@@ -5303,17 +5435,9 @@ var wijmo;
                             xMinMax = self._getMinMaxValue(valuesX);
                             yMinMax = self._getMinMaxValue(valuesY);
                             if(i === 0) {
-                                val.txx = xMinMax.max;
-                                val.txn = xMinMax.min;
                                 val.tyx = yMinMax.max;
                                 val.tyn = yMinMax.min;
                             } else {
-                                if(val.txx < xMinMax.max) {
-                                    val.txx = xMinMax.max;
-                                }
-                                if(val.txn > xMinMax.min) {
-                                    val.txn = xMinMax.min;
-                                }
                                 if(val.tyx < yMinMax.max) {
                                     val.tyx = yMinMax.max;
                                 }
@@ -5321,7 +5445,18 @@ var wijmo;
                                     val.tyn = yMinMax.min;
                                 }
                             }
-                            i++;
+                            if(seriesIndex === 0) {
+                                val.txx = xMinMax.max;
+                                val.txn = xMinMax.min;
+                            } else {
+                                if(val.txx < xMinMax.max) {
+                                    val.txx = xMinMax.max;
+                                }
+                                if(val.txn > xMinMax.min) {
+                                    val.txn = xMinMax.min;
+                                }
+                            }
+                            seriesIndex++;
                         });
                         if(is100Percent) {
                             val.tyx = 1;
@@ -5486,39 +5621,36 @@ var wijmo;
                 }
                 return val;
             };
+            wijchartcore.prototype._getTickTextForCalculateUnit = function (value, axisInfo, prec) {
+                var isTime = axisInfo.isTime, formatString = axisInfo.annoFormatString;
+                if(isTime) {
+                    return Globalize.format($.fromOADate(value), formatString, this._getCulture());
+                } else {
+                    return $.round(value, prec).toString();
+                }
+            };
             wijchartcore.prototype._calculateMajorMinor = function (axisOptions, axisInfo) {
                 var self = this, o = self.options, canvasBounds = axisInfo.bounds || self.canvasBounds, autoMajor = axisOptions.autoMajor, autoMinor = axisOptions.autoMinor, maxData = axisInfo.max, minData = axisInfo.min, isTime = axisInfo.isTime, tinc = axisInfo.tinc, formatString = axisInfo.annoFormatString, maxText = null, minText = null, sizeMax = null, sizeMin = null, mx = null, mn = null, prec = null, _prec = null, textStyle = null, dx = maxData - minData, width = 0, height = 0, nticks = 0, major = 0;
                 if(autoMajor) {
                     textStyle = $.extend(true, {
                     }, o.textStyle, axisOptions.textStyle, axisOptions.labels.style);
-                    if(isTime) {
-                        // maxText = $.format($.fromOADate(maxData), formatString);
-                        maxText = Globalize.format($.fromOADate(maxData), formatString, self._getCulture());
-                        // minText = $.format($.fromOADate(minData), formatString);
-                        minText = Globalize.format($.fromOADate(minData), formatString, self._getCulture());
-                        mx = self._text(-1000, -1000, maxText).attr(textStyle);
-                        mn = self._text(-1000, -1000, minText).attr(textStyle);
-                        sizeMax = mx.wijGetBBox();
-                        sizeMin = mn.wijGetBBox();
-                        mx.wijRemove();
-                        mx = null;
-                        mn.wijRemove();
-                        mn = null;
-                    } else {
+                    if(!isTime) {
                         prec = ChartDataUtil.nicePrecision(dx);
                         _prec = prec + 1;
                         if(_prec < 0 || _prec > 15) {
                             _prec = 0;
                         }
-                        mx = self._text(-1000, -1000, $.round(maxData, _prec).toString()).attr(textStyle);
-                        mn = self._text(-1000, -1000, $.round(minData, _prec).toString()).attr(textStyle);
-                        sizeMax = mx.wijGetBBox();
-                        sizeMin = mn.wijGetBBox();
-                        mx.wijRemove();
-                        mx = null;
-                        mn.wijRemove();
-                        mn = null;
                     }
+                    maxText = this._getTickTextForCalculateUnit(maxData, axisInfo, prec);
+                    minText = this._getTickTextForCalculateUnit(minData, axisInfo, prec);
+                    mx = self._text(-1000, -1000, maxText).attr(textStyle);
+                    mn = self._text(-1000, -1000, minText).attr(textStyle);
+                    sizeMax = mx.wijGetBBox();
+                    sizeMin = mn.wijGetBBox();
+                    mx.wijRemove();
+                    mx = null;
+                    mn.wijRemove();
+                    mn = null;
                     if(sizeMax.width < sizeMin.width) {
                         sizeMax.width = sizeMin.width;
                     }
@@ -5622,6 +5754,8 @@ var wijmo;
                 };
                 /** A value that indicator the culture to format the chart text. */
                 this.culture = "";
+                /** A value that indicates whether to redraw the chart automatically when resizing the chart element. */
+                this.autoResize = true;
                 /**
                 * Creates an array of series objects that contain data values and labels to display in the chart.
                 */

@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20133.20
+ * Wijmo Library 3.20141.34
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -8,7 +8,8 @@
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * licensing@wijmo.com
  * http://wijmo.com/widgets/license/
- *
+ * ----
+ * Credits: Wijmo includes some MIT-licensed software, see copyright notices below.
  */
 var __extends = this.__extends || function (d, b) {
     function __() { this.constructor = d; }
@@ -146,8 +147,7 @@ var wijmo;
                 self.refreshSuperPanel();
             };
             wijlist.prototype._setOption = function (key, value) {
-                var self = this, selectedItem, selectedActive = listItemCSSSelected + " " + self.options.wijCSS.stateActive, ulOuterHeight, isBind, renderItems;
-                //$.wijmo.widget.prototype._setOption.apply(self, arguments);
+                var self = this, o = this.options, selectedActive = listItemCSSSelected + " " + o.wijCSS.stateActive, ulOuterHeight, isBind, renderItems, selectedItem;
                 _super.prototype._setOption.call(this, key, value);
                 if(key === "disabled") {
                     self._handleDisabledOption(value, self.element);
@@ -166,7 +166,15 @@ var wijmo;
                             i.element.removeClass(selectedActive);
                         });
                     }
-                    self.selectedItem = [];
+                    self.selectedItems = [];
+                    if(value === "single") {
+                        o.selectedIndex = -1;
+                    } else {
+                        o.selectedIndex = [];
+                    }
+                } else if(key === "selectedIndex") {
+                    self._initInvalidateSelectIndex();
+                    self._setSelectedIndex();
                 } else if(key === "listItems") {
                     isBind = self._isBind();
                     if(isBind) {
@@ -186,7 +194,7 @@ var wijmo;
                         self.refreshSuperPanel();
                     }
                 } else if(key === "autoSize" || key === "maxItemsCount") {
-                    if(!self.options.autoSize && self.element.is(":visible")) {
+                    if(!o.autoSize && self.element.is(":visible")) {
                         if(self._oriHeight !== 0) {
                             self.element.height(self._oriHeight);
                         } else {
@@ -197,6 +205,63 @@ var wijmo;
                         }
                     }
                     self.refreshSuperPanel();
+                }
+            };
+            wijlist.prototype._initInvalidateSelectIndex = function () {
+                var o = this.options, index = o.selectedIndex, items = this.items, newIndices = [];
+                if(o.selectionMode === "single") {
+                    if($.isArray(index) && index.length) {
+                        index = index[0];
+                    }
+                    if(!items[index]) {
+                        index = -1;
+                    }
+                } else {
+                    if(!$.isArray(index)) {
+                        index = [
+                            index
+                        ];
+                    }
+                    $.each(index, function (i, idx) {
+                        if(items[idx]) {
+                            newIndices.push(idx);
+                        }
+                    });
+                    index = newIndices;
+                }
+                o.selectedIndex = index;
+            };
+            wijlist.prototype._setSelectedIndex = function () {
+                var o = this.options, index = o.selectedIndex, items = this.items, selectedItem = this.selectedItem, selectedItems = this.selectedItems, mode = o.selectionMode, oldIndex = -1, needUnselect = true, needSelect = true;
+                if(mode === "single") {
+                    if(selectedItem) {
+                        oldIndex = $.inArray(selectedItem, items);
+                    }
+                    if(oldIndex === -1) {
+                        needUnselect = false;
+                    }
+                    if(index === -1) {
+                        needSelect = false;
+                    }
+                } else {
+                    if(selectedItems && selectedItems.length) {
+                        oldIndex = [];
+                        $.each(selectedItems, function (i, item) {
+                            oldIndex.push($.inArray(item, items));
+                        });
+                    }
+                    if(oldIndex.length === 0) {
+                        needUnselect = false;
+                    }
+                    if(index.length === 0) {
+                        needSelect = false;
+                    }
+                }
+                if(needUnselect) {
+                    this.unselectItems(oldIndex);
+                }
+                if(needSelect) {
+                    this.selectItems(index, false, true);
                 }
             };
             wijlist.prototype._create = function () {
@@ -210,7 +275,7 @@ var wijmo;
                     role: "listbox",
                     "aria-activedescendant": activeItem,
                     "aria-multiselectable": o.selectionMode === "multiple"
-                }).bind("click." + self.widgetName, self, self._onListClick);
+                }).bind("click." + self.widgetName, self, self._onListClick).bind("mousedown." + self.widgetName, self, self._onListMouseDown);
                 if(ele.is("div") && ele.children().is("ul")) {
                     self._isInnerData = true;
                     self._templates = [];
@@ -303,7 +368,7 @@ var wijmo;
             };
             wijlist.prototype._createDisabledDiv = function (outerEle) {
                 var self = this, ele = outerEle || self.element, eleOffset = ele.offset(), disabledWidth = ele.outerWidth(), disabledHeight = ele.outerHeight();
-                return $("<div></div>").addClass("ui-disabled").css({
+                return $("<div></div>").addClass(self.options.wijCSS.stateDisabled).css({
                     "z-index": "99999",
                     position: "absolute",
                     width: disabledWidth,
@@ -356,10 +421,14 @@ var wijmo;
                     }
                     $.each(self._templates, function (idx) {
                         if(self.items[idx]) {
-                            self.items[idx].templateHtml = self._templates[idx].templateHtml;
+                            if(!self.items[idx].templateEncoded) {
+                                self.items[idx].templateHtml = wijmo.htmlEncode(self._templates[idx].templateHtml);
+                                self.items[idx].templateEncoded = true;
+                            }
                         } else {
                             self.items.push({
-                                templateHtml: self._templates[idx].templateHtml,
+                                templateHtml: wijmo.htmlEncode(self._templates[idx].templateHtml),
+                                templateEncoded: true,
                                 label: items[idx].label,
                                 value: items[idx].value
                             });
@@ -371,6 +440,7 @@ var wijmo;
                 if(!items) {
                     return null;
                 }
+                self._initSelectedIndex();
                 selectedItems = $.grep(items, function (a) {
                     return a.selected;
                 }, undefined);
@@ -379,6 +449,31 @@ var wijmo;
                     self.selectedItem = selectedItems.length > 0 ? selectedItems[0] : undefined;
                 } else {
                     self.selectedItems = selectedItems;
+                }
+            };
+            wijlist.prototype._initSelectedIndex = function () {
+                var items = this.items, o = this.options, mode = o.selectionMode, selectedIndex;
+                function clearSelected(items) {
+                    $.each(items, function (i, item) {
+                        if(item.selected) {
+                            item.selected = false;
+                        }
+                    });
+                }
+                this._initInvalidateSelectIndex();
+                selectedIndex = o.selectedIndex;
+                if(mode === "single") {
+                    if(selectedIndex !== -1) {
+                        clearSelected(items);
+                        items[selectedIndex].selected = true;
+                    }
+                } else {
+                    if(selectedIndex.length > 0) {
+                        clearSelected(items);
+                        $.each(selectedIndex, function (i, index) {
+                            items[index].selected = true;
+                        });
+                    }
                 }
             };
             wijlist.prototype.filterItems = /** @ignore */
@@ -415,7 +510,11 @@ var wijmo;
                     label = item.label;
                     // if text is set, text will override label value.
                     if(item.templateHtml) {
-                        label = item.templateHtml;
+                        if(item.templateEncoded) {
+                            label = wijmo.htmlDecode(item.templateHtml);
+                        } else {
+                            label = item.templateHtml;
+                        }
                     } else if(item.text !== undefined) {
                         label = item.text;
                     }
@@ -478,6 +577,19 @@ var wijmo;
             function () {
                 return this.ul;
             };
+            wijlist.prototype.getSelectedItems = /** Get the select item(s).
+            * @remarks
+            * It will return item object in single selection mode, and items array in multiple selection mode.
+            * If no item is selected, it will return null in single selection mode, and empty array in multiple selection mode.
+            * @returns {array|Object} items array for multiple selection mode, item object for single selection mode.
+            */
+            function () {
+                if(this.options.selectionMode === "single") {
+                    return this.selectedItem || null;
+                } else {
+                    return this.selectedItems;
+                }
+            };
             wijlist.prototype._onListClick = function (e) {
                 var self = e.data;
                 if(self.options.disabled) {
@@ -487,6 +599,21 @@ var wijmo;
                     return;
                 }
                 self.select(e);
+            };
+            wijlist.prototype._onListMouseDown = function (e) {
+                var self = e.data, curItem;
+                if(self.options.disabled) {
+                    return;
+                }
+                if(!$(e.target).closest("." + listItemCSS).length) {
+                    return;
+                }
+                if(self.active && self.active.element) {
+                    curItem = self.active.element.data(itemKey);
+                }
+                self._trigger("mouseDown", e, {
+                    item: curItem
+                });
             };
             wijlist.prototype.destroy = /**
             * Remove the functionality completely. This will return the element back to its pre-init state.
@@ -573,11 +700,11 @@ var wijmo;
             };
             wijlist.prototype.first = /** The first method tests whether the focus is at the first list item.*/
             function () {
-                return this.active && !this.active.element.prev().length;
+                return this.active && this.active.element.is(":visible") && !this.active.element.prevAll(":visible").length;
             };
             wijlist.prototype.last = /** The last method tests whether the last list item has focus.*/
             function () {
-                return this.active && !this.active.element.next().length;
+                return this.active && this.active.element.is(":visible") && !this.active.element.nextAll(":visible").length;
             };
             wijlist.prototype.move = /** @ignore */
             function (direction, edge, event) {
@@ -585,7 +712,7 @@ var wijmo;
                 /// Move focus between items.
                 /// </summary>
                                 var self = this, item, next;
-                if(!self.active) {
+                if(!self.active || !self.active.element.is(":visible")) {
                     item = self.ul.children(":visible" + edge).data(itemKey);
                     self.activate(event, item, true);
                     return;
@@ -610,7 +737,7 @@ var wijmo;
                 /// Selects active list item.
                 /// </summary>
                 ///
-                                var self = this, ele, selectedIndex, selectedActive = listItemCSSSelected + " " + self.options.wijCSS.stateActive, item, singleMode, previous;
+                                var self = this, ele, selectedIndex, o = self.options, selectedActive = listItemCSSSelected + " " + self.options.wijCSS.stateActive, item, singleMode, previous;
                 if(!self.active) {
                     self.active = $($(event.target).closest("." + listItemCSS)).data(itemKey);
                     if(!self.active) {
@@ -706,7 +833,7 @@ var wijmo;
                     foundItems = self._findItemsByValues(searchTerms);
                 } else {
                     if(!isNumber) {
-                        return null;
+                        return [];
                     }
                     foundItems = self._findItemsByIndices(searchTerms);
                 }
@@ -820,7 +947,7 @@ var wijmo;
                 self._trigger("listRendered", null, self);
             };
             wijlist.prototype._renderItem = function (ul, item, index, singleMode) {
-                var self = this, li = $("<li role='option' class='" + self.options.wijCSS.listItem + " " + listItemCSS + " " + self.options.wijCSS.cornerAll + "'></li>"), selectedActive = listItemCSSSelected + " " + self.options.wijCSS.stateActive, label, url;
+                var self = this, li = $("<li role='option' class='" + self.options.wijCSS.listItem + " " + self.options.wijCSS.cornerAll + "'></li>"), selectedActive = listItemCSSSelected + " " + self.options.wijCSS.stateActive, label, url;
                 item.element = li;
                 item.list = self;
                 if(self._trigger("itemRendering", null, item) === false) {
@@ -832,7 +959,11 @@ var wijmo;
                 }
                 // if text is set, text will override label value.
                 if(item.templateHtml) {
-                    label = item.templateHtml;
+                    if(item.templateEncoded) {
+                        label = wijmo.htmlDecode(item.templateHtml);
+                    } else {
+                        label = item.templateHtml;
+                    }
                 } else if(item.text !== undefined) {
                     label = item.text;
                 }
@@ -884,9 +1015,10 @@ var wijmo;
                 }
                 return value.replace(/([\^\$\(\)\[\]\{\}\*\.\+\?\|\\])/gi, "\\$1");
             };
-            wijlist.prototype.adjustOptions = //update for juice
+            wijlist.prototype.adjustOptions = /** @ignore*/
             function () {
-                var o = this.options, i;
+                //update for juice project only
+                                var o = this.options, i;
                 if(o.data !== null) {
                     for(i = 0; i < o.listItems.length; i++) {
                         delete o.listItems[i].element;
@@ -899,7 +1031,7 @@ var wijmo;
             *  the wijlist to reflect a change in the wijlist content.
             */
             function () {
-                var self = this, ele = this.element, o = this.options, ul = this.ul, singleItem = ul.children("." + listItemCSS + ":first"), headerHeight, ulOuterHeight, eleInnerWidth, spHeader = ele.find(".wijmo-wijsuperpanel-header"), spFooter = ele.find(".wijmo-wijsuperpanel-footer"), adjustHeight = null, h, percent, small, vScroller, large, spOptions, pt;
+                var self = this, ele = this.element, o = this.options, ul = this.ul, singleItem = ul.children("." + listItemCSS + ":first"), headerHeight, ulOuterHeight, eleInnerWidth, spHeader = ele.find(".wijmo-wijsuperpanel-header"), spFooter = ele.find(".wijmo-wijsuperpanel-footer"), adjustHeight = null, h, percent, diff, small, vScroller, large, spOptions, pt, superpanel = self.superPanel || ele.data("wijmo-wijsuperpanel");
                 if(!ele.is(":visible")) {
                     return false;
                 }
@@ -911,6 +1043,12 @@ var wijmo;
                 if(adjustHeight !== null) {
                     ele.height(Math.min(adjustHeight, ulOuterHeight));
                 }
+                // ** refix case 48091.
+                // When initialize, if items list is empty, it doesn't need to add superpanel. **
+                if(!(self.items && self.items.length > 0) && !superpanel) {
+                    return;
+                }
+                // ** end comments **
                 h = ele.innerHeight();
                 //fix #37228, minus header and footer's height.
                 if(spHeader.length) {
@@ -920,9 +1058,10 @@ var wijmo;
                     h -= spFooter.height();
                 }
                 //end comments
-                percent = h / (ulOuterHeight - h);
+                diff = ulOuterHeight - h;
+                percent = h / diff;
                 large = (101 * percent) / (1 + percent);
-                small = (singleItem.outerHeight() / (ulOuterHeight - h)) * (101 - large);
+                small = (singleItem.outerHeight() / diff) * (101 - large);
                 if(self.superPanel === undefined) {
                     spOptions = {
                         allowResize: false,
@@ -937,7 +1076,7 @@ var wijmo;
                         }
                     };
                     $.extend(spOptions, o.superPanelOptions);
-                    self.superPanel = ele.wijsuperpanel(spOptions).data("wijmoWijsuperpanel");
+                    self.superPanel = ele.wijsuperpanel(spOptions).data("wijmo-wijsuperpanel");
                     //update for fixing can't show all dropdown items by wuhao
                     if(self.superPanel && self.superPanel.vNeedScrollBar) {
                         ul.setOutWidth(eleInnerWidth - 18);
@@ -994,8 +1133,8 @@ var wijmo;
                 /** @ignore */
                 this.wijMobileCSS = {
                     header: "ui-header ui-bar-a",
-                    content: "ui-body-c",
-                    stateDefault: "ui-btn-up-c",
+                    content: "ui-body-b",
+                    stateDefault: "ui-btn ui-btn-b",
                     stateHover: "ui-btn-up-b",
                     stateActive: "ui-btn-down-b"
                 };
@@ -1027,6 +1166,14 @@ var wijmo;
                 *      again after initialization.
                 */
                 this.selectionMode = "single";
+                /** A value that specifies the index of the item to select when using single mode.
+                * @type {number|array}
+                * @remarks
+                *       If the selectionMode is "multiple", then this option could be set
+                *       to an array of Number which contains the indices of the items to select.
+                *       If no item is selected, it will return -1 or [](in multiple mode).
+                */
+                this.selectedIndex = -1;
                 /** The autoSize determines whether or not the wijlist will be automatically sized.*/
                 this.autoSize = false;
                 /** A value specifies the maximum number of items that will be displayed

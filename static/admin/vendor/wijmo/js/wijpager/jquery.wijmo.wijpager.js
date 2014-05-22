@@ -1,6 +1,6 @@
 /*
  *
- * Wijmo Library 3.20133.20
+ * Wijmo Library 3.20141.34
  * http://wijmo.com/
  *
  * Copyright(c) GrapeCity, Inc.  All rights reserved.
@@ -8,7 +8,6 @@
  * Licensed under the Wijmo Commercial License. Also available under the GNU GPL Version 3 license.
  * licensing@wijmo.com
  * http://wijmo.com/widgets/license/
- *
  *
  */
 var __extends = this.__extends || function (d, b) {
@@ -94,26 +93,26 @@ var wijmo;
                 }
             };
             wijpager.prototype._createNextPrev = function (addFirstLast) {
-                var o = this.options;
+                var o = this.options, firstPageClass = !!o.firstPageClass ? o.firstPageClass + " " + o.wijCSS.iconSeekFirst : "", previousPageClass = !!o.previousPageClass ? o.previousPageClass + " " + o.wijCSS.iconSeekPrev : "", nextPageClass = !!o.nextPageClass ? o.nextPageClass + " " + o.wijCSS.iconSeekNext : "", lastPageClass = !!o.lastPageClass ? o.lastPageClass + " " + o.wijCSS.iconSeekEnd : "";
                 // first button
                 if(addFirstLast && o.pageIndex) {
-                    this.$ul.append(this._createPagerItem(false, o.firstPageText, 1, o.firstPageClass));
+                    this.$ul.append(this._createPagerItem(false, o.firstPageText, 1, firstPageClass));
                 }
                 // previous button
                 if(o.pageIndex) {
-                    this.$ul.append(this._createPagerItem(false, o.previousPageText, o.pageIndex, o.previousPageClass));
+                    this.$ul.append(this._createPagerItem(false, o.previousPageText, o.pageIndex, previousPageClass));
                 }
                 // next button
                 if(o.pageIndex + 1 < o.pageCount) {
-                    this.$ul.append(this._createPagerItem(false, o.nextPageText, o.pageIndex + 2, o.nextPageClass));
+                    this.$ul.append(this._createPagerItem(false, o.nextPageText, o.pageIndex + 2, nextPageClass));
                 }
                 // last button
                 if(addFirstLast && (o.pageIndex + 1 < o.pageCount)) {
-                    this.$ul.append(this._createPagerItem(false, o.lastPageText, o.pageCount, o.lastPageClass));
+                    this.$ul.append(this._createPagerItem(false, o.lastPageText, o.pageCount, lastPageClass));
                 }
             };
             wijpager.prototype._createNumeric = function (addFirstLast) {
-                var o = this.options, currentPage = o.pageIndex + 1, startPageNumber = 1, endPageNumber = Math.min(o.pageCount, o.pageButtonCount), i;
+                var o = this.options, currentPage = o.pageIndex + 1, startPageNumber = 1, endPageNumber = Math.min(o.pageCount, o.pageButtonCount), i, firstPageClass = !!o.firstPageClass ? o.firstPageClass + " " + o.wijCSS.iconSeekFirst : "", lastPageClass = !!o.lastPageClass ? o.lastPageClass + " " + o.wijCSS.iconSeekEnd : "";
                 if(currentPage > endPageNumber) {
                     startPageNumber = (Math.floor(o.pageIndex / o.pageButtonCount)) * o.pageButtonCount + 1;
                     endPageNumber = startPageNumber + o.pageButtonCount - 1;
@@ -126,7 +125,7 @@ var wijmo;
                 if(startPageNumber !== 1) {
                     // first button
                     if(addFirstLast) {
-                        this.$ul.append(this._createPagerItem(false, o.firstPageText, 1, o.firstPageClass));
+                        this.$ul.append(this._createPagerItem(false, o.firstPageText, 1, firstPageClass));
                     }
                     // "..." button
                     this.$ul.append(this._createPagerItem(false, "...", startPageNumber - 1, ""));
@@ -140,7 +139,7 @@ var wijmo;
                     this.$ul.append(this._createPagerItem(false, "...", endPageNumber + 1, ""));
                     // last button
                     if(addFirstLast) {
-                        this.$ul.append(this._createPagerItem(false, o.lastPageText, o.pageCount, o.lastPageClass));
+                        this.$ul.append(this._createPagerItem(false, o.lastPageText, o.pageCount, lastPageClass));
                     }
                 }
             };
@@ -210,8 +209,8 @@ var wijmo;
                 /** @ignore */
                 this.wijMobileCSS = {
                     header: "ui-header ui-bar-a",
-                    content: "ui-body-c",
-                    stateDefault: "ui-btn-up-c",
+                    content: "ui-body-b",
+                    stateDefault: "ui-btn ui-btn-b",
                     stateHover: "ui-btn-down-b",
                     stateActive: "ui-btn-down-c"
                 };
