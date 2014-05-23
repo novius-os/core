@@ -111,7 +111,7 @@
         numberFormat: {
             ",": ".",
             ".": ",",
-            NaN: "NeuN",
+            "NaN": "NeuN",
             negativeInfinity: "-Infinito",
             positiveInfinity: "Infinito",
             percent: {
