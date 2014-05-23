@@ -29,8 +29,8 @@ return array(
         ),
     ),
     'icons' => array(
-        64 => '/static/apps/noviusos_menu/img/64/menu.png',
-        32 => '/static/apps/noviusos_menu/img/32/menu.png',
-        16 => '/static/apps/noviusos_menu/img/16/menu.png',
+        64 => 'static/apps/noviusos_menu/img/64/menu.png',
+        32 => 'static/apps/noviusos_menu/img/32/menu.png',
+        16 => 'static/apps/noviusos_menu/img/16/menu.png',
     ),
 );
