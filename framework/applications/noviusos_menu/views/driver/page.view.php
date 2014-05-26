@@ -12,7 +12,8 @@ if ($item_driver->item->mitem_page_id) {
     $page = \Nos\Page\Model_Page::find($item_driver->item->mitem_page_id);
     if (!empty($page)) {
         $params['text'] = e($item_driver->title());
-        if (\Nos\Nos::main_controller()->getUrl() === $page->url()) {
+        if (method_exists(\Nos\Nos::main_controller(), 'getUrl') &&
+            \Nos\Nos::main_controller()->getUrl() === $page->url()) {
             !isset($params['class']) && $params['class'] = '';
             $params['class'] .= ' '.\Arr::get($params, 'active_class', 'active');
         }
