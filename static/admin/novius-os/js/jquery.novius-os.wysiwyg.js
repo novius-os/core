@@ -66,7 +66,9 @@ define('jquery-nos-wysiwyg',
             });
             options.plugins = plugins.join(',');
 
-            $(self).tinymce(options);
+            $(self).nosOnShow('one', function() {
+                $(self).tinymce(options);
+            });
         };
         return $;
     });
