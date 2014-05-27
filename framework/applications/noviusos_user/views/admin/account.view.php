@@ -68,9 +68,9 @@ $fieldset_infos->add('my_account', '', array('type' => 'hidden', 'value' => '1')
                 var $container = $('#<?= $uniqid ?>');
                 $('#<?= $fieldset_display->form()->get_attribute('id') ?>').bind('ajax_success', function(e, json) {
                     if (json.wallpaper_url) {
-                        $('#noviusospanel').css('background-image', 'url("' + json.wallpaper_url + '")');
+                        $('body').css('background-image', 'url("' + json.wallpaper_url + '")');
                     } else {
-                        $('#noviusospanel').css('background-image', '');
+                        $('body').css('background-image', '');
                     }
                 });
                 var $tabs = $('#<?= $uniqid ?> .tabs');
