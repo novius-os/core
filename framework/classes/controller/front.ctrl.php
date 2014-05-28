@@ -194,8 +194,10 @@ class Controller_Front extends Controller
                     $this->_cache->reset();
                     $this->_findPage();
 
-                    \Event::trigger('front.pageFound', array('page' => $this->getPage()));
-                    $this->pageFoundAlreadyTriggered = true;
+                    if (!$this->pageFoundAlreadyTriggered) {
+                        \Event::trigger('front.pageFound', array('page' => $this->getPage()));
+                        $this->pageFoundAlreadyTriggered = true;
+                    }
 
                     $this->_generateCache();
 
@@ -822,6 +824,7 @@ class Controller_Front extends Controller
 
         if (!$this->pageFoundAlreadyTriggered) {
             \Event::trigger('front.pageFound', array('page' => $this->getPage()));
+            $this->pageFoundAlreadyTriggered = true;
         }
     }
 
