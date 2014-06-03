@@ -94,7 +94,7 @@ define('jquery-nos-link-wysiwyg',
 
                         select_media = function(media) {
                                 $title.text(media.title);
-                                $real_url.text(params.base_url + media.path);
+                                $real_url.text(media.path);
                                 $input_url.val('nos://media/' + media.id);
                                 $container.wijtabs('enableTab', 2)
                                     .wijtabs('select', 2);
@@ -237,7 +237,7 @@ define('jquery-nos-link-wysiwyg',
                                     dataType: 'json',
                                     success: function(media) {
                                         $title.text(media.title);
-                                        $real_url.text(params.base_url + media.path);
+                                        $real_url.text(media.path);
                                     }
                                 });
                             }
