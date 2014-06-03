@@ -30,6 +30,7 @@ return array(
                         'main' => array(
                             'title'  => __('Properties'),
                             'fields' => array(
+                                'mitem_driver',
                                 'mitem_title',
                             ),
                         ),
@@ -52,8 +53,10 @@ return array(
                 'dont_save' => true,
             ),
             'mitem_driver' => array(
+                'label' => __('Type:'),
                 'form' => array(
-                    'type' => 'hidden',
+                    'type' => 'select',
+                    'class' => 'menu_item_driver',
                 ),
             ),
             'mitem_title' => array(
@@ -66,6 +69,7 @@ return array(
                 'label' => __('ID:'),
                 'form' => array(
                     'type' => 'text',
+                    'class' => 'menu_item_dom_id',
                 ),
                 'expert' => true,
             ),
@@ -73,6 +77,7 @@ return array(
                 'label' => __('CSS classes:'),
                 'form' => array(
                     'type' => 'text',
+                    'class' => 'menu_item_css_class',
                 ),
                 'expert' => true,
             ),

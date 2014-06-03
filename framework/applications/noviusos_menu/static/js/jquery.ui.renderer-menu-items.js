@@ -146,6 +146,19 @@ define('jquery-nos-renderer-menu-items',
                     }
                 });
 
+                $liForm.find('.menu_item_driver').change(function() {
+                    var $select = $(this),
+                        item = $li.data('item');
+
+                    item.driver = $select.val();
+                    item.title = $liForm.find('.menu_item_title').val();
+                    item.dom_id = $liForm.find('.menu_item_dom_id').val();
+                    item.css_class = $liForm.find('.menu_item_css_class').val();
+                    $liForm.remove();
+
+                    self._ajaxItem(item, $li.empty());
+                });
+
                 $li.append($liChildren);
 
                 $liChildren.find('> li').each(function() {
@@ -181,30 +194,36 @@ define('jquery-nos-renderer-menu-items',
                         bind: {
                             click : function() {
                                 var id = 't' + self.incrementalId++,
-                                    $li = $('<li></li>').data('item', {
+                                    item = {
                                         id: id,
                                         driver: driver_class,
                                         title: driver.texts.new
-                                    })
+                                    },
+                                    $li = $('<li></li>').data('item', item)
                                     .attr('data-id', 'item-' + id)
                                     .appendTo(self.$rootOl);
 
-                                self._hierarchy();
-
-                                $.get(o.itemUrl, {
-                                    driver: driver_class,
-                                    id: id
-                                }, function(data) {
-                                    $li.html(data);
-                                    self._parseItem($li);
-                                    $li.find('> .renderer-menu-items-item').click();
-                                });
+                                self._hierarchy()
+                                    ._ajaxItem(item, $li);
                             }
                         }
                     }).appendTo(self.$addsContainer);
                 });
 
                 self.$addsContainer.nosFormUI();
+
+                return self;
+            },
+
+            _ajaxItem: function(item, $li) {
+                var self = this,
+                    o = self.options;
+
+                $.get(o.itemUrl, item, function(data) {
+                    $li.html(data);
+                    self._parseItem($li);
+                    $li.find('> .renderer-menu-items-item').click();
+                });
 
                 return self;
             },

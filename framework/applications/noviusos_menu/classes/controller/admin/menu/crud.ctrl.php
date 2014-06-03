@@ -74,6 +74,9 @@ class Controller_Admin_Menu_Crud extends Controller_Admin_Crud
             $item = Model_Menu_Item::forge();
             $item->mitem_driver = \Input::get('driver', 'Nos\Menu\Menu_Item_Link');
             $item->mitem_id = \Input::get('id');
+            $item->mitem_title = \Input::get('title');
+            $item->mitem_dom_id = \Input::get('dom_id');
+            $item->mitem_css_class = \Input::get('css_class');
         }
 
         $config = $item->driver()->config();
@@ -81,6 +84,13 @@ class Controller_Admin_Menu_Crud extends Controller_Admin_Crud
         if (empty($item->mitem_title)) {
             \Arr::set($fields, 'mitem_title.form.placeholder', $item->driver()->title());
         }
+        \Arr::set($fields, 'mitem_driver.form.options', array_map(
+            function ($val) {
+                return $val['name'];
+            },
+            Menu_Item::drivers()
+        ));
+
         $fieldset = \Fieldset::build_from_config($fields, $item, array('save' => false, 'auto_id' => false));
 
         $image_view_params = array(
