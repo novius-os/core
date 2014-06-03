@@ -20,6 +20,12 @@ class Tools_Wysiwyg
         static::$_options = \Config::get('wysiwyg.default');
     }
 
+    /**
+     * Parse a wysiwyg content for edition
+     *
+     * @param  string $content Wysiwyg content to parse
+     * @return string Wysiwyg content parsed
+     */
     public static function prepare_renderer($content)
     {
         $replaces = array();
