@@ -32,6 +32,9 @@ class Tools_Wysiwyg
         static::parse_medias(
             $content,
             function ($media, $params) use (&$replaces) {
+                if ($params['tag'] === 'a') {
+                    return;
+                }
                 if (empty($media)) {
                     $replaces[$params['content']] = '';
                 } else {

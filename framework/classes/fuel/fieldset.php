@@ -420,7 +420,7 @@ class Fieldset extends \Fuel\Core\Fieldset
             $user = \Session::user();
             $options['csrf'] += array(
                 'value' => sha1($user->user_md5),
-                'callback' => function($data, $good_csrf, $fieldset) {
+                'callback' => function ($data, $good_csrf, $fieldset) {
                     return !empty($data['_csrf']) && $data['_csrf'] === $good_csrf;
                 },
                 'error' => __('Invalid request, you may have been victim of hacking. Did you click any suspicious link?'),
