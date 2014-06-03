@@ -15,7 +15,7 @@ class Renderer_Tag extends Renderer
     public function __construct($name, $label = '', array $attributes = array(), array $rules = array(), \Fuel\Core\Fieldset $fieldset = null)
     {
         $attributes['type']  = 'text';
-        $attributes['class'] = (isset($attributes['class']) ? $attributes['class'] : '').' tinymce not_initialized';
+        $attributes['class'] = (isset($attributes['class']) ? $attributes['class'] : '');
 
         if (empty($attributes['id'])) {
             $attributes['id'] = uniqid('tag_');

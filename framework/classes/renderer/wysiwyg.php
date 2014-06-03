@@ -67,7 +67,7 @@ class Renderer_Wysiwyg extends Renderer
     protected static function parseOptions($renderer = array())
     {
         $renderer['type']  = 'textarea';
-        $renderer['class'] = (isset($renderer['class']) ? $renderer['class'] : '').' tinymce not_initialized';
+        $renderer['class'] = (isset($renderer['class']) ? $renderer['class'] : '').' not_initialized';
 
         if (empty($renderer['id'])) {
             $renderer['id'] = uniqid('wysiwyg_');
