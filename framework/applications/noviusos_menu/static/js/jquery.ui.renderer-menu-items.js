@@ -244,6 +244,8 @@ define('jquery-nos-renderer-menu-items',
 
                     stop: function () {
                         self._hierarchy();
+
+                        self.$rootOl.find('.renderer-menu-items-item.ui-state-active').click();
                     }
                 }, o.nestedSortable));
 
