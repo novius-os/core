@@ -23,10 +23,10 @@ define('jquery-nos-renderer-item-picker',
                 dataset: {},
                 actions: [],
                 texts : {
-                    empty: 'No item selected',
-                    add: 'Pick an item',
-                    edit: 'Pick another item',
-                    delete: 'Unselect item'
+                    'empty': 'No item selected',
+                    'add': 'Pick an item',
+                    'edit': 'Pick another item',
+                    'delete': 'Unselect item'
                 },
                 defaultThumbnail: ''
             },
@@ -112,13 +112,13 @@ define('jquery-nos-renderer-item-picker',
                         },
                         'delete': {
                             action: {},
-                            label: o.texts.delete,
+                            label: o.texts['delete'],
                             primary: true,
                             icon: 'closethick'
                         }
                     }, o.actions);
                 } else {
-                    actions ={
+                    actions = {
                         'add': {
                             action: {},
                             label: o.texts.add,
@@ -156,8 +156,8 @@ define('jquery-nos-renderer-item-picker',
                         pick_item(item, e);
                     })
                     .nosListenEvent({
-                        name : o.model,
-                        action : 'insert'
+                        name: o.model,
+                        action: 'insert'
                     }, function(e) {
                         $.ajax({
                             method: 'GET',
@@ -206,8 +206,8 @@ define('jquery-nos-renderer-item-picker',
                             .prependTo(self.$thumb.empty())
                             .nosOnShow('one', function() {
                                 $img.css({
-                                    marginTop : '-' + ($img.height() / 2) + 'px',
-                                    marginLeft : '-' + ($img.width() / 2) + 'px'
+                                    marginTop: '-' + ($img.height() / 2) + 'px',
+                                    marginLeft: '-' + ($img.width() / 2) + 'px'
                                 });
                             });
                     })
