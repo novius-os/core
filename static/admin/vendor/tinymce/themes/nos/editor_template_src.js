@@ -93,10 +93,12 @@
                     });
 
                     ed.onMouseUp.add(function() {
+                        var e = DOM.get(ed.id + '_external');
                         var toolbarRect = DOM.getRect(ed.id + '_tblext');
 
                         if (toolbarRect.w + toolbarRect.x > window.innerWidth) {
-                            DOM.setStyle(e, 'left', window.innerWidth - toolbarRect.w - toolbarRect.x - 1);
+                            DOM.setStyle(e, 'left', 'auto');
+                            DOM.setStyle(e, 'right', 0);
                         }
                     });
                 }
