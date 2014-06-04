@@ -107,7 +107,7 @@ define('jquery-nos-link-wysiwyg',
                                     .wijtabs('select', 2);
                             },
                         $dialog = $container.closest('.ui-dialog-content')
-                            .bind('select_media', function(e, media) {
+                            .bind('appdesk_pick_Nos\\Media\\Model_Media', function(e, media) {
                                 select_media(media);
                             })
                             .nosListenEvent({
@@ -125,7 +125,7 @@ define('jquery-nos-link-wysiwyg',
                                     });
                                 }
                             })
-                            .bind('select_page', function(e, page) {
+                            .bind('appdesk_pick_Nos\\Page\\Model_Page', function(e, page) {
                                 select_page(page);
                             })
                             .nosListenEvent({
@@ -275,7 +275,7 @@ define('jquery-nos-link-wysiwyg',
                                                 padding: 0,
                                                 margin: 0
                                             })
-                                            .load(link_type === 'internal' ? 'admin/noviusos_page/appdesk/index/link_pick' : 'admin/noviusos_media/appdesk/index/media_pick');
+                                            .load(link_type === 'internal' ? 'admin/noviusos_page/appdesk/index/appdesk_pick' : 'admin/noviusos_media/appdesk/index/appdesk_pick');
                                         appdesk_loaded = link_type;
                                     }
                                 } else if (ui.panel === $panel_properties[0]) {
