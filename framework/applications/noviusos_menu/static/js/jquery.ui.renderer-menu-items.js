@@ -275,15 +275,21 @@ define('jquery-nos-renderer-menu-items',
                     o = self.options;
 
                 var driver = o.drivers[driver_class];
-                var id = 't' + self.incrementalId++,
-                    item = {
+                var id = 't' + self.incrementalId++;
+                var item = {
                         id: id,
                         driver: driver_class,
                         title: driver.texts.new
-                    },
-                    $li = $('<li></li>').data('item', item)
-                        .attr('data-id', 'item-' + id)
-                        .appendTo(self.$rootOl);
+                    };
+                var $li = $('<li></li>').data('item', item)
+                        .attr('data-id', 'item-' + id);
+                var $currentLi = self.$rootOl.find('.renderer-menu-items-item.ui-state-active');
+
+                if ($currentLi.size() === 1) {
+                    $li.insertAfter($currentLi.parent());
+                } else {
+                    $li.appendTo(self.$rootOl);
+                }
 
                 self.currentDriver = driver_class;
                 self._driversButtons();
