@@ -18,6 +18,7 @@ define('jquery-nos-renderer-menu-items',
                     maxLevels: 0
                 },
                 texts: {
+                    addItem: 'Add an item',
                     deleteItem: 'Delete this item'
                 },
                 drivers: {},
@@ -25,6 +26,7 @@ define('jquery-nos-renderer-menu-items',
             },
 
             incrementalId: 1,
+            currentDriver: null,
 
             _create: function() {
                 var self = this,
@@ -185,34 +187,109 @@ define('jquery-nos-renderer-menu-items',
                 var self = this,
                     o = self.options;
 
+                var currentDriver = self.currentDriver ? o.drivers[self.currentDriver] : false;
+                var $splitButton = $('<div><button></button><button></button></div>').appendTo(self.$addsContainer.empty());
+                var date = new Date();
+                var id = date.getDate() + "_" + date.getHours() + "_" + date.getMinutes() + "_" + date.getSeconds() + "_" + date.getMilliseconds();
+                var $ul = $('<ul></ul>');
+                var $menubutton;
+
+                $splitButton.find('button:first')
+                    .click(function(e) {
+                        e.preventDefault();
+                        e.stopImmediatePropagation();
+                        if (self.currentDriver) {
+                            self._addItem(self.currentDriver);
+                        } else {
+                            $menubutton.click();
+                        }
+                    })
+                    .data({
+                        icons: {
+                            primary: currentDriver ? {iconUrl: currentDriver.icon} : 'plus'
+                        }
+                    })
+                    .text(currentDriver ? currentDriver.texts.add : o.texts.addItem);
+
+                $menubutton = $splitButton.find('button:last')
+                    .attr('type', 'button')
+                    .attr('id', id)
+                    .text(o.texts.addItem)
+                    .data({
+                        text: false,
+                        icons: {
+                            primary: 'triangle-1-s'
+                        }
+                    });
+
+                $splitButton.nosFormUI()
+                    .buttonset();
+
                 $.each(o.drivers, function(driver_class) {
                     var driver = this;
 
-                    $.nosUIElement({
-                        label: driver.texts.add,
-                        iconUrl : driver.icon,
-                        bind: {
-                            click : function() {
-                                var id = 't' + self.incrementalId++,
-                                    item = {
-                                        id: id,
-                                        driver: driver_class,
-                                        title: driver.texts.new
-                                    },
-                                    $li = $('<li></li>').data('item', item)
-                                    .attr('data-id', 'item-' + id)
-                                    .appendTo(self.$rootOl);
-
-                                self._hierarchy()
-                                    ._ajaxItem(item, $li);
-                            }
-                        }
-                    }).appendTo(self.$addsContainer);
+                    $('<li><a><span></span><span></span></a></li>')
+                        .data('driver', driver_class)
+                        .appendTo($ul)
+                        .find('span:first')
+                        .addClass('ui-icon nos-icon16 wijmo-wijmenu-icon-left')
+                        .css('background-image', 'url(' + driver.icon + ')')
+                        .end()
+                        .find('span:last')
+                        .text(driver.texts.add);
                 });
 
-                self.$addsContainer.nosFormUI();
+                $ul.insertAfter($splitButton)
+                    .wijmenu({
+                        orientation: 'vertical',
+                        animation: {
+                            animated:"slide",
+                            option: {
+                                direction: "up"
+                            },
+                            duration: 50,
+                            easing: null
+                        },
+                        hideAnimation: {
+                            animated:"slide",
+                            option: {
+                                direction: "up"
+                            },
+                            duration: 0,
+                            easing: null
+                        },
+                        trigger: '#' + id,
+                        select: function(e, data) {
+                            var $li = $(data.item.element),
+                                driver_class = $li.data('driver');
+
+                            self._addItem(driver_class);
+                        }
+                    });
 
                 return self;
+            },
+
+            _addItem: function(driver_class) {
+                var self = this,
+                    o = self.options;
+
+                var driver = o.drivers[driver_class];
+                var id = 't' + self.incrementalId++,
+                    item = {
+                        id: id,
+                        driver: driver_class,
+                        title: driver.texts.new
+                    },
+                    $li = $('<li></li>').data('item', item)
+                        .attr('data-id', 'item-' + id)
+                        .appendTo(self.$rootOl);
+
+                self.currentDriver = driver_class;
+                self._driversButtons();
+
+                self._hierarchy()
+                    ._ajaxItem(item, $li);
             },
 
             _ajaxItem: function(item, $li) {
