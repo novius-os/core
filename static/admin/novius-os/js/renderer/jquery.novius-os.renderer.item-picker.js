@@ -202,8 +202,8 @@ define('jquery-nos-renderer-item-picker',
                         self._loadImgDefault();
                     })
                     .load(function() {
-                        var $img = $(this)
-                            .prependTo(self.$thumb.empty())
+                        var $img = $(this);
+                        $img.prependTo(self.$thumb.empty())
                             .nosOnShow('one', function() {
                                 $img.css({
                                     marginTop: '-' + ($img.height() / 2) + 'px',
