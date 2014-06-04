@@ -63,7 +63,7 @@
                         dataType: 'json',
                         data: data,
                         success: function(json) {
-                            enhancer.html(json.preview);
+                            enhancer.html($.trim(json.preview));
                             self.onEnhancerAdd(enhancer, metadata);
                         },
                         error: function() {
@@ -211,11 +211,11 @@
                         edit = ed.dom.get('__mce_tmp');
                     }
                     $(edit).attr({
-                        'data-config':$.type(json.config) === 'string' ? json.config : JSON.stringify(json.config),
-                        'data-enhancer': metadata.id
-                    })
+                            'data-config':$.type(json.config) === 'string' ? json.config : JSON.stringify(json.config),
+                            'data-enhancer': metadata.id
+                        })
                         .removeAttr('id')
-                        .html($(json.preview).html());
+                        .html($.trim(json.preview));
 
                     // Add special links (this is also called onInit())
                     self.onEnhancerAdd(edit, metadata);
