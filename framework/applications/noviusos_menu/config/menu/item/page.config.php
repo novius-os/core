@@ -44,7 +44,22 @@ return array(
         'fields' => array(
             'mitem_page_id' => array(
                 'label' => __('Page:'),
-                'renderer' => 'Nos\Page\Renderer_Selector',
+                'form' => array(
+                    'type' => 'hidden',
+                    'class' => 'menu_item_page_id',
+                ),
+                'renderer' => 'Nos\Renderer_Item_Picker',
+                'renderer_options' => array(
+                    'model' => 'Nos\Page\Model_Page',
+                    'appdesk' => 'admin/noviusos_page/appdesk',
+                    'defaultThumbnail' => 'static/apps/noviusos_page/img/64/page.png',
+                    'texts' => array(
+                        'empty' => __('No page selected'),
+                        'add' => __('Pick a page'),
+                        'edit' => __('Pick another page'),
+                        'delete' => __('Unselect page'),
+                    ),
+                ),
             ),
         ),
     ),

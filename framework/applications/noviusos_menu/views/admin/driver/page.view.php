@@ -16,8 +16,9 @@
             $(function() {
                 var $div = $('#<?= $id ?>');
                 $div.nosOnShow('bind', function() {
-                    var $form = $div.parents('.renderer-menu-items-li-form')
-                        .on('selectionChanged', ':radio', function(e, data) {
+                    var $form = $div.parents('.renderer-menu-items-li-form');
+                    $form.find('.menu_item_page_id')
+                        .on('nositempickerpick', function(e, data) {
                             $form.find('.menu_item_title').attr('placeholder', data._title || '').trigger('keyup');
                         });
                 });
