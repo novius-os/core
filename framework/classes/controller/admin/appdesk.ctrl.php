@@ -48,6 +48,41 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
         }
         $this->config['selectedView'] = $view;
 
+        if ($this->config['selectedView'] === 'appdesk_pick') {
+            if (!isset($this->config['views']['appdesk_pick'])) {
+                $this->config['views']['appdesk_pick'] = $this->config['views']['default'];
+                $this->config['views']['appdesk_pick']['virtual'] = true;
+            }
+
+            foreach ($this->config['appdesk']['actions'] as $id => $action) {
+                $this->config['appdesk']['actions'][$id]['primary'] = false;
+            }
+            $this->config['appdesk']['actions']['appdesk_pick'] = array(
+                'label' => __('Pick'),
+                'icon' => 'check',
+                'text' => true,
+                'primary' => true,
+                'action' => array(
+                    'action' => 'dialogPick',
+                    'event' => 'appdesk_pick_'.$this->config['model'],
+                ),
+            );
+            if (isset($this->config['appdesk']['appdesk']['grid'])) {
+                array_unshift($this->config['appdesk']['appdesk']['grid']['columns']['actions']['actions'], 'appdesk_pick');
+            }
+            if (isset($this->config['appdesk']['appdesk']['thumbnails'])) {
+                array_unshift($this->config['appdesk']['appdesk']['thumbnails']['actions'], 'appdesk_pick');
+            }
+            if (isset($this->config['appdesk']['appdesk']['inspectors']['preview'])) {
+                array_unshift($this->config['appdesk']['appdesk']['inspectors']['preview']['options']['actions'], 'appdesk_pick');
+            }
+        }
+
+        $selectedContexts = (array) \Input::get('selectedContexts', array());
+        if (!empty($selectedContexts)) {
+            $this->config['selectedContexts'] = $selectedContexts;
+        }
+
         if (empty($this->config['custom'])) {
             $this->config['custom'] = array(
                 'from' => 'default',
@@ -573,6 +608,18 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
 
         \Response::json($json);
     }
-}
 
-/* End of file list.php */
+    public function action_info($id)
+    {
+        $model = $this->config['model'];
+        $item = $model::find($id);
+
+        if (!empty($item)) {
+            $item = Controller::dataset_item($item);
+        } else {
+            $item = null;
+        }
+
+        \Response::json($item);
+    }
+}

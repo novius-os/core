@@ -189,6 +189,8 @@ return array(
         'jquery-nos-renderer-datetimepicker' =>
             'static/novius-os/admin/novius-os/js/renderer/jquery.novius-os.renderer.datetime-picker',
         'jquery-nos-renderer-menu-items' => 'static/apps/noviusos_menu/js/jquery.ui.renderer-menu-items',
+        'jquery-nos-renderer-item-picker' =>
+            'static/novius-os/admin/novius-os/js/renderer/jquery.novius-os.renderer.item-picker',
     ),
     'shim' => array(
         'jquery-migrate' => array('jquery'),
@@ -546,5 +548,7 @@ return array(
             'static/novius-os/admin/novius-os/js/inspector/minified/jquery.novius-os.inspector-plain-data',
         'jquery-nos-renderer-datetimepicker' =>
             'static/novius-os/admin/novius-os/js/renderer/minified/jquery.novius-os.renderer.datetime-picker',
+        'jquery-nos-renderer-item-picker' =>
+            'static/novius-os/admin/novius-os/js/renderer/minified/jquery.novius-os.renderer.item-picker',
     ),
 );

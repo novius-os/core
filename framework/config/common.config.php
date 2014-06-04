@@ -40,6 +40,7 @@ return array(
             'icon' => 'pencil',
             'targets' => array(
                 'grid' => true,
+                'renderer' => true,
             ),
             'disabled' => array(
                 'check_context' => function ($item) {

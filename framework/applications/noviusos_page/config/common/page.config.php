@@ -149,6 +149,7 @@ return array(
                 'targets' => array(
                     'grid' => true,
                     'toolbar-edit' => true,
+                    'renderer' => true,
                 ),
                 'visible' => array(
                     'is_new' => function ($params) {
