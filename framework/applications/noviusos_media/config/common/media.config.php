@@ -141,6 +141,7 @@ return array(
             'targets' => array(
                 'grid' => true,
                 'toolbar-edit' => true,
+                'renderer' => true,
             ),
             'visible' => array(function ($params) {
                 return !isset($params['item']) || !$params['item']->is_new();

@@ -14,6 +14,7 @@ return array(
         'Nos\Menu\Menu_Item_Text',
         'Nos\Menu\Menu_Item_Link',
         'Nos\Menu\Menu_Item_Page',
+        'Nos\Menu\Menu_Item_Media',
         'Nos\Menu\Menu_Item_Html',
     ),
 );
