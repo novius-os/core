@@ -317,7 +317,7 @@ class Controller_Front extends Controller
 
             if (!empty($this->_page->page_cache_duration)) {
                 $this->_cache_duration = $this->_page->page_cache_duration;
-                \FrontCache::$cache_duration = $this->_cache_duration;
+                \Nos\FrontCache::$cache_duration = $this->_cache_duration;
             }
         }
 
