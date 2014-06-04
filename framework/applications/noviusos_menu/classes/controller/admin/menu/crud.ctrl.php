@@ -81,7 +81,8 @@ class Controller_Admin_Menu_Crud extends Controller_Admin_Crud
 
         $config = $item->driver()->config();
         $fields = \Arr::get($config, 'admin.fields', array());
-        if (empty($item->mitem_title)) {
+        if (empty($item->mitem_title) || $item->mitem_title === \Arr::get($config, 'texts.new', '')) {
+            $item->mitem_title = '';
             \Arr::set($fields, 'mitem_title.form.placeholder', $item->driver()->title());
         }
         \Arr::set($fields, 'mitem_driver.form.options', array_map(
@@ -103,7 +104,8 @@ class Controller_Admin_Menu_Crud extends Controller_Admin_Crud
         // Replace name with item[12345][name]
         $replaces = array();
         foreach ($fields as $name => $field_config) {
-            $replaces[$name] = 'item['.$item->mitem_id.']['.$name.']';
+            $replaces['name="'.$name.'"'] = 'name="item['.$item->mitem_id.']['.$name.']"';
+            $replaces['name="'.$name.'[]"'] = 'name="item['.$item->mitem_id.']['.$name.'][]"';
         }
         $return = (string) \View::forge('noviusos_menu::admin/renderer/menu/item', $image_view_params, false)
                 ->render().$fieldset->build_append();
