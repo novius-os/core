@@ -78,19 +78,8 @@ echo !empty($fieldset) ? $fieldset->close() : '</form>';
                     })
                     .end()
                     .find('form')
-                    .submit(function() {
-                        var self = this;
-                        $(self).ajaxSubmit({
-                            dataType: 'json',
-                            success: function(json) {
-                                div.closest('.ui-dialog-content').trigger('save.enhancer', json);
-                            },
-                            error: function(error) {
-                                $.nosNotify('An error occured', 'error');
-                            }
-                        });
-
-                        return false;
+                    .on('ajax_success', function(e, json) {
+                        div.closest('.ui-dialog-content').trigger('save.enhancer', json);
                     })
                     .nosFormUI();
         });
