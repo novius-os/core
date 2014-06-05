@@ -147,7 +147,7 @@ class FrontCache
         } else {
             $this->_suffix_handlers = $this->_suffix_handlers + $handler;
         }
-        $this->_suffix_handlers = array_unique($this->_suffix_handlers);
+        $this->_suffix_handlers = array_unique($this->_suffix_handlers, SORT_REGULAR);
 
         $this->_suffix_handlers();
 
