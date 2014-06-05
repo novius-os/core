@@ -95,6 +95,10 @@ class Model_Menu extends Model
         ),
     );
 
+    /**
+     * @param array $params
+     * @return \View
+     */
     public function html(array $params = array())
     {
         $view = \Arr::get($params, 'view', 'noviusos_menu::menu');
@@ -104,6 +108,10 @@ class Model_Menu extends Model
         return \View::forge($view, $params, false);
     }
 
+    /**
+     * @param mixed $parent
+     * @return array
+     */
     public function branch($parent = null)
     {
         if ($parent instanceof Model_Menu_Item) {
@@ -119,6 +127,12 @@ class Model_Menu extends Model
         return $tree;
     }
 
+    /**
+     * @param $context
+     * @param null $page_id
+     * @param $depth
+     * @return Model_Menu
+     */
     public static function buildFromPages($context, $page_id = null, $depth = -1)
     {
         if ($page_id instanceof Model_Page) {
@@ -129,6 +143,12 @@ class Model_Menu extends Model
         return $menu;
     }
 
+    /**
+     * @param $context
+     * @param $idParent
+     * @param $depth
+     * @return Model_Menu[]
+     */
     private static function addPagesItems($context, $idParent, $depth)
     {
         $pages = Model_Page::find('all', array(
