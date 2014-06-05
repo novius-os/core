@@ -1277,6 +1277,9 @@ define('jquery-nos',
                             $dialog = $('<div></div>').addClass('nos-dispatcher')
                                 .appendTo($container);
 
+                        if ($container.data('nosContext')) {
+                            $dialog.data('nosContext', $container.data('nosContext'));
+                        }
 
                         $.extend(options, {
                                 close : function(e, ui) {
