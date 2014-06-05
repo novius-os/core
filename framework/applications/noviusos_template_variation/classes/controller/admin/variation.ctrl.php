@@ -115,6 +115,13 @@ class Controller_Admin_Variation extends Controller_Admin_Crud
                 \Arr::get($template_config, 'admin.layout', array()),
                 $this->config['layout_insert']['form']['params']
             );
+
+            if ($this->reload_with_template) {
+                $init = \Arr::get($template_config, 'init');
+                if (is_callable($init)) {
+                    $_POST = array_merge($_POST, $init());
+                }
+            }
         }
 
         if (!$this->is_new) {
