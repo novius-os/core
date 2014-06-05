@@ -136,6 +136,7 @@ define('jquery-nos-renderer-item-picker',
                     var pick_item = function(item, e) {
                         o.dataset = item;
                         self.element.val(item._id);
+                        self.element.trigger('change');
                         self._trigger('pick', e, item);
                         $dialog.nosDialog('close');
                         self._init();
