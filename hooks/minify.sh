@@ -18,7 +18,7 @@ then
   ./hooks/minify-nos-js.sh
   git add static/admin/bundle/nos.min.js
 
-  SUB_DIR=( inspector media page views )
+  SUB_DIR=( inspector media page views renderer )
   for D in ${SUB_DIR[@]}; do
     git add static/admin/novius-os/js/$D/minified/*
   done
