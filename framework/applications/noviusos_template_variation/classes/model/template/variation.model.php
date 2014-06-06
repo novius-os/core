@@ -153,24 +153,37 @@ class Model_Template_Variation extends \Nos\Orm\Model
             );
 
             $callables = array(
-                'layout' => function ($val) {
-                    return (array) $val;
-                },
-                'cols' => function ($val) {
-                    return intval($val);
-                },
-                'rows' => function ($val) {
+                'layout' => array(
+                    'validator' => function ($val) {
+                        return (array) $val;
+                    },
+                    'default' => array(),
+                ),
+                'cols' => array(
+                    'validator' => function ($val) {
                         return intval($val);
-                },
-                'file' => true,
-                'screenshot' => true,
+                    },
+                    'default' => 1,
+                ),
+                'rows' => array(
+                    'validator' => function ($val) {
+                            return intval($val);
+                    },
+                    'default' => 1,
+                ),
+                'file' => array(
+                    'default' => '',
+                ),
+                'screenshot' => array(
+                    'default' => '',
+                ),
             );
-            foreach ($callables as $key => $value) {
-                $config_value = \Arr::get($config, $key, array());
+            foreach ($callables as $key => $params) {
+                $config_value = \Arr::get($config, $key, $params['default']);
                 if (is_callable($config_value)) {
                     $config_value = $config_value($this);
                 }
-                \Arr::set($config, $key, is_callable($value) ? $value($config_value) : $config_value);
+                \Arr::set($config, $key, isset($params['validator']) ? $params['validator']($config_value) : $config_value);
             }
 
             $this->config_compiled = $config;
