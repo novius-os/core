@@ -152,23 +152,26 @@ class Model_Template_Variation extends \Nos\Orm\Model
                 \Config::load($template_metadata['application'].'::variation/'.$this->tpvar_template, true)
             );
 
-            $wysiwyg_layout = \Arr::get($config, 'layout', array());
-            if (is_callable($wysiwyg_layout)) {
-                $wysiwyg_layout = $wysiwyg_layout($this);
+            $callables = array(
+                'layout' => function ($val) {
+                    return (array) $val;
+                },
+                'cols' => function ($val) {
+                    return intval($val);
+                },
+                'rows' => function ($val) {
+                        return intval($val);
+                },
+                'file' => true,
+                'screenshot' => true,
+            );
+            foreach ($callables as $key => $value) {
+                $config_value = \Arr::get($config, $key, array());
+                if (is_callable($config_value)) {
+                    $config_value = $config_value($this);
+                }
+                \Arr::set($config, $key, is_callable($value) ? $value($config_value) : $config_value);
             }
-            \Arr::set($config, 'layout', (array) $wysiwyg_layout);
-
-            $file = \Arr::get($config, 'file', '');
-            if (is_callable($file)) {
-                $file = $file($this);
-            }
-            \Arr::set($config, 'file', $file);
-
-            $screenshot = \Arr::get($config, 'screenshot', '');
-            if (is_callable($screenshot)) {
-                $screenshot = $screenshot($this);
-            }
-            \Arr::set($config, 'screenshot', $screenshot);
 
             $this->config_compiled = $config;
         }
