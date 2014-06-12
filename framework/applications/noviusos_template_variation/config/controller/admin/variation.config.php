@@ -45,7 +45,7 @@ return array(
             ),
         ),
         'tpvar_title' => array(
-            'label' => __('Title'),
+            'label' => __('Variation title'),
             'form' => array(
                 'type' => 'text',
                 'size' => 50,

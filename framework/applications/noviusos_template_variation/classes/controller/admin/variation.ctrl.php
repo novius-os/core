@@ -128,6 +128,8 @@ class Controller_Admin_Variation extends Controller_Admin_Crud
             $this->config['layout_update'] = $this->config['layout_insert'];
             $this->config['layout_update']['form']['params']['title'] =  'tpvar_title';
             $this->config['layout_update']['form']['params']['subtitle'] =  array('tpvar_template');
+        } else {
+            $this->config['fields']['tpvar_title']['form']['placeholder'] = '';
         }
 
         return parent::fields($this->config['fields']);

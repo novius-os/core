@@ -61,8 +61,8 @@ return array(
                         return
                             !!$tpvar->tpvar_default ?
                             __(
-                                'The default template variation cannot be deleted. To delete this '.
-                                'template variation, set another template variation as default first.'
+                                'The default variation cannot be deleted. To delete this '.
+                                'variation, set another variation as default first.'
                             ) :
                             false;
                     },
@@ -70,7 +70,7 @@ return array(
                         if (\Nos\Page\Model_Page::count(array(
                                 'where' => array(array('page_template_variation_id' => $tpvar->tpvar_id)),
                             ))) {
-                            return __('This template variation is used by pages.');
+                            return __('This variation is used by pages.');
                         }
                     },
                 ),
@@ -95,7 +95,7 @@ return array(
                 ),
             ),
             'set_default' => array(
-                'label' => __('Set as default template variation'),
+                'label' => __('Set as default variation'),
                 'primary' => false,
                 'icon' => 'circle-check',
                 'action' => array(
@@ -123,13 +123,13 @@ return array(
                                     $one_site = count(Nos\Tools_Context::sites()) === 1;
                                     if ($one_site) {
                                         $disabled = __(
-                                            'We know it’s frustrating, but you can only set a template variation as '.
+                                            'We know it’s frustrating, but you can only set a variation as '.
                                             'default when viewing one language. Select a language '.
                                             'from the drop-down list in the top-right corner to do so.'
                                         );
                                     } else {
                                         $disabled = __(
-                                            'We know it’s frustrating, but you can only set a template variation as '.
+                                            'We know it’s frustrating, but you can only set a variation as '.
                                             'default when viewing one context. Select a context '.
                                             'from the drop-down list in the top-right corner to do so.'
                                         );
@@ -140,7 +140,7 @@ return array(
                         return $disabled;
                     },
                     'check_default' => function ($tpvar) {
-                        return !!$tpvar->tpvar_default ? __('This template variation is the default already.') : false;
+                        return !!$tpvar->tpvar_default ? __('This variation is the default already.') : false;
                     },
                 ),
             ),
@@ -164,5 +164,41 @@ return array(
                 ),
             ),
         ),
+    ),
+    'i18n' => array(
+        // Crud
+        'notification item added' => __('Done! The variation has been added.'),
+        'notification item deleted' => __('The variation has been deleted.'),
+
+        // General errors
+        'notification item does not exist anymore' => __('This variation doesn’t exist any more. It has been deleted.'),
+        'notification item not found' => __('We cannot find this variation.'),
+
+        // Deletion popup
+        'deleting item title' => __('Deleting the variation ‘{{title}}’'),
+
+        # Delete action's labels
+        'deleting button N items' => n__(
+            'Yes, delete this variation ',
+            'Yes, delete these {{count}} variations'
+        ),
+
+        'N items' => n__(
+            '1 variation',
+            '{{count}} variations'
+        ),
+
+        # Keep only if the model has the behaviour Contextable
+        'deleting with N contexts' => n__(
+            'This variation exists in <strong>one context</strong>.',
+            'This variation exists in <strong>{{context_count}} contexts</strong>.'
+        ),
+        'deleting with N languages' => n__(
+            'This variation exists in <strong>one language</strong>.',
+            'This variation exists in <strong>{{language_count}} languages</strong>.'
+        ),
+
+        # Keep only if the model has the behaviour Twinnable
+        'translate error impossible context' => __('This variation cannot be added in {{context}}. (How come you get this error message? You’ve hacked your way into here, haven’t you?)'),
     ),
 );
