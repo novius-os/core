@@ -11,7 +11,7 @@
 return array(
     'name' => 'Menus manager',
     'namespace' => 'Nos\Menu',
-    'version' => '4.1 (Dubrovka)',
+    'version' => '5.0 (Elche)',
     'provider' => array(
         'name' => 'Novius OS',
     ),

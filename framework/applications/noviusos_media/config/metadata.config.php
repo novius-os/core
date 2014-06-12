@@ -11,7 +11,7 @@
 return array(
     'name'      => 'Media Centre',
     'namespace' => 'Nos\Media',
-    'version'   => '4.2 (Dubrovka)',
+    'version'   => '5.0 (Elche)',
     'provider'  => array(
         'name'  => 'Novius OS',
     ),

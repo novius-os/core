@@ -11,7 +11,7 @@
 return array(
     'name'      => 'Webpages',
     'namespace' => 'Nos\Page',
-    'version'   => '4.2 (Dubrovka)',
+    'version'   => '5.0 (Elche)',
     'provider'  => array(
         'name'  => 'Novius OS 1',
     ),
