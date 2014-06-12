@@ -26,7 +26,7 @@ define('jquery-nos-renderer-item-picker',
                     'empty': 'No item selected',
                     'add': 'Pick an item',
                     'edit': 'Pick another item',
-                    'delete': 'Unselect item'
+                    'delete': 'Un-select this item'
                 },
                 defaultThumbnail: ''
             },
@@ -108,7 +108,7 @@ define('jquery-nos-renderer-item-picker',
                             action: {},
                             label: o.texts.edit,
                             primary: true,
-                            icon: 'check'
+                            icon: 'search'
                         },
                         'delete': {
                             action: {},
