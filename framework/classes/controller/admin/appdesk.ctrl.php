@@ -57,15 +57,20 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
             foreach ($this->config['appdesk']['actions'] as $id => $action) {
                 $this->config['appdesk']['actions'][$id]['primary'] = false;
             }
-            $this->config['appdesk']['actions']['appdesk_pick'] = array(
-                'label' => __('Pick'),
-                'icon' => 'check',
-                'text' => true,
-                'primary' => true,
-                'action' => array(
-                    'action' => 'dialogPick',
-                    'event' => 'appdesk_pick_'.$this->config['model'],
+            $this->config['appdesk']['actions'] = array_merge(
+                array(
+                    'appdesk_pick' => array(
+                        'label' => __('Pick'),
+                        'icon' => 'check',
+                        'text' => true,
+                        'primary' => true,
+                        'action' => array(
+                            'action' => 'dialogPick',
+                            'event' => 'appdesk_pick_'.$this->config['model'],
+                        ),
+                    ),
                 ),
+                $this->config['appdesk']['actions']
             );
             if (isset($this->config['appdesk']['appdesk']['grid'])) {
                 array_unshift($this->config['appdesk']['appdesk']['grid']['columns']['actions']['actions'], 'appdesk_pick');
