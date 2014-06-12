@@ -8,6 +8,8 @@
  * @link http://www.novius-os.org
  */
 
+Nos\I18n::current_dictionary(array('noviusos_menu::common', 'nos::common'));
+
 $json = array(
     'itemUrl' => \Uri::base(true).'admin/noviusos_menu/menu/crud/menu_item',
     'nestedSortable' => \Arr::get($options, 'nestedSortable', array()),

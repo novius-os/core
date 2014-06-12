@@ -8,6 +8,8 @@
  * @link http://www.novius-os.org
  */
 
+Nos\I18n::current_dictionary(array('noviusos_menu::common', 'nos::common'));
+
 return array(
     'controller_url' => 'admin/noviusos_menu/menu/crud',
     'model' => 'Nos\Menu\Model_Menu',

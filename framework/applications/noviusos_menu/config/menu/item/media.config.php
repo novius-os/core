@@ -45,7 +45,7 @@ return array(
         ),
         'fields' => array(
             'mitem_media_id' => array(
-                'label' => __('Media:'),
+                'label' => __('Media file:'),
                 'form' => array(
                     'type' => 'hidden',
                     'class' => 'menu_item_media_id',

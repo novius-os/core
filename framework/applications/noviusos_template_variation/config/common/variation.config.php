@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-\Nos\I18n::current_dictionary(array('noviusos_template_variation::common'));
+\Nos\I18n::current_dictionary(array('noviusos_template_variation::common', 'nos::common'));
 
 return array(
     'data_mapping' => array(

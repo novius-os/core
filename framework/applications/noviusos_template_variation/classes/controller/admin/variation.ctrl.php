@@ -12,11 +12,18 @@ namespace Nos\Template\Variation;
 
 use Nos\Config_Data;
 use Nos\Controller_Admin_Crud;
+use Nos\I18n;
 
 class Controller_Admin_Variation extends Controller_Admin_Crud
 {
     protected $reload_with_template = false;
     protected $template_metadata = array();
+
+    public function before()
+    {
+        parent::before();
+        I18n::current_dictionary('noviusos_template_variation::common', 'nos::common');
+    }
 
     public function action_form_template($id = null)
     {

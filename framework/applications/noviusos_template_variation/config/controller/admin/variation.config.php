@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-\Nos\I18n::current_dictionary('noviusos_template_variation::common');
+Nos\I18n::current_dictionary(array('noviusos_template_variation::common', 'nos::common'));
 
 $templates = array('' => __('Choose a template'));
 foreach (\Nos\Config_Data::get('templates', array()) as $tpl_key => $template) {
