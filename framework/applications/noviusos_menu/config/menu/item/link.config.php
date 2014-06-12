@@ -8,11 +8,13 @@
  * @link http://www.novius-os.org
  */
 
+Nos\I18n::current_dictionary(array('noviusos_menu::common', 'nos::common'));
+
 return array(
-    'name' => 'Link',
+    'name' => __('Link'),
     'texts' => array(
-        'add' => 'Add a new link',
-        'new' => 'New link',
+        'add' => __('Add a new link'),
+        'new' => __('New link'),
     ),
     'icon' => 'static/apps/noviusos_menu/img/16/link.png',
 

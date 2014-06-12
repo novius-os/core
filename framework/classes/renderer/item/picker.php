@@ -24,7 +24,7 @@ class Renderer_Item_Picker extends Renderer
             'empty' => 'No item selected',
             'add' => 'Pick an item',
             'edit' => 'Pick another item',
-            'delete' => 'Unselect item',
+            'delete' => 'Un-select this item',
         ),
         'defaultThumbnail' => '',
     );
@@ -38,7 +38,7 @@ class Renderer_Item_Picker extends Renderer
             'empty' => __('No item selected'),
             'add' => __('Pick an item'),
             'edit' => __('Pick another item'),
-            'delete' => __('Unselect item'),
+            'delete' => __('Un-select this item'),
         );
     }
 

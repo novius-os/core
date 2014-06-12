@@ -8,11 +8,13 @@
  * @link http://www.novius-os.org
  */
 
+Nos\I18n::current_dictionary(array('noviusos_menu::common', 'nos::common'));
+
 return array(
-    'name' => 'HTML content',
+    'name' => __('Rich text'),
     'texts' => array(
-        'add' => 'Add a new HTML content',
-        'new' => 'New HTML content',
+        'add' => __('Add a new rich text block'),
+        'new' => __('New rich text block'),
     ),
     'icon' => 'static/apps/noviusos_menu/img/16/html.png',
 

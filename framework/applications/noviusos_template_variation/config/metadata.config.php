@@ -19,7 +19,7 @@ return array(
     'permission' => array(),
     'launchers' => array(
         'noviusos_template_variation' => array(
-            'name' => 'Template variation manager',
+            'name' => 'Template variations',
             'action' => array(
                 'action' => 'nosTabs',
                 'tab' => array(

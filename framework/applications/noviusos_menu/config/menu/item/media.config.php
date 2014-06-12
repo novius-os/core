@@ -8,11 +8,13 @@
  * @link http://www.novius-os.org
  */
 
+Nos\I18n::current_dictionary(array('noviusos_menu::common', 'nos::common'));
+
 return array(
-    'name' => 'Media',
+    'name' => __('Link to a media'),
     'texts' => array(
-        'add' => 'Add a new media link',
-        'new' => 'New media link',
+        'add' => __('Add a new link to a media'),
+        'new' => __('New link to a media'),
     ),
     'icon' => 'static/apps/noviusos_menu/img/16/media.png',
 
@@ -54,10 +56,10 @@ return array(
                     'appdesk' => 'admin/noviusos_media/appdesk',
                     'defaultThumbnail' => 'static/apps/noviusos_media/img/media-64.png',
                     'texts' => array(
-                        'empty' => __('No media selected'),
-                        'add' => __('Pick a media'),
-                        'edit' => __('Pick another media'),
-                        'delete' => __('Unselect media'),
+                        'empty' => __('No media file selected'),
+                        'add' => __('Pick a media file'),
+                        'edit' => __('Pick another media file'),
+                        'delete' => __('Un-select this media file'),
                     ),
                 ),
             ),

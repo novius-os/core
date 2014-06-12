@@ -8,11 +8,13 @@
  * @link http://www.novius-os.org
  */
 
+Nos\I18n::current_dictionary(array('noviusos_menu::common', 'nos::common'));
+
 return array(
-    'name' => 'Page',
+    'name' => __('Link to a page'),
     'texts' => array(
-        'add' => 'Add a new page link',
-        'new' => 'New page link',
+        'add' => __('Add a new link to a page'),
+        'new' => __('New link to a page'),
     ),
     'icon' => 'static/apps/noviusos_menu/img/16/page.png',
 
@@ -57,7 +59,7 @@ return array(
                         'empty' => __('No page selected'),
                         'add' => __('Pick a page'),
                         'edit' => __('Pick another page'),
-                        'delete' => __('Unselect page'),
+                        'delete' => __('Un-select this page'),
                     ),
                 ),
             ),
