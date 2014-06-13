@@ -24,12 +24,14 @@ class Migrate_Page extends Migration
 
             $templates_context = \DB::select('page_template', 'page_context')->from('nos_page')->distinct()->execute();
             foreach ($templates_context->as_array() as $template_context) {
-                $template = \Arr::get($templates, $template_context['page_template'], array());
-                $template_variation = Model_Template_Variation::forge();
-                $template_variation->tpvar_template = $template_context['page_template'];
-                $template_variation->tpvar_title = \Arr::get($template, 'title', $template_context['page_template']);
-                $template_variation->tpvar_context = $template_context['page_context'];
-                $template_variation->save();
+                if (!empty($template_context['page_template'])) {
+                    $template = \Arr::get($templates, $template_context['page_template'], array());
+                    $template_variation = Model_Template_Variation::forge();
+                    $template_variation->tpvar_template = $template_context['page_template'];
+                    $template_variation->tpvar_title = \Arr::get($template, 'title', $template_context['page_template']);
+                    $template_variation->tpvar_context = $template_context['page_context'];
+                    $template_variation->save();
+                }
             }
 
             // Same request that in Page migration 008_template_variation
