@@ -15,7 +15,7 @@ return array(
     'search_text' => 'menu_title',
     'i18n' => array(
         'item' => __('menu'),
-        'items' => __('menus'),
+        'items' => __('Website menus'),
         'NItems' => n__(
             '1 menu',
             '{{count}} menus'

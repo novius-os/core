@@ -9,7 +9,7 @@
  */
 
 return array(
-    'name' => 'Menus manager',
+    'name' => 'Website menus',
     'namespace' => 'Nos\Menu',
     'version' => '5.0 (Elche)',
     'provider' => array(
@@ -19,7 +19,7 @@ return array(
     'permission' => array(),
     'launchers' => array(
         'noviusos_menu' => array(
-            'name' => 'Menus',
+            'name' => 'Website menus',
             'action' => array(
                 'action' => 'nosTabs',
                 'tab' => array(
