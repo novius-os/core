@@ -312,7 +312,7 @@ class I18n
         static::$_files_dict[$dbg[$i]['file']] = call_user_func('static::dictionary', (array) $list);
     }
 
-    public static function translate_from_file($file, $message, $default)
+    public static function translate_from_file($file, $message, $default = null)
     {
         // same as in gget
         if (isset(static::$_priority_messages[static::$_locale][$message])) {
@@ -339,7 +339,7 @@ class I18n
 
     public static function nTranslateFromFile($file, $singular, $plural, $n)
     {
-        $result = static::translate_from_file($file, $singular, false);
+        $result = static::translate_from_file($file, $singular);
 
         return static::plural($result, $singular, $plural, $n);
     }
@@ -372,7 +372,7 @@ class I18n
                 }
             }
             if (empty($result)) {
-                $result = $default ?: $message;
+                $result = $default === null ? $message : $default;
             }
             return $result;
         };
