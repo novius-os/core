@@ -372,7 +372,7 @@ class I18n
                 }
             }
             if (empty($result)) {
-                $result = $default ?: $message;
+                $result = $default === null ? $message : $default;
             }
             return $result;
         };
