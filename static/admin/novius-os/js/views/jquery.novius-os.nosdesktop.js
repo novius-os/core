@@ -62,7 +62,7 @@ define('jquery-nos-nosdesktop',
                 $.each(o.launchers, function() {
                     var launcher = this;
 
-                    $('<a href="toto">' +
+                    $('<a href="#">' +
                         '<span class="icon">' +
                         '<img class="gloss" src="static/novius-os/admin/novius-os/img/64/gloss.png" />' +
                         '<img width="64" />' +
