@@ -825,7 +825,9 @@ class Controller_Front extends Controller
                 unset($cache[$property]);
             }
         }
-
+        
+        \Nos\I18n::setLocale(\Nos\Tools_Context::localeCode($this->getPage()->get_context()));
+        
         if (!$this->pageFoundAlreadyTriggered) {
             \Event::trigger('front.pageFound', array('page' => $this->getPage()));
             $this->pageFoundAlreadyTriggered = true;
