@@ -733,6 +733,8 @@ class Controller_Front extends Controller
             }
         }
 
+        \Nos\I18n::setLocale(\Nos\Tools_Context::localeCode($this->getPage()->get_context()));
+
         \Event::trigger('front.pageFound', array('page' => $this->getPage()));
     }
 
