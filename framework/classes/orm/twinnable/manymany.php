@@ -292,8 +292,9 @@ class Orm_Twinnable_ManyMany extends \Orm\ManyMany
         } else {
             if (!empty($original_model_ids)) {
                 $model_to_class = $this->model_to;
+                $primary_key = $model_to_class::primary_key();
                 $result = \DB::select($common_id_property)->from($model_to_class::table())
-                    ->where(reset($model_to_class::primary_key()), 'IN', $original_model_ids)
+                    ->where(reset($primary_key), 'IN', $original_model_ids)
                     ->execute($model_to_class::connection());
                 $original_common_ids = \Arr::pluck($result->as_array(), $common_id_property);
             }
