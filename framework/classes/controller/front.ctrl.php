@@ -65,7 +65,7 @@ class Controller_Front extends Controller
     protected $_headers = array();
 
     protected $_custom_data_cached = array();
-    protected static $_properties_cached = array('_page', '_context_url', '_page_url', '_url', '_status', '_headers');
+    protected static $_properties_cached = array('_page', '_context', '_context_url', '_page_url', '_url', '_status', '_headers');
 
     protected $pageFoundAlreadyTriggered = false;
 
@@ -835,6 +835,8 @@ class Controller_Front extends Controller
                 unset($cache[$property]);
             }
         }
+
+        I18n::setLocale(Tools_Context::localeCode($this->_context));
 
         if (!$this->pageFoundAlreadyTriggered) {
             \Event::trigger('front.pageFound', array('page' => $this->getPage()));

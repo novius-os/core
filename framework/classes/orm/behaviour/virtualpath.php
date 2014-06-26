@@ -170,10 +170,15 @@ class Orm_Behaviour_Virtualpath extends Orm_Behaviour_Virtualname
                 }
             }
 
-            \DB::update($item->table())
+            $update = \DB::update($item->table())
                 ->set($replaces)
-                ->where($virtual_path_property, 'LIKE', $old_virtual_path.'%')
-                ->execute();
+                ->where($virtual_path_property, 'LIKE', $old_virtual_path.'%');
+                
+            if (is_array($this->_properties['unique_path']) && !empty($this->_properties['unique_path']['context_property'])) {
+                $update->where($this->_properties['unique_path']['context_property'], '=', $item->{$this->_properties['unique_path']['context_property']});
+            }
+            
+            $update->execute();
 
             $item->observe('after_change_virtual_path');
         }
