@@ -132,7 +132,7 @@ class Controller_Admin_Enhancer extends \Nos\Controller_Admin_Application
                 'layout' => $this->config['preview']['layout'],
                 'params' => $this->config['preview']['params'],
                 'enhancer_args' => $args,
-            ))->render(),
+            ), false)->render(),
         );
         \Response::json($body);
     }
