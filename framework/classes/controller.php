@@ -152,6 +152,8 @@ class Controller extends \Fuel\Core\Controller_Hybrid
 
         $model = $config['model'];
 
+        $model::eventStatic('gridQueryConfig', array(&$config));
+
         $query = $model::query();
         foreach ($config['related'] as $related) {
             $query->related($related);
