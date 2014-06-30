@@ -93,6 +93,9 @@ class Controller_Front extends Controller
         $this->_is_preview = \Input::get('_preview', false) && \Session::get('logged_user_id', false);
 
         $cache_path = (empty($this->_url) ? 'index/' : $this->_url);
+        if ($status == 404) {
+            $cache_path = '404.error/'.$cache_path;
+        }
 
         // POST or preview means no cache. Ever.
         // We don't want cache in DEV except if _cache=1
