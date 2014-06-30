@@ -1,3 +1,3 @@
 tinyMCE.addI18n('fr.nosbrclearall', {
-    "brclearall_desc" : "Nouveau ligne sous l\u0027image"
+"desc":"Nouvelle ligne sous l\u2019image"
 });
