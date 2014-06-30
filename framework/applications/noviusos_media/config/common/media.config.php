@@ -83,6 +83,10 @@ return array(
                 return dirname($item->url(false));
             },
         ),
+        'media_path' => array(
+            'title' => __('Path'),
+            'column' => 'media_path',
+        ),
         'image' => array(
             'value' => function ($item) {
                 return $item->isImage();

@@ -33,7 +33,7 @@ return array(
         ),
         'order_by' => array('media_id' => 'DESC'),
     ),
-    'search_text' => 'media_title',
+    'search_text' => array('media_title', 'media_path'),
     'inspectors' => array(
         'folder',
         'extension',
