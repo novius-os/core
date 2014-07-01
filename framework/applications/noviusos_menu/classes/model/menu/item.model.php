@@ -146,7 +146,7 @@ class Model_Menu_Item extends Model
      * @param bool $reload
      * @return Menu_Item_Driver
      */
-    public function driver($reload = true)
+    public function driver($reload = false)
     {
         if (is_null($this->menu_item_driver) || $reload) {
             $this->menu_item_driver = Menu_Item::forge($this);
