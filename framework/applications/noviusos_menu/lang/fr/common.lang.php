@@ -44,7 +44,7 @@ return array(
     'This menu has not been added in {context} yet.' => 'Ce menu n\'a pas encore été ajouté dans {context}.',
 
     #: config/controller/admin/menu/crud.config.php:66
-    'Add a new menu in {context}' => 'Ajouter un nouveau menu dans {context}',
+    'Add a menu in {context}' => 'Ajouter un menu dans {context}',
 
     #: config/controller/admin/menu/crud.config.php:67
     'Delete a menu' => 'Supprimer un menu',
@@ -53,7 +53,7 @@ return array(
     'menu' => 'menu',
 
     #: config/controller/admin/menu/appdesk.config.php:18
-    'Website menus' => 'Menus de sites web',
+    'Website menus' => 'Menus de site web',
 
     #: config/controller/admin/menu/appdesk.config.php:20
     #: config/common/menu.config.php:39
@@ -143,7 +143,7 @@ return array(
     'Link to a page' => 'Lien vers une page',
 
     #: config/menu/item/page.config.php:16
-    'Add a new link to a page' => 'Ajouter un nouveau lien vers une page',
+    'Add a link to a page' => 'Ajouter un lien vers une page',
 
     #: config/menu/item/page.config.php:17
     'New link to a page' => 'Nouveau lien vers une page',
@@ -167,7 +167,7 @@ return array(
     'Link to a media' => 'Lien vers un média',
 
     #: config/menu/item/media.config.php:16
-    'Add a new link to a media' => 'Ajouter un nouveau lien vers un média',
+    'Add a link to a media' => 'Ajouter un lien vers un média',
 
     #: config/menu/item/media.config.php:17
     'New link to a media' => 'Nouveau lien vers un média',
@@ -191,7 +191,7 @@ return array(
     'Link' => 'Lien',
 
     #: config/menu/item/link.config.php:16
-    'Add a new link' => 'Ajouter un nouveau lien',
+    'Add a link' => 'Ajouter un lien',
 
     #: config/menu/item/link.config.php:17
     'New link' => 'Nouveau lien',
@@ -206,10 +206,10 @@ return array(
     'Rich text' => 'Texte riche',
 
     #: config/menu/item/html.config.php:16
-    'Add a new rich text block' => 'Ajouter un nouveau bloc de texte riche',
+    'Add a rich text block' => 'Ajouter un bloc de texte mis en forme',
 
     #: config/menu/item/html.config.php:17
-    'New rich text block' => 'Nouveau bloc de texte riche',
+    'New rich text block' => 'Nouveau bloc de texte mis en forme',
 
     #: config/menu/item/html.config.php:40
     'Content' => 'Contenu',

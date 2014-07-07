@@ -13,7 +13,7 @@ Nos\I18n::current_dictionary(array('noviusos_menu::common', 'nos::common'));
 return array(
     'name' => __('Rich text'),
     'texts' => array(
-        'add' => __('Add a new rich text block'),
+        'add' => __('Add a rich text block'),
         'new' => __('New rich text block'),
     ),
     'icon' => 'static/apps/noviusos_menu/img/16/html.png',

@@ -14,7 +14,8 @@ $json = array(
     'itemUrl' => \Uri::base(true).'admin/noviusos_menu/menu/crud/menu_item',
     'nestedSortable' => \Arr::get($options, 'nestedSortable', array()),
     'texts' => array(
-        'deleteItem' => __('Delete this item')
+        'addItem' => __('Add an item'),
+        'deleteItem' => __('Delete this item'),
     ),
     'drivers' => \Nos\Menu\Menu_Item::drivers(),
 );

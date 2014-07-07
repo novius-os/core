@@ -13,7 +13,7 @@ Nos\I18n::current_dictionary(array('noviusos_menu::common', 'nos::common'));
 return array(
     'name' => __('Link'),
     'texts' => array(
-        'add' => __('Add a new link'),
+        'add' => __('Add a link'),
         'new' => __('New link'),
     ),
     'icon' => 'static/apps/noviusos_menu/img/16/link.png',

@@ -201,4 +201,9 @@ return array(
         # Keep only if the model has the behaviour Twinnable
         'translate error impossible context' => __('This variation cannot be added in {{context}}. (How come you get this error message? You’ve hacked your way into here, haven’t you?)'),
     ),
+    'actions' => array(
+        'add' => array(
+            'label' => __('Add a variation'),
+        ),
+    ),
 );
