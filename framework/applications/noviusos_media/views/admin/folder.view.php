@@ -47,7 +47,7 @@ foreach ($fieldset->field() as $field) {
             </td>
         </tr>
         <tr>
-            <th style="vertical-align: top;"><?= !empty($crud['environment']) ? '' : ($item->is_new() ? $fieldset->field('medif_parent_id')->label : __('Change the folder\'s location:')); ?></th>
+            <th style="vertical-align: top;"><?= !empty($crud['environment']) ? '' : ($item->is_new() ? $fieldset->field('medif_parent_id')->label : __('Change the folder’s location:')); ?></th>
             <td id="<?= $uniqid_radio ?>">
 
                 <?= $fieldset->field('medif_parent_id')->build(); ?>

@@ -238,7 +238,7 @@ return array(
     'Yes, I want to delete this folder and the {{count}} media files it contains.' => 'Yes, yo desire deleter ti dossier e li {{count}} documents media it contene.',
 
     #: views/admin/folder.view.php:51
-    'Change the folder\'s location:' => 'Changear li localisation del dossier:',
+    'Change the folder’s location:' => 'Changear li localisation del dossier:',
 
     #: views/admin/folder.view.php:57
     'Warning: moving a folder changes the URL of all the files it contains.' => 'Attention: mover un dossier changea li URL de omni documents it contene. ',

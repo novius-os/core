@@ -41,7 +41,7 @@ return array(
     'This menu cannot be added {context}.' => 'Ce menu ne peut pas être ajouté {context}.',
 
     #: config/controller/admin/menu/crud.config.php:65
-    'This menu has not been added in {context} yet.' => 'Ce menu n\'a pas encore été ajouté dans {context}.',
+    'This menu has not been added in {context} yet.' => 'Ce menu n’a pas encore été ajouté dans {context}.',
 
     #: config/controller/admin/menu/crud.config.php:66
     'Add a menu in {context}' => 'Ajouter un menu dans {context}',

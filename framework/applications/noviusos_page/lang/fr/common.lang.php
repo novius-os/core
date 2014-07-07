@@ -207,7 +207,7 @@ return array(
     'You cannot set this page as home page because it isn’t published. Publish it first.' => 'Vous ne pouvez définir cette page comme page d’accueil, car elle doit être d’abord être publiée.',
 
     #: config/common/page.config.php:216
-    'This page is the home page already.' => 'Cette page est déjà la page d\'accueil.',
+    'This page is the home page already.' => 'Cette page est déjà la page d’accueil.',
 
     #: config/common/page.config.php:227
     #: views/admin/popup_duplicate.view.php:139

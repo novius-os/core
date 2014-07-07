@@ -236,7 +236,7 @@ return array(
     'Yes, I want to delete this folder and the {{count}} media files it contains.' => 'はい、このフォルダには{{count}}個のメディアファイルがありますが、このフォルダを削除します。',
 
     #: views/admin/folder.view.php:51
-    'Change the folder\'s location:' => 'フォルダの位置を変更する:',
+    'Change the folder’s location:' => 'フォルダの位置を変更する:',
 
     #: views/admin/folder.view.php:57
     'Warning: moving a folder changes the URL of all the files it contains.' => '警告: フォルダを移動すると、そのフォルダ内の全てのファイルの URL が変わります。',

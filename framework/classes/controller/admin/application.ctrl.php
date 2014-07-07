@@ -25,7 +25,7 @@ class Controller_Admin_Application extends Controller_Admin_Auth
         if (!$this->bypass) {
             list($application) = \Config::configFile(get_called_class());
             if (!User\Permission::isApplicationAuthorised($application)) {
-                throw new Access_Exception('You don\'t have access to application '.$application.'!');
+                throw new Access_Exception('You don’t have access to application '.$application.'!');
             }
         }
     }

@@ -122,7 +122,7 @@ return array(
     'No sooner said than done. The default template variation is now ‘{{title}}’.' => 'C’est tout bon. La déclinaison par défaut est désormais «&nbsp;{{title}}&nbsp;».',
 
     #: classes/controller/admin/visualise.ctrl.php:31
-    'You don\'t have access to application ' => 'Vous n\'avez pas accès à l\'application ',
+    'You don’t have access to application {{application}}!' => 'Vous n’avez pas accès à l’application {{application}} !',
 
     #: classes/controller/admin/visualise.ctrl.php:68
     'This template variation does’nt exist !' => 'Cette déclinaison de gabarit n’existe pas !',

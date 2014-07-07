@@ -359,7 +359,7 @@ return array(
     'Scheduled for {{date}}' => 'Planifié pour le {{date}}',
 
     #: views/admin/orm/publishable_label.view.php:27
-    'Published until {{date}}' => 'Publié jusqu\'au {{date}}',
+    'Published until {{date}}' => 'Publié jusqu’au {{date}}',
 
     #. Note to translator: action (button)
     #: views/admin/enhancer/popup.view.php:44
@@ -395,7 +395,7 @@ return array(
     '<row><cell>Scheduled from:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>to:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>' => '<row><cell>Planifié du&nbsp;:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>au&nbsp;:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>',
 
     #: views/renderer/publishable.view.php:118
-    '<row><cell>Published since:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>until:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>' => '<row><cell>Publié depuis&nbsp;:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>jusqu\'au&nbsp;:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>',
+    '<row><cell>Published since:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>until:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>' => '<row><cell>Publié depuis&nbsp;:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>jusqu’au&nbsp;:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>',
 
     #: views/renderer/publishable.view.php:119
     '<row><cell>Was published from:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>to:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>' => '<row><cell>A été publié du&nbsp;:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>au&nbsp;:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>',
@@ -404,7 +404,7 @@ return array(
     '<row><cell>Will be scheduled from:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>to:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>' => '<row><cell>Sera planifié du&nbsp;:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>au&nbsp;:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>',
 
     #: views/renderer/publishable.view.php:123
-    '<row><cell>Will be published from:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>until:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>' => '<row><cell>Sera publié du&nbsp;:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>jusqu\'au&nbsp;:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>',
+    '<row><cell>Will be published from:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>until:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>' => '<row><cell>Sera publié du&nbsp;:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>jusqu’au&nbsp;:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>',
 
     #: views/renderer/publishable.view.php:124
     '<row><cell>Will be backdated from:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>to:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>' => '<row><cell>Sera anti-daté du&nbsp;:</cell><cell>{{start}}</cell><cell>{{clear}}</cell></row><row><cell>au&nbsp;:</cell><cell>{{end}}</cell><cell>{{clear}}</cell></row>',

@@ -34,10 +34,10 @@ return array(
     'Uninstall' => 'Désinstaller',
 
     #: views/admin/app_manager.view.php:92
-    'Cannot be uninstalled. Uninstall ‘{{application}}’ first.' => 'Ne peut être désinstallée. Désinstallez d\'abord ‘{{application}}’.',
+    'Cannot be uninstalled. Uninstall ‘{{application}}’ first.' => 'Ne peut être désinstallée. Désinstallez d’abord ‘{{application}}’.',
 
     #: views/admin/app_manager.view.php:97
-    'Cannot be uninstalled. Uninstall <a>these applications</a> first.' => 'Ne peut être désinstallée. Désinstallez d\'abord <a>ces applications</a>.',
+    'Cannot be uninstalled. Uninstall <a>these applications</a> first.' => 'Ne peut être désinstallée. Désinstallez d’abord <a>ces applications</a>.',
 
     #: views/admin/app_manager.view.php:117
     #: views/admin/app_manager.view.php:173
@@ -53,10 +53,10 @@ return array(
     'Install' => 'Installer',
 
     #: views/admin/app_manager.view.php:152
-    'Cannot be installed. Install ‘{{application}}’ first.' => 'Ne peut être installée. Installez d\'abord ‘{{application}}’.',
+    'Cannot be installed. Install ‘{{application}}’ first.' => 'Ne peut être installée. Installez d’abord ‘{{application}}’.',
 
     #: views/admin/app_manager.view.php:157
-    'Cannot be installed. Install <a>these applications</a> first.' => 'Ne peut être installée. Installez d\'abord <a>ces applications</a>.',
+    'Cannot be installed. Install <a>these applications</a> first.' => 'Ne peut être installée. Installez d’abord <a>ces applications</a>.',
 
     #: views/admin/app_manager.view.php:181
     'Website configuration' => 'Configuration du site web',

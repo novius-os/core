@@ -311,7 +311,7 @@ return array(
     'Yes, I want to delete this media file even though it is used {{count}} times.' => 'Oui, je veux supprimer ce média bien qu’il soit utilisé {{count}} fois.',
 
     #: views/admin/permissions/folders.view.php:14
-    'Note: when no folders are selected, no restriction applies, all folders are accessible. The root folder is always accessible.' => 'Note&nbsp;: Quand aucun dossier n\'est sélectionné, il n’y a pas de restriction, tous les dossiers sont accessibles. Le dossier racine est toujours accessible.',
+    'Note: when no folders are selected, no restriction applies, all folders are accessible. The root folder is always accessible.' => 'Note&nbsp;: Quand aucun dossier n’est sélectionné, il n’y a pas de restriction, tous les dossiers sont accessibles. Le dossier racine est toujours accessible.',
 
     #: views/admin/permissions/general.view.php:16
     'Can add, edit and delete media files' => 'Peut ajouter, modifier et supprimer des médias',
@@ -364,7 +364,7 @@ return array(
     'Yes, I want to delete this folder and the {{count}} media files it contains.' => 'Oui, je veux supprimer ce dossier et les {{count}} médias qu’il contient.',
 
     #: views/admin/folder.view.php:49
-    'Change the folder\'s location:' => 'Changer l’emplacement du dossier&nbsp;:',
+    'Change the folder’s location:' => 'Changer l’emplacement du dossier&nbsp;:',
 
     #: views/admin/folder.view.php:55
     'Warning: moving a folder changes the URL of all the files it contains.' => 'Attention&nbsp;: déplacer un dossier change l’URL de tous les fichiers qu’il contient.',

@@ -28,7 +28,10 @@ class Controller_Admin_Visualise extends Controller_Front
         if (!Permission::isApplicationAuthorised($application)) {
             echo \View::forge('nos::errors/blank_slate_front', array(
                 'base_url' => \Uri::base(),
-                'error' => __('You don\'t have access to application '.$application.'!'),
+                'error' => strtr(
+                    __('You don’t have access to application {{application}}!'),
+                    array('{{application}}' => $application)
+                ),
             ), false);
             exit();
         }

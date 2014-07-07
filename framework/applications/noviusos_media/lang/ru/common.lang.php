@@ -240,7 +240,7 @@ return array(
     'Yes, I want to delete this folder and the {{count}} media files it contains.' => 'Да, я хочу удалить эту папку и {{count}} файлов медиа, которые там находятся.',
 
     #: views/admin/folder.view.php:51
-    'Change the folder\'s location:' => 'Изменить расположение папки:',
+    'Change the folder’s location:' => 'Изменить расположение папки:',
 
     #: views/admin/folder.view.php:57
     'Warning: moving a folder changes the URL of all the files it contains.' => 'Предупреждаем: перемещение папки изменит URL (адреса) всех файлов, которые там находятся.',
