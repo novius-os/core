@@ -1,7 +1,7 @@
 tinyMCE.addI18n('fr.nosenhancer', {
-"desc":"",
+"desc":"Applications",
 "delete":"Supprimer",
-"options":"",
+"options":"Options",
 "p_after":"Nouveau paragraphe apr\u00e8s",
 "p_before":"Nouveau paragraph avant",
 "new_paragraph":"Nouveau paragraphe",
