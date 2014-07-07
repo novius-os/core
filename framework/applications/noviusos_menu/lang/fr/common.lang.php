@@ -1,9 +1,9 @@
 <?php
 
-// Generated on 30/06/2014 14:54:18
+// Generated on 07/07/2014 11:51:57
 
-// 67 out of 67 messages are translated (100%).
-// 285 out of 285 words are translated (100%).
+// 69 out of 69 messages are translated (100%).
+// 287 out of 287 words are translated (100%).
 
 return array(
     #: config/controller/admin/menu/crud.config.php:39
@@ -44,7 +44,7 @@ return array(
     'This menu has not been added in {context} yet.' => 'Ce menu n’a pas encore été ajouté dans {context}.',
 
     #: config/controller/admin/menu/crud.config.php:66
-    'Add a menu in {context}' => 'Ajouter un menu dans {context}',
+    'Add a new menu in {context}' => 'Ajouter un nouveau menu dans {context}',
 
     #: config/controller/admin/menu/crud.config.php:67
     'Delete a menu' => 'Supprimer un menu',
@@ -114,6 +114,9 @@ return array(
     #. Keep only if the model has the behaviour Twinnable
     #: config/common/menu.config.php:54
     'This menu cannot be added in {{context}}. (How come you get this error message? You’ve hacked your way into here, haven’t you?)' => 'Ce menu ne peut être ajouté à {{context}}. (Mais comment avez-vous obtenu ce message&nbsp;? Vous bidouillez le système, non&nbsp;?)',
+
+    #: config/common/menu.config.php:58
+    'Add a menu' => 'Ajouter un menu',
 
     #: config/menu/item/driver.config.php:16
     'Add a item' => 'Ajouter un item',
@@ -227,6 +230,9 @@ return array(
     'Interpret as HTML code' => 'Interprété comme du code HTML',
 
     #: views/admin/renderer/menu/items.view.php:17
+    'Add an item' => 'Ajouter un item',
+
+    #: views/admin/renderer/menu/items.view.php:18
     'Delete this item' => 'Supprimer cet item',
 
 );

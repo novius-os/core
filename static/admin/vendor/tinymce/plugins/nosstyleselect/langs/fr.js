@@ -2,7 +2,7 @@ tinyMCE.addI18n('fr.nosstyleselect', {
 "dd":"D\u00e9finition du terme",
 "dt":"Terme \u00e0 d\u00e9finir",
 "samp":"Exemple de code",
-"code":"",
+"code":"Code",
 "blockquote":"Bloc de citation",
 "h6":"Titre 6",
 "h5":"Titre 5",
@@ -14,5 +14,5 @@ tinyMCE.addI18n('fr.nosstyleselect', {
 "address":"Adresse",
 "div":"Div",
 "paragraph":"Paragraphe",
-"style_select":""
+"style_select":"Styles"
 });

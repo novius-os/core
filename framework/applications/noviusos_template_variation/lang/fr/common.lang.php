@@ -1,9 +1,9 @@
 <?php
 
-// Generated on 30/06/2014 14:54:18
+// Generated on 07/07/2014 11:51:57
 
-// 34 out of 34 messages are translated (100%).
-// 221 out of 221 words are translated (100%).
+// 35 out of 35 messages are translated (100%).
+// 224 out of 224 words are translated (100%).
 
 return array(
     #: config/controller/admin/inspector/template.config.php:33
@@ -118,16 +118,19 @@ return array(
     #: config/common/variation.config.php:202
     'This variation cannot be added in {{context}}. (How come you get this error message? You’ve hacked your way into here, haven’t you?)' => 'Cette déclinaison ne peut être ajoutée à {{context}}. (Mais comment avez-vous obtenu ce message&nbsp;? Vous bidouillez le système, non&nbsp;?)',
 
+    #: config/common/variation.config.php:206
+    'Add a variation' => 'Ajouter une déclinaison',
+
     #: classes/controller/admin/variation.ctrl.php:65
     'No sooner said than done. The default template variation is now ‘{{title}}’.' => 'C’est tout bon. La déclinaison par défaut est désormais «&nbsp;{{title}}&nbsp;».',
 
-    #: classes/controller/admin/visualise.ctrl.php:31
+    #: classes/controller/admin/visualise.ctrl.php:32
     'You don’t have access to application {{application}}!' => 'Vous n’avez pas accès à l’application {{application}} !',
 
-    #: classes/controller/admin/visualise.ctrl.php:68
+    #: classes/controller/admin/visualise.ctrl.php:71
     'This template variation does’nt exist !' => 'Cette déclinaison de gabarit n’existe pas !',
 
-    #: classes/controller/admin/visualise.ctrl.php:78
+    #: classes/controller/admin/visualise.ctrl.php:81
     'Lorem Ipsum' => '',
 
 );
