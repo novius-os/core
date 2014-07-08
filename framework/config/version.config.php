@@ -9,6 +9,7 @@
  */
 
 return array(
-    'fullname' => '4.3 (Dubrovka)',
+    'version' => '5.0.0',
+    'fullname' => '5.0 (Elche)',
     'date'     => \Date::create_from_string('2014-07-08', 'mysql_date'),
 );
