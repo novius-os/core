@@ -537,6 +537,13 @@ class Controller_Front extends Controller
      */
     public function addJavascript($url, $footer = true)
     {
+        if (is_string($url) || (is_array($url) && isset($url['js']))) {
+            $lib_url = is_string($url) ? $url : $url['js'];
+            if (in_array($lib_url, $footer ? $this->_js_footer : $this->_js_header)) {
+                return $this;
+            }
+        }
+
         if ($footer) {
             $this->_js_footer[] = $url;
         } else {
@@ -566,6 +573,13 @@ class Controller_Front extends Controller
      */
     public function addCss($url)
     {
+        if (is_string($url) || (is_array($url) && isset($url['css']))) {
+            $lib_url = is_string($url) ? $url : $url['css'];
+            if (in_array($lib_url, $this->_css)) {
+                return $this;
+            }
+        }
+
         $this->_css[] = $url;
 
         return $this;
@@ -656,7 +670,6 @@ class Controller_Front extends Controller
         foreach ($this->_metas as $metas) {
             $head[] = $metas;
         }
-        $this->_css = array_unique($this->_css, SORT_REGULAR);
         foreach ($this->_css as $css) {
             if (is_array($css) && isset($css['inline']) && $css['inline'] && isset($css['css'])) {
                 $head[] = '<style type="text/css">'.$css['css'].'</style>';
@@ -664,7 +677,6 @@ class Controller_Front extends Controller
                 $head[] = '<link href="'.(is_string($css) ? $css : $css['css']).'" rel="stylesheet" type="text/css">';
             }
         }
-        $this->_js_header = array_unique($this->_js_header, SORT_REGULAR);
         foreach ($this->_js_header as $js) {
             if (is_array($js) && isset($js['inline']) && $js['inline'] && isset($js['js'])) {
                 $head[] = \Str::starts_with($js['js'], '<script ') || \Str::starts_with($js['js'], '<script>')?
@@ -679,7 +691,6 @@ class Controller_Front extends Controller
         }
 
         $footer = array();
-        $this->_js_footer = array_unique($this->_js_footer, SORT_REGULAR);
         foreach ($this->_js_footer as $js) {
             if (is_array($js) && isset($js['inline']) && $js['inline'] && isset($js['js'])) {
                 $footer[] = \Str::starts_with($js['js'], '<script ') || \Str::starts_with($js['js'], '<script>') ?
