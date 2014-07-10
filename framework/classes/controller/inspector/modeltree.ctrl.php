@@ -62,6 +62,9 @@ class Controller_Inspector_Modeltree extends Controller_Inspector
             if (!isset($config['dataset'])) {
                 $config['dataset']  = $data_mapping;
             }
+
+            // Config overwritten :
+            // it has to be "id" because of the use of methods like "Model::find($id)" or "group_by_pk"
             $config['dataset']['id']       = array(
                 'column' => 'id',
                 'visible' => false
