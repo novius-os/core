@@ -275,7 +275,18 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                 $class = $model['model'];
 
                 if (!isset($model['pk'])) {
+                    //default value is the primary key
                     $model['pk'] = \Arr::get($class::primary_key(), 0);
+                    //if the "parent" relation is twinnable, then use the common id as key
+                    $relations = $class::relations();
+                    foreach ($relations as $relation) {
+                        if ($relation->model_to == $model['model']) {
+                            if (get_class($relation) == 'Nos\Orm_Twinnable_BelongsTo') {
+                                $model['pk'] = $relation->key_to[0];
+                                break;
+                            }
+                        }
+                    }
                 }
                 if (!isset($model['order_by'])) {
                     $model['order_by'] = array($model['pk']);
