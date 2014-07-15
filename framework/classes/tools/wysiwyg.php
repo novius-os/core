@@ -157,24 +157,36 @@ class Tools_Wysiwyg
 
     public static function parse_medias(&$content, $closure)
     {
+        $media_matches = array();
+        $media_ids = array();
+
         // Find all medias
-        preg_match_all('`<(img|a)(?:.+?)(?:src|href)="(nos://media/(\d+)(?:/(\d+)/(\d+))?)"(?:.*?)>`u', $content, $matches);
-        if (!empty($matches[0])) {
-            $media_ids = array();
-            foreach ($matches[3] as $match_id => $media_id) {
-                $media_ids[] = $media_id;
-            }
-            $medias = \Nos\Media\Model_Media::find('all', array('where' => array(array('media_id', 'IN', $media_ids))));
-            foreach ($matches[3] as $match_id => $media_id) {
-                $closure(
-                    \Arr::get($medias, $media_id, null),
-                    array(
+        $tags = array(
+            'a' => 'href',
+            'img' => 'src',
+        );
+        foreach ($tags as $tag => $tag_url) {
+            preg_match_all('`<'.$tag.'(?:.+?)'.$tag_url.'="(nos://media/(\d+)(?:/(\d+)/(\d+))?)"(?:.*?)>`u', $content, $matches);
+            if (!empty($matches[0])) {
+                foreach ($matches[2] as $match_id => $media_id) {
+                    $media_ids[] = $media_id;
+                    $media_matches[] = array(
+                        'id' => $media_id,
                         'content' => $matches[0][$match_id],
-                        'tag' => $matches[1][$match_id],
-                        'url' => $matches[2][$match_id],
-                        'width' => \Arr::get($matches[4], $match_id, null),
-                        'height' => \Arr::get($matches[5], $match_id, null),
-                    )
+                        'tag' => $tag,
+                        'url' => $matches[1][$match_id],
+                        'width' => \Arr::get($matches[3], $match_id, null),
+                        'height' => \Arr::get($matches[4], $match_id, null),
+                    );
+                }
+            }
+        }
+        if (!empty($media_matches)) {
+            $medias = \Nos\Media\Model_Media::find('all', array('where' => array(array('media_id', 'IN', $media_ids))));
+            foreach ($media_matches as $media_match) {
+                $closure(
+                    \Arr::get($medias, $media_match['id'], null),
+                    $media_match
                 );
             }
         }
