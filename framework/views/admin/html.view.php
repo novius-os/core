@@ -23,12 +23,11 @@ $config = array(
         ),
     ),
     'shim' => \Arr::get($requirejs_config, 'shim', array()),
-    'paths' => \Arr::get($requirejs_config, 'paths-min', array()),
+    'paths' => array_merge(
+        \Arr::get($requirejs_config, $assets_minified ? 'paths' : 'paths-min', array()),
+        \Arr::get($requirejs_config, $assets_minified ? 'paths-min' : 'paths', array())
+    ),
 );
-
-if (!$assets_minified) {
-    $config['paths'] = array_merge($config['paths'], \Arr::get($requirejs_config, 'paths', array()));
-}
 ?>
 <!DOCTYPE html>
 <html>
@@ -97,7 +96,7 @@ if ($assets_minified) {
 <?= $css ?>
 <script src="<?= $require ?>" type="text/javascript"></script>
 <script type="text/javascript">
-    require.config(<?= \Format::forge($config)->to_json() ?>);
+    require.config(<?= \Format::forge()->to_json($config, \Fuel::$env !== \Fuel::PRODUCTION) ?>);
 </script>
 <script type="text/javascript">
     require(['jquery-nos'], function($) {
