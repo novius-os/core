@@ -21,6 +21,8 @@ class Orm_Twinnable_HasMany extends \Orm\HasMany
     protected $column_context_is_main_to = false;
 
     protected $cascade_delete_after_last_twin = true;
+    
+    protected $force_context = false;
 
     public function __construct($from, $name, array $config)
     {
