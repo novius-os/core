@@ -339,7 +339,7 @@ class I18n
 
     public static function nTranslateFromFile($file, $singular, $plural, $n)
     {
-        $result = static::translate_from_file($file, $singular);
+        $result = static::translate_from_file($file, $singular, false);
 
         return static::plural($result, $singular, $plural, $n);
     }
