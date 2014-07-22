@@ -7855,33 +7855,39 @@ var wijmo;
                 }
                 this._onDataViewLoading();
                 var sm = new wijmo.grid.settingsManager(this._wijgrid);
-                if((userData && userData.forceDataLoad) || this._needToLoad(sm)) {
+                // Novius OS Fixed : this bugfix has been taken form the version 3.20142.45. Without it, pager on listgrid widget doesn't work. Will be ok with the next vendors update.
+                if ((userData && userData.forceDataLoad) || this._needToLoad(sm)) {
                     var loadParams = sm.MapWGToDV(), local = false;
-                    if(this._isWijdatasource && !this._isDynamicWijdatasource && dataView.isLoaded()) {
+
+                    if (this._isWijdatasource && !this._isDynamicWijdatasource && dataView.isLoaded()) {
                         local = true;
                     }
+
                     // ** ensure pageIndex
-                                        var pagedDataView = wijmo.grid.asPagedDataView(dataView), totalItems = -1;
+                    var pagedDataView = wijmo.grid.asPagedDataView(dataView), totalItems = -1;
+
                     // if paging is enabled and dataView provides totalItemCount then ensure that pageIndex is within[0; pageCount) range.
-                    if(pagedDataView && (loadParams.pageSize >= 0) && ((totalItems = pagedDataView.totalItemCount()) >= 0)) {
+                    if (pagedDataView && (loadParams.pageSize >= 0) && ((totalItems = pagedDataView.totalItemCount()) >= 0)) {
                         // ** 47731: handle situation when underlying array was changed directly by user.
-                        if(this._isOwnDataView && !this._isKODataView && (pagedDataView.pageSize() > 0)) {
-                            // test if dataView is paged already
+                        if (this._isOwnDataView && !this._isKODataView && !this._isDynamicWijdatasource && (pagedDataView.pageSize() > 0)) {
                             var source = pagedDataView.getSource();
-                            if(source && (source.length < /*!==*/ totalItems)) {
+                            if (source && (source.length < totalItems)) {
                                 totalItems = source.length;
                             }
                         }
+
                         // 47731 **
-                                                var pageCount = Math.ceil(totalItems / loadParams.pageSize) || 1, pageIndex = loadParams.pageIndex;
-                        if(pageIndex >= pageCount) {
+                        var pageCount = Math.ceil(totalItems / loadParams.pageSize) || 1, pageIndex = loadParams.pageIndex;
+
+                        if (pageIndex >= pageCount) {
                             pageIndex = Math.max(0, pageCount - 1);
                         }
+
                         loadParams.pageIndex = pageIndex;
                     }
+
                     // ensure pageIndex **
-                    this.ignoreCurrentChangedEvent(true)// The currentPositionChanged event fires before the change event, stop listening. Listening will  be restored in the _onDataViewReset method.
-                    ;
+                    this.ignoreCurrentChangedEvent(true); // The currentPositionChanged event fires before the change event, stop listening. Listening will  be restored in the _onDataViewReset method.
                     dataView.refresh(loadParams, local);
                 } else {
                     if(this.isDataLoaded()) {
