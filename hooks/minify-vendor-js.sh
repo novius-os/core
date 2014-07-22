@@ -5,4 +5,5 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $DIR
 
 php -f ./minify-vendor-js.php
-nodejs /usr/local/bin/r.js -o build.js
+# install require.js via npm for this to work : npm install -g requirejs
+r.js -o build.js
