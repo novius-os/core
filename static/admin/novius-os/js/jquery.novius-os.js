@@ -1231,7 +1231,7 @@ define('jquery-nos',
                             }
 
                             // Cascade on the children
-                            $el.find('.nos-on-show').not('.nos-on-show-exec').nosOnShow();
+                            $el.find('.nos-on-show').not('.nos-on-show-exec').filter(':visible').nosOnShow();
                         }).removeClass('nos-on-show-exec');
                         break;
                 }
