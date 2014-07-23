@@ -1382,7 +1382,7 @@ define('jquery-nos',
                 return this;
             },
 
-            nosListenEvent : function(json_match, callback, caller) {
+            nosListenEvent : function(json_to_checked, callback, caller) {
                 var self = this,
                     $dispatcher = this.closest('.nos-dispatcher, body'),
                     listens = $dispatcher.data('noviusos-listens');
@@ -1393,32 +1393,44 @@ define('jquery-nos',
                     $dispatcher.on('noviusos', function(e) {
                         e.noviusos = e.noviusos || {};
 
-                        $.each($dispatcher.data('noviusos-listens'), function(index_listen, listen) {
-                            var json_match = listen.json_match,
-                                callback = listen.callback,
+                        $.each($dispatcher.data('noviusos-listens'), function(i_listened, listened) {
+                            var array_json_to_checked = listened.array_json_to_checked,
+                                callback = listened.callback,
                                 matched = false;
 
-                            // Check if one of match_obj matched with event
-                            $.each(json_match, function(i, match_obj) {
-                                var matched_obj = true;
-                                $.each(match_obj, function(key, value) {
+                            $.each(array_json_to_checked, function(i, json_to_checked) {
+                                var json_matched = true;
+
+                                // Check if at least one key of the json_to_checked matched with the same key of the event
+                                $.each(json_to_checked, function(key, value) {
                                     if (!$.isArray(e.noviusos[key]) && !$.isArray(value)) {
-                                        matched_obj = e.noviusos[key] === value;
+                                        // both values of triggered and listened are not arrays
+                                        // values must be equal
+                                        json_matched = e.noviusos[key] === value;
+
                                     } else if ($.isArray(e.noviusos[key]) && !$.isArray(value)) {
-                                        matched_obj = $.inArray(value, e.noviusos[key]) !== -1;
+                                        // only the value of triggered is array
+                                        // the value of listened must be in this array
+                                        json_matched = $.inArray(value, e.noviusos[key]) !== -1;
+
                                     } else if (!$.isArray(e.noviusos[key]) && $.isArray(value)) {
-                                        matched_obj = $.inArray(e.noviusos[key], value) !== -1;
+                                        // only the value of listened is array
+                                        // the value of triggered must be in this array
+                                        json_matched = $.inArray(e.noviusos[key], value) !== -1;
+
                                     } else if ($.isArray(e.noviusos[key]) && $.isArray(value)) {
+                                        // both values of triggered and listened are arrays
+                                        // This two arrays must have at least a common value
                                         var matched_temp = false;
                                         $.each(value, function(i, val) {
                                             matched_temp = $.inArray(val, e.noviusos[key]) !== -1;
                                             return !matched_temp;
                                         });
-                                        matched_obj = matched_temp;
+                                        json_matched = matched_temp;
                                     }
-                                    return matched_obj;
+                                    return json_matched;
                                 });
-                                if (matched_obj) {
+                                if (json_matched) {
                                     matched = true;
                                     return false;
                                 }
@@ -1432,7 +1444,7 @@ define('jquery-nos',
                 listens = $.isArray(listens) ? listens : [];
                 listens.push({
                     caller: caller,
-                    json_match: $.isArray(json_match) ? json_match : [json_match],
+                    array_json_to_checked: $.isArray(json_to_checked) ? json_to_checked : [json_to_checked],
                     callback: callback
                 });
                 $dispatcher.data('noviusos-listens', listens);
