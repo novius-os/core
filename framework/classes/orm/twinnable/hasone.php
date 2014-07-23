@@ -22,6 +22,9 @@ class Orm_Twinnable_HasOne extends \Orm\HasOne
 
     protected $cascade_delete_after_last_twin = true;
 
+    protected $force_context_fallback = false;// force using a specific context
+    protected $front_context_fallback = false;// try using front context
+
     public function __construct($from, $name, array $config)
     {
         $to = \Arr::get($config, 'model_to', \Inflector::get_namespace($from).'Model_'.\Inflector::classify($name));
@@ -32,18 +35,36 @@ class Orm_Twinnable_HasOne extends \Orm\HasOne
         }
         $to_behaviour = $to::behaviours('Nos\Orm_Behaviour_Twinnable', false);
 
-        $from_behaviour = $from::behaviours('Nos\Orm_Behaviour_Twinnable', false);
-        if (!$from_behaviour) {
-            throw new \FuelException(
-                'The model ‘'.$from.'’ has a twinnable_has_one relation '.
-                'but no Twinnable behaviour. Now this is rather odd.'
-            );
+
+
+        $this->front_context_fallback = \Arr::get($config, 'front_context_fallback', false);
+
+        $this->force_context_fallback = \Arr::get($config, 'force_context_fallback', false);
+        $from_behaviour = $from::behaviours('Nos\Orm_Behaviour_Twinnable', array());
+        if (!$this->force_context_fallback) {
+            if (empty($from_behaviour)) {
+                throw new \FuelException(
+                    'The model ‘'.$from.'’ has a twinnable_has_one relation '.
+                    'but no Twinnable behaviour. Surprising, don’t you think?'
+                );
+            }
+            $config['key_from'] = (array) \Arr::get($config, 'key_from', $from_behaviour['common_id_property']);
+        } else {
+            if (empty($config['key_from'])) {
+                throw new \FuelException(
+                    'You must define a ‘key_from‘ on ‘'.$from.'’ twinnable_has_one relation '.'‘'.$name.'’'
+                );
+            }
+            if ($this->force_context_fallback === true) {
+                //set default context if not given
+                $contexts = Tools_Context::contexts();
+                $this->force_context_fallback = key($contexts);
+            }
         }
-        $config['key_from'] = (array) \Arr::get($config, 'key_from', $from_behaviour['common_id_property']);
 
         parent::__construct($from, $name, $config);
 
-        $this->column_context_from = \Arr::get($config, 'column_context_from', $from_behaviour['context_property']);
+        $this->column_context_from = \Arr::get($config, 'column_context_from', \Arr::get($from_behaviour, 'context_property', false));
 
         $this->column_context_to = \Arr::get(
             $config,
@@ -79,8 +100,20 @@ class Orm_Twinnable_HasOne extends \Orm\HasOne
             $query->where(current($this->key_to), $from->{$key});
             next($this->key_to);
         }
+
+        if ($this->front_context_fallback && (NOS_ENTRY_POINT == Nos::ENTRY_POINT_FRONT)) {
+            //front context is used
+            $context_to = Nos::main_controller()->getContext();
+        } elseif (empty($this->force_context_fallback)) {
+            //model context is used
+            $context_to = $from->{$this->column_context_from};
+        } else {
+            //default context is used
+            $context_to = $this->force_context_fallback;
+        }
+
         $query->and_where_open();
-        $query->where($this->column_context_to, $from->{$this->column_context_from});
+        $query->where($this->column_context_to, $context_to);
         $query->or_where($this->column_context_is_main_to, 1);
         $query->and_where_close();
 
@@ -88,7 +121,7 @@ class Orm_Twinnable_HasOne extends \Orm\HasOne
             is_array($condition) or $condition = array($key, '=', $condition);
             $query->where($condition);
         }
-        $query->order_by(DB::expr($this->column_context_to.' = '.DB::quote($from->{$this->column_context_from})), 'DESC');
+        $query->order_by(DB::expr($this->column_context_to.' = '.\DB::quote($context_to)), 'DESC');
         $query->order_by($this->column_context_is_main_to, 'DESC');
 
         return $query->get_one();
@@ -139,8 +172,20 @@ class Orm_Twinnable_HasOne extends \Orm\HasOne
             $models[$rel_name.'_fallback']['join_on'][] = array($alias_from.'.'.$key, '=', $alias_to.'_fallback'.'.'.current($this->key_to));
             next($this->key_to);
         }
+
+        if ($this->front_context_fallback && (NOS_ENTRY_POINT == Nos::ENTRY_POINT_FRONT)) {
+            //front context is used
+            $context_to = \DB::expr(\DB::quote(Nos::main_controller()->getContext()));
+        } elseif (empty($this->force_context_fallback)) {
+            //model context is used
+            $context_to = $alias_from.'.'.$this->column_context_from;
+        } else {
+            //default context is used
+            $context_to = \DB::expr(\DB::quote($this->force_context));
+        }
+
         $models[$rel_name]['join_on'][] = array($alias_to.'.'.$this->column_context_is_main_to, '=', DB::expr(1));
-        $models[$rel_name.'_fallback']['join_on'][] = array($alias_from.'.'.$this->column_context_from, '=', $alias_to.'_fallback'.'.'.$this->column_context_to);
+        $models[$rel_name.'_fallback']['join_on'][] = array($alias_to.'_fallback'.'.'.$this->column_context_to, '=', $context_to);
 
         foreach (array(\Arr::get($this->conditions, 'where', array()), \Arr::get($conditions, 'join_on', array())) as $c) {
             foreach ($c as $key => $condition) {
