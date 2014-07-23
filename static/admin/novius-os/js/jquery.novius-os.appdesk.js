@@ -110,10 +110,10 @@ define('jquery-nos-appdesk',
 
                 self.element.nosToolbar('create');
 
-                self._createSplitter();
+                self._createLayout();
             },
 
-            _createSplitter: function() {
+            _createLayout: function() {
                 var self = this,
                     o = self.options;
 
@@ -466,7 +466,7 @@ define('jquery-nos-appdesk',
                     self.dispatcher.off('contextChange');
 
                     self.uiSplitterVertical.remove();
-                    self._createSplitter()
+                    self._createLayout()
                         ._uiInspectorsPopulate()
                         ._uiSplitters()
                         ._uiInspectorsInit()

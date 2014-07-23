@@ -58,7 +58,6 @@ define('jquery-nos-ostabs',
                 });
             },
 
-            // TODO : revoir ?
             _setOption: function( key, value ) {
                 var self = this;
 
@@ -125,6 +124,7 @@ define('jquery-nos-ostabs',
                     fragmentId = /^#.+/; // Safari 2 reports '#' for an empty hash
 
                 // initialization from scratch
+                // create and initialize layout
                 if ( init ) {
                     self.element.addClass('nos-ostabs ui-widget ui-widget-content' + (touchDevice ? ' nos-ostabs-touch' : ''));
 
@@ -224,6 +224,7 @@ define('jquery-nos-ostabs',
                     self.uiOstabsTabs.width( self.tabsWidth );
                 }
 
+                // Save for internal usage alls <li> and <a> of tabs
                 var tabOpenRank = [];
                 self.lis = self.uiOstabsDesktopTab.add(self.uiOstabsTabs).find("li")
                     .each(function(i) {
@@ -247,6 +248,7 @@ define('jquery-nos-ostabs',
                 });
                 self.panels = $( [] );
 
+                // For all <a> of tabs, search or create the panel
                 self.anchors.each(function( i, a ) {
                     var $a = $(a),
                         href = $a.attr( "href"),
@@ -303,6 +305,7 @@ define('jquery-nos-ostabs',
                 });
 
                 // initialization from scratch
+                // Additionnal initialization now that we have all <li> and panels
                 if ( init ) {
                     // attach necessary classes for styling
                     self.uiOstabsTray.add( self.uiOstabsDesktopTab )
