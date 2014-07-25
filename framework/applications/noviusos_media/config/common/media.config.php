@@ -72,7 +72,7 @@ return array(
          ),
         'path' => array(
             'value' => function ($item) {
-                return $item->url();
+                return $item->url().($item->isImage() ? '?t='.urlencode($item->media_updated_at) : '');
             },
         ),
         'path_folder' => array(
@@ -87,7 +87,7 @@ return array(
         ),
         'thumbnail' => array(
             'value' => function ($item) {
-                return $item->isImage() ? $item->urlResized(64, 64) : '';
+                return $item->isImage() ? $item->urlResized(64, 64).'?t='.urlencode($item->media_updated_at) : '';
             },
         ),
         'height' => array(
