@@ -16,7 +16,9 @@ define('jquery-nos-listgrid',
                 pageSizeAuto: false,
                 culture: $.nosLang.substr(0, 2),
                 loadingText : 'Loading...',
-                columnsOptions: {},
+                columnsOptions: {
+                    hideContexts :true
+                },
                 pagerSettings: {
                     mode: 'numericFirstLast',
                     position: 'bottom'
