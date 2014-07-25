@@ -78,6 +78,7 @@ echo !empty($fieldset) ? $fieldset->close() : '</form>';
                     })
                     .end()
                     .find('form')
+                    <?= empty($fieldset) ? '.nosFormAjax()' : '' // when fieldset isn't empty, $fieldset->close() already add nosFormAjax() ?>
                     .on('ajax_success', function(e, json) {
                         div.closest('.ui-dialog-content').trigger('save.enhancer', json);
                     })
