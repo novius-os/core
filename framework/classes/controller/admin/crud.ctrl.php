@@ -263,6 +263,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
                     'type' => 'hidden',
                     'value' => \Input::get('create_from_id', \Input::post('create_from_id', 0)),
                 ),
+                'dont_save' => true,
             );
         }
         $model = $this->config['model'];
