@@ -351,7 +351,7 @@ class Model_Page extends \Nos\Orm\Model
             $url .= $this->virtual_path();
         }
         if (!empty($params['preview'])) {
-            $url .= '?_preview='.rand(1, getrandmax());
+            $url .= '?_preview=1';
         }
 
         return $url;

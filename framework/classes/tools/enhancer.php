@@ -120,12 +120,12 @@ class Tools_Enhancer
                         }
                         $urls[$page_id.($key_has_url_enhanced ? '::'.$urlEnhanced : '')] =
                             Tools_Url::context($url_params['context']).
-                            $url_params['url'].$urlEnhanced.($preview ? '?_preview='.rand(1, getrandmax()) : '');
+                            $url_params['url'].$urlEnhanced.($preview ? '?_preview=1' : '');
                     }
                 }
             }
         } else {
-            $urls[] = $urlPath.$urlEnhanced.($preview ? '?_preview='.rand(1, getrandmax()) : '');
+            $urls[] = $urlPath.$urlEnhanced.($preview ? '?_preview=1' : '');
         }
 
         return $urls;
