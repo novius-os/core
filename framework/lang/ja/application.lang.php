@@ -1,35 +1,11 @@
 <?php
 
-// Generated on 11/12/2013 17:57:29
+// Generated on 30/07/2014 09:57:01
 
-// 18 out of 18 messages are translated (100%).
-// 99 out of 99 words are translated (100%).
+// 19 out of 19 messages are translated (100%).
+// 100 out of 100 words are translated (100%).
 
 return array(
-    #: classes/controller/admin/crud.ctrl.php:350
-    'This item already exists in {{context}}. Therefore your item cannot be added.' => 'このアイテムは既に{{context}}にあります。したがって追加することはできません。',
-
-    #: classes/controller/admin/appdesk.ctrl.php:167
-    'Default view' => 'デフォルトビュー',
-
-    #: views/crud/context_common_fields.view.php:17
-    'This field is common to all languages' => 'このフィールドは全ての言語に共通です。',
-
-    #: views/crud/context_common_fields.view.php:17
-    'This field is common to all contexts' => 'このフィールドは全てのコンテキストに共通です。',
-
-    #: views/crud/context_common_fields.view.php:19
-    'When you modify the value of this field, the change applies to the following languages:' => 'このフィールドの値を変更すると、以下の言語に適用されます。',
-
-    #: views/crud/context_common_fields.view.php:20
-    'When you modify the value of this field, the change applies to the following contexts:' => 'このフィールドの値を変更すると、以下のコンテキストに適用されます。',
-
-    #: views/crud/context_common_fields.view.php:21
-    'Go ahead, I understand' => 'はい、了解しました',
-
-    #: views/crud/context_common_fields.view.php:22
-    'Cancel, I won’t modify it' => 'いいえ、変更しません',
-
     #. Note to translator: this is an action (button)
     #: views/crud/blank_slate.view.php:61
     'Translate from {{context}}' => '{{context}}から翻訳する',
@@ -62,5 +38,32 @@ return array(
     #. Note to translator: This is a submit button
     #: views/crud/toolbar.view.php:21
     'Save' => '保存',
+
+    #: views/crud/context_common_fields.view.php:17
+    'This field is common to all languages' => 'このフィールドは全ての言語に共通です。',
+
+    #: views/crud/context_common_fields.view.php:17
+    'This field is common to all contexts' => 'このフィールドは全てのコンテキストに共通です。',
+
+    #: views/crud/context_common_fields.view.php:19
+    'When you modify the value of this field, the change applies to the following languages:' => 'このフィールドの値を変更すると、以下の言語に適用されます。',
+
+    #: views/crud/context_common_fields.view.php:20
+    'When you modify the value of this field, the change applies to the following contexts:' => 'このフィールドの値を変更すると、以下のコンテキストに適用されます。',
+
+    #: views/crud/context_common_fields.view.php:21
+    'Go ahead, I understand' => 'はい、了解しました',
+
+    #: views/crud/context_common_fields.view.php:22
+    'Cancel, I won’t modify it' => 'いいえ、変更しません',
+
+    #: classes/controller/admin/appdesk.ctrl.php:63
+    'Pick' => '選択',
+
+    #: classes/controller/admin/appdesk.ctrl.php:207
+    'Default view' => 'デフォルトビュー',
+
+    #: classes/controller/admin/crud.ctrl.php:350
+    'This item already exists in {{context}}. Therefore your item cannot be added.' => 'このアイテムは既に{{context}}にあります。したがって追加することはできません。',
 
 );
