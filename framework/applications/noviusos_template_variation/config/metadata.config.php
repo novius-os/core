@@ -11,7 +11,7 @@
 return array(
     'name'      => 'Template variation manager',
     'namespace' => 'Nos\Template\Variation',
-    'version'   => '5.0 (Elche)',
+    'version'   => '5.0.1 (Elche)',
     'provider'  => array(
         'name'  => 'Novius OS',
     ),

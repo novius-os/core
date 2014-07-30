@@ -11,7 +11,7 @@
 return array(
     'name'      => 'Applications manager',
     'namespace' => 'Nos\Appmanager',
-    'version'   => '5.0 (Elche)',
+    'version'   => '5.0.1 (Elche)',
     'provider'  => array(
         'name'  => 'Novius OS',
     ),
