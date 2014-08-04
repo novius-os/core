@@ -6,9 +6,15 @@ class Config_Common
     public static function load($model, $filter_data_mapping = array())
     {
         list($application_name, $file) = \Config::configFile($model);
-        $file = 'common'.substr($file, strrpos($file, DS));
+        $file = 'common'.substr($file, strpos($file, DS));
 
         $config = \Config::load($application_name.'::'.$file, true);
+
+        //Fallback on old common config configuration
+        if (empty($config)) {
+            $file = 'common'.substr($file, strrpos($file, DS));
+            $config = \Config::load($application_name.'::'.$file, true);
+        }
 
         $config = static::process_placeholders($model, $config);
         $config = static::process_callable_keys($config);
