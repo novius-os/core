@@ -12,8 +12,12 @@ class Config_Common
 
         //Fallback on old common config configuration
         if (empty($config)) {
+            $good_file = $file; //used for deprecated message only
             $file = 'common'.substr($file, strrpos($file, DS));
             $config = \Config::load($application_name.'::'.$file, true);
+            if (!empty($config) && (\Fuel::$env == \Fuel::DEVELOPMENT)) {
+                \Log::deprecated('For model '.$model.'. Put the common configuration directly into the common folder is deprecated. Please put it into '.$good_file.'.config.php');
+            }
         }
 
         $config = static::process_placeholders($model, $config);
