@@ -20,6 +20,9 @@ class CacheExpiredException extends \Exception
 
 class FrontCache
 {
+    protected static $opcache_invalidate = null;
+    protected static $apc_compile_file = null;
+
     protected static $_php_begin = null;
 
     public static $cache_duration = 60;
@@ -30,6 +33,13 @@ class FrontCache
     public static function _init()
     {
         \Config::load('cache', true);
+
+        if (static::$opcache_invalidate === null) {
+            static::$opcache_invalidate = PHP_VERSION_ID >= 50500 && function_exists('opcache_invalidate');
+        }
+        if (static::$apc_compile_file === null) {
+            static::$apc_compile_file = function_exists('apc_compile_file');
+        }
     }
 
     protected static function _phpBegin()
@@ -213,6 +223,7 @@ class FrontCache
             } catch (CacheExpiredException $e) {
                 ob_end_clean();
                 @unlink($this->_path);
+                static::$opcache_invalidate && opcache_invalidate($this->_path, true);
             }
         }
         throw new CacheNotFoundException();
@@ -349,6 +360,9 @@ class FrontCache
         if ($temporary) {
             register_shutdown_function('unlink', $path);
         }
+
+        static::$opcache_invalidate && opcache_invalidate($path, true);
+        static::$apc_compile_file && apc_compile_file($path);
 
         return true;
     }
