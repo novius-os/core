@@ -28,7 +28,7 @@ $main_col_size = 11;
 if ($item->isImage()) {
     $main_col_size -= 3;
     echo '<div class="col c3 preview_zone">';
-    $src = $item->urlResized(512, 512);
+    $src = $item->urlResized(512, 512).'?t='.urlencode($item->media_updated_at);
     echo '<img src="'.$src.'" />';
     echo '</div>';
 }
