@@ -268,6 +268,12 @@ class Controller_Front extends Controller
             }
         }
 
+        if ($this->_is_preview) {
+            $this->setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+            $this->setHeader('Pragma', 'no-cache');
+            $this->setHeader('Expires', '0');
+        }
+
         \Event::trigger_function('front.response', array(array('content' => &$this->_content, 'status' => &$this->_status, 'headers' => &$this->_headers)));
 
         return \Response::forge($this->_content, $this->_status, $this->_headers);
