@@ -6,9 +6,19 @@ class Config_Common
     public static function load($model, $filter_data_mapping = array())
     {
         list($application_name, $file) = \Config::configFile($model);
-        $file = 'common'.substr($file, strrpos($file, DS));
+        $file = 'common'.substr($file, strpos($file, DS));
 
         $config = \Config::load($application_name.'::'.$file, true);
+
+        //Fallback on old common config configuration
+        if (empty($config)) {
+            $good_file = $file; //used for deprecated message only
+            $file = 'common'.substr($file, strrpos($file, DS));
+            $config = \Config::load($application_name.'::'.$file, true);
+            if (!empty($config) && (\Fuel::$env == \Fuel::DEVELOPMENT)) {
+                \Log::deprecated('For model '.$model.'. Put the common configuration directly into the common folder is deprecated. Please put it into '.$good_file.'.config.php', 'Elche');
+            }
+        }
 
         $config = static::process_placeholders($model, $config);
         $config = static::process_callable_keys($config);
