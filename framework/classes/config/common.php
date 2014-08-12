@@ -16,7 +16,7 @@ class Config_Common
             $file = 'common'.substr($file, strrpos($file, DS));
             $config = \Config::load($application_name.'::'.$file, true);
             if (!empty($config) && (\Fuel::$env == \Fuel::DEVELOPMENT)) {
-                \Log::deprecated('For model '.$model.'. Put the common configuration directly into the common folder is deprecated. Please put it into '.$good_file.'.config.php');
+                \Log::deprecated('For model '.$model.'. Put the common configuration directly into the common folder is deprecated. Please put it into '.$good_file.'.config.php', 'Elche');
             }
         }
 
