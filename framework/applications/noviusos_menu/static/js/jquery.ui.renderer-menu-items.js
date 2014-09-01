@@ -69,7 +69,7 @@ define('jquery-nos-renderer-menu-items',
                     o = self.options,
                     item = $li.data('item') || {},
                     $liDiv = $('<div></div>'),
-                    $liChildren = $li.find('ol').detach(),
+                    $liChildren = $li.find('> ol').detach(),
                     $liForm = $('<div></div>').append($li.contents()),
                     $liLabel;
 
