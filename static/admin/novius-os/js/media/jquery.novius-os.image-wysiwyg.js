@@ -40,7 +40,7 @@ define('jquery-nos-image-wysiwyg',
                             .click(function(e) {
                                 var img = $('<img />');
 
-                                if (!media || !media.id) {
+                                if (!media || !media._id) {
                                         $.nosNotify(params.texts.imageFirst, 'error');
 
                                     return;
