@@ -41,21 +41,30 @@ define('jquery-nos-nosdesktop',
                     this.positions[left][top] = false;
                 }
             },
-            unPositioned: [],
 
             _create: function() {
                 var self = this,
-                    o = self.options,
-                    timeout;
+                    o = self.options;
 
-                self.element.nosListenEvent({name : 'Nos\\Application'} ,function(json) {
-                    $.ajax({
+                this.unPositioned = [];
+
+                self.element.nosListenEvent({name : 'Nos\\Application'} ,function() {
+                    if (self.jqxhrReload) {
+                        self.jqxhrReload.abort();
+                    }
+                    self.jqxhrReload = $.ajax({
                         url: o.reloadUrl,
                         success: function(data) {
+                            $(window).off('resize', self._windowResize);
+
+                            self.element.nosUnlistenEvent('nosdesktop')
+                                .closest('.nos-dispatcher').off('showPanel');
+
+                            // This will destroy current widget and recreate from scratch with new data
                             self.element.parent().empty().append(data);
                         }
                     });
-                })
+                }, 'nosdesktop');
 
                 self.maxWidth = self.element.width();
 
@@ -81,7 +90,7 @@ define('jquery-nos-nosdesktop',
                 self.$launchers = self.element.find('.app');
 
                 self._calculateLauncherHeight()
-                    ._positionLaunchers()
+                    ._positionLaunchers(true)
                     ._positionUnpositioned();
 
                 if (!touchDevice) {
@@ -92,19 +101,23 @@ define('jquery-nos-nosdesktop',
                     self._launcherClick($(this), e);
                 });
 
-                self.element.closest('.nos-dispatcher').on({
-                    resizePanel : function() {
-                        if (timeout) {
-                            window.clearTimeout(timeout);
+                self._windowResize = $.proxy(function() {
+                    var self = this;
+
+                    if (self.element.closest('.nos-dispatcher').is(':visible')) {
+                        if (self.timeoutResize) {
+                            window.clearTimeout(self.timeoutResize);
                         }
-                        timeout = window.setTimeout(function() {
+                        self.timeoutResize = window.setTimeout(function() {
                             self.resize();
                         }, 200);
-                    },
-                    showPanel :  function() {
-                        self.resize();
+                    } else {
+                        self.element.closest('.nos-dispatcher').one('showPanel', function() {
+                            self.resize();
+                        });
                     }
-                });
+                }, self);
+                $(window).on('resize', self._windowResize);
             },
 
             _calculateLauncherHeight: function() {
@@ -120,7 +133,7 @@ define('jquery-nos-nosdesktop',
                 return self;
             },
 
-            _positionLaunchers: function() {
+            _positionLaunchers: function(init) {
                 var self = this;
 
                 self.$launchers.each(function() {
@@ -129,6 +142,9 @@ define('jquery-nos-nosdesktop',
 
                     if (launcher.position && ((launcher.position.left + 1) * self.launcherWidth) < self.maxWidth) {
                         self._positionLauncher($launcher, launcher.position.left, launcher.position.top);
+                        if (init) {
+                            launcher.savedPosition = $.extend({}, launcher.position);
+                        }
                     } else {
                         if (launcher.position) {
                             self.grid.unSet(launcher.position);
@@ -167,8 +183,6 @@ define('jquery-nos-nosdesktop',
                         }
                     }
                 });
-
-                self.save();
 
                 self.unPositioned = [];
 
@@ -257,6 +271,14 @@ define('jquery-nos-nosdesktop',
                 var self = this;
 
                 self.maxWidth = self.element.width();
+                self.$launchers.each(function() {
+                    var $launcher = $(this),
+                        launcher = $launcher.data('launcher');
+                    if (launcher.savedPosition) {
+                        self.grid.unSet(launcher.position);
+                        launcher.position = $.extend({}, launcher.savedPosition);
+                    }
+                });
                 self._positionLaunchers()
                     ._positionUnpositioned();
 
@@ -270,6 +292,8 @@ define('jquery-nos-nosdesktop',
                 self.$launchers.each(function() {
                     var $launcher = $(this),
                         launcher = $launcher.data('launcher');
+
+                    launcher.savedPosition = $.extend({}, launcher.position);
                     data[launcher.key] = {position: launcher.position};
                 });
                 self.$launchers.nosSaveUserConfig('misc.apps', data);
