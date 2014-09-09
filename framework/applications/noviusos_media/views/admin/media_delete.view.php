@@ -12,6 +12,8 @@
 Nos\I18n::current_dictionary(array('noviusos_media::common', 'nos::common'));
 
 $usage_count = count($item->link);
+$usage_count += \Nos\Model_Wysiwyg::query()->where('wysiwyg_text', 'LIKE', '%nos://media/'.$item->media_id.'"%')->count();
+$usage_count += \Nos\Model_Wysiwyg::query()->where('wysiwyg_text', 'LIKE', '%nos://media/'.$item->media_id.'/%')->count();
 ?>
 <input type="hidden" name="id" value="<?= $item->{$crud['pk']} ?>" />
 <div id="<?= $uniqid = uniqid('id_') ?>" class="fieldset standalone">
