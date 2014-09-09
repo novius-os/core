@@ -202,7 +202,7 @@ class Tools_Enhancer
                 array($args)
             );
             if (empty($function_content) && \Fuel::$env == \Fuel::DEVELOPMENT) {
-                $function_content = 'Enhancer '.$enhancer.' ('.$config['enhancer'].') returned empty content.';
+                $function_content = 'Enhancer '.$enhancer.' ('.(!empty($config['urlEnhancer']) ? $config['urlEnhancer'] : $config['enhancer']).') returned empty content.';
             }
         } else {
             $function_content = \Fuel::$env == \Fuel::DEVELOPMENT ? 'Enhancer '.$enhancer.' not found.' : '';
