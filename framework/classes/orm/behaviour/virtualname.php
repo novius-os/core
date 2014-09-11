@@ -47,7 +47,7 @@ class Orm_Behaviour_Virtualname extends Orm_Behaviour
 
             // If the virtual name is empty, generate a default one from the title
             if (empty($item->{$this->_properties['virtual_name_property']})) {
-                $item->virtual_name($item->{$item->title_property()});
+                $item->virtual_name($item->title_item());
             }
 
             // If it's still empty, we have an error
