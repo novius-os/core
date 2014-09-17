@@ -1022,7 +1022,7 @@ define('jquery-nos',
                                 $input.inputFileThumb({
                                     file: item.image ? item.thumbnail : item.path
                                 });
-                                $input.val(item.id).trigger('change', {
+                                $input.val(item._id).trigger('change', {
                                     item : item
                                 });
                                 $dialog.nosDialog('close');

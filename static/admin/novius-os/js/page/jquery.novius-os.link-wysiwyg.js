@@ -95,14 +95,14 @@ define('jquery-nos-link-wysiwyg',
                         select_media = function(media) {
                                 $title.text(media.title);
                                 $real_url.text(media.path);
-                                $input_url.val('nos://media/' + media.id);
+                                $input_url.val('nos://media/' + media._id);
                                 $container.wijtabs('enableTab', 2)
                                     .wijtabs('select', 2);
                             },
                         select_page = function(page) {
                                 $title.text(page.page_title);
                                 $real_url.text(page.url);
-                                $input_url.val('nos://page/' + page.id);
+                                $input_url.val('nos://page/' + page._id);
                                 $container.wijtabs('enableTab', 2)
                                     .wijtabs('select', 2);
                             },
