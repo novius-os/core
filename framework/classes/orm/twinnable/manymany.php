@@ -457,14 +457,4 @@ class Orm_Twinnable_ManyMany extends \Orm\ManyMany
             parent::delete_related($model_from);
         }
     }
-
-    public function delete($model_from, $models_to, $parent_deleted, $cascade)
-    {
-        // If not cascade, others twins use the relation
-        // see \Nos\Orm\Model->should_cascade_delete()
-        // prevent parent delete() to set the foreign key to null
-        if ((bool) $cascade) {
-            return parent::delete($model_from, $models_to, $parent_deleted, $cascade);
-        }
-    }
 }
