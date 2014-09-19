@@ -11,7 +11,7 @@
 Nos\I18n::current_dictionary(array('noviusos_menu::common', 'nos::common'));
 
 return array(
-    'name' => 'Text',
+    'name' => __('Text'),
     'texts' => array(
         'add' => __('Add a text block'),
         'new' => __('New text block'),
