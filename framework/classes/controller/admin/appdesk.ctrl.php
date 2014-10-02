@@ -60,6 +60,12 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
         $locales = \Nos\User\Permission::locales();
         $sites = \Nos\User\Permission::sites();
 
+        $selectedContexts = \Arr::get($this->config, 'selectedContexts', array());
+        if (!empty($selectedContexts)) {
+            $authorizedSelectedContexts = array_intersect($selectedContexts, array_keys($contexts));
+            \Arr::set($this->config, 'selectedContexts', $authorizedSelectedContexts);
+        }
+
         foreach ($contexts as $context => $params) {
             $site = Tools_Context::siteCode($context);
             $locale = Tools_Context::localeCode($context);
