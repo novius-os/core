@@ -352,7 +352,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
         $selected = \Input::get('selected');
         $depth = intval(\Input::get('depth', 1));
         $context = \Input::get('context', null);
-        if ($context === null) {
+        if (empty($context)) {
             $context = array_keys(\Nos\User\Permission::contexts());
         }
 
