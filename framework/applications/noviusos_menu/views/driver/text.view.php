@@ -7,12 +7,13 @@
  *             http://www.gnu.org/licenses/agpl-3.0.html
  * @link http://www.novius-os.org
  */
-
-$content = $item_driver->item->mitem_text;
+if (isset($item_driver->item) && isset($item_driver->item->mitem_text)) {
+    $content = $item_driver->item->mitem_text;
+}
 if (empty($content)) {
     $content = $item_driver->title();
 }
-if (!$item_driver->item->mitem_is_html) {
+if (isset($item_driver->item) && isset($item_driver->item->mitem_is_html) && !$item_driver->item->mitem_is_html) {
     $content = e($content);
 }
 echo html_tag('div', $params, $content);

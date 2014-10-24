@@ -8,7 +8,7 @@
  * @link http://www.novius-os.org
  */
 
-if ($item_driver->item->mitem_media_id) {
+if (isset($item_driver->item) && isset($item_driver->item->mitem_media_id) && !empty($item_driver->item->mitem_media_id)) {
     $media = \Nos\Media\Model_Media::find($item_driver->item->mitem_media_id);
     if (!empty($media)) {
         $params['text'] = e($item_driver->title());

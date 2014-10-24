@@ -8,7 +8,9 @@
  * @link http://www.novius-os.org
  */
 
-if ($item_driver->item->mitem_url_blank) {
+if (isset($item_driver->item) && isset($item_driver->item->mitem_url_blank) && $item_driver->item->mitem_url_blank) {
     $params['target'] = '_blank';
 }
-echo \Html::anchor($item_driver->item->mitem_url, e($item_driver->title()), $params);
+if (isset($item_driver->item) && isset($item_driver->item->mitem_url)) {
+    echo \Html::anchor($item_driver->item->mitem_url, e($item_driver->title()), $params);
+}
