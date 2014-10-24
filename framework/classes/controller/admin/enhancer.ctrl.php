@@ -134,6 +134,12 @@ class Controller_Admin_Enhancer extends \Nos\Controller_Admin_Application
                 'enhancer_args' => $args,
             ), false)->render(),
         );
-        \Response::json($body);
+        
+        //As action_save() is called by action_preview() and a preview can be built through hmvc,
+        //then only send content when it's not
+        if (!\Request::is_hmvc()) {
+            \Response::json($body);
+        }
+        return $body['preview'];
     }
 }
