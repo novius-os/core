@@ -96,6 +96,7 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
     }
 
     /**
+     * @param array $fields the fields configuration for the crud of the item.
      * @return bool Return true if model has common fields (fields, linked medias or wysiwyg)
      */
     public function hasCommonFields(array $fields = array())
@@ -104,6 +105,7 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
             return true;
         }
 
+        //We need to check if at least one field of the crud configuration is a shared medias or a shared wysiwyg because they are not declared into the class
         foreach ($fields as $name => $field_properties) {
             if ($this->isCommonField($name)) {
                 return true;
