@@ -718,11 +718,24 @@ class Model extends \Orm\Model
      */
     public function title_item()
     {
-        $title_property = static::title_property();
-        if (is_callable($title_property)) {
-            return $title_property($this);
-        } elseif (is_string($title_property)) {
-            return $this->{$title_property};
+        $config = static::configModel();
+        if (!empty($config) && !empty($config['title_item'])) {
+            $title = $config['title_item'];
+            if (is_callable($title)) {
+                return $title($this);
+            } elseif (is_string($title)) {
+                return $title;
+            }
+        } else {
+            $title_property = static::title_property();
+            if (is_callable($title_property)) {
+                //TODO Remove ?
+                // $title_property should not be callable as the method explicitely says it retrieves a property name
+                // and can be used a generic way to get it
+                return $title_property($this);
+            } elseif (is_string($title_property)) {
+                return $this->{$title_property};
+            }
         }
 
         return null;
