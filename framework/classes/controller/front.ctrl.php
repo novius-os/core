@@ -820,7 +820,7 @@ class Controller_Front extends Controller
         if (empty($this->_template['file'])) {
             throw new \Exception(
                 'The template file for '.
-                ($this->_template['title'] ?: $this->_page->template_variation->tpvar_template ).' is not defined.'
+                (\Arr::get($this->_template, 'title') ?: $this->_page->template_variation->tpvar_template ).' is not defined.'
             );
         }
 
