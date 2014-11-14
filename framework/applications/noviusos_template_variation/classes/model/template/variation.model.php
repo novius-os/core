@@ -149,7 +149,7 @@ class Model_Template_Variation extends \Nos\Orm\Model
             $template_metadata = \Arr::get($templates, $this->tpvar_template, array());
             $config = array_merge(
                 $template_metadata,
-                \Config::load($template_metadata['application'].'::variation/'.$this->tpvar_template, true)
+                \Config::load(\Arr::get($template_metadata, 'application').'::variation/'.$this->tpvar_template, true)
             );
 
             $callables = array(
