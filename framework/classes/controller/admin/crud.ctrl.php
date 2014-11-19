@@ -333,7 +333,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
             $return['dataset'] = \Nos\Controller::dataset_item($this->item);
         }
         
-		list($app, $file_name) = \Config::configFile(get_called_class());
+        list($app, $file_name) = \Config::configFile(get_called_class());
         \Event::trigger_function('crudJson|'.$app.'::'.$file_name, array(&$return));
         
         return $return;
