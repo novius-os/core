@@ -201,12 +201,12 @@ class Orm_Twinnable_BelongsTo extends \Orm\BelongsTo
         foreach (array(\Arr::get($this->conditions, 'where', array()), \Arr::get($conditions, 'join_on', array())) as $c) {
             foreach ($c as $key => $condition) {
                 !is_array($condition) and $condition = array($key, '=', $condition);
+                is_string($condition[2]) and $condition[2] = \Db::quote($condition[2], $models[$rel_name_main]['connection']);
                 $condition_context = $condition;
                 if (!$condition[0] instanceof \Fuel\Core\Database_Expression and strpos($condition[0], '.') === false) {
                     $condition[0] = $alias_to_main.'.'.$condition[0];
                     $condition_context[0] = $alias_to_context.'.'.$condition_context[0];
                 }
-                is_string($condition[2]) and $condition[2] = \Db::quote($condition[2], $models[$rel_name]['connection']);
 
                 $models[$rel_name_main]['join_on'][] = $condition;
                 $models[$rel_name_context]['join_on'][] = $condition_context;
