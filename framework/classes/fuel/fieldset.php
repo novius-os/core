@@ -496,7 +496,7 @@ class Fieldset extends \Fuel\Core\Fieldset
         }
     }
 
-    public function populate_with_instance($instance = null, $generate_id = true)
+    public function populate_with_instance($instance = null, $generate_id = false)
     {
         $this->instance = $instance;
 
