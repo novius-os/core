@@ -124,31 +124,42 @@ class Orm_Twinnable_HasMany extends \Orm\HasMany
 
         $alias_to = 't'.$alias_to_nr;
 
-        $props_pks = $this->_selectFallback($alias_to, $alias_to.'_fallback');
+        $main_context = \Arr::get($conditions, 'main_context', true);
+        if ($main_context) {
+            $rel_name_main = $rel_name;
+            $alias_to_main = $alias_to;
+            $rel_name_context = $rel_name.'_context';
+            $alias_to_context = $alias_to.'_context';
+        } else {
+            $rel_name_main = $rel_name.'_main';
+            $alias_to_main = $alias_to.'_main';
+            $rel_name_context = $rel_name;
+            $alias_to_context = $alias_to;
+        }
 
         $models = array(
-            $rel_name => array(
+            $rel_name_main => array(
                 'model' => $this->model_to,
                 'connection' => call_user_func(array($this->model_to, 'connection')),
-                'table' => array(call_user_func(array($this->model_to, 'table')), $alias_to),
-                'primary_key' => $props_pks['primary_key'],
-                'join_type' => \Arr::get($conditions, 'join_type') ? : \Arr::get($this->conditions, 'join_type', 'left'),
-                'join_on' => array(),
-                'columns' => $props_pks['columns'],
-                'rel_name' => strpos($rel_name, '.') ? substr($rel_name, strrpos($rel_name, '.') + 1) : $rel_name,
-                'relation' => $this,
-                'where' => \Arr::get($conditions, 'where', array()),
-                'order_by' => \Arr::get($conditions, 'order_by') ? : \Arr::get($this->conditions, 'order_by', array()),
-            ),
-            $rel_name.'_fallback' => array(
-                'model' => null,
-                'connection' => call_user_func(array($this->model_to, 'connection')),
-                'table' => array(call_user_func(array($this->model_to, 'table')), $alias_to.'_fallback'),
+                'table' => array(call_user_func(array($this->model_to, 'table')), $alias_to_main),
                 'primary_key' => null,
                 'join_type' => \Arr::get($conditions, 'join_type') ? : \Arr::get($this->conditions, 'join_type', 'left'),
                 'join_on' => array(),
                 'columns' => array(),
-                'rel_name' => (strpos($rel_name, '.') ? substr($rel_name, strrpos($rel_name, '.') + 1) : $rel_name).'_fallback',
+                'rel_name' => strpos($rel_name_main, '.') ? substr($rel_name_main, strrpos($rel_name_main, '.') + 1) : $rel_name_main,
+                'relation' => $this,
+                'where' => \Arr::get($conditions, 'where', array()),
+                'order_by' => \Arr::get($conditions, 'order_by') ? : \Arr::get($this->conditions, 'order_by', array()),
+            ),
+            $rel_name_context => array(
+                'model' => null,
+                'connection' => call_user_func(array($this->model_to, 'connection')),
+                'table' => array(call_user_func(array($this->model_to, 'table')), $alias_to_context),
+                'primary_key' => null,
+                'join_type' => \Arr::get($conditions, 'join_type') ? : \Arr::get($this->conditions, 'join_type', 'left'),
+                'join_on' => array(),
+                'columns' => array(),
+                'rel_name' => (strpos($rel_name_context, '.') ? substr($rel_name_context, strrpos($rel_name_context, '.') + 1) : $rel_name_context),
                 'relation' => $this,
                 'where' => \Arr::get($conditions, 'where', array()),
                 'order_by' => \Arr::get($conditions, 'order_by') ? : \Arr::get($this->conditions, 'order_by', array()),
@@ -157,8 +168,8 @@ class Orm_Twinnable_HasMany extends \Orm\HasMany
 
         reset($this->key_to);
         foreach ($this->key_from as $key) {
-            $models[$rel_name]['join_on'][] = array($alias_from.'.'.$key, '=', $alias_to.'.'.current($this->key_to));
-            $models[$rel_name.'_fallback']['join_on'][] = array($alias_from.'.'.$key, '=', $alias_to.'_fallback'.'.'.current($this->key_to));
+            $models[$rel_name_main]['join_on'][] = array($alias_from.'.'.$key, '=', $alias_to_main.'.'.current($this->key_to));
+            $models[$rel_name_context]['join_on'][] = array($alias_from.'.'.$key, '=', $alias_to_context.'.'.current($this->key_to));
             next($this->key_to);
         }
 
@@ -173,20 +184,32 @@ class Orm_Twinnable_HasMany extends \Orm\HasMany
             $context_to = \DB::expr(\DB::quote($this->force_context));
         }
 
-        $models[$rel_name]['join_on'][] = array($alias_to.'.'.$this->column_context_is_main_to, '=', DB::expr(1));
-        $models[$rel_name.'_fallback']['join_on'][] = array($alias_to.'_fallback'.'.'.$this->column_context_to, '=', $context_to);
+        $models[$rel_name_main]['join_on'][] = array($alias_to_main.'.'.$this->column_context_is_main_to, '=', DB::expr(1));
+        $models[$rel_name_context]['join_on'][] = array($alias_to_context.'.'.$this->column_context_to, '=', $context_to);
 
         foreach (array(\Arr::get($this->conditions, 'where', array()), \Arr::get($conditions, 'join_on', array())) as $c) {
             foreach ($c as $key => $condition) {
                 !is_array($condition) and $condition = array($key, '=', $condition);
+                is_string($condition[2]) and $condition[2] = \Db::quote($condition[2], $models[$rel_name_main]['connection']);
+                $condition_context = $condition;
                 if (!$condition[0] instanceof \Fuel\Core\Database_Expression and strpos($condition[0], '.') === false) {
                     $condition[0] = $alias_to.'.'.$condition[0];
+                    $condition_context[0] = $alias_to_context.'.'.$condition_context[0];
                 }
-                is_string($condition[2]) and $condition[2] = \Db::quote($condition[2], $models[$rel_name]['connection']);
 
-                $models[$rel_name]['join_on'][] = $condition;
-                $models[$rel_name.'_fallback']['join_on'][] = $condition;
+                $models[$rel_name_main]['join_on'][] = $condition;
+                $models[$rel_name_context]['join_on'][] = $condition_context;
             }
+        }
+
+        if ($main_context) {
+            $props_pks = $this->_selectFallback($alias_to_main, $alias_to_context);
+            $models[$rel_name_main]['primary_key'] = $props_pks['primary_key'];
+            $models[$rel_name_main]['columns'] = $props_pks['columns'];
+        } else {
+            unset($models[$rel_name_main]);
+            $models[$rel_name_context]['primary_key'] = call_user_func(array($this->model_to, 'primary_key'));
+            $models[$rel_name_context]['columns'] = $this->select($alias_to_context);
         }
 
         return $models;
