@@ -17,7 +17,7 @@ class Orm_Twinnable_HasMany extends \Orm\HasMany
     protected $column_context_from = 'context';
 
     protected $column_context_to = false;
-
+    protected $column_context_common_id_to = false;
     protected $column_context_is_main_to = false;
 
     protected $cascade_delete_after_last_twin = true;
@@ -72,6 +72,11 @@ class Orm_Twinnable_HasMany extends \Orm\HasMany
             $config,
             'column_context_is_main_to',
             $to_behaviour ? $to_behaviour['is_main_property'] : false
+        );
+        $this->column_context_common_id_to = (array) \Arr::get(
+            $config,
+            'column_context_common_id_to',
+            $to_behaviour ? $to_behaviour['common_id_property'] : false
         );
 
         $this->cascade_delete_after_last_twin =  \Arr::get(
@@ -170,6 +175,7 @@ class Orm_Twinnable_HasMany extends \Orm\HasMany
         foreach ($this->key_from as $key) {
             $models[$rel_name_main]['join_on'][] = array($alias_from.'.'.$key, '=', $alias_to_main.'.'.current($this->key_to));
             $models[$rel_name_context]['join_on'][] = array($alias_from.'.'.$key, '=', $alias_to_context.'.'.current($this->key_to));
+            $models[$rel_name_context]['join_on'][] = array($alias_to_main.'.'.current($this->column_context_common_id_to), '=', $alias_to_context.'.'.current($this->column_context_common_id_to));
             next($this->key_to);
         }
 
