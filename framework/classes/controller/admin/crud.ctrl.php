@@ -334,7 +334,7 @@ class Controller_Admin_Crud extends Controller_Admin_Application
         }
         
         list($app, $file_name) = \Config::configFile(get_called_class());
-        \Event::trigger_function('crudJson|'.$app.'::'.$file_name, array(&$return));
+        \Event::trigger_function('afterSaveCrud|'.$app.'::'.$file_name, array(&$return));
         
         return $return;
     }
