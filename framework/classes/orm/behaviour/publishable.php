@@ -92,6 +92,7 @@ class Orm_Behaviour_Publishable extends Orm_Behaviour
         if (empty($start)) {
             return strtotime($end) > strtotime('now');
         }
+        return strtotime($start) < strtotime('now') && strtotime($end) > strtotime('now');
     }
 
     public function before_query(&$options)
