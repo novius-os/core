@@ -213,7 +213,6 @@ class Orm_Twinnable_HasMany extends \Orm\HasMany
             $models[$rel_name_main]['primary_key'] = $props_pks['primary_key'];
             $models[$rel_name_main]['columns'] = $props_pks['columns'];
         } else {
-            unset($models[$rel_name_main]);
             $models[$rel_name_context]['primary_key'] = call_user_func(array($this->model_to, 'primary_key'));
             $models[$rel_name_context]['columns'] = $this->select($alias_to_context);
         }
