@@ -150,7 +150,7 @@ class Orm_Behaviour_Publishable extends Orm_Behaviour
     public function crudConfig(&$config, $crud)
     {
         // 1. adding the Renderer in the fields list
-        if (!isset($config['fields']['publishable'])) {
+        if (!isset($config['fields']['_publishable'])) {
             $config['fields']['_publishable'] = array();
         }
         $config['fields']['_publishable'] = \Arr::merge(array(

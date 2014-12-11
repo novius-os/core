@@ -129,7 +129,7 @@ if (!empty($subtitle)) {
         $fieldset->form()->set_config('field_template', '{label}{required} {field} {error_msg}');
         foreach ((array) $subtitle as $name) {
             $field = $fieldset->field($name);
-            if ($field->type == 'hidden' || $field->isRestricted()) {
+            if (($field->type == 'hidden' && !is_a($field, 'Nos\Renderer'))|| $field->isRestricted()) {
                 continue;
             }
             $field_template = $field->template;
