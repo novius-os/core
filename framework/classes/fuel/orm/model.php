@@ -893,7 +893,7 @@ class Model extends \Orm\Model
             }
             if ($check) {
                 try {
-                    return parent::get($property);
+                    return parent::get($property, $conditions);
                 } catch (\OutOfBoundsException $e) {
                     if ($provider = static::providers($property)) {
                         return $this->providers[$property];
