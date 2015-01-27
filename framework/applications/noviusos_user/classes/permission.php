@@ -135,7 +135,7 @@ class Permission
             if (empty($allowedContexts)) {
                 return array();
             }
-            $contexts = array_intersect_key(array_combine($allowedContexts, $allowedContexts), $contexts);
+            $contexts = array_intersect_key($contexts, array_combine($allowedContexts, $allowedContexts));
         }
 
         return $contexts;
