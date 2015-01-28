@@ -79,10 +79,10 @@ class Controller_Front extends Controller
     {
         $this->_status = $status;
 
-        $this->_base_href = \URI::base(false);
-        $this->_context_url = \URI::base(false);
-
-        $this->_url = \Input::server('NOS_URL');
+        $this->_base_href = \Arr::get($params, 'base_href', \URI::base(false));
+        $this->_context_url = \Arr::get($params, 'context_url', \URI::base(false));
+        $this->_url = \Arr::get($params, 'url', \Input::server('NOS_URL'));
+        
         $this->_extension = pathinfo($this->_url, PATHINFO_EXTENSION);
         $url = $this->_url;
         if (!empty($this->_extension)) {
@@ -253,18 +253,24 @@ class Controller_Front extends Controller
             if ($_404) {
                 \Event::trigger('front.404NotFound', array('url' => rtrim($this->_page_url, '/')));
 
-                // If no redirection then we display 404
-                if (!empty($url)) {
-                    $_SERVER['NOS_URL'] = '';
-
-                    return $this->router('index', $params, 404);
-                } else {
-                    // The DB config is there, there's probably no homepage.
+                // Show a blank state if we're on the homepage
+                if (empty($url)) {
                     echo \View::forge('nos::errors/blank_slate_front', array(
                         'base_url' => $this->_base_href,
                     ), false);
                     exit();
                 }
+                
+                // Redirect to homepage ?
+                if (\Config::get('novius-os.404.redirect_homepage')) {
+                    \Response::redirect($this->_base_href, 'location', 404);
+                }
+                
+                // This can be done in a better way, here are some ideas :
+                // throw new HttpNotFoundException()
+                // return \Response::forge(null, 404);
+                header(\Input::server('SERVER_PROTOCOL'], 'HTTP/1.0').' 404 Not Found');
+                exit();
             }
         }
 
