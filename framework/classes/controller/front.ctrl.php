@@ -261,15 +261,10 @@ class Controller_Front extends Controller
                     exit();
                 }
                 
-                // Redirect to homepage ?
-                if (\Config::get('novius-os.404.redirect_homepage')) {
-                    \Response::redirect($this->_base_href, 'location', 404);
-                }
-                
                 // This can be done in a better way, here are some ideas :
                 // throw new HttpNotFoundException()
                 // return \Response::forge(null, 404);
-                header(\Input::server('SERVER_PROTOCOL'], 'HTTP/1.0').' 404 Not Found');
+                header(\Input::server('SERVER_PROTOCOL', 'HTTP/1.0').' 404 Not Found');
                 exit();
             }
         }
