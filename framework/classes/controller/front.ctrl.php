@@ -259,8 +259,8 @@ class Controller_Front extends Controller
             $this->setHeader('Expires', '0');
         }
 
-        // Page not found
         if ($_404) {
+            // Page not found
             $this->_status = 404;
             $this->_content = null;
 
@@ -279,10 +279,8 @@ class Controller_Front extends Controller
                 'headers'   => &$this->_headers,
                 'params'    => $params,
             ));
-        }
-
-        // Page found
-        else {
+        } else {
+            // Page found
             \Event::trigger_function('front.response', array(
                 array(
                     'content'   => &$this->_content,
