@@ -114,6 +114,8 @@ class Controller_Front extends Controller
         $this->_cache = FrontCache::forge($cache_path);
         \Nos\FrontCache::$cache_duration = $this->_cache_duration;
 
+        $_404 = true;
+
         try {
             if (!$this->_use_cache) {
                 throw new CacheNotFoundException();
@@ -169,7 +171,6 @@ class Controller_Front extends Controller
                 'url' => $url.'/',
             );
 
-            $_404 = true;
             // Loop URLs enhanced for one that not send a NotFoundException
             foreach ($url_enhanced as $page_id => $page_params) {
                 $temp_url = $page_params['url'];
@@ -249,33 +250,48 @@ class Controller_Front extends Controller
                     exit($e->getMessage());
                 }
             }
-
-            if ($_404) {
-                \Event::trigger('front.404NotFound', array('url' => rtrim($this->_page_url, '/')));
-
-                // Show a blank state if we're on the homepage
-                if (empty($url)) {
-                    echo \View::forge('nos::errors/blank_slate_front', array(
-                        'base_url' => $this->_base_href,
-                    ), false);
-                    exit();
-                }
-                
-                // This can be done in a better way, here are some ideas :
-                // throw new HttpNotFoundException()
-                // return \Response::forge(null, 404);
-                header(\Input::server('SERVER_PROTOCOL', 'HTTP/1.0').' 404 Not Found');
-                exit();
-            }
         }
 
+        // Disable browser cache if it's a preview
         if ($this->_is_preview) {
             $this->setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
             $this->setHeader('Pragma', 'no-cache');
             $this->setHeader('Expires', '0');
         }
 
-        \Event::trigger_function('front.response', array(array('content' => &$this->_content, 'status' => &$this->_status, 'headers' => &$this->_headers)));
+        // Page not found
+        if ($_404) {
+            $this->_status = 404;
+            $this->_content = null;
+
+            // Set a blank state as content if we're on the homepage
+            if (empty($url)) {
+                $this->_content = \View::forge('nos::errors/blank_slate_front', array(
+                    'base_url' => $this->_base_href,
+                ), false);
+            }
+
+            // Let the possibility to alter the 404 response
+            \Event::trigger('front.404NotFound', array(
+                'url'       => rtrim($this->_page_url, '/'),
+                'content'   => &$this->_content,
+                'status'    => &$this->_status,
+                'headers'   => &$this->_headers,
+                'params'    => $params,
+            ));
+        }
+
+        // Page found
+        else {
+            \Event::trigger_function('front.response', array(
+                array(
+                    'content'   => &$this->_content,
+                    'status'    => &$this->_status,
+                    'headers'   => &$this->_headers,
+                    'params'    => $params,
+                )
+            ));
+        }
 
         return \Response::forge($this->_content, $this->_status, $this->_headers);
     }
