@@ -120,7 +120,10 @@ class Tools_Enhancer
         if (!$context) {
             $contexts = Tools_Context::contexts();
             if (count($contexts) > 1) {
-                $context = Nos::main_controller()->getContext();
+                $controller = Nos::main_controller();
+                if (!empty($controller)) {
+                    $context = $controller->getContext();
+                }
             }
         }
 
