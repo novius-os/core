@@ -566,6 +566,14 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
                 $query->and_where_close();
             }
 
+            $itemSelected = \Input::get('current_id', 0);
+            if (!empty($itemSelected)) {
+                //a selected item will be on first page
+                $model = $config['model'];
+                $pk = $model::primary_key();
+                $query->order_by(\DB::expr(\DB::quote_identifier(reset($pk)).' = '.$itemSelected), 'DESC');
+            }
+
             Filter::apply($query, $config);
 
             return $query;

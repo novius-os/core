@@ -1306,7 +1306,9 @@ define('jquery-nos-appdesk',
                         url: o.grid.urlJson,
                         loading: function (dataSource, userData) {
                             var r = userData.data.paging;
+                            var itemSelected = self.itemSelected || o.itemSelected;
                             self.pageIndex = r.pageIndex;
+                            dataSource.proxy.options.data.current_id = itemSelected._id;
                             dataSource.proxy.options.data.context = o.selectedContexts || '';
                             dataSource.proxy.options.data.inspectors = self._jsonInspectors();
                             dataSource.proxy.options.data.offset = r.pageIndex * r.pageSize;
