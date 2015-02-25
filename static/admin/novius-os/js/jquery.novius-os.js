@@ -1004,10 +1004,10 @@ define('jquery-nos',
 
                 data = data || {};
                 var $input = this,
-                    url = 'admin/noviusos_media/appdesk?view=media_pick&current_id=' + $input.val(),
+                    url = 'admin/noviusos_media/appdesk?current_id=' + $input.val(),
                     contentUrls = {
-                        'all'   : url,
-                        'image' : url
+                        'all'   : url + '&view=media_pick',
+                        'image' : url + '&view=image_pick'
                     },
                     titles = {
                         'all'   : $.nosTexts.chooseMediaFile,
