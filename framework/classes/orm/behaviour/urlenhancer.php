@@ -73,7 +73,7 @@ class Orm_Behaviour_Urlenhancer extends Orm_Behaviour
     {
         $params['canonical'] = true;
 
-        return $this->url($item, $params);
+        return $item->url($params);
     }
 
     /**
@@ -129,7 +129,7 @@ class Orm_Behaviour_Urlenhancer extends Orm_Behaviour
             }
         }
 
-        $urls = $this->urls($item, $params);
+        $urls = $item->urls($params);
         return reset($urls) ?: null;
     }
 
