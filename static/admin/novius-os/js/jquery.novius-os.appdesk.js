@@ -1332,16 +1332,17 @@ define('jquery-nos-appdesk',
                             self.uiResetSearch[self.uiInspectorsTags.find('.nos-appdesk-inspectorstag').length || self.uiSearchInput.val() ? 'show' : 'hide']();
                         },
                         rendered : function() {
+                            var itemSelected = self.itemSelected || o.itemSelected;
                             self.uiSplitterHorizontalBottom.find('.wijmo-wijpager').prepend(self.uiPaginationLabel);
 
-                            if (self.itemSelected !== null) {
+                            if (itemSelected !== null) {
                                 // Search the selection in the data
                                 var found = false;
                                 $.each(self.uiThumbnail.thumbnailsgrid('data') || [], function(dataRowIndex, data) {
-                                    if (data._model == self.itemSelected._model && data._id == self.itemSelected._id) {
+                                    if (data._model == itemSelected._model && data._id == itemSelected._id) {
                                         found = true;
                                         if (!self.uiThumbnail.thumbnailsgrid('select', dataRowIndex)) {
-                                            self.itemSelected = null;
+                                            itemSelected = null;
                                         }
                                     }
                                 });
@@ -1749,6 +1750,7 @@ define('jquery-nos-appdesk',
                     // If the property is set explicitely, use it, else display only if there's more than 1 context
                     var hideContexts = (typeof config.hideContexts != 'undefined' ? config.hideContexts : Object.keys(config.contexts).length <= 1);
 
+                    // main config (used in grid, everything else won't be)
                     $.extend(true, appdesk.appdesk, {
                         contexts : config.contexts,
                         sites : config.sites,
@@ -1757,7 +1759,8 @@ define('jquery-nos-appdesk',
                         views : config.views,
                         name  : config.configuration_id,
                         selectedView : config.selectedView,
-                        selectedContexts : config.selectedContexts
+                        selectedContexts : config.selectedContexts,
+                        itemSelected:config.itemSelected
                     });
                     if (onCustom) {
                         $.extend(true, appdesk.appdesk, {
