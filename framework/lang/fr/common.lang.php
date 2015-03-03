@@ -579,7 +579,4 @@ return array(
     #: classes/renderer/item/picker.php:41
     'Un-select this item' => 'Dé-sélectionner cet item',
 
-    #: views/admin/desktop.view.php:43
-    'Are you sure you want to reset the position of application launchers?' => 'Êtes-vous sur de vouloir réinitialiser la position des lanceurs d\'application ?',
-
 );

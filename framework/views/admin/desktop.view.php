@@ -32,7 +32,7 @@ require(
             // Initialize the desktop toolbar
             $container.nosToolbar(
                 // Reset the position of app launchers
-                $('<a href="#" data-icon="wrench"><?= htmlspecialchars(__('Reset')); ?></a>')
+                $('<a href="#" data-icon="wrench"><?= htmlspecialchars(__('Reset launchers position')); ?></a>')
                     .on('click', function(e) {
                         e.preventDefault();
                         if (confirm($.nosCleanupTranslation(<?= \Format::forge(__('Are you sure you want to reset the position of application launchers?'))->to_json() ?>))) {
