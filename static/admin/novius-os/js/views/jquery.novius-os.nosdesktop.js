@@ -46,6 +46,7 @@ define('jquery-nos-nosdesktop',
                 var self = this,
                     o = self.options;
 
+                this.grid.positions = {};
                 this.unPositioned = [];
 
                 self.element.nosListenEvent({name : 'Nos\\Application'} ,function() {
