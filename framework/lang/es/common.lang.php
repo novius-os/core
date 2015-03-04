@@ -526,5 +526,4 @@ return array(
 
     #: config/validation.config.php:21
     'They don’t match. Are you sure you’ve typed the same thing?' => 'No coinciden. ¿Estás seguro/a de que has puesto lo mismo?',
-
 );
