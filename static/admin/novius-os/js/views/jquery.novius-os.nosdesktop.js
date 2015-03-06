@@ -46,6 +46,7 @@ define('jquery-nos-nosdesktop',
                 var self = this,
                     o = self.options;
 
+                this.grid.positions = {};
                 this.unPositioned = [];
 
                 self.element.nosListenEvent({name : 'Nos\\Application'} ,function() {
@@ -140,16 +141,16 @@ define('jquery-nos-nosdesktop',
                     var $launcher = $(this),
                         launcher = $launcher.data('launcher');
 
-                    if (launcher.position && ((launcher.position.left + 1) * self.launcherWidth) < self.maxWidth) {
+                    if ($.isPlainObject(launcher.position) && ((launcher.position.left + 1) * self.launcherWidth) < self.maxWidth) {
                         self._positionLauncher($launcher, launcher.position.left, launcher.position.top);
-                        if (init) {
-                            launcher.savedPosition = $.extend({}, launcher.position);
-                        }
                     } else {
-                        if (launcher.position) {
+                        if ($.isPlainObject(launcher.position)) {
                             self.grid.unSet(launcher.position);
                         }
                         self.unPositioned.push($launcher);
+                    }
+                    if (init) {
+                        launcher.savedPosition = $.extend({}, launcher.position);
                     }
                 });
 
@@ -283,6 +284,38 @@ define('jquery-nos-nosdesktop',
                     ._positionUnpositioned();
 
                 return self;
+            },
+
+            /**
+             * Reset launchers position in the grid
+             */
+            reset: function() {
+                var self = this;
+
+                // Reset launchers position
+                self.unPositioned = [];
+                self.$launchers.each(function() {
+                    var $launcher = $(this),
+                        launcher = $launcher.data('launcher');
+
+                    if ($.isPlainObject(launcher.position)) {
+                        self.grid.unSet(launcher.position);
+                    }
+                    launcher.position = {};
+                    launcher.savedPosition = {};
+                });
+
+                // Reset grid positions
+                self.grid.positions = {};
+
+                // Sort unpositioned launchers alphabetically
+                self.unPositioned.sort(function(a, b) {
+                    var aName = a.data('launcher').name.toLowerCase();
+                    var bName = b.data('launcher').name.toLowerCase();
+                    return ((aName < bName) ? -1 : ((aName > bName) ? 1 : 0));
+                });
+
+                self.resize();
             },
 
             save: function() {

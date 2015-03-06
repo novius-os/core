@@ -41,7 +41,11 @@ class Nos
      */
     public static function main_controller()
     {
-        return \Request::main()->controller_instance;
+        $request = \Request::main();
+        if (empty($request)) {
+            return null;
+        }
+        return $request->controller_instance;
     }
 
     /**

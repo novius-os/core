@@ -46,6 +46,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
         if (empty($view)) {
             $view = \Input::get('view', $this->config['selectedView']);
         }
+
         $this->config['selectedView'] = $view;
 
         if ($this->config['selectedView'] === 'appdesk_pick') {
@@ -116,6 +117,8 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
             $locales[$locale]['sites'][] = $site;
         }
 
+        $this->config['itemSelected']['_id'] = \Input::get('current_id', 0);
+
         $params = array_merge(
             array(
                 'contexts' => $contexts,
@@ -141,8 +144,9 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
 
     public static function process_config($application, $config)
     {
-        $valid_keys = array('model', 'css', 'notify', 'query', 'search_text', 'dataset', 'selectedView', 'views', 'appdesk', 'tree', 'configuration_id', 'inputs', 'hideContexts', 'i18n', 'custom', 'contexts', 'locales', 'sites');
+        $valid_keys = array('model', 'css', 'notify', 'query', 'search_text', 'dataset', 'selectedView', 'itemSelected', 'views', 'appdesk', 'tree', 'configuration_id', 'inputs', 'hideContexts', 'i18n', 'custom', 'contexts', 'locales', 'sites');
         if (isset($config['model'])) {
+            $full_model = $config['model'];
             $config['model'] = ltrim($config['model'], '\\');
             $namespace_model = \Inflector::get_namespace($config['model']);
 
@@ -201,6 +205,12 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
 
             if (!isset($config['selectedView'])) {
                 $config['selectedView'] = isset($common_config['selectedView']) ? $common_config['selectedView'] : 'default';
+            }
+
+            if (!isset($config['itemSelected'])) {
+                $config['itemSelected'] = isset($common_config['itemSelected']) ? $common_config['itemSelected'] : array(
+                    '_model' => $full_model
+                );
             }
 
             if (!isset($config['views'])) {
@@ -554,6 +564,14 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
                 }
                 $query->or_where(array(\Db::expr('0'), 1));
                 $query->and_where_close();
+            }
+
+            $itemSelected = \Input::get('current_id', 0);
+            if (!empty($itemSelected)) {
+                //a selected item will be on first page
+                $model = $config['model'];
+                $pk = $model::primary_key();
+                $query->order_by(\DB::expr(\DB::quote_identifier(reset($pk)).' = '.$itemSelected), 'DESC');
             }
 
             Filter::apply($query, $config);

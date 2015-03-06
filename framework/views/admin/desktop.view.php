@@ -16,14 +16,31 @@ $config = array(
     'launchers' => $apps,
     'reloadUrl' => 'admin/nos/noviusos/desktop',
 );
+
 ?>
 <div id="<?= $id ?>" class="nos-desktop-apps"></div>
 <script type="text/javascript">
 require(
-    ['jquery-nos-nosdesktop'],
+    ['jquery-nos-nosdesktop', 'jquery-nos-toolbar-crud'],
     function($) {
         $(function() {
-            $('#<?= $id ?>').nosdesktop(<?= \Format::forge($config)->to_json() ?>);
+            var $container = $('#<?= $id ?>');
+
+            // Initialize the desktop apps
+            $container.nosdesktop(<?= \Format::forge($config)->to_json() ?>);
+
+            // Initialize the desktop toolbar
+            $container.nosToolbar(
+                // Reset the position of app launchers
+                $('<a href="#" data-icon="wrench"><?= htmlspecialchars(__('Reset launchers position')); ?></a>')
+                    .on('click', function(e) {
+                        e.preventDefault();
+                        if (confirm($.nosCleanupTranslation(<?= \Format::forge(__('Are you sure you want to reset the position of application launchers?'))->to_json() ?>))) {
+                            $container.nosdesktop('reset');
+                            $container.nosdesktop('save');
+                        }
+                    })
+            );
         });
     });
 </script>
