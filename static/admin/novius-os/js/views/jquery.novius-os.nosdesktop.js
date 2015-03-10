@@ -30,6 +30,9 @@ define('jquery-nos-nosdesktop',
                     this.positions[left][top] = true;
                 },
                 isSet: function(left, top) {
+                    if (left < 0 || top < 0) {
+                        return true;
+                    }
                     return this.positions[left] && this.positions[left][top];
                 },
                 unSet: function(left, top) {
