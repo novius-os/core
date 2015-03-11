@@ -28,6 +28,20 @@ return array(
             ),
         ),
     ),
+    'enhancers' => array(
+        'noviusos_menu' => array(
+            'title' => 'Menu',
+            'desc'  => '',
+            'enhancer' => 'noviusos_menu/front/menu/enhancer/main',
+            'previewUrl' => 'admin/noviusos_menu/menu/enhancer/preview',
+            'dialog' => array(
+                'contentUrl' => 'admin/noviusos_menu/menu/enhancer/popup',
+                'width' => 500,
+                'height' => 400,
+                'ajax' => true,
+            ),
+        ),
+    ),
     'icons' => array(
         64 => 'static/apps/noviusos_menu/img/64/menu.png',
         32 => 'static/apps/noviusos_menu/img/32/menu.png',
