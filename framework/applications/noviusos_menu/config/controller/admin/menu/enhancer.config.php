@@ -27,7 +27,6 @@ return array(
             ),
             'renderer' => 'Nos\Renderer_Item_Picker',
             'renderer_options' => array(
-                'template' => '{{field}}@5',
                 'model' => 'Nos\\Menu\\Model_Menu',
                 'appdesk' => 'admin/noviusos_menu/menu/appdesk',
                 'defaultThumbnail' => 'static/apps/noviusos_menu/img/64/menu.png',
@@ -61,7 +60,7 @@ return array(
                         ));
                     }
                 }
-                return 'Menu';
+                return __('Menu');
             }
         ),
     ),
