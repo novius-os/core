@@ -72,6 +72,11 @@ class Tools_Context
         return static::$_contexts;
     }
 
+    public static function useCurrentContext() {
+        \Config::load('contexts', true);
+        return \Config::get('contexts.use_current', false);
+    }
+
     /**
      * get an array of all sites Novius OS instance
      *
