@@ -121,6 +121,7 @@ class Orm_Behaviour_Publishable extends Orm_Behaviour
             return array($where);
         };
         $options['before_order_by']['published'] = $_properties['publication_state_property'];
+        $options['before_order_by']['published_at'] = $_properties['publication_start_property'];
     }
 
     public function form_processing(Orm\Model $item, $data, $response_json)
@@ -141,6 +142,11 @@ class Orm_Behaviour_Publishable extends Orm_Behaviour
             if ($status == 2 && empty($publication_start) && empty($publication_end)) {
                 // Unpublish
                 $status = 0;
+            }
+
+            // Set publication start to now if published without schedule
+            if (!$item->get($publication_start_property) && $status == 1) {
+                $item->set($publication_start_property, (new \Date())->format('mysql'));
             }
         }
         $item->set($publishable, $status);
