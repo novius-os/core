@@ -636,7 +636,7 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
         $result_context = array();
         foreach ($query->get() as $pk => $item) {
             if (isset($result_context[$item->{$this->_properties['common_id_property']}])) {
-                if ((is_array($context) && in_array($item->{$this->_properties['context_property']}, $context)) ||
+                if ((is_array($context) && !in_array($item->{$this->_properties['context_property']}, $context)) ||
                     $item->{$this->_properties['context_property']} !== $context) {
                     continue;
                 } else {
