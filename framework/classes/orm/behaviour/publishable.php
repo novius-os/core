@@ -146,7 +146,7 @@ class Orm_Behaviour_Publishable extends Orm_Behaviour
 
             // Set publication start to now if published without schedule
             if (!$item->get($publication_start_property) && $status == 1) {
-                $item->set($publication_start_property, (new \Date())->format('mysql'));
+                $item->set($publication_start_property, \Date::forge()->format('mysql'));
             }
         }
         $item->set($publishable, $status);
