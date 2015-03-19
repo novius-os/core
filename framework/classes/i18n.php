@@ -118,6 +118,15 @@ class I18n
             static::$_locale.'@'.$variant,
             static::$_locale,
         ));
+        //Prevent the tr_TR local problems (see https://bugs.php.net/bug.php?id=18556 )
+        if (static::$_locale == 'tr_TR') {
+            setlocale(LC_CTYPE, array(
+                'en_GB.'.static::$_encoding.'@'.$variant,
+                'en_GB.'.static::$_encoding,
+                'en_GB@'.$variant,
+                'en_GB'
+            ));
+        }
     }
 
     /**
