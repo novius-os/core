@@ -509,7 +509,9 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                     $parent = $parent->find_context($from->get_context());
                 }
                 $from->set_parent($parent);
-            }
+            } elseif ($params['targetType'] === 'in') {
+				$params['targetType'] = 'after';
+			}
 
             // Change sort order
             $behaviour_sort = $model_from::behaviours('Nos\Orm_Behaviour_Sortable');
