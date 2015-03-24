@@ -539,11 +539,13 @@ class Controller extends \Fuel\Core\Controller_Hybrid
             );
         }
 
-        \Response::json(
-            array(
-                'success' => true,
-            )
+        $json = array(
+            'success' => true,
         );
+        if (empty($behaviour_tree)) {
+            $json['no_tree'] = true;
+        }
+        \Response::json($json);
     }
 
     public function tree_selected(array $tree_config, array $params)
