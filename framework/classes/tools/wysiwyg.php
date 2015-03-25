@@ -64,6 +64,8 @@ class Tools_Wysiwyg
 
         \Fuel::$profiling && \Profiler::mark('Recherche des fonctions dans la page');
 
+        \Event::trigger_function('front.before_parse_wysiwyg', array(&$content));
+
         $callback = array('Nos\Tools_Enhancer', 'content');
         static::parseEnhancers(
             $content,
