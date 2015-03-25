@@ -50,6 +50,7 @@ class Renderer_Select_Model extends Renderer
         $model = $renderer_options['model'];
         $twinnable = $model::behaviours('Nos\Orm_Behaviour_Twinnable', array());
         $contextable = $model::behaviours('Nos\Orm_Behaviour_Contextable', $twinnable);
+        $options = \Arr::get($renderer_options, 'query', array());
 
         $shared_context = false;
         if (!empty($contextable)) {
@@ -57,12 +58,14 @@ class Renderer_Select_Model extends Renderer
             if (!empty($context)) {
                 $shared_context = \Arr::get($renderer_options, 'shared_context', false);
                 if (!empty($twinnable) && $shared_context) {
-                    $items = $model::findMainOrContext($context);
+                    $items = $model::findMainOrContext($context, $options);
                 } else {
                     $renderer_options['context'] = $context;
-                    $items = $model::find('all', array('where' => array(
-                        array($contextable['context_property'] => $context),
-                    )));
+                    if (!isset($options['where']) || !is_array($options['where'])) {
+                        $options['where'] = array();
+                    }
+                    $options['where'][] = array($contextable['context_property'] => $context);
+                    $items = $model::find('all', $options);
                 }
             }
         }
@@ -72,7 +75,7 @@ class Renderer_Select_Model extends Renderer
 
         $pk = $model::primary_key();
         if (!isset($items)) {
-            $items = $model::find('all');
+            $items = $model::find('all', $options);
         }
         $options = array();
         if (\Arr::get($renderer_options, 'empty_option', true)) {
