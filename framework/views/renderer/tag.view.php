@@ -15,7 +15,8 @@
             'jquery-ui.tag-it'
         ],
         function($) {
-            var $t = $("#<?= $id ?>").nosOnShow('one', function tagit() {
+            var $t = $("#<?= $id ?>");
+            $t.nosOnShow('one', function tagit() {
                 $t.tagit({
                     animate: false,
                     caseSensitive: false,

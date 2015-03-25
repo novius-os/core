@@ -55,12 +55,24 @@ class Renderer_Tag extends Renderer
         $tag_class = $this->renderer_options['model'];
 
         $item->{$this->renderer_options['relation_name']} = $tag_class::find('all', array('where' => array(array($this->renderer_options['label_column'], 'IN', array_keys($tags)))));
+        $item_class = get_class($item);
+        $twinnable = $item_class::behaviours('Nos\Orm_Behaviour_Twinnable', array());
+        $contextable = $item_class::behaviours('Nos\Orm_Behaviour_Contextable', $twinnable);
 
         foreach ($item->{$this->renderer_options['relation_name']} as $obj) {
             unset($tags[$obj->{$this->renderer_options['label_column']}]);
         }
         foreach ($tags as $tag) {
-            $tag_obj = new $tag_class(array($this->renderer_options['label_column'] => $tag));
+            $tag_obj = $tag_class::forge(array($this->renderer_options['label_column'] => $tag));
+
+            //Test if the item & tag class are twinable or contextable
+            $tag_twinnable = $tag_class::behaviours('Nos\Orm_Behaviour_Twinnable', array());
+            $tag_contextable = $tag_class::behaviours('Nos\Orm_Behaviour_Contextable', $tag_twinnable);
+            if (!empty($contextable) && !empty($tag_contextable)) {
+                //If its contextable, give it the same context as the item
+                $tag_obj->set(\Arr::get($tag_contextable, 'context_property'), $item->get_context());
+            }
+
             $item->{$this->renderer_options['relation_name']}[] = $tag_obj;
         }
 
