@@ -115,6 +115,18 @@ class Tools_Enhancer
                 }
             }
         }
+
+        // Get the current context if the context parameter is not specified and we have more than one context
+        if (!$context && Tools_Context::useCurrentContext()) {
+            $contexts = Tools_Context::contexts();
+            if (count($contexts) > 1) {
+                $controller = Nos::main_controller();
+                if (!empty($controller)) {
+                    $context = $controller->getContext();
+                }
+            }
+        }
+
         $empty_params = !count(array_diff_key(
             $params,
             array('context' => null, 'urlPath' => null, 'preview' => null)
