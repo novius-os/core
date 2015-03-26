@@ -53,7 +53,7 @@ define('jquery-nos-inspector-plain-data',
                             },
                             rendered : function() {
                                 rendered = true;
-                                inspector.css('height', 'auto');
+                                inspector.css('height', 'auto').noslistgrid("currentCell", -1, -1);
                             }
                         });
                 });

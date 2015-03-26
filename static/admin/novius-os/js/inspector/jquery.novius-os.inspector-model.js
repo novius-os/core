@@ -95,7 +95,6 @@ define('jquery-nos-inspector-model',
                             currentCellChanged: function (e) {
                                 var row = $(e.target).noslistgrid("currentCell").row(),
                                     data = row ? row.data : false;
-
                                 if (data && rendered) {
                                     inspectorData.selectionChanged(data.id, data._title);
                                 }
@@ -106,7 +105,7 @@ define('jquery-nos-inspector-model',
                             },
                             rendered : function() {
                                 rendered = true;
-                                inspector.css('height', 'auto');
+                                inspector.css('height', 'auto').noslistgrid("currentCell", -1, -1);
                             }
                         });
                 });
