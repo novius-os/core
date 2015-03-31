@@ -45,9 +45,9 @@ class Orm_Behaviour_Virtualname extends Orm_Behaviour
             // Enforce virtual name restrictions
             $item->virtual_name($item->{$this->_properties['virtual_name_property']});
 
-            // If the virtual name is empty, generate a default one from the title
+            // If the virtual name is empty, generate a default one
             if (empty($item->{$this->_properties['virtual_name_property']})) {
-                $item->virtual_name($item->title_item());
+                $item->virtual_name($item->virtual_name_populate_value());
             }
 
             // If it's still empty, we have an error
@@ -103,6 +103,18 @@ class Orm_Behaviour_Virtualname extends Orm_Behaviour
         $item->{$this->_properties['virtual_name_property']} = $virtual_name;
 
         return $item->{$this->_properties['virtual_name_property']};
+    }
+
+    public function virtual_name_populate_value(\Nos\Orm\Model $item)
+    {
+        if (!empty($this->_properties['populate_property'])) {
+            if (isset($item->{$this->_properties['populate_property']})) {
+                return $item->{$this->_properties['populate_property'])};
+            } elseif (method_exists($item, $this->_properties['populate_property'])) {
+                return call_user_func($item, $this->_properties['populate_property']);
+            }
+        }
+        return $item->title_item()
     }
 
     protected static function _friendlySlug($slug, array $options)
