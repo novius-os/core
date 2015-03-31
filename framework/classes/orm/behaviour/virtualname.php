@@ -109,12 +109,12 @@ class Orm_Behaviour_Virtualname extends Orm_Behaviour
     {
         if (!empty($this->_properties['populate_property'])) {
             if (isset($item->{$this->_properties['populate_property']})) {
-                return $item->{$this->_properties['populate_property'])};
+                return $item->{$this->_properties['populate_property']};
             } elseif (method_exists($item, $this->_properties['populate_property'])) {
                 return call_user_func($item, $this->_properties['populate_property']);
             }
         }
-        return $item->title_item()
+        return $item->title_item();
     }
 
     protected static function _friendlySlug($slug, array $options)
