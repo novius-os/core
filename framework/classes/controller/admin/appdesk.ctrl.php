@@ -188,10 +188,12 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
             if (!isset($config['dataset'])) {
                 $config['dataset'] = $data_mapping;
             }
-            $config['dataset']['id'] = array(
-                'column' => 'id',
-                'visible' => false
-            );
+            if (!isset($config['dataset']['id'])) {
+                $config['dataset']['id'] = array(
+                    'column' => 'id',
+                    'visible' => false
+                );
+            }
 
             if (!isset($config['dataset']['actions'])) {
                 $item_actions = \Config::actions(array('models' => array($config['model']), 'target' => 'grid', 'class' => get_called_class()));
