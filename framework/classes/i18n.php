@@ -229,6 +229,8 @@ class I18n
      */
     public static function gget($group, $message, $default = null)
     {
+        \Event::trigger_function('i18n.gget', array(array('group' => $group, 'message' => &$message, 'default' => &$default)));
+
         // same as in translate_from_file
         if (isset(static::$_priority_messages[static::$_locale][$message])) {
             return static::$_priority_messages[static::$_locale][$message];
@@ -323,6 +325,8 @@ class I18n
 
     public static function translate_from_file($file, $message, $default = null)
     {
+        \Event::trigger_function('i18n.translate_from_file', array(array('file' => $file, 'message' => &$message, 'default' => &$default)));
+
         // same as in gget
         if (isset(static::$_priority_messages[static::$_locale][$message])) {
             return static::$_priority_messages[static::$_locale][$message];
