@@ -509,6 +509,8 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                     $parent = $parent->find_context($from->get_context());
                 }
                 $from->set_parent($parent);
+            } elseif ($params['targetType'] === 'in') {
+            	$params['targetType'] = 'after';
             }
 
             // Change sort order
@@ -537,11 +539,13 @@ class Controller extends \Fuel\Core\Controller_Hybrid
             );
         }
 
-        \Response::json(
-            array(
-                'success' => true,
-            )
+        $json = array(
+            'success' => true,
         );
+        if (empty($behaviour_tree)) {
+            $json['no_tree'] = true;
+        }
+        \Response::json($json);
     }
 
     public function tree_selected(array $tree_config, array $params)
