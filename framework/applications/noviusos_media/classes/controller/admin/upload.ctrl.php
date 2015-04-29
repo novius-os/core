@@ -98,7 +98,7 @@ class Controller_Admin_Upload extends \Nos\Controller_Admin_Application
 
         $error = '';
         if ($this->nbDuplicateError > 0) {
-            $error = n__('One file was already present!', '{{count}} files were already present!', $this->nbDuplicateError);
+            $error = n__('One file already exists!', '{{count}} files already exists!', $this->nbDuplicateError);
             $error = strtr($error, array('{{count}}' => $this->nbDuplicateError));
         }
         \Response::json(array(
