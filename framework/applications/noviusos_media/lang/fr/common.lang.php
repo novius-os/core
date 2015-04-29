@@ -427,4 +427,9 @@ return array(
     #: classes/renderer/media.php:39
     'This extension is not allowed.' => 'Cette extension n’est pas autorisée.',
 
+    'One file already exist!' => array(
+        0 => 'Un fichier était déjà existant !',
+        1 => '{{count}} fichiers étaient déjà existant !',
+    ),
+
 );
