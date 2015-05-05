@@ -31,6 +31,11 @@ class Controller_Admin_Folder extends \Nos\Controller_Admin_Crud
         if (!$folder->is_new()) {
             if ($folder->path() != $this->clone->path()) {
                 if (is_dir($this->clone->path())) {
+                    if (!is_dir($folder->path())) {
+                        $base_dir = APPPATH.Model_Media::$private_path;
+                        $remaining_dir = str_replace($base_dir, '', $folder->path());
+                        \File::create_dir($base_dir, $remaining_dir, 0777);
+                    }
                     if (!\File::rename_dir($this->clone->path(), $folder->path())) {
                         $folder->medif_path = $this->clone->medif_path;
                     }
