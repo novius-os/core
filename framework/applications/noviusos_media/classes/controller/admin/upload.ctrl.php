@@ -114,8 +114,8 @@ class Controller_Admin_Upload extends \Nos\Controller_Admin_Application
             try {
                 if (is_array($file)) {
                     $name   = rtrim($dir, '/');
-                    $folder = $this->_importFolder($name, $folder);
-                    $this->_importFiles($file, $path . $dir, $folder);
+                    $new_folder = $this->_importFolder($name, $folder);
+                    $this->_importFiles($file, $path . $dir, $new_folder);
                 } else {
                     $pathinfo = pathinfo($file);
                     if (!in_array(\Str::lower($pathinfo['extension']), static::$_disallowed_extensions)) {
