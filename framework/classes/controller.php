@@ -195,7 +195,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
         $select = \Arr::get($model::primary_key(), 0);
         $select = (mb_strpos($select, '.') === false ? $query->alias().'.'.$select : $select);
         // Get the columns
-        $columns = \DB::expr('DISTINCT '.\Database_Connection::instance()->quote_identifier($select).' AS group_by_pk');
+        $columns = \DB::expr('DISTINCT '.\Database_Connection::instance($query->connection())->quote_identifier($select).' AS group_by_pk');
         // Remove the current select and
         $new_query = call_user_func('DB::select', $columns);
         // Set from table
