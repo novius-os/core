@@ -20,8 +20,6 @@ class Controller_Admin_Application extends Controller_Admin_Auth
 
     public function before()
     {
-        \Event::trigger('admin.start');
-
         parent::before();
 
         if (!$this->bypass) {
@@ -30,6 +28,8 @@ class Controller_Admin_Application extends Controller_Admin_Auth
                 throw new Access_Exception('You don’t have access to application '.$application.'!');
             }
         }
+
+        \Event::trigger('admin.start');
     }
 
     public function after($response)
