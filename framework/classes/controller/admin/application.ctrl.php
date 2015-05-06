@@ -20,6 +20,8 @@ class Controller_Admin_Application extends Controller_Admin_Auth
 
     public function before()
     {
+        \Event::trigger('admin.start');
+
         parent::before();
 
         if (!$this->bypass) {
