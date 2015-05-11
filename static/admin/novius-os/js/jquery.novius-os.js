@@ -1050,6 +1050,9 @@ define('jquery-nos',
                                         }
                                     });
                                 });
+                    },
+                    'delete': function() {
+                        $input.val('').trigger('change');
                     }
                 }, data.inputFileThumb || {});
 
