@@ -536,7 +536,7 @@ class Fieldset extends \Fuel\Core\Fieldset
                         $arrayPtr = &$arrayPtr[$member];
                     }
                     $arrayPtr = $populate[$k];
-                    $populate = \Arr::merge($populate, $array);
+                    $populate = \Arr::merge_assoc($populate, $array);
                 }
                 continue;
             }
