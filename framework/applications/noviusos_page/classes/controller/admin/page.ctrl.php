@@ -314,12 +314,14 @@ class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
                     $clone->page_title = $main->page_title.$title_append;
                     $clone->page_virtual_name = null;
                     $clone->page_virtual_url = null;
-                    $lastPage = Model_Page::query()
-                        ->where('page_parent_id', $clone->page_parent_id)
-                        ->order_by('page_sort', 'DESC')
-                        ->limit(1)
-                        ->get_one();
-                    $clone->page_sort = $lastPage->page_sort + 1;
+                    if ($clone->behaviours('Nos\Orm_Behaviour_Sortable')) {
+                        $lastPage = Model_Page::query()
+                            ->where('page_parent_id', $clone->page_parent_id)
+                            ->order_by('page_sort', 'DESC')
+                            ->limit(1)
+                            ->get_one();
+                        $clone->move_after($lastPage);
+                    }
                 }
                 $clone->save();
                 break;
