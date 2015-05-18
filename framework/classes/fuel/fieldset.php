@@ -528,15 +528,7 @@ class Fieldset extends \Fuel\Core\Fieldset
             if ($populateCallback && is_callable($populateCallback)) {
                 $populate[$k] = call_user_func($populateCallback, $instance);
                 if (strpos($k, ']')) {
-                    $members = array_filter(explode('[', str_replace(']', '', $k)));
-                    $array = array();
-                    $arrayPtr = &$array;
-                    foreach ($members as $member) {
-                        $arrayPtr[$member] = array();
-                        $arrayPtr = &$arrayPtr[$member];
-                    }
-                    $arrayPtr = $populate[$k];
-                    $populate = \Arr::merge_assoc($populate, $array);
+                    \Arr::set($populate, strtr($k, array('[' => '.', ']' => '')), $populate[$k]);
                 }
                 continue;
             }
