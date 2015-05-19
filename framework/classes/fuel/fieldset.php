@@ -527,6 +527,9 @@ class Fieldset extends \Fuel\Core\Fieldset
             $populateCallback = \Arr::get($this->config_used, "$k.populate");
             if ($populateCallback && is_callable($populateCallback)) {
                 $populate[$k] = call_user_func($populateCallback, $instance);
+                if (strpos($k, ']')) {
+                    \Arr::set($populate, strtr($k, array('[' => '.', ']' => '')), $populate[$k]);
+                }
                 continue;
             }
 
