@@ -287,7 +287,7 @@ class Attachment
     }
 
     /**
-     * Delete all caches of the media
+     * Delete all caches of the attachment
      */
     public function deleteCache()
     {
