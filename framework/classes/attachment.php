@@ -278,10 +278,37 @@ class Attachment
             $this->new_file = null;
             $this->new_file_name = null;
 
+            $this->deleteCache();
+
             return true;
         }
 
         return false;
+    }
+
+    /**
+     * Delete all caches of the attachment
+     */
+    public function deleteCache()
+    {
+        try {
+            $file_url = $this->url(false);
+            $pathinfo = pathinfo($file_url);
+            $path = ltrim($pathinfo['dirname'], '/').DS.$pathinfo['filename'];
+
+            $path_public = DOCROOT.$file_url;
+            $path_public_cache = DOCROOT.'cache'.DS.$path;
+            $path_private_cache = \Config::get('cache_dir').$path;
+
+            \File::is_link($path_public) and \File::delete($path_public);
+            is_dir($path_public_cache) and \File::delete_dir($path_public_cache, true, true);
+            is_dir($path_private_cache) and \File::delete_dir($path_private_cache, true, true);
+        } catch (\Exception $e) {
+            \Log::exception($e, 'Error while deleting the cache of attachment '.$this->filename().' ('.$path.'). ');
+            if (\Fuel::$env == \Fuel::DEVELOPMENT) {
+                throw $e;
+            }
+        }
     }
 
     /**
