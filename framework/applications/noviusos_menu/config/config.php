@@ -19,7 +19,7 @@ return array(
     ),
 
     // Available templates for the enhancer
-    'templates' => array(
+    'views' => array(
         'default' => array(
             'title' => __('List'),
             'view' => 'noviusos_menu::menu',

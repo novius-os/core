@@ -8,13 +8,13 @@
  * @link http://www.novius-os.org
  */
 
-// Get the available templates
+// Get the available views
 $app_config = \Config::load('noviusos_menu::config', true);
-$templates = array_map(
+$views = array_map(
     function($row) {
         return \Arr::get($row, 'title');
     },
-    \Arr::get($app_config, 'templates', array())
+    \Arr::get($app_config, 'views', array())
 );
 
 return array(
@@ -38,13 +38,13 @@ return array(
                 ),
             ),
         ),
-        'menu_template' => array(
-            'label' => __('Template:'),
+        'menu_view' => array(
+            'label' => __('View:'),
             'template' => '<p style="margin:10px 0 .5em 10px;">{label}{required}<br />{field} {error_msg}</p>',
             'form' => array(
-                'type' => count($templates) > 1 ? 'select' : 'hidden',
-                'class' => 'menu_template',
-                'options' => $templates,
+                'type' => count($views) > 1 ? 'select' : 'hidden',
+                'class' => 'menu_view',
+                'options' => $views,
             ),
         ),
     ),

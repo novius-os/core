@@ -33,14 +33,14 @@ class Controller_Front_Menu_Enhancer extends Controller_Front_Application
             return false;
         }
 
-        // Get the template
-        $menu_template = \Arr::get($args, 'menu_template');
-        if (empty($menu_template) || empty($this->app_config['templates'][$menu_template])) {
+        // Get the view
+        $menu_view = \Arr::get($args, 'menu_view');
+        if (empty($menu_view) || empty($this->app_config['views'][$menu_view])) {
             return false;
         }
 
         return $menu->html(array(
-            'view' => \Arr::get($this->app_config['templates'][$menu_template], 'view')
+            'view' => \Arr::get($this->app_config['views'][$menu_view], 'view')
         ));
     }
 }
