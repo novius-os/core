@@ -28,6 +28,11 @@ class FrontCache
     public static $cache_duration = 60;
 
     /**
+     * @var bool True when executing cache, to prevent echoing uncache strings
+     */
+    protected static $executing = false;
+
+    /**
      * Loads any default caching settings when available
      */
     public static function _init()
@@ -60,11 +65,15 @@ class FrontCache
      */
     public static function callHmvcUncached($uri, $args = array())
     {
-        echo static::_phpBegin();
-        // Serialize allow to persist objects in the cache file
-        // API is Nos\Nos::hmvc('location', $args)
-        echo 'echo \Nos\Nos::hmvc('.var_export($uri, true).', unserialize('.var_export(serialize($args), true).'));';
-        echo '?>';
+        if (self::$executing) {
+            echo \Nos\Nos::hmvc($uri, $args);
+        } else {
+            echo static::_phpBegin();
+            // Serialize allow to persist objects in the cache file
+            // API is Nos\Nos::hmvc('location', $args)
+            echo 'echo \Nos\Nos::hmvc(' . var_export($uri, true) . ', unserialize(' . var_export(serialize($args), true) . '));';
+            echo '?>';
+        }
     }
 
     /**
@@ -76,10 +85,14 @@ class FrontCache
      */
     public static function viewForgeUncached($file = null, $data = null, $auto_filter = null)
     {
-        echo static::_phpBegin();
-        // Serialize allow to persist objects in the cache file
-        echo 'echo View::forge('.var_export($file, true).', unserialize('.var_export(serialize($data), true).'), '.var_export($auto_filter, true).');';
-        echo '?>';
+        if (self::$executing) {
+            echo \View::forge($file, $data, $auto_filter);
+        } else {
+            echo static::_phpBegin();
+            // Serialize allow to persist objects in the cache file
+            echo 'echo View::forge(' . var_export($file, true) . ', unserialize(' . var_export(serialize($data), true) . '), ' . var_export($auto_filter, true) . ');';
+            echo '?>';
+        }
     }
 
     public static function forge($path)
@@ -215,9 +228,11 @@ class FrontCache
         //flock($this->_lock_fp, LOCK_EX);
         if (!empty($this->_path) && is_file($this->_path)) {
             try {
+                self::$executing = true;
                 ob_start();
                 include $this->_path;
                 $this->content = ob_get_clean();
+                self::$executing = false;
                 //flock($this->_lock_fp, LOCK_UN);
                 return $this->content;
             } catch (CacheExpiredException $e) {
