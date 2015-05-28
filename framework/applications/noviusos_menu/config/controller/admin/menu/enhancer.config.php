@@ -45,7 +45,7 @@ return array(
                 'type' => count($views) > 1 ? 'select' : 'hidden',
                 'class' => 'menu_view',
                 'options' => $views,
-                'value' => array_keys($views)[0],
+                'value' => key($views),
             ),
         ),
     ),
