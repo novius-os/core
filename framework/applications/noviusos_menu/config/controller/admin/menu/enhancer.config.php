@@ -10,12 +10,11 @@
 
 // Get the available views
 $app_config = \Config::load('noviusos_menu::config', true);
-$views = array_map(
-    function($row) {
-        return \Arr::get($row, 'title');
-    },
-    \Arr::get($app_config, 'views', array())
-);
+$views_config = \Arr::get($app_config, 'views', array());
+$views = array();
+foreach($views_config as $key => $value){
+    $views[$key] = $value['title'];
+}
 
 return array(
     'fields' => array(
