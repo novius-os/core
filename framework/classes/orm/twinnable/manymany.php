@@ -149,6 +149,13 @@ class Orm_Twinnable_ManyMany extends \Orm\ManyMany
             $query->where($condition);
         }
 
+        foreach (\Arr::get($this->conditions, 'join_on', array()) as $key => $condition) {
+            is_array($condition) or $condition = array($key, '=', $condition);
+            reset($condition);
+            $condition[key($condition)] = 't0_through.'.current($condition);
+            $join['join_on'][] = $condition;
+        }
+
         foreach (\Arr::get($this->conditions, 'order_by', array()) as $field => $direction) {
             if (is_numeric($field)) {
                 $query->order_by($direction);
