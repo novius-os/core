@@ -104,6 +104,11 @@ class Controller_Front extends Controller
             $this->_use_cache = \Input::get('_cache', \Config::get('novius-os.cache', true));
         }
 
+        // Disable browser cache if it's a preview
+        if ($this->_is_preview) {
+            $this->disableBrowserCache();
+        }
+
         $cache_path = $this->getCachePath();
 
         // Front start
@@ -128,15 +133,22 @@ class Controller_Front extends Controller
             // Starts building the cache
             $this->_cache->start();
 
+            // Try to find the content
             try {
-
-                // Finds the content
-                if (!$this->findContent($url)) {
-                    throw new ContentNotFoundException('The requested page was not found.');
+                $this->_content = $this->findContent($url);
+                if ($this->_content === false) {
+                    throw new ContentNotFoundException('The requested content was not found.');
                 }
                 
                 // Displays the content
                 \Event::trigger_function('front.display', array(&$this->_content));
+                \Event::trigger('front.display', array(
+                    'url'       => rtrim($this->_page_url, '/'),
+                    'content'   => &$this->_content,
+                    'status'    => &$this->_status,
+                    'headers'   => &$this->_headers,
+                    'params'    => $params,
+                ));
                 echo $this->_content;
                 
                 // Saves the cache
@@ -144,9 +156,26 @@ class Controller_Front extends Controller
                 $this->_content = $this->_cache->execute();
             }
             
-            // Page not found
+            // Content not found
             catch (ContentNotFoundException $e) {
-                $_404 = true;
+                $this->_status = 404;
+                $this->_content = null;
+    
+                // Set a blank state as content if we're on the homepage
+                if (empty($url)) {
+                    $this->_content = \View::forge('nos::errors/blank_slate_front', array(
+                        'base_url' => $this->_base_href,
+                    ), false);
+                }
+    
+                // Let the possibility to alter the 404 response
+                \Event::trigger('front.404NotFound', array(
+                    'url'       => $url,
+                    'content'   => &$this->_content,
+                    'status'    => &$this->_status,
+                    'headers'   => &$this->_headers,
+                    'params'    => $params,
+                ));
             }
             
             // A database exception occurred
@@ -174,46 +203,22 @@ class Controller_Front extends Controller
             }
         }
 
-        // Disable browser cache if it's a preview
-        if ($this->_is_preview) {
-            $this->setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-            $this->setHeader('Pragma', 'no-cache');
-            $this->setHeader('Expires', '0');
-        }
-
-        // Page not found
-        if ($_404) {
-            $this->_status = 404;
-            $this->_content = null;
-
-            // Set a blank state as content if we're on the homepage
-            if (empty($url)) {
-                $this->_content = \View::forge('nos::errors/blank_slate_front', array(
-                    'base_url' => $this->_base_href,
-                ), false);
-            }
-
-            // Let the possibility to alter the 404 response
-            \Event::trigger('front.404NotFound', array(
-                'url'       => rtrim($this->_page_url, '/'),
+        \Event::trigger_function('front.response', array(
+            array(
                 'content'   => &$this->_content,
                 'status'    => &$this->_status,
                 'headers'   => &$this->_headers,
                 'params'    => $params,
-            ));
-        } else {
-            // Page found
-            \Event::trigger_function('front.response', array(
-                array(
-                    'content'   => &$this->_content,
-                    'status'    => &$this->_status,
-                    'headers'   => &$this->_headers,
-                    'params'    => $params,
-                )
-            ));
-        }
+            )
+        ));
 
         return \Response::forge($this->_content, $this->_status, $this->_headers);
+    }
+    
+    public function disableBrowserCache() {
+        $this->setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+        $this->setHeader('Pragma', 'no-cache');
+        $this->setHeader('Expires', '0');
     }
 
     protected function findContent($url) {
@@ -227,8 +232,7 @@ class Controller_Front extends Controller
         foreach ($methods as $method) {
             $content = call_user_func(array($this, $method), $url);
             if ($content !== false) {
-                $this->_content = $content;
-                return true;
+                return $content;
             }
         }
         return false;
@@ -276,14 +280,17 @@ class Controller_Front extends Controller
             try {
 
                 // Finds the page
-                $page = $this->getPageById($this->_page_id);
+                $page = $this->getPageById($this->_page_id, array(
+                    // The page has to be published, except for a preview
+                    'where' => !$this->isPreview() ? array(array('published', 1)) : array(),
+                ));
                 if (!empty($page)) {
                 
                     // Loads the page
                     $this->loadPage($page);
                     
                     // Renders the page
-                    $this->renderPage();
+                    $this->renderPage($page);
                     
                     return true;
                 }
@@ -306,27 +313,22 @@ class Controller_Front extends Controller
         
         $this->_page_id = null;
         $this->_page_url = $url.'/';
-            
-            // Ignore the template
-            catch (FrontIgnoreTemplateException $e) {
-                echo $this->_content;
-
-                $this->_cache->save(!$this->_use_cache ? -1 : $this->_cache_duration, $this);
-                $this->_content = $this->_cache->execute();
-            }
 
         // Try to load the page
         try {
 
             // Finds the page
-            $page = $this->getPageByUrl($this->_page_url);
+            $page = $this->getPageByUrl($this->_page_url, array(
+                // The page has to be published, except for a preview
+                'where' => !$this->isPreview() ? array(array('published', 1)) : array(),
+            ));
             if (!empty($page)) {
             
                 // Loads the page
                 $this->loadPage($page);
                 
                 // Renders the page
-                $this->renderPage();
+                $this->renderPage($page);
                 
                 return true;
             }
@@ -340,31 +342,28 @@ class Controller_Front extends Controller
         return false;
     }
 
-    public function renderPage()
+    public function renderPage($page)
     {
-        // Loads the page template
-        $this->loadPageTemplate();
-    
         try {
             // Renders the page's wysiwygs and assigns them to the template view
             $wysiwyg = array();
             foreach ($this->_template['layout'] as $wysiwyg_name => $layout) {
                 $this->_wysiwyg_name = $wysiwyg_name;
-                $wysiwyg[$wysiwyg_name] = Tools_Wysiwyg::parse($this->_page->wysiwygs->{$wysiwyg_name});
+                $wysiwyg[$wysiwyg_name] = Tools_Wysiwyg::parse($page->wysiwygs->{$wysiwyg_name});
             }
             $this->_wysiwyg_name = null;
             $this->_view->set('wysiwyg', $wysiwyg, false);
             
             // Renders the template view
             $this->_content = $this->_view->render();
+        
+            $this->_handleHead();
         }
             
         // Ignore the template
-        catch (FrontIgnoreTemplateException $e) {}
-        
-        $this->_handleHead();
-
-        return $this->_content;
+        catch (FrontIgnoreTemplateException $e) {
+            $this->_content = false;
+        }
     }
 
     public function getCachePath() {
@@ -574,7 +573,10 @@ class Controller_Front extends Controller
             $template = \Config::get('title_template', ':title');
         }
 
-        $this->_title = \Str::tr($template, array('title' => $title, 'page_title' => $this->_page->page_title));
+        $this->_title = \Str::tr($template, array(
+            'title' => $title, 
+            'page_title' => !empty($this->_page) ? $this->_page->page_title : null,
+        ));
 
         return $this;
     }
@@ -612,7 +614,7 @@ class Controller_Front extends Controller
 
         $this->_meta_description = \Str::tr($template, array(
             'meta_description' => $meta_description,
-            'page_meta_description' => $this->_page->page_meta_description,
+            'page_meta_description' => !empty($this->_page) ? $this->_page->page_meta_description : null,
         ));
 
         return $this;
@@ -633,7 +635,7 @@ class Controller_Front extends Controller
 
         $this->_meta_keywords = \Str::tr($template, array(
             'meta_keywords' => $meta_keywords,
-            'page_meta_keywords' => $this->_page->page_meta_keywords,
+            'page_meta_keywords' => !empty($this->_page) ? $this->_page->page_meta_keywords : null,
         ));
 
         return $this;
@@ -863,14 +865,9 @@ class Controller_Front extends Controller
      */
     protected function getPageById($page_id)
     {
-        $where = array(
-            array('page_id', $page_id),
-        );
-        
-        // The page has to be published, except for a preview
-        if (!$this->isPreview()) {
-            $where[] = array('published', 1);
-        }
+        $where = \Arr::get($options, 'where', array());
+
+        $where[] = array('page_id', $page_id);
         
         // Search the page
         $page = Page\Model_Page::find('first', array(
@@ -889,28 +886,25 @@ class Controller_Front extends Controller
      * @param string $url
      * @return Page\Model_Page|null
      */
-    protected function getPageByUrl($url)
+    protected function getPageByUrl($url, $options = array())
     {
-        $where = array();
+        $where = \Arr::get($options, 'where', array());
+        $absolute_url = \Uri::base(false).$url;
         
-        // The page has to be published, except for a preview
-        if (!$this->isPreview()) {
-            $where[] = array('published', 1);
-        }
-        
+        // Try to search the page in each possible contexts until one matches
         foreach ($this->_contexts_possibles as $context => $domain) {
             $where_context = $where;
             $where_context[] = array('page_context', $context);
             
-            // Get the relative URL without the context part
-            $url = rtrim(mb_substr(\Uri::base(false).$this->_page_url, mb_strlen($domain)), '/');
-            $url = !empty($url) ? $url.'.html' : null;
-            if (empty($url)) {
-                // If the url is empty, then search the entrance page
-                $where_context[] = array('page_entrance', 1);
+            // Builds the virtual url by removing the context part
+            $virtual_url = rtrim(mb_substr($absolute_url, mb_strlen($domain)), '/');
+            $virtual_url = !empty($virtual_url) ? $virtual_url.'.html' : null;
+            if (!empty($virtual_url)) {
+                // Search the page by virtual url
+                $where_context[] = array('page_virtual_url', $virtual_url);
             } else {
-                // Otherwise search the page by virtual url
-                $where_context[] = array('page_virtual_url', $url);
+                // Otherwise if the url is empty then search the entrance page
+                $where_context[] = array('page_entrance', 1);
             }
 
             // Search the page
@@ -927,13 +921,13 @@ class Controller_Front extends Controller
             if (!empty($page)) {
                 
                 // Prevents duplicate URLs for the entrance page
-                if ($page->page_entrance && !empty($url)) {
+                if ($page->page_entrance && !empty($virtual_url)) {
                     \Response::redirect($domain, 'location', 301);
                     exit();
                 }
                 
                 // Loads the page
-                $this->_page_url = $url;
+                $this->_page_url = $virtual_url;
                 return $page;
             }
         }
@@ -949,84 +943,63 @@ class Controller_Front extends Controller
         $this->_page = $page;
 
         \Event::trigger('front.pageFound', array(
-            'page' => $this->_page,
+            'page' => $page,
         ));
 
-        \Fuel::$profiling && \Profiler::console('page_id = ' . $this->_page->page_id);
+        \Fuel::$profiling && \Profiler::console('page_id = ' . $page->page_id);
         
         // Redirect if the page is an external link
-        if ($this->_page->page_type == \Nos\Page\Model_Page::TYPE_EXTERNAL_LINK) {
-            \Response::redirect($this->_page->page_external_link, 'location', 301);
+        if ($page->page_type == \Nos\Page\Model_Page::TYPE_EXTERNAL_LINK) {
+            \Response::redirect($page->page_external_link, 'location', 301);
             exit();
         }
         
         // Set the page's SEO
-        if ($this->_page->page_meta_noindex) {
+        if ($page->page_meta_noindex) {
             $replaces = array();
             $this->setMetaRobots('noindex');
         } else {
             $replaces = array(
-               'title' => !empty($this->_page->page_meta_title) ? $this->_page->page_meta_title : $this->_page->page_title,
-               'meta_description' => $this->_page->page_meta_description,
-               'meta_keywords' => $this->_page->page_meta_keywords,
+               'title' => !empty($page->page_meta_title) ? $page->page_meta_title : $page->page_title,
+               'meta_description' => $page->page_meta_description,
+               'meta_keywords' => $page->page_meta_keywords,
             );
         }
         
         // Set the page as the displayed item
-        $this->setItemDisplayed($this->_page, $replaces);
+        $this->setItemDisplayed($page, $replaces);
 
         // Set the context from the page
-        $this->_context = $this->_page->get_context();
+        $this->_context = $page->get_context();
         $this->_context_url = $this->_contexts_possibles[$this->_context];
         I18n::setLocale(Tools_Context::localeCode($this->_context));
 
         // Sets the page's specific cache duration
-        if (!empty($this->_page->page_cache_duration)) {
-            $this->_cache_duration = $this->_page->page_cache_duration;
+        if (!empty($page->page_cache_duration)) {
+            $this->_cache_duration = $page->page_cache_duration;
             \Nos\FrontCache::$cache_duration = $this->_cache_duration;
         }
-
-        // Loads the page template
-        $this->loadPageTemplate();
-    
-        try {
-            // Renders the page's wysiwygs and assigns them to the template view
-            $wysiwyg = array();
-            foreach ($this->_template['layout'] as $wysiwyg_name => $layout) {
-                $this->_wysiwyg_name = $wysiwyg_name;
-                $wysiwyg[$wysiwyg_name] = Tools_Wysiwyg::parse($this->_page->wysiwygs->{$wysiwyg_name});
-            }
-            $this->_wysiwyg_name = null;
-            $this->_view->set('wysiwyg', $wysiwyg, false);
-            
-            // Renders the template view
-            $this->_content = $this->_view->render();
-        }
-            
-        // Ignore the template
-        catch (FrontIgnoreTemplateException $e) {}
         
-        $this->_handleHead();
-
-        return $this->_content;
+        // Loads the page template
+        $this->loadPageTemplate($page);
     }
 
-    protected function loadPageTemplate()
+    protected function loadPageTemplate($page)
     {
-        if (!isset($this->_page->template_variation)) {
+        if (!isset($page->template_variation)) {
             throw new \Exception('This page have no template variation configured.');
         }
 
-        // Load the template configuration
-        $this->_template = $this->_page->template_variation->configCompiled();
+        // Loads the template configuration
+        $this->_template = $page->template_variation->configCompiled();
         if (empty($this->_template['file'])) {
             throw new \Exception(
                 'The template file for '.
-                ($this->_template['title'] ?: $this->_page->template_variation->tpvar_template ).' is not defined.'
+                ($this->_template['title'] ?: $page->template_variation->tpvar_template ).' is not defined.'
             );
         }
 
-        // Set the template view
+        // Sets the template view
         $this->setView($this->_template['file']);
     }
     
