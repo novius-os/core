@@ -527,6 +527,13 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
         return $data;
     }
 
+    /**
+     * @deprecated Please consider using findContextOrMain() which returns more consistent results.
+     *
+     * @param $context
+     * @param array $options
+     * @return array
+     */
     public function findMainOrContext($context, array $options = array())
     {
         $class = $this->_class;
@@ -549,6 +556,54 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
             }
             $result_context[$item->{$this->_properties['common_id_property']}] = $pk;
             $result[$pk] = $item;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Find items in the specified context(s) with a fallback on the main item
+     *
+     * If an item is available in several specified contexts, it will be returned in the
+     * context that is the highest in the list of specified contexts
+     *
+     * @param array|string $contexts
+     * @param array $options
+     * @return array
+     */
+    public function findContextOrMain($contexts, array $options = array())
+    {
+        $contexts = (array) $contexts;
+
+        // Build the query
+        $class = $this->_class;
+        $items = $class::query($options)
+            ->and_where_open()
+            ->where($this->_properties['context_property'], 'IN', $contexts)
+            ->or_where($this->_properties['is_main_property'], '=', 1)
+            ->and_where_close()
+            ->get();
+
+        // Group items by common id
+        $common_items = array();
+        foreach ($items as $pk => $item) {
+            $common_items[$item->{$this->_properties['common_id_property']}][$pk] = $item;
+        }
+
+        // Build results
+        $result = array();
+        foreach ($common_items as $items) {
+            // Sort items by specified context order
+            uasort($items, function($a, $b) use ($contexts) {
+                $a_context = array_search($a->get_context(), $contexts);
+                $b_context = array_search($b->get_context(), $contexts);
+                if ($a_context === false xor $b_context === false) {
+                    return $a_context === false ? 1 : -1;
+                }
+                return intval($a_context) - intval($b_context);
+            });
+            reset($items);
+            $result[key($items)] = current($items);
         }
 
         return $result;
