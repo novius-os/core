@@ -69,7 +69,15 @@ class Controller_Front extends Controller
     protected $_headers = array();
 
     protected $_custom_data_cached = array();
-    protected static $_properties_cached = array('_page', '_context', '_context_url', '_page_url', '_url', '_status', '_headers');
+    protected static $_properties_cached = array(
+        '_page',
+        '_context',
+        '_context_url',
+        '_page_url',
+        '_url',
+        '_status',
+        '_headers'
+    );
 
     protected $pageFoundAlreadyTriggered = false;
 
@@ -125,19 +133,15 @@ class Controller_Front extends Controller
         $this->_cache = FrontCache::forge($cache_path);
         \Nos\FrontCache::$cache_duration = $this->_cache_duration;
 
-        // Gets the content from cache
-        $this->_content = $this->_use_cache ? $this->findCache() : null;
-
-        // Builds the content if not already cached
-        if ($this->_content === false) {
+        // Try to get the content from the cache
+        if (!$this->findCache())) {
 
             // Starts building the cache
             $this->_cache->start();
 
             // Try to find the content
             try {
-                $this->_content = $this->findContent($url);
-                if ($this->_content === false) {
+                if (!$this->findContent($url)) {
                     throw new ContentNotFoundException('The requested content was not found.');
                 }
                 
@@ -216,6 +220,12 @@ class Controller_Front extends Controller
         return \Response::forge($this->_content, $this->_status, $this->_headers);
     }
 
+    /**
+     * Try to find a content that match the specified $url using several methods.
+     * 
+     * @param string $url
+     * @return bool
+     */
     protected function findContent($url) {
         $methods = array(
             // Try to find a page with an url enhancer that match the url
@@ -225,16 +235,18 @@ class Controller_Front extends Controller
         );
         // Try several methods to find a content that match the URL
         foreach ($methods as $method) {
-            $content = call_user_func(array($this, $method), $url);
-            if ($content !== false) {
-                return $content;
+            if (call_user_func(array($this, $method), $url)) {
+                return true;
             }
         }
         return false;
     }
 
     /**
-     * Try to find an URL enhancer
+     * Try to find an URL enhancer in a page that match $url
+     * 
+     * @param string $url
+     * @return bool
      */
     public function findUrlEnhancer($url)
     {
@@ -259,8 +271,20 @@ class Controller_Front extends Controller
             $this->_contexts_possibles = array(
                 $page_params['context'] => $contexts_possibles[$page_params['context']]
             );
+
+            // Gets the page by ID
+            $page = $this->getPageById($this->_page_id, array(
+                // The page has to be published, except for a preview
+                'where' => !$this->isPreview() ? array(array('published', 1)) : array(),
+            ));
+            if (empty($page)) {
+                // No page found
+                continue;
+            }
             
             $this->_page_id = $page_id;
+            
+            // Sets the URLs and paths
             if (in_array($page_params['url'], array('', '/'))) {
                 $this->_page_url = '';
                 $this->_enhanced_url_path = '';
@@ -271,28 +295,58 @@ class Controller_Front extends Controller
             $context_url = \Arr::get($contexts_possibles, $page_params['context']).$page_params['url'];
             $this->_enhancer_url = mb_substr(\Uri::base(false).ltrim($url, '/'), mb_strlen($context_url));
 
-            // Try to load the page
+            // Renders the page
             try {
-
-                // Finds the page by ID
-                $page = $this->getPageById($this->_page_id, array(
-                    // The page has to be published, except for a preview
-                    'where' => !$this->isPreview() ? array(array('published', 1)) : array(),
-                ));
-                if (!empty($page)) {
-                    
-                    // Renders the page
-                    return $this->renderPage($page);
-                }
-            } catch (NotFoundException $e) {}
-            
-            // Page not found, resets the cache
-            $this->_cache->reset();
+                $this->_content = $this->renderPage($page);
+                return true;
+            }
+            // No content was found while rendering the page
+            catch (NotFoundException $e) {
+                // Resets the cache
+                $this->_cache->reset();
+            }
         }
 
         $this->_enhanced_url_path = false;
         $this->_enhancer_url = false;
         
+        return false;
+    }
+
+    /**
+     * Try to find a page that match $url
+     * 
+     * @param int $page_id
+     * @return Page\Model_Page|null
+     */
+    protected function findPage($url)
+    {
+        // Sets the possible contexts for this URL
+        $this->_contexts_possibles = $this->getUrlContexts($url);
+        
+        $this->_page_id = null;
+        $this->_page_url = $url.'/';
+
+        // Gets the page by virtual URL
+        $page = $this->getPageByVirtualUrl($this->_page_url, array(
+            // The page has to be published, except for a preview
+            'where' => !$this->isPreview() ? array(array('published', 1)) : array(),
+        ));
+            
+        if (!empty($page)) {
+
+            // Renders the page
+            try {
+                $this->_content = $this->renderPage($page);
+                return true;
+            }
+            // No content was found while rendering the page
+            catch (NotFoundException $e) {
+                // Resets the cache
+                $this->_cache->reset();
+            }
+        }
+            
         return false;
     }
 
@@ -318,36 +372,6 @@ class Controller_Front extends Controller
         
         return $page;
     }
-                
-    protected function findPage($url)
-    {
-        // Sets the possible contexts for this URL
-        $this->_contexts_possibles = $this->getUrlContexts($url);
-        
-        $this->_page_id = null;
-        $this->_page_url = $url.'/';
-
-        // Try to load the page
-        try {
-
-            // Finds the page by virtual URL
-            $page = $this->getPageByUrl($this->_page_url, array(
-                // The page has to be published, except for a preview
-                'where' => !$this->isPreview() ? array(array('published', 1)) : array(),
-            ));
-            if (!empty($page)) {
-                
-                // Renders the page
-                return $this->renderPage($page);
-            }
-            
-        } catch (NotFoundException $e) {}
-            
-        // Page not found, resets the cache
-        $this->_cache->reset();
-            
-        return false;
-    }
 
     /**
      * Gets a page by URL
@@ -355,7 +379,7 @@ class Controller_Front extends Controller
      * @param string $url
      * @return Page\Model_Page|null
      */
-    protected function getPageByUrl($url, $options = array())
+    protected function getPageByVirtualUrl($url, $options = array())
     {
         $where = \Arr::get($options, 'where', array());
         $absolute_url = \Uri::base(false).$url;
@@ -404,56 +428,53 @@ class Controller_Front extends Controller
         return false;
     }
 
-    protected function loadPageTemplate($page)
-    {
-        if (!isset($page->template_variation)) {
-            throw new \Exception('This page have no template variation configured.');
-        }
-
-        // Loads the template configuration
-        $this->_template = $page->template_variation->configCompiled();
-        if (empty($this->_template['file'])) {
-            throw new \Exception(
-                'The template file for '.
-                ($this->_template['title'] ?: $page->template_variation->tpvar_template ).' is not defined.'
-            );
-        }
-
-        // Sets the template view
-        $this->setView($this->_template['file']);
-    }
-
-    public function renderPage($page)
-    { 
-        // Sets as current page
+    /**
+     * Set the specified $page as the displayed page
+     * 
+     * @param string $url
+     * @return bool|string
+     */
+    protected function setPageDisplayed($page) {
         $this->_page = $page;
 
+        // Be careful, this event can be triggered several times because of the logic based on 
+        // the "NotFoundException" exception thrown by URL enhancers to tell the controller 
+        // that no content were found.
         \Event::trigger('front.pageFound', array(
             'page' => $page,
         ));
 
         \Fuel::$profiling && \Profiler::console('page_id = ' . $page->page_id);
         
+        // SEO no index
+        if ($page->page_meta_noindex) {
+            $this->setMetaRobots('noindex');
+        }
+        
+        // Sets the page as the displayed item
+        $this->setItemDisplayed($page, array(
+           'title' => $page->getMetaTitle() ?: $page->page_title,
+           'meta_description' => $page->getMetaDescription(),
+           'meta_keywords' => $page->getMetaKeywords(),
+        ));
+    }
+
+    /**
+     * Renders and return the content of the specified $page
+     * 
+     * @param string $url
+     * @return bool|string
+     */
+    public function renderPage($page)
+    { 
         // Redirects if the page is an external link
         if ($page->page_type == \Nos\Page\Model_Page::TYPE_EXTERNAL_LINK) {
             \Response::redirect($page->page_external_link, 'location', 301);
             exit();
         }
         
-        // Sets the page's SEO
-        if ($page->page_meta_noindex) {
-            $replaces = array();
-            $this->setMetaRobots('noindex');
-        } else {
-            $replaces = array(
-               'title' => !empty($page->page_meta_title) ? $page->page_meta_title : $page->page_title,
-               'meta_description' => $page->page_meta_description,
-               'meta_keywords' => $page->page_meta_keywords,
-            );
-        }
-        
-        // Sets the page as the displayed item
-        $this->setItemDisplayed($page, $replaces);
+        // Set the page a thes displayed page
+        $this->setPageDisplayed($page);
 
         // Sets the page's context as the current context
         $this->_context = $page->get_context();
@@ -482,7 +503,7 @@ class Controller_Front extends Controller
             // Renders the template view
             $content = $this->_view->render();
         
-            $content = $this->_handleHead($content);
+            $this->_content = $this->_handleHead($content);
             
             return $content;
         }
@@ -491,6 +512,32 @@ class Controller_Front extends Controller
         catch (FrontIgnoreTemplateException $e) {
             return false;
         }
+    }
+
+
+    /**
+     * Loads the template of the specified $page
+     * 
+     * @param string $url
+     * @return bool|string
+     */
+    protected function loadPageTemplate($page)
+    {
+        if (!isset($page->template_variation)) {
+            throw new \Exception('This page have no template variation configured.');
+        }
+
+        // Loads the template configuration
+        $this->_template = $page->template_variation->configCompiled();
+        if (empty($this->_template['file'])) {
+            throw new \Exception(
+                'The template file for '.
+                ($this->_template['title'] ?: $page->template_variation->tpvar_template ).' is not defined.'
+            );
+        }
+
+        // Sets the template view
+        $this->setView($this->_template['file']);
     }
     
     public function getUrlContexts($url, $absolute = false) {
@@ -853,6 +900,7 @@ class Controller_Front extends Controller
 
     protected function _handleHead($content)
     {
+    }
         $replaces  = array(
             '_base_href'         => array(
                 'pattern' => '<base [^>]*\/?>',
@@ -977,13 +1025,14 @@ class Controller_Front extends Controller
      * @return string The current context
      */
     protected function findCache() {
-        try {
-            // If cache exists then retrieves its content
-            $this->_content = $this->_cache->execute($this);
-        } catch (CacheNotFoundException $e) {
-            return false;
+        if ($this->_use_cache) {
+            try {
+                // If cache exists then retrieves its content
+                $this->_content = $this->_cache->execute($this);
+                return true;
+            } catch (CacheNotFoundException $e) {}
         }
-        return true;
+        return false;
     }
 
     public function getCachePath() {
