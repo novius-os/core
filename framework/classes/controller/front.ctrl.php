@@ -14,11 +14,20 @@ use Fuel\Core\Cache;
 use Fuel\Core\Config;
 use View;
 
+// @deprecated Please consider using FrontNotFoundException instead
 class NotFoundException extends \Exception
 {
 }
 
-class ContentNotFoundException extends \Exception
+class FrontNotFoundException extends NotFoundException
+{
+}
+
+class FrontContentNotFoundException extends \Exception
+{
+}
+
+class FrontContentErrorException extends NotFoundException
 {
 }
 
@@ -106,116 +115,127 @@ class Controller_Front extends Controller
 
         // POST or preview means no cache. Ever.
         // We don't want cache in DEV except if _cache=1
-        if ($this->_is_preview || \Input::method() == 'POST') {
+        if ($this->isPreview() || \Input::method() == 'POST') {
             $this->_use_cache = false;
         } else {
             $this->_use_cache = \Input::get('_cache', \Config::get('novius-os.cache', true));
         }
 
-        // Disable browser cache if it's a preview
-        if ($this->_is_preview) {
+        // Disable browser caching if it's a preview
+        if ($this->isPreview()) {
             $this->disableBrowserCaching();
         }
-
-        $cache_path = $this->getCachePath();
-
-        // Front start
-        \Event::trigger('front.start');
-        \Event::trigger_function('front.start', array(
-            array(
-                'url' => &$url, 
-                'cache_path' => &$cache_path
-            )
-        ));
-
-        // Initializes the cache
-        $cache_path = \Nos\FrontCache::getPathFromUrl($this->_base_href, $cache_path);
-        $this->_cache = FrontCache::forge($cache_path);
-        \Nos\FrontCache::$cache_duration = $this->_cache_duration;
-
-        // Try to get the content from the cache
-        if (!$this->findCache())) {
-
-            // Starts building the cache
-            $this->_cache->start();
-
-            // Try to find the content
-            try {
-                if (!$this->findContent($url)) {
-                    throw new ContentNotFoundException('The requested content was not found.');
-                }
-                
-                // Displays the content
-                \Event::trigger_function('front.display', array(&$this->_content));
-                \Event::trigger('front.display', array(
-                    'url'       => rtrim($this->_page_url, '/'),
-                    'content'   => &$this->_content,
-                    'status'    => &$this->_status,
-                    'headers'   => &$this->_headers,
-                    'params'    => $params,
-                ));
-                echo $this->_content;
-                
-                // Saves the cache
-                $this->_cache->save(!$this->_use_cache ? -1 : $this->_cache_duration, $this);
-                $this->_content = $this->_cache->execute();
-            }
-            
-            // Content not found
-            catch (ContentNotFoundException $e) {
-                $this->_status = 404;
-                $this->_content = null;
+        
+        try {
+            // Builds the default cache path
+            $cache_path = $this->getCachePath();
+        
+            // Front start
+            \Event::trigger('front.start');
+            \Event::trigger_function('front.start', array(
+                array(
+                    'url' => &$url, 
+                    'cache_path' => &$cache_path,
+                )
+            ));
     
-                // Set a blank state as content if we're on the homepage
-                if (empty($url)) {
-                    $this->_content = \View::forge('nos::errors/blank_slate_front', array(
-                        'base_url' => $this->_base_href,
-                    ), false);
-                }
+            // Initializes the cache
+            $cache_path = \Nos\FrontCache::getPathFromUrl($this->_base_href, $cache_path);
+            $this->_cache = FrontCache::forge($cache_path);
+            \Nos\FrontCache::$cache_duration = $this->_cache_duration;
     
-                // Let the possibility to alter the 404 response
-                \Event::trigger('front.404NotFound', array(
-                    'url'       => $url,
-                    'content'   => &$this->_content,
-                    'status'    => &$this->_status,
-                    'headers'   => &$this->_headers,
-                    'params'    => $params,
-                ));
-            }
-            
-            // A database exception occurred
-            catch (\Database_Exception $e) {
-                // No database configuration file is found
-                if (!is_file(APPPATH.'config'.DS.'db.config.php')) {
-                    // if install.php is there, redirects!
-                    if (is_file(DOCROOT.'htdocs'.DS.'install.php')) {
-                        \Response::redirect($this->_base_href.'install.php');
+            // Try to get the content from the cache
+            if (!$this->findCache())) {
+    
+                // Starts building the cache
+                $this->_cache->start();
+    
+                // Try to find the content
+                try {
+                    if (!$this->findContent($url)) {
+                        throw new FrontContentNotFoundException('The requested content was not found.');
                     }
+                    
+                    // Displays the content
+                    \Event::trigger_function('front.display', array(&$this->_content));
+                    \Event::trigger('front.display', array(
+                        'url'       => rtrim($this->_page_url, '/'),
+                        'content'   => &$this->_content,
+                        'status'    => &$this->_status,
+                        'headers'   => &$this->_headers,
+                        'params'    => $params,
+                    ));
+                    echo $this->_content;
+                    
+                    // Saves the cache
+                    $this->_cache->save(!$this->_use_cache ? -1 : $this->_cache_duration, $this);
+                    $this->_content = $this->_cache->execute();
                 }
-
-                echo \View::forge('nos::errors/blank_slate_front', array(
-                    'base_url' => $this->_base_href,
-                    'error' => 'Database configuration error.',
-                    'exception' => $e,
-                ), false);
-                exit();
+                
+                // Content not found
+                catch (FrontContentNotFoundException $e) {
+                    $this->_cache->reset();
+                    $this->_status = 404;
+                    $this->_content = null;
+        
+                    // Set a blank state as content if we're on the homepage
+                    if (empty($url)) {
+                        $this->_content = \View::forge('nos::errors/blank_slate_front', array(
+                            'base_url' => $this->_base_href,
+                        ), false);
+                    }
+        
+                    // Let the possibility to alter the 404 response
+                    \Event::trigger('front.404NotFound', array(
+                        'url'       => $url,
+                        'content'   => &$this->_content,
+                        'status'    => &$this->_status,
+                        'headers'   => &$this->_headers,
+                        'params'    => $params,
+                    ));
+                }
+                
+                // An error occured while rendering the front content
+                catch (FrontContentErrorException $e) {
+                    $this->_cache->reset();
+                    echo $e->getMessage();
+                    exit();
+                }
             }
-            
-            // An exception occurred
-            catch (\Exception $e) {
-                //@todo : error page case
-                exit($e->getMessage());
-            }
+    
+            \Event::trigger_function('front.response', array(
+                array(
+                    'content'   => &$this->_content,
+                    'status'    => &$this->_status,
+                    'headers'   => &$this->_headers,
+                    'params'    => $params,
+                )
+            ));
         }
+            
+        // A database exception occurred
+        catch (\Database_Exception $e) {
+            // No database configuration file is found
+            if (!is_file(APPPATH.'config'.DS.'db.config.php')) {
+                // if install.php is there, redirects!
+                if (is_file(DOCROOT.'htdocs'.DS.'install.php')) {
+                    \Response::redirect($this->_base_href.'install.php');
+                }
+            }
 
-        \Event::trigger_function('front.response', array(
-            array(
-                'content'   => &$this->_content,
-                'status'    => &$this->_status,
-                'headers'   => &$this->_headers,
-                'params'    => $params,
-            )
-        ));
+            echo \View::forge('nos::errors/blank_slate_front', array(
+                'base_url' => $this->_base_href,
+                'error' => 'Database configuration error.',
+                'exception' => $e,
+            ), false);
+            exit();
+        }
+        
+        // An exception occurred
+        catch (\Exception $e) {
+            //@todo : error page case
+            exit($e->getMessage());
+        }
 
         return \Response::forge($this->_content, $this->_status, $this->_headers);
     }
@@ -297,7 +317,7 @@ class Controller_Front extends Controller
 
             // Renders the page
             try {
-                $this->_content = $this->renderPage($page);
+                $this->renderPage($page);
                 return true;
             }
             // No content was found while rendering the page
@@ -337,7 +357,7 @@ class Controller_Front extends Controller
 
             // Renders the page
             try {
-                $this->_content = $this->renderPage($page);
+                $this->renderPage($page);
                 return true;
             }
             // No content was found while rendering the page
@@ -429,37 +449,6 @@ class Controller_Front extends Controller
     }
 
     /**
-     * Set the specified $page as the displayed page
-     * 
-     * @param string $url
-     * @return bool|string
-     */
-    protected function setPageDisplayed($page) {
-        $this->_page = $page;
-
-        // Be careful, this event can be triggered several times because of the logic based on 
-        // the "NotFoundException" exception thrown by URL enhancers to tell the controller 
-        // that no content were found.
-        \Event::trigger('front.pageFound', array(
-            'page' => $page,
-        ));
-
-        \Fuel::$profiling && \Profiler::console('page_id = ' . $page->page_id);
-        
-        // SEO no index
-        if ($page->page_meta_noindex) {
-            $this->setMetaRobots('noindex');
-        }
-        
-        // Sets the page as the displayed item
-        $this->setItemDisplayed($page, array(
-           'title' => $page->getMetaTitle() ?: $page->page_title,
-           'meta_description' => $page->getMetaDescription(),
-           'meta_keywords' => $page->getMetaKeywords(),
-        ));
-    }
-
-    /**
      * Renders and return the content of the specified $page
      * 
      * @param string $url
@@ -500,20 +489,44 @@ class Controller_Front extends Controller
             $this->_wysiwyg_name = null;
             $this->_view->set('wysiwyg', $wysiwyg, false);
             
-            // Renders the template view
-            $content = $this->_view->render();
-        
-            $this->_content = $this->_handleHead($content);
-            
-            return $content;
+            // Renders the template
+            $this->renderTemplate();
         }
             
-        // Ignore the template
-        catch (FrontIgnoreTemplateException $e) {
-            return false;
-        }
+        // Exception thrown to ignore the template
+        catch (FrontIgnoreTemplateException $e) {}
     }
 
+    /**
+     * Set the specified $page as the displayed page
+     * 
+     * @param string $url
+     * @return bool|string
+     */
+    protected function setPageDisplayed($page) {
+        $this->_page = $page;
+
+        // Be careful, this event can be triggered several times because of the logic based on 
+        // the "NotFoundException" exception thrown by URL enhancers to tell the controller 
+        // that no content were found.
+        \Event::trigger('front.pageFound', array(
+            'page' => $page,
+        ));
+
+        \Fuel::$profiling && \Profiler::console('page_id = ' . $page->page_id);
+        
+        // SEO no index
+        if ($page->page_meta_noindex) {
+            $this->setMetaRobots('noindex');
+        }
+        
+        // Sets the page as the displayed item
+        $this->setItemDisplayed($page, array(
+           'title' => $page->getMetaTitle() ?: $page->page_title,
+           'meta_description' => $page->getMetaDescription(),
+           'meta_keywords' => $page->getMetaKeywords(),
+        ));
+    }
 
     /**
      * Loads the template of the specified $page
@@ -537,9 +550,50 @@ class Controller_Front extends Controller
         }
 
         // Sets the template view
-        $this->setView($this->_template['file']);
+        $this->setTemplateView($this->_template['file']);
+    }
+
+    /**
+     * Sets $file as the template view
+     * 
+     * @param $file
+     * @throws \Exception
+     */
+    public function setTemplateView($file) {
+        // Loads the template view
+        try {
+            $this->_view = View::forge($file);
+        } catch (\FuelException $e) {
+            throw new \Exception('The template '.$file.' cannot be found.');
+        }
+
+        // Assigns some default variables
+        $this->_view->set('title', $this->h1, false);
+        $this->_view->set('page', $this->_page, false);
+        $this->_view->set('main_controller', $this, false);
     }
     
+    /**
+     * Renders the template
+     */
+    public function renderTemplate() {
+        // Renders the template view
+        $content = $this->_view->render();
+    
+        // Parses the content
+        $content = $this->parseContent($content);
+        
+        // Sets as content
+        $this->_content = $content;
+    }
+    
+    /**
+     * Gets the contexts that match the specified $url
+     * 
+     * @param string $url
+     * @param bool $absolute
+     * @return array
+     */
     public function getUrlContexts($url, $absolute = false) {
         $url = rtrim($url, '/').'/';
         if (!$absolute) {
@@ -558,25 +612,27 @@ class Controller_Front extends Controller
         return $url_contexts;
     }
     
+    /**
+     * Returns the available contexts
+     * 
+     * @return array
+     */
     protected function getAvailableContexts() {
         try {
             return Tools_Context::contexts();
         } catch (\RuntimeException $e) {
-            // Check if the contexts configuration file exists
-            if (!is_file(APPPATH.'config'.DS.'contexts.config.php')) {
-                // Redirects to the install script if the file is there
-                if (is_file(DOCROOT.'htdocs'.DS.'install.php')) {
-                    \Response::redirect($this->_base_href.'install.php');
-                }
+            // Sends an error if the contexts configuration file exists
+            if (is_file(APPPATH.'config'.DS.'contexts.config.php')) {
+                $this=>sendError(array(
+                    'error' => 'Context configuration error.',
+                    'exception' => $e,
+                ));
             }
-            
-            // There is a context configuration error
-            echo \View::forge('nos::errors/blank_slate_front', array(
-                'base_url' => $this->_base_href,
-                'error' => 'Context configuration error.',
-                'exception' => $e,
-            ), false);
-            exit();
+            // Otherwise redirects to the install script if the file exists
+            elseif (is_file(DOCROOT.'htdocs'.DS.'install.php')) {
+                \Response::redirect($this->_base_href.'install.php');
+            }
+            throw $e;
         }
     }
 
@@ -898,9 +954,16 @@ class Controller_Front extends Controller
         $this->_is_preview = (bool) $value;
     }
 
-    protected function _handleHead($content)
+    /**
+     * Parse and returns the specified $content
+     * 
+     * Handles the HTML head/foot replacements (css/js/meta)
+     * 
+     * @param string $content
+     * @return string
+     */
+    protected function parseContent($content)
     {
-    }
         $replaces  = array(
             '_base_href'         => array(
                 'pattern' => '<base [^>]*\/?>',
@@ -1004,23 +1067,17 @@ class Controller_Front extends Controller
         
         return $content;
     }
-    
-    public function setView($file) {
-        // Loads the template view
-        try {
-            $this->_view = View::forge($file);
-        } catch (\FuelException $e) {
-            throw new \Exception('The template '.$file.' cannot be found.');
-        }
 
-        // Assigns some default variables
-        $this->_view->set('title', $this->h1, false);
-        $this->_view->set('page', $this->_page, false);
-        $this->_view->set('main_controller', $this, false);
+    /**
+     * @deprecated Please consider using parseContent() instead
+     */
+    protected function _handleHead()
+    {
+        $this->_content = $this->parseContent($this->_content);
     }
     
     /**
-     * Try to load the content from the cache
+     * Try to find the content from the cache
      * 
      * @return string The current context
      */
@@ -1190,6 +1247,22 @@ class Controller_Front extends Controller
         $this->_content = $content;
 
         throw new FrontIgnoreTemplateException();
+    }
+
+    /**
+     * Sends an error page and stop all threatments
+     * 
+     * @param array() $params
+     */
+    public function sendError($params = array()) {
+        $params = \Arr::merge(array(
+            'base_url' => $this->_base_href,
+        ), $params);
+
+        // Renders the error view
+        $content = \View::forge('nos::errors/blank_slate_front', $params, false);
+
+        throw new FrontContentErrorException($content);
     }
 
     /**
