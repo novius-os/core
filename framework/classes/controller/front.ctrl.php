@@ -612,7 +612,7 @@ class Controller_Front extends Controller
         $content = $this->_view->render();
     
         // Parses the content
-        $content = $this->parseContent($content);
+        $content = $this->prepareHtmlContent($content);
         
         // Sets as content
         $this->_content = $content;
@@ -989,14 +989,14 @@ class Controller_Front extends Controller
     }
 
     /**
-     * Parse and returns the specified $content
+     * Prepares and returns the specified HTML $content
      * 
      * Handles the HTML head/foot replacements (css/js/meta)
      * 
      * @param string $content
      * @return string
      */
-    protected function parseContent($content)
+    protected function prepareHtmlContent($content)
     {
         $replaces  = array(
             '_base_href'         => array(
