@@ -96,6 +96,11 @@ class Controller_Front extends Controller
         $this->_cache_duration = \Config::get('novius-os.cache_duration_page', 60);
     }
 
+    /**
+     * Routes the specified $action
+     * 
+     * @return \Response
+     */
     public function router($action, $params, $status = 200)
     {
         $this->_status = $status;
@@ -115,10 +120,10 @@ class Controller_Front extends Controller
 
         // POST or preview means no cache. Ever.
         // We don't want cache in DEV except if _cache=1
-        if ($this->isPreview() || \Input::method() == 'POST') {
-            $this->_use_cache = false;
+        if ($this->isPreview() || \Input::method() == 'POST' || !\Input::get('_cache', \Config::get('novius-os.cache', true))) {
+            $this->disableCaching();
         } else {
-            $this->_use_cache = \Input::get('_cache', \Config::get('novius-os.cache', true));
+            $this->enableCaching();
         }
 
         // Disable browser caching if it's a preview
@@ -144,64 +149,8 @@ class Controller_Front extends Controller
             $this->_cache = FrontCache::forge($cache_path);
             \Nos\FrontCache::$cache_duration = $this->_cache_duration;
     
-            // Try to get the content from the cache
-            if (!$this->findCache())) {
-    
-                // Starts building the cache
-                $this->_cache->start();
-    
-                // Try to find the content
-                try {
-                    if (!$this->findContent($url)) {
-                        throw new FrontContentNotFoundException('The requested content was not found.');
-                    }
-                    
-                    // Displays the content
-                    \Event::trigger_function('front.display', array(&$this->_content));
-                    \Event::trigger('front.display', array(
-                        'url'       => rtrim($this->_page_url, '/'),
-                        'content'   => &$this->_content,
-                        'status'    => &$this->_status,
-                        'headers'   => &$this->_headers,
-                        'params'    => $params,
-                    ));
-                    echo $this->_content;
-                    
-                    // Saves the cache
-                    $this->_cache->save(!$this->_use_cache ? -1 : $this->_cache_duration, $this);
-                    $this->_content = $this->_cache->execute();
-                }
-                
-                // Content not found
-                catch (FrontContentNotFoundException $e) {
-                    $this->_cache->reset();
-                    $this->_status = 404;
-                    $this->_content = null;
-        
-                    // Set a blank state as content if we're on the homepage
-                    if (empty($url)) {
-                        $this->_content = \View::forge('nos::errors/blank_slate_front', array(
-                            'base_url' => $this->_base_href,
-                        ), false);
-                    }
-        
-                    // Let the possibility to alter the 404 response
-                    \Event::trigger('front.404NotFound', array(
-                        'url'       => $url,
-                        'content'   => &$this->_content,
-                        'status'    => &$this->_status,
-                        'headers'   => &$this->_headers,
-                        'params'    => $params,
-                    ));
-                }
-                
-                // An error occured while rendering the front content
-                catch (FrontContentErrorException $e) {
-                    $this->_cache->reset();
-                    echo $e->getMessage();
-                    exit();
-                }
-            }
+            // Builds the content
+            $this->buildContent($url);
     
             \Event::trigger_function('front.response', array(
                 array(
@@ -239,6 +188,78 @@ class Controller_Front extends Controller
 
         return \Response::forge($this->_content, $this->_status, $this->_headers);
     }
+    
+    /**
+     * Builds the content
+     */
+    public function buildContent($url)
+    {
+        // Try to get the content from the cache
+        if ($this->findCache())) {
+            return true;
+        }
+
+        // Starts building the cache
+        $this->_cache->start();
+
+        try {
+            
+            // Try to find the content
+            if ($this->findContent($url)) {
+            
+                // Displays the content
+                \Event::trigger_function('front.display', array(
+                    &$this->_content,
+                ));
+                \Event::trigger('front.display', array(
+                    'url'       => $url,
+                    'content'   => &$this->_content,
+                    'status'    => &$this->_status,
+                    'headers'   => &$this->_headers,
+                    'params'    => $params,
+                ));
+                
+                // Saves the content in cache if enabled
+                if ($this->isCachingEnabled()) {
+                    echo $this->_content;
+                    $this->_cache->save($this->_cache_duration, $this);
+                    $this->_content = $this->_cache->execute();
+                }
+                
+                return true;
+            }
+            
+            // Content not found
+            $this->_cache->reset();
+            $this->_status = 404;
+            $this->_content = null;
+
+            // Set a blank state as content if we're on the homepage
+            if (empty($url)) {
+                $this->_content = \View::forge('nos::errors/blank_slate_front', array(
+                    'base_url' => $this->_base_href,
+                ), false);
+            }
+
+            // Let the possibility to alter the 404 response
+            \Event::trigger('front.404NotFound', array(
+                'url'       => $url,
+                'content'   => &$this->_content,
+                'status'    => &$this->_status,
+                'headers'   => &$this->_headers,
+                'params'    => $params,
+            ));
+        }
+        
+        // An error occured while rendering the front content
+        catch (FrontContentErrorException $e) {
+            $this->_cache->reset();
+            echo $e->getMessage();
+            exit();
+        }
+
+        return false;
+    }
 
     /**
      * Try to find a content that match the specified $url using several methods.
@@ -246,19 +267,26 @@ class Controller_Front extends Controller
      * @param string $url
      * @return bool
      */
-    protected function findContent($url) {
+    protected function findContent($url)
+    {
         $methods = array(
             // Try to find a page with an url enhancer that match the url
             'findUrlEnhancer',
             // Try to find a page that match the url
             'findPage',
         );
-        // Try several methods to find a content that match the URL
-        foreach ($methods as $method) {
-            if (call_user_func(array($this, $method), $url)) {
-                return true;
+        
+        try {
+            // Try several methods to find a content that match the URL
+            foreach ($methods as $method) {
+                if (call_user_func(array($this, $method), $url)) {
+                    return true;
+                }
             }
         }
+        // No content were found
+        catch (FrontContentNotFoundException $e) {}
+                    
         return false;
     }
 
@@ -503,7 +531,8 @@ class Controller_Front extends Controller
      * @param string $url
      * @return bool|string
      */
-    protected function setPageDisplayed($page) {
+    protected function setPageDisplayed($page)
+    {
         $this->_page = $page;
 
         // Be careful, this event can be triggered several times because of the logic based on 
@@ -559,7 +588,8 @@ class Controller_Front extends Controller
      * @param $file
      * @throws \Exception
      */
-    public function setTemplateView($file) {
+    public function setTemplateView($file)
+    {
         // Loads the template view
         try {
             $this->_view = View::forge($file);
@@ -576,7 +606,8 @@ class Controller_Front extends Controller
     /**
      * Renders the template
      */
-    public function renderTemplate() {
+    public function renderTemplate()
+    {
         // Renders the template view
         $content = $this->_view->render();
     
@@ -594,7 +625,8 @@ class Controller_Front extends Controller
      * @param bool $absolute
      * @return array
      */
-    public function getUrlContexts($url, $absolute = false) {
+    public function getUrlContexts($url, $absolute = false)
+    {
         $url = rtrim($url, '/').'/';
         if (!$absolute) {
             $url = \Uri::base(false).$url;
@@ -617,7 +649,8 @@ class Controller_Front extends Controller
      * 
      * @return array
      */
-    protected function getAvailableContexts() {
+    protected function getAvailableContexts()
+    {
         try {
             return Tools_Context::contexts();
         } catch (\RuntimeException $e) {
@@ -950,7 +983,8 @@ class Controller_Front extends Controller
      * @param boolean $value True to enable or false to disable
      * @return boolean True if current page is requested in the preview mode.
      */
-    protected function setPreview($value) {
+    protected function setPreview($value)
+    {
         $this->_is_preview = (bool) $value;
     }
 
@@ -1081,8 +1115,9 @@ class Controller_Front extends Controller
      * 
      * @return string The current context
      */
-    protected function findCache() {
-        if ($this->_use_cache) {
+    protected function findCache()
+    {
+        if ($this->isCachingEnabled()) {
             try {
                 // If cache exists then retrieves its content
                 $this->_content = $this->_cache->execute($this);
@@ -1092,7 +1127,8 @@ class Controller_Front extends Controller
         return false;
     }
 
-    public function getCachePath() {
+    public function getCachePath()
+    {
         $cache_path = $this->_url;
         if (empty($cache_path) {
             $cache_path = 'index/';
@@ -1138,14 +1174,34 @@ class Controller_Front extends Controller
     }
 
     /**
-     * Disable caching and cache retrieve of the current page.
+     * Checks if caching is enabled
+     *
+     * @return Controller_Front
+     */
+    public function isCachingEnabled()
+    {
+        return (bool) $this->_use_cache;
+    }
+
+    /**
+     * Disables caching
      *
      * @return Controller_Front
      */
     public function disableCaching()
     {
         $this->_use_cache = false;
+        return $this;
+    }
 
+    /**
+     * Enables caching
+     *
+     * @return Controller_Front
+     */
+    public function enableCaching()
+    {
+        $this->_use_cache = true;
         return $this;
     }
 
@@ -1254,7 +1310,8 @@ class Controller_Front extends Controller
      * 
      * @param array() $params
      */
-    public function sendError($params = array()) {
+    public function sendError($params = array())
+    {
         $params = \Arr::merge(array(
             'base_url' => $this->_base_href,
         ), $params);
