@@ -26,6 +26,7 @@ class FrontCache
     protected static $_php_begin = null;
 
     public static $cache_duration = 60;
+    public static $cache_duration_page_id = null;
 
     /**
      * @var bool True when executing cache, to prevent echoing uncache strings
@@ -251,12 +252,14 @@ class FrontCache
         $this->_level = ob_get_level();
     }
 
-    public static function checkExpires($expires, $initial_cache_duration = 0)
+    public static function checkExpires($expires, $initial_cache_duration = 0, $cache_duration_page_id = null)
     {
         if ($expires > 0 && $expires <= time()) {
             throw new CacheExpiredException();
         }
-        if ($initial_cache_duration > static::$cache_duration) {
+        // Check if cache duration change
+        // if page_cache_duration is set, $cache_duration_page_id contains page_id ; in this case, we ignore that test
+        if (empty($cache_duration_page_id) && $initial_cache_duration > static::$cache_duration) {
             throw new CacheExpiredException();
         }
     }
@@ -273,7 +276,7 @@ class FrontCache
             $expires = time() + $duration;
             $prepend .= '<?php
 
-            '.__CLASS__.'::checkExpires('.$expires.', '.$duration.');'."\n";
+            '.__CLASS__.'::checkExpires('.$expires.', '.$duration.', '.(int) static::$cache_duration_page_id.');'."\n";
 
             if (!empty($controller)) {
                 if ($this->_path === $this->_init_path && !empty($this->_suffix_handlers)) {
