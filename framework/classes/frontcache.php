@@ -279,7 +279,7 @@ class FrontCache
         ));
     }
 
-    public function save($duration = -1, $controller = null, $expires_params = array())
+    public function save($duration = -1, $controller = null)
     {
         $prepend = '';
         $this->_content = '';
