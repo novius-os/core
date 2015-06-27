@@ -15,11 +15,8 @@ use \DB;
 class Orm_Twinnable_ManyMany extends \Orm\ManyMany
 {
     protected $column_context_from = 'context';
-
     protected $column_context_common_id_to = false;
-
     protected $column_context_to = false;
-
     protected $column_context_is_main_to = false;
 
     protected $cascade_delete_after_last_twin = true;
@@ -29,6 +26,14 @@ class Orm_Twinnable_ManyMany extends \Orm\ManyMany
     protected $force_context_fallback = false;// force using a specific context
     protected $front_context_fallback = false;// try using front context
 
+    /**
+     * Initializes the twinnable relation specified by $name on the item $from
+     *
+     * @param string $from
+     * @param string $name
+     * @param array $config
+     * @throws \FuelException
+     */
     public function __construct($from, $name, array $config)
     {
         $to = \Arr::get($config, 'model_to', \Inflector::get_namespace($from).'Model_'.\Inflector::classify($name));
@@ -139,8 +144,7 @@ class Orm_Twinnable_ManyMany extends \Orm\ManyMany
      */
     protected function _build_query_where($query, $conditions, $alias_to, $from)
     {
-        if ($this->column_context_to)
-        {
+        if ($this->column_context_to) {
             // Filters the query to get the items in the context and the items in the main context
             $context_to = $this->get_context_to() ?: $from->{$this->column_context_from};
             $query->and_where_open();
@@ -152,65 +156,25 @@ class Orm_Twinnable_ManyMany extends \Orm\ManyMany
     }
 
     /**
-     * Gets the context for the model_to
+     * Gets the properties to join the related items on a query
      *
-     * @return bool|mixed|string
-     */
-    public function get_context_to() {
-        // Gets the context
-        if ($this->front_context_fallback && (NOS_ENTRY_POINT == Nos::ENTRY_POINT_FRONT)) {
-            // front context is used
-            return Nos::main_controller()->getContext();
-        } elseif (!empty($this->force_context_fallback)) {
-            // forced context fallback
-            return $this->force_context_fallback;
-        }
-        return false;
-    }
-
-    /**
-     * Gets the relations properties (name, alias...)
-     *
+     * @param $alias_from
      * @param $rel_name
-     * @param $alias_to
-     * @param $conditions
+     * @param $alias_to_nr
+     * @param array $conditions
      * @return array
      */
-    public function get_relations_properties($rel_name, $alias_to, $conditions) {
-        if (\Arr::get($conditions, 'main_context', true)) {
-            $relations = array(
-                'main' => array(
-                    'name' => $rel_name,
-                    'alias' => $alias_to,
-                ),
-                'context' => array(
-                    'name' => $rel_name.'_context',
-                    'alias' => $alias_to.'_context',
-                ),
-            );
-        } else {
-            $relations = array(
-                'main' => array(
-                    'name' => $rel_name.'_main',
-                    'alias' => $alias_to.'_main',
-                ),
-                'context' => array(
-                    'name' => $rel_name,
-                    'alias' => $alias_to,
-                ),
-            );
-        }
-
-        return $relations;
-    }
-
     public function join($alias_from, $rel_name, $alias_to_nr, $conditions = array())
     {
+		// Consider as a classical many_many relation if no column context defined
         if (!$this->column_context_to) {
+			// @todo throw an exception in a future major release ?
             return parent::join($alias_from, $rel_name, $alias_to_nr, $conditions);
         }
 
-        $alias_to = 't'.$alias_to_nr;
+		$this->alias_to = 't'.$alias_to_nr;
+		$this->alias_from = $alias_from;
+		$this->alias_through = $this->alias_to.'_through';
 
         // Merges the conditions of the relation with the specific conditions
         $conditions = \Arr::merge($this->conditions, $conditions);
@@ -218,7 +182,7 @@ class Orm_Twinnable_ManyMany extends \Orm\ManyMany
         $main_context = \Arr::get($conditions, 'main_context', true);
 
         // Get the relations properties (name, alias...)
-        $relations = $this->get_relations_properties($rel_name, $alias_to, $conditions);
+        $relations = $this->getRelationsProperties($rel_name, $this->alias_to, $conditions);
 
         // Gets the context in which to search the related items
         $context_to = $this->get_context_to();
@@ -228,11 +192,11 @@ class Orm_Twinnable_ManyMany extends \Orm\ManyMany
             $rel_name.'_through' => array(
                 'model'        => null,
                 'connection'   => call_user_func(array($this->model_to, 'connection')),
-                'table'        => array($this->table_through, $alias_to.'_through'),
+                'table'        => array($this->table_through, $this->alias_through),
                 'primary_key'  => null,
                 'join_type'    => \Arr::get($conditions, 'join_type', 'left'),
                 'join_on'      => array(),
-                'columns'      => $this->select_through($alias_to.'_through'),
+                'columns'      => $this->select_through($this->alias_through),
                 'rel_name'     => $this->model_through,
                 'relation'     => $this
             ),
@@ -246,9 +210,9 @@ class Orm_Twinnable_ManyMany extends \Orm\ManyMany
                     array($relations['main']['alias'].'.'.$this->column_context_is_main_to, '=', DB::expr(1))
                 ),
                 'columns'      => array(),
-                'rel_name'     => strpos($relations['main']['name'], '.') ? substr($relations['main']['name'], strrpos($relations['main']['name'], '.') + 1) : $relations['main']['name'],
+                'rel_name'     => $this->getRelationName($relations['main']['name']),
                 'relation'     => $this,
-                'where'        => \Arr::get($conditions, 'where', array()),
+                'where'        => array(),
             ),
             $relations['context']['name'] => array(
                 'model'       => $main_context ? null : $this->model_to,
@@ -260,39 +224,34 @@ class Orm_Twinnable_ManyMany extends \Orm\ManyMany
                     array($relations['context']['alias'].'.'.$this->column_context_to, '=', $context_to)
                 ),
                 'columns'     => array(),
-                'rel_name'    => (strpos($relations['context']['name'], '.') ? substr($relations['context']['name'], strrpos($relations['context']['name'], '.') + 1) : $relations['context']['name']),
+                'rel_name'    => $this->getRelationName($relations['context']['name']),
                 'relation'    => $this,
-                'where'       => \Arr::get($conditions, 'where', array()),
+                'where'       => array(),
             ),
         );
 
         // Builds the join conditions on the table_through
-        if (!$this->_build_join_through($joins, $rel_name, $alias_to.'_through', $alias_from, $conditions))
-        {
+        if (!$this->_build_join_through($joins, $rel_name, $this->alias_through, $this->alias_from, $conditions)) {
             return array();
         }
 
         // Builds the join conditions on the model_to
-        if (!$this->_build_join_to($joins, $rel_name, $alias_to, $alias_to.'_through', $conditions))
-        {
+        if (!$this->_build_join_to($joins, $rel_name, $this->alias_to, $this->alias_through, $conditions)) {
             return array();
         }
 
         // Builds the where conditions on the table_through
-        if (!$this->_build_join_where_through($joins, $rel_name, $alias_to, $alias_from, $conditions))
-        {
+        if (!$this->_build_join_where_through($joins, $rel_name, $this->alias_to, $this->alias_from, $conditions)) {
             return array();
         }
 
         // Builds the where conditions on the model_to
-        if (!$this->_build_join_where_to($joins, $rel_name, $alias_to, $alias_from, $conditions))
-        {
+        if (!$this->_build_join_where_to($joins, $rel_name, $this->alias_to, $this->alias_from, $conditions)) {
             return array();
         }
 
         // Builds the order_by conditions
-        if (!$this->_build_join_orderby($joins, $rel_name, $alias_to, $alias_from, $conditions))
-        {
+        if (!$this->_build_join_orderby($joins, $rel_name, $this->alias_to, $this->alias_from, $conditions)) {
             return array();
         }
 
@@ -326,7 +285,7 @@ class Orm_Twinnable_ManyMany extends \Orm\ManyMany
         }
 
         // Get the relations properties (name, alias...)
-        $relations = $this->get_relations_properties($rel_name, $alias_to, $conditions);
+        $relations = $this->getRelationsProperties($rel_name, $alias_to, $conditions);
 
         // Creates the conditions for the join on the main context and on the specified context
         foreach (\Arr::filter_keys($relations, array('main', 'context')) as $relation) {
@@ -355,7 +314,7 @@ class Orm_Twinnable_ManyMany extends \Orm\ManyMany
         }
 
         // Get the relations properties (name, alias...)
-        $relations = $this->get_relations_properties($rel_name, $alias_to, $conditions);
+        $relations = $this->getRelationsProperties($rel_name, $alias_to, $conditions);
 
         // Creates the conditions for the join on the main context and on the specified context
         foreach (\Arr::filter_keys($relations, array('main', 'context')) as $relation) {
@@ -386,11 +345,10 @@ class Orm_Twinnable_ManyMany extends \Orm\ManyMany
         $main_context = \Arr::get($conditions, 'main_context', true);
 
         // Get the relations properties (name, alias...)
-        $relations = $this->get_relations_properties($rel_name, $alias_to, $conditions);
+        $relations = $this->getRelationsProperties($rel_name, $alias_to, $conditions);
 
         // Builds the order_by conditions
-        foreach (\Arr::get($conditions, 'order_by', array()) as $key => $direction)
-        {
+        foreach (\Arr::get($conditions, 'order_by', array()) as $key => $direction) {
             // If the main_context feature is enabled then sort on the context column with a fallback on the main column
             if ($main_context && !$key instanceof \Fuel\Core\Database_Expression and strpos($key, '.') === false) {
                 $fields = array();
@@ -401,7 +359,7 @@ class Orm_Twinnable_ManyMany extends \Orm\ManyMany
             }
             // Otherwise sort on the context column
             else {
-                $key = $this->getAliasedField($key, $alias_to);
+                $key = $this->getAliasedField($key);
             }
 
             foreach ($relations as $relation) {
@@ -556,5 +514,58 @@ class Orm_Twinnable_ManyMany extends \Orm\ManyMany
         if (count($result) === 0) {
             parent::delete_related($model_from);
         }
+    }
+
+    /**
+     * Gets the context for the model_to
+     *
+     * @return bool|mixed|string
+     */
+    public function get_context_to() {
+        // Gets the context
+        if ($this->front_context_fallback && (NOS_ENTRY_POINT == Nos::ENTRY_POINT_FRONT)) {
+            // front context is used
+            return Nos::main_controller()->getContext();
+        } elseif (!empty($this->force_context_fallback)) {
+            // forced context fallback
+            return $this->force_context_fallback;
+        }
+        return false;
+    }
+
+    /**
+     * Gets the relations properties (name, alias...)
+     *
+     * @param $rel_name
+     * @param $alias_to
+     * @param $conditions
+     * @return array
+     */
+    public function getRelationsProperties($rel_name, $alias_to, $conditions) {
+        if (\Arr::get($conditions, 'main_context', true)) {
+            $relations = array(
+                'main' => array(
+                    'name' => $rel_name,
+                    'alias' => $alias_to,
+                ),
+                'context' => array(
+                    'name' => $rel_name.'_context',
+                    'alias' => $alias_to.'_context',
+                ),
+            );
+        } else {
+            $relations = array(
+                'main' => array(
+                    'name' => $rel_name.'_main',
+                    'alias' => $alias_to.'_main',
+                ),
+                'context' => array(
+                    'name' => $rel_name,
+                    'alias' => $alias_to,
+                ),
+            );
+        }
+
+        return $relations;
     }
 }
