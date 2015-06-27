@@ -38,6 +38,7 @@ class FrontIgnoreTemplateException extends \Exception
 class Controller_Front extends Controller
 {
     protected $_url = '';
+    protected $_virtual_url = '';
     protected $_extension = '';
     protected $_page_url = '';
     protected $_enhancer_url = false;
@@ -108,30 +109,31 @@ class Controller_Front extends Controller
         $this->_base_href = \Arr::get($params, 'base_href', \URI::base(false));
         $this->_context_url = \Arr::get($params, 'context_url', \URI::base(false));
         $this->_url = \Arr::get($params, 'url', \Input::server('NOS_URL'));
-
         $this->_extension = pathinfo($this->_url, PATHINFO_EXTENSION);
-        $url = $this->_url;
+
+        // Builds the virtual url
+        $this->_virtual_url = $this->_url;
         if (!empty($this->_extension)) {
-            $url = \Str::sub($url, 0, - strlen($this->_extension) - 1);
-        }
-
-        // Why Session::get() instead of Auth::check()? See https://github.com/novius-os/core/pull/52#issuecomment-21237309
-        $this->setPreview(\Input::get('_preview', false) && \Session::get('logged_user_id', false));
-
-        // POST or preview means no cache. Ever.
-        // We don't want cache in DEV except if _cache=1
-        if ($this->isPreview() || \Input::method() == 'POST' || !\Input::get('_cache', \Config::get('novius-os.cache', true))) {
-            $this->disableCaching();
-        } else {
-            $this->enableCaching();
-        }
-
-        // Disable browser caching if it's a preview
-        if ($this->isPreview()) {
-            $this->disableBrowserCaching();
+            $this->_virtual_url = \Str::sub($this->_virtual_url, 0, - strlen($this->_extension) - 1);
         }
         
         try {
+            // Why Session::get() instead of Auth::check()? See https://github.com/novius-os/core/pull/52#issuecomment-21237309
+            $this->setPreview(\Input::get('_preview', false) && \Session::get('logged_user_id', false));
+    
+            // POST or preview means no cache. Ever.
+            // We don't want cache in DEV except if _cache=1
+            if ($this->isPreview() || \Input::method() == 'POST' || !\Input::get('_cache', \Config::get('novius-os.cache', true))) {
+                $this->disableCaching();
+            } else {
+                $this->enableCaching();
+            }
+    
+            // Disable browser caching if it's a preview
+            if ($this->isPreview()) {
+                $this->disableBrowserCaching();
+            }
+            
             // Builds the default cache path
             $cache_path = $this->getCachePath();
         
@@ -139,7 +141,7 @@ class Controller_Front extends Controller
             \Event::trigger('front.start');
             \Event::trigger_function('front.start', array(
                 array(
-                    'url' => &$url, 
+                    'url' => &$this->_virtual_url, 
                     'cache_path' => &$cache_path,
                 )
             ));
@@ -150,7 +152,7 @@ class Controller_Front extends Controller
             \Nos\FrontCache::$cache_duration = $this->_cache_duration;
     
             // Builds the content
-            $this->buildContent($url);
+            $this->buildContent();
     
             \Event::trigger_function('front.response', array(
                 array(
@@ -192,7 +194,7 @@ class Controller_Front extends Controller
     /**
      * Builds the content
      */
-    public function buildContent($url)
+    public function buildContent()
     {
         // Try to get the content from the cache
         if ($this->findCache())) {
@@ -205,14 +207,14 @@ class Controller_Front extends Controller
         try {
             
             // Try to find the content
-            if ($this->findContent($url)) {
+            if ($this->findContent()) {
             
                 // Displays the content
                 \Event::trigger_function('front.display', array(
                     &$this->_content,
                 ));
                 \Event::trigger('front.display', array(
-                    'url'       => $url,
+                    'url'       => $this->_virtual_url,
                     'content'   => &$this->_content,
                     'status'    => &$this->_status,
                     'headers'   => &$this->_headers,
@@ -235,7 +237,7 @@ class Controller_Front extends Controller
             $this->_content = null;
 
             // Set a blank state as content if we're on the homepage
-            if (empty($url)) {
+            if (empty($this->_virtual_url)) {
                 $this->_content = \View::forge('nos::errors/blank_slate_front', array(
                     'base_url' => $this->_base_href,
                 ), false);
@@ -243,7 +245,7 @@ class Controller_Front extends Controller
 
             // Let the possibility to alter the 404 response
             \Event::trigger('front.404NotFound', array(
-                'url'       => $url,
+                'url'       => $this->_virtual_url,
                 'content'   => &$this->_content,
                 'status'    => &$this->_status,
                 'headers'   => &$this->_headers,
@@ -262,24 +264,23 @@ class Controller_Front extends Controller
     }
 
     /**
-     * Try to find a content that match the specified $url using several methods.
+     * Try to find a content using several methods.
      * 
-     * @param string $url
      * @return bool
      */
-    protected function findContent($url)
+    protected function findContent()
     {
         $methods = array(
-            // Try to find a page with an url enhancer that match the url
+            // Try to find a page with an url enhancer that match the virtual url
             'findUrlEnhancer',
-            // Try to find a page that match the url
+            // Try to find a page that match the virtual url
             'findPage',
         );
         
         try {
             // Try several methods to find a content that match the URL
-            foreach ($methods as $method) {
-                if (call_user_func(array($this, $method), $url)) {
+            foreach (static::$methods as $method) {
+                if (call_user_func(array($this, $method)), $this->_virtual_url) {
                     return true;
                 }
             }
@@ -362,9 +363,9 @@ class Controller_Front extends Controller
     }
 
     /**
-     * Try to find a page that match $url
+     * Try to find a page that match the specified $url
      * 
-     * @param int $page_id
+     * @param string $url
      * @return Page\Model_Page|null
      */
     protected function findPage($url)
@@ -424,13 +425,13 @@ class Controller_Front extends Controller
     /**
      * Gets a page by URL
      * 
-     * @param string $url
+     * @param string $virtual_url
      * @return Page\Model_Page|null
      */
-    protected function getPageByVirtualUrl($url, $options = array())
+    protected function getPageByVirtualUrl($virtual_url, $options = array())
     {
         $where = \Arr::get($options, 'where', array());
-        $absolute_url = \Uri::base(false).$url;
+        $absolute_url = \Uri::base(false).$virtual_url;
         
         // Try to search the page in each possible contexts until one matches
         foreach ($this->_contexts_possibles as $context => $domain) {
@@ -479,7 +480,7 @@ class Controller_Front extends Controller
     /**
      * Renders and return the content of the specified $page
      * 
-     * @param string $url
+     * @param Page\Model_Page $page
      * @return bool|string
      */
     public function renderPage($page)
@@ -528,7 +529,7 @@ class Controller_Front extends Controller
     /**
      * Set the specified $page as the displayed page
      * 
-     * @param string $url
+     * @param Page\Model_Page $page
      * @return bool|string
      */
     protected function setPageDisplayed($page)
@@ -560,7 +561,7 @@ class Controller_Front extends Controller
     /**
      * Loads the template of the specified $page
      * 
-     * @param string $url
+     * @param Page\Model_Page $page
      * @return bool|string
      */
     protected function loadPageTemplate($page)
