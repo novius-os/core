@@ -271,10 +271,11 @@ class Controller_Front extends Controller
     protected function findContent()
     {
         $methods = array(
+            'findContentByRoute',
             // Try to find a page with an url enhancer that match the virtual url
-            'findUrlEnhancer',
+            'findContentByUrlEnhancer',
             // Try to find a page that match the virtual url
-            'findPage',
+            'findContentByPage',
         );
         
         try {
@@ -292,12 +293,31 @@ class Controller_Front extends Controller
     }
 
     /**
+     * Try to find a route that match $url
+     * 
+     * @param string $url
+     * @return bool
+     */
+    public function findContentByRoute($url) {
+        $url = trim($url, '/');
+        $routes = \Nos\Config_Data::get('routes', array());
+        foreach ($routes as $route) {
+            // @todo use a real routing system
+            if ($route['route'] === $url) {
+                $this->_content = Nos::hmvc($route['controller']);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Try to find an URL enhancer in a page that match $url
      * 
      * @param string $url
      * @return bool
      */
-    public function findUrlEnhancer($url)
+    public function findContentByUrlEnhancer($url)
     {
         // Get the possible contexts for this URL
         $contexts_possibles = $this->getUrlContexts($url);
@@ -368,7 +388,7 @@ class Controller_Front extends Controller
      * @param string $url
      * @return Page\Model_Page|null
      */
-    protected function findPage($url)
+    protected function findContentByPage($url)
     {
         // Sets the possible contexts for this URL
         $this->_contexts_possibles = $this->getUrlContexts($url);
@@ -428,10 +448,10 @@ class Controller_Front extends Controller
      * @param string $virtual_url
      * @return Page\Model_Page|null
      */
-    protected function getPageByVirtualUrl($virtual_url, $options = array())
+    protected function getPageByVirtualUrl($url, $options = array())
     {
         $where = \Arr::get($options, 'where', array());
-        $absolute_url = \Uri::base(false).$virtual_url;
+        $absolute_url = \Uri::base(false).$url;
         
         // Try to search the page in each possible contexts until one matches
         foreach ($this->_contexts_possibles as $context => $domain) {
