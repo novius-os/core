@@ -359,7 +359,7 @@ class Orm_Twinnable_ManyMany extends \Orm\ManyMany
             }
             // Otherwise sort on the context column
             else {
-                $key = $this->getAliasedField($key);
+                $key = $this->getAliasedField($key, $alias_to);
             }
 
             foreach ($relations as $relation) {
