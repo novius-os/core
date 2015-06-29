@@ -69,10 +69,28 @@ class Controller_Front extends Controller
 
     protected $pageFoundAlreadyTriggered = false;
 
+    public static function _init() {
+        /**
+         * For pages that use the default cache duration, we need to invalidate the cache if the current default cache duration is smaller.
+         * For pages that use a custom cache duration, the cache is invalidated anyway when saving the page
+         */
+        \Event::register('front.cache.checkExpires', function($params) {
+            $cache_params = \Arr::get($params, 'cache_params', array());
+            // Only for pages that use the default cache duration
+            if (!empty($cache_params['page_id']) && empty($cache_params['page_cache_duration'])) {
+                // Checks if the cache duration is greater than the current default cache duration
+                if (\Arr::get($params, 'cache_duration') > \Nos\FrontCache::$cache_duration) {
+                    // Invalidates the cache
+                    throw new CacheExpiredException();
+                }
+            }
+        });
+    }
+
     public function before()
     {
         parent::before();
-        $this->_cache_duration = \Config::get('novius-os.cache_duration_page', 60);
+        $this->_cache_duration = \Config::get('novius-os.cache_duration_page', FrontCache::$cache_duration);
     }
 
     public function router($action, $params, $status = 200)
@@ -110,7 +128,6 @@ class Controller_Front extends Controller
         \Event::trigger_function('front.start', array(array('url' => &$url, 'cache_path' => &$cache_path)));
 
         $cache_path = \Nos\FrontCache::getPathFromUrl($this->_base_href, $cache_path);
-
         $this->_cache = FrontCache::forge($cache_path);
         \Nos\FrontCache::$cache_duration = $this->_cache_duration;
 
@@ -326,9 +343,14 @@ class Controller_Front extends Controller
 
             \Fuel::$profiling && \Profiler::console('page_id = ' . $this->_page->page_id);
 
+            // Sets the page ID as cache param
+            $this->_cache->setCacheParam('page_id', $this->_page->page_id);
+
+            // Sets the page's custom cache duration
             if (!empty($this->_page->page_cache_duration)) {
                 $this->_cache_duration = $this->_page->page_cache_duration;
                 \Nos\FrontCache::$cache_duration = $this->_cache_duration;
+                $this->_cache->setCacheParam('page_cache_duration', true);
             }
         }
 

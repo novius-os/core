@@ -33,6 +33,11 @@ class FrontCache
     protected static $executing = false;
 
     /**
+     * @var array The cache params
+     */
+    protected $cache_params = array();
+
+    /**
      * Loads any default caching settings when available
      */
     public static function _init()
@@ -251,14 +256,27 @@ class FrontCache
         $this->_level = ob_get_level();
     }
 
-    public static function checkExpires($expires, $initial_cache_duration = 0)
+    /**
+     * Checks if the cache has expired
+     *
+     * @param int $expires
+     * @param int $cache_duration
+     * @param array $cache_params
+     * @throws CacheExpiredException
+     */
+    public static function checkExpires($expires, $cache_duration = 0, $cache_params = array())
     {
+        // Invalidates the cache if the expiration timestamp has passed
         if ($expires > 0 && $expires <= time()) {
             throw new CacheExpiredException();
         }
-        if ($initial_cache_duration > static::$cache_duration) {
-            throw new CacheExpiredException();
-        }
+
+        // Triggers an event to allow custom cache invalidation
+        \Event::trigger('front.cache.checkExpires', array(
+            'expires' => $expires,
+            'cache_duration' => $cache_duration,
+            'cache_params' => $cache_params,
+        ));
     }
 
     public function save($duration = -1, $controller = null)
@@ -271,9 +289,15 @@ class FrontCache
             $this->_path = \Config::get('novius-os.temp_dir').DS.uniqid('page/').'.php';
         } else {
             $expires = time() + $duration;
+
+            // Gets the cache params and adds the cache path
+            $cache_params = \Arr::merge($this->getCacheParams(), array(
+                'cache_path' => $this->_path,
+            ));
+
             $prepend .= '<?php
 
-            '.__CLASS__.'::checkExpires('.$expires.', '.$duration.');'."\n";
+            '.__CLASS__.'::checkExpires('.$expires.', '.$duration.', unserialize('.var_export(serialize($cache_params), true).'));'."\n";
 
             if (!empty($controller)) {
                 if ($this->_path === $this->_init_path && !empty($this->_suffix_handlers)) {
@@ -518,5 +542,47 @@ class FrontCache
     {
         $url = (empty($url) ? 'index/' : $url);
         return 'pages'.DS.str_replace(array('http://', 'https://'), array('', ''), rtrim($base, '/')).DS.trim($url, '/');
+    }
+
+    /**
+     * Replaces the cache params with $params
+     *
+     * @param $params
+     */
+    public function resetCacheParams($params = array())
+    {
+        $this->cache_params = $params;
+    }
+
+    /**
+     * Sets the $value of the cache param $name
+     *
+     * @param $name
+     * @param $value
+     */
+    public function setCacheParam($name, $value)
+    {
+        \Arr::set($this->cache_params, $name, $value);
+    }
+
+    /**
+     * Returns the cache params
+     *
+     * @return mixed
+     */
+    public function getCacheParams()
+    {
+        return $this->cache_params;
+    }
+
+    /**
+     * Gets a cache param by $name
+     *
+     * @param $name
+     * @return mixed
+     */
+    public function getCacheParam($name)
+    {
+        return \Arr::get($this->cache_params, $name);
     }
 }
