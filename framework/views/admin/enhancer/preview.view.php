@@ -18,7 +18,7 @@ if (is_callable($params['title'])) {
 ?>
 <div style="overflow: hidden">
     <img style="display: block; float: left; width: 64px; height: 64px;" src="<?= $params['icon'] ?>" />
-    <h1 style="margin-left: 80px;"><?= $params['title'] ?></h1>
+    <h1 style="margin-left: 80px;"><?= e($params['title']) ?></h1>
 <?php
 foreach ($layout as $view) {
     if (is_array($view)) {
