@@ -29,7 +29,14 @@ class Controller_Admin_Login extends Controller
 
     protected function redirect()
     {
-        \Response::redirect(urldecode(\Input::get('redirect', 'admin/')));
+        $url = urldecode(\Input::get('redirect', 'admin/'));
+
+        // Ensure that the url is on the same domain
+        if (!\Str::starts_with($url, \Uri::base())) {
+            $url = \Uri::base().ltrim($url, '/');
+        }
+
+        \Response::redirect($url);
         exit();
     }
 
