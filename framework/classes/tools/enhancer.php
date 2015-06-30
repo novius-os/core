@@ -83,7 +83,7 @@ class Tools_Enhancer
         $url_enhanced = Config_Data::get('url_enhanced', array());
 
         $urlPath = \Arr::get($params, 'urlPath', false);
-        $preview = \Arr::get($params, 'preview', false);
+        $preview = \Arr::get($params, 'preview', \Input::get('_preview', false));
 
         $callback = array($namespace.'\\'.$controller_name, 'getUrlEnhanced');
 
