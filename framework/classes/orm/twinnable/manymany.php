@@ -114,9 +114,6 @@ class Orm_Twinnable_ManyMany extends \Orm\ManyMany
         if ($this->column_context_to) {
             $result_context = array();
             $context_to = $this->get_context_to($from->{$this->column_context_from});
-            if (empty($context_to)) {
-                $this->get_context_to($from->{$this->column_context_from});
-            }
             foreach ($result as $pk => $model) {
                 if (isset($result_context[$model->{$this->column_context_common_id_to}])) {
                     if ($model->{$this->column_context_to} !== $context_to) {
