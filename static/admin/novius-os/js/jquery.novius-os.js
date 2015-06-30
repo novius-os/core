@@ -110,6 +110,15 @@ define('jquery-nos',
                 errorImageNotfind : 'We’re afraid we cannot find this image.'
             },
 
+            nosEscapeHtml: function(str) {
+                return str
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;");
+            },
+
             nosI18nPlural: function(msgs, $n) {
                 var plural_indice;
                 if (!$.isArray(msgs)) {
@@ -326,7 +335,7 @@ define('jquery-nos',
                             .find('img')
                             .attr({
                                 src : media.path,
-                                title : media.title
+                                title : $.nosEscapeHtml(media.title)
                             })
                             .css({
                                 width : 0,
