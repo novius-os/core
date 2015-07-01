@@ -708,6 +708,11 @@ class Model extends \Orm\Model
 
     public static function prefix()
     {
+        if (!is_null(static::$_prefix)) {
+            // Uses the defined prefix
+            return static::$_prefix;
+        }
+        // Generates the prefix from the primary key
         return mb_substr(static::$_primary_key[0], 0, mb_strpos(static::$_primary_key[0], '_') + 1);
     }
 
