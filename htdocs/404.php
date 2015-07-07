@@ -36,6 +36,7 @@ $is_media = preg_match('`^(?:cache/)?media/`', $nos_url);
 if ($is_media) {
     $is_resized = \Str::sub($nos_url, 0, 6) === 'cache/';
 
+    $media_url = '';
     if ($is_resized) {
         $pathinfo = pathinfo($nos_url);
         // Remove 12 characteres for cache/media/
@@ -43,8 +44,8 @@ if ($is_media) {
             $pathinfo['dirname'].(empty($pathinfo['extension']) ? '' : '.'.$pathinfo['extension']),
             12
         );
-    } else {
-        $media_url = str_replace('media/', '', $nos_url);
+    } elseif (\Str::starts_with($media_url, 'media/')) {
+        $media_url = \Str::sub($nos_url, \Str::length('media/'));
     }
 
     $media = false;
@@ -145,12 +146,13 @@ $is_attachment = preg_match('`^(?:cache/)?data/files/`', $nos_url);
 if ($is_attachment) {
     $is_resized = \Str::sub($nos_url, 0, 6) === 'cache/';
 
+    $attachment_url = '';
     if ($is_resized) {
         $pathinfo = pathinfo($nos_url);
         // Remove 12 characteres for cache/data/files/
         $attachment_url = \Str::sub($pathinfo['dirname'].'.'.$pathinfo['extension'], 17);
-    } else {
-        $attachment_url = str_replace('data/files/', '', $nos_url);
+    } elseif (\Str::starts_with($attachment_url, 'data/files/')) {
+        $attachment_url = \Str::sub($nos_url, \Str::length('data/files/'));
     }
 
     $send_file = false;
