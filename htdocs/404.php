@@ -44,7 +44,7 @@ if ($is_media) {
             $pathinfo['dirname'].(empty($pathinfo['extension']) ? '' : '.'.$pathinfo['extension']),
             12
         );
-    } elseif (\Str::starts_with($media_url, 'media/')) {
+    } elseif (\Str::starts_with($nos_url, 'media/')) {
         $media_url = \Str::sub($nos_url, \Str::length('media/'));
     }
 
@@ -151,7 +151,7 @@ if ($is_attachment) {
         $pathinfo = pathinfo($nos_url);
         // Remove 12 characteres for cache/data/files/
         $attachment_url = \Str::sub($pathinfo['dirname'].'.'.$pathinfo['extension'], 17);
-    } elseif (\Str::starts_with($attachment_url, 'data/files/')) {
+    } elseif (\Str::starts_with($nos_url, 'data/files/')) {
         $attachment_url = \Str::sub($nos_url, \Str::length('data/files/'));
     }
 
