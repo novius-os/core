@@ -677,7 +677,7 @@ class Controller_Front extends Controller
         } catch (\RuntimeException $e) {
             // Sends an error if the contexts configuration file exists
             if (is_file(APPPATH.'config'.DS.'contexts.config.php')) {
-                $this=>sendError(array(
+                $this->sendError(array(
                     'error' => 'Context configuration error.',
                     'exception' => $e,
                 ));
