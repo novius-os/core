@@ -246,6 +246,7 @@ class FrontCache
                 static::$opcache_invalidate && opcache_invalidate($this->_path, true);
             }
         }
+        self::$executing = false; // We may have executed a higher level page, make sure we don't inline uncached calls
         throw new CacheNotFoundException();
     }
 
