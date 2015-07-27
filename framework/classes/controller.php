@@ -92,7 +92,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
 
             // If the response isn't a Response object, embed in the available one for BC
             // @deprecated  can be removed when $this->response is removed
-            if (!$response instanceof Response && $this->response->body == null) {
+            if (!$response instanceof \Response && $this->response->body == null) {
                 $this->response->body = $response;
                 $response = $this->response;
             }
