@@ -254,6 +254,16 @@ class Attachment
 
         return $this;
     }
+    
+    /**
+     * Get the ID of object
+     *
+     * @return string
+     */
+    public function getId()
+    {
+        return $this->attached;
+    }
 
     /**
      * Save a new Attachment file
