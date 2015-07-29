@@ -50,7 +50,7 @@ if ($is_media) {
 
     $media = false;
     $res = \DB::select()->from(\Nos\Media\Model_Media::table())->where(array(
-        array('media_path', '=', '/'.$media_url),
+        array('media_path', '=', '/'.parse_url($media_url, PHP_URL_PATH)),
     ))->execute()->as_array();
 
     if (!empty($res)) {
