@@ -17,6 +17,13 @@ return array(
     'inspectors' => array(
         'template',
     ),
+    'query' => array(
+        'callback' => array(
+            function ($query) {
+                return $query->order_by('tpvar_default', 'DESC')->order_by('tpvar_title');
+            }
+        )
+    ),
     'appdesk' => array(
         'appdesk' => array(
             'defaultView' => 'thumbnails',
