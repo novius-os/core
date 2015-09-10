@@ -244,6 +244,9 @@ class FrontCache
                 ob_end_clean();
                 @unlink($this->_path);
                 static::$opcache_invalidate && opcache_invalidate($this->_path, true);
+            } catch (\Exception $e) {
+                self::$executing = false;
+                throw $e;
             }
         }
         self::$executing = false; // We may have executed a higher level page, make sure we don't inline uncached calls
