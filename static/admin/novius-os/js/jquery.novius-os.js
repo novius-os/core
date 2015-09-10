@@ -987,7 +987,7 @@ define('jquery-nos',
                 }
                 // http://www.maheshchari.com/jquery-ajax-error-handling/
                 if (x.status != 0) {
-                    $.nosNotify('Connection error!', 'error');
+                    $.nosNotify('An unexpected error has occurred.', 'error');
                 } else if (e == 'parsererror') {
                     $.nosNotify('Request seemed a success, but we could not read the answer.');
                 } else if (e == 'timeout') {
