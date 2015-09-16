@@ -45,6 +45,14 @@ class Auth
 
     public static function check()
     {
+        // No cookie ? Do not start Session.
+        $sessionConfig      = \Config::load('session', true);
+        $sessionDriver      = \Arr::get($sessionConfig, 'driver', 'file');
+        $sessionCookieName  = \Arr::get($sessionConfig, $sessionDriver.'.cookie_name', 'fuelfid');
+        if (!\Cookie::get($sessionCookieName, false) && !\Cookie::get('logged_user_id', false)) {
+            return false;
+        }
+        
         // Might be great to add some additional verifications here !
         $logged_user_id = \Session::get('logged_user_id', false);
         $logged_user_md5 = \Session::get('logged_user_md5', false);
