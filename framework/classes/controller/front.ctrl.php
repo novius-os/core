@@ -44,7 +44,7 @@ class Controller_Front extends Controller
     protected $_enhancer_url = false;
     protected $_enhanced_url_path = false;
     protected $_context = '';
-    protected $_contexts_possibles = array();
+    protected $_contexts = null;
 
     protected $_template;
     protected $_view;
@@ -114,7 +114,7 @@ class Controller_Front extends Controller
         // Builds the virtual url
         $this->_virtual_url = $this->_url;
         if (!empty($this->_extension)) {
-            $this->_virtual_url = \Str::sub($this->_virtual_url, 0, - strlen($this->_extension) - 1);
+            $this->_virtual_url = \Str::sub($this->_virtual_url, 0, -\Str::length($this->_extension) - 1);
         }
         
         try {
@@ -293,17 +293,17 @@ class Controller_Front extends Controller
     }
 
     /**
-     * Try to find a route that match $url
+     * Try to find a route that match $virtual_url
      * 
-     * @param string $url
+     * @param string $virtual_url
      * @return bool
      */
-    public function findContentByRoute($url) {
-        $url = trim($url, '/');
+    public function findContentByRoute($virtual_url) {
+        $virtual_url = trim($virtual_url, '/');
         $routes = \Nos\Config_Data::get('routes', array());
         foreach ($routes as $route) {
             // @todo use a real routing system
-            if ($route['route'] === $url) {
+            if ($route['route'] === $virtual_url) {
                 $this->_content = Nos::hmvc($route['controller']);
                 return true;
             }
@@ -312,36 +312,31 @@ class Controller_Front extends Controller
     }
 
     /**
-     * Try to find an URL enhancer in a page that match $url
+     * Try to find an URL enhancer in a page that match $virtual_url
      * 
-     * @param string $url
+     * @param string $virtual_url
      * @return bool
      */
-    public function findContentByUrlEnhancer($url)
+    public function findContentByUrlEnhancer($virtual_url)
     {
-        // Get the possible contexts for this URL
-        $contexts_possibles = $this->getUrlContexts($url);
+        // Gets the possible contexts for this URL
+        $contexts = $this->searchUrlContexts(static::makeUrlAbsolute($virtual_url, \Uri::base(false)));
 
         // Gets the enhanced URLs that match the url in the possible contexts
         $url_enhanced = \Nos\Config_Data::get('url_enhanced', array());
-        $base_href = $this->_base_href;
-        $url_enhanced = array_filter($url_enhanced, function ($page_params) use ($contexts_possibles, $base_href, $url) {
-            if (!in_array($page_params['context'], array_keys($contexts_possibles))) {
+        $url_absolute = static::makeUrlAbsolute($virtual_url, $this->_base_href);
+        $url_enhanced = array_filter($url_enhanced, function ($page_params) use ($contexts, $url_absolute) {
+            if (!in_array($page_params['context'], array_keys($contexts))) {
                 return false;
             }
-            $url_absolute = $contexts_possibles[$page_params['context']].$page_params['url'];
-            return mb_substr($base_href.$url.'/', 0, mb_strlen($url_absolute)) === $url_absolute;
+            $enhanced_url_absolute = static::makeUrlAbsolute($page_params['url'], \Arr::get($contexts, $page_params['context']));
+            return \Str::starts_with($url_absolute, $enhanced_url_absolute);
         });
             
         // Loops through the enhanced URLs until we found one that matches
         foreach ($url_enhanced as $page_id => $page_params) {
 
-            // Sets the possible contexts
-            $this->_contexts_possibles = array(
-                $page_params['context'] => $contexts_possibles[$page_params['context']]
-            );
-
-            // Gets the page by ID
+            // Searches the page by ID
             $page = $this->getPageById($this->_page_id, array(
                 // The page has to be published, except for a preview
                 'where' => !$this->isPreview() ? array(array('published', 1)) : array(),
@@ -361,8 +356,8 @@ class Controller_Front extends Controller
                 $this->_page_url = rtrim($page_params['url'], '/').'.html';
                 $this->_enhanced_url_path = rtrim($page_params['url'], '/').'/';
             }
-            $context_url = \Arr::get($contexts_possibles, $page_params['context']).$page_params['url'];
-            $this->_enhancer_url = mb_substr(\Uri::base(false).ltrim($url, '/'), mb_strlen($context_url));
+            $context_url = \Arr::get($contexts, $page_params['context']).$page_params['url'];
+            $this->_enhancer_url = \Str::sub(\Uri::base(false).ltrim($virtual_url, '/'),  \Str::length($context_url));
 
             // Renders the page
             try {
@@ -383,40 +378,38 @@ class Controller_Front extends Controller
     }
 
     /**
-     * Try to find a page that match the specified $url
+     * Try to find a page that match the specified $virtual_url
      * 
-     * @param string $url
-     * @return Page\Model_Page|null
+     * @param string $virtual_url
+     * @return bool
      */
-    protected function findContentByPage($url)
+    protected function findContentByPage($virtual_url)
     {
-        // Sets the possible contexts for this URL
-        $this->_contexts_possibles = $this->getUrlContexts($url);
-        
         $this->_page_id = null;
-        $this->_page_url = $url.'/';
+        $this->_page_url = rtrim($virtual_url, '/').'/';
 
-        // Gets the page by virtual URL
+        // Searches the page by virtual URL
         $page = $this->getPageByVirtualUrl($this->_page_url, array(
             // The page has to be published, except for a preview
             'where' => !$this->isPreview() ? array(array('published', 1)) : array(),
         ));
-            
-        if (!empty($page)) {
-
-            // Renders the page
-            try {
-                $this->renderPage($page);
-                return true;
-            }
-            // No content was found while rendering the page
-            catch (NotFoundException $e) {
-                // Resets the cache
-                $this->_cache->reset();
-            }
+        if (empty($page)) {
+            return false;
         }
-            
-        return false;
+
+        // Renders the page
+        try {
+            $this->renderPage($page);
+        }
+        // No content was found while rendering the page
+        // (this exception is most likely thrown by an enhancer)
+        catch (NotFoundException $e) {
+            // Resets the cache
+            $this->_cache->reset();
+            return false;
+        }
+        
+        return true;
     }
 
     /**
@@ -448,13 +441,13 @@ class Controller_Front extends Controller
      * @param string $virtual_url
      * @return Page\Model_Page|null
      */
-    protected function getPageByVirtualUrl($url, $options = array())
+    protected function getPageByVirtualUrl($virtual_url, $options = array())
     {
         $where = \Arr::get($options, 'where', array());
-        $absolute_url = \Uri::base(false).$url;
+        $absolute_url = static::makeUrlAbsolute($virtual_url, \Uri::base(false));
         
         // Try to search the page in each possible contexts until one matches
-        foreach ($this->_contexts_possibles as $context => $domain) {
+        foreach ($this->searchUrlContexts($absolute_url) as $context => $domain) {
             $where_context = $where;
             $where_context[] = array('page_context', $context);
             
@@ -488,7 +481,6 @@ class Controller_Front extends Controller
                     exit();
                 }
                 
-                // Loads the page
                 $this->_page_url = $virtual_url;
                 return $page;
             }
@@ -498,7 +490,7 @@ class Controller_Front extends Controller
     }
 
     /**
-     * Renders and return the content of the specified $page
+     * Renders the specified $page
      * 
      * @param Page\Model_Page $page
      * @return bool|string
@@ -511,12 +503,12 @@ class Controller_Front extends Controller
             exit();
         }
         
-        // Set the page a thes displayed page
+        // Sets the page as the displayed page
         $this->setPageDisplayed($page);
 
         // Sets the page's context as the current context
         $this->_context = $page->get_context();
-        $this->_context_url = $this->_contexts_possibles[$this->_context];
+        $this->_context_url = $this->searchContextBaseUrl($this->_context);
         I18n::setLocale(Tools_Context::localeCode($this->_context));
 
         // Sets the page's specific cache duration
@@ -630,33 +622,28 @@ class Controller_Front extends Controller
     public function renderTemplate()
     {
         // Renders the template view
-        $content = $this->_view->render();
+        $template_content = $this->_view->render();
     
         // Parses the content
-        $content = $this->prepareHtmlContent($content);
+        $template_content = $this->prepareHtmlContent($template_content);
         
         // Sets as content
-        $this->_content = $content;
+        $this->_content = $template_content;
     }
-    
+
     /**
-     * Gets the contexts that match the specified $url
+     * Searches the contexts that match the specified absolute url
      * 
      * @param string $url
-     * @param bool $absolute
      * @return array
      */
-    public function getUrlContexts($url, $absolute = false)
+    public function searchUrlContexts($url)
     {
-        $url = rtrim($url, '/').'/';
-        if (!$absolute) {
-            $url = \Uri::base(false).$url;
-        }
-
+        // Searches the first domain that match the url for each available context
         $url_contexts = array();
         foreach ($this->getAvailableContexts() as $context => $domains) {
             foreach ($domains as $domain) {
-                if (mb_substr(\Uri::base(false).$url.'/', 0, mb_strlen($domain)) === $domain) {
+                if (\Str::starts_with($url, $domain)) {
                     $url_contexts[$context] = $domain;
                     break;
                 }
@@ -666,28 +653,43 @@ class Controller_Front extends Controller
     }
     
     /**
+     * Searches the base URL of the specified context
+     * 
+     * @param string $context
+     * @return string
+     */
+    public function searchContextBaseUrl($context)
+    {
+        $domains = \Arr::get($this->getAvailableContexts(), $context);
+        return reset($domains);
+    }
+    
+    /**
      * Returns the available contexts
      * 
      * @return array
      */
     protected function getAvailableContexts()
     {
-        try {
-            return Tools_Context::contexts();
-        } catch (\RuntimeException $e) {
-            // Sends an error if the contexts configuration file exists
-            if (is_file(APPPATH.'config'.DS.'contexts.config.php')) {
-                $this->sendError(array(
-                    'error' => 'Context configuration error.',
-                    'exception' => $e,
-                ));
+        if (is_null(static::$_contexts)) {
+            try {
+                static::$_contexts = Tools_Context::contexts();
+            } catch (\RuntimeException $e) {
+                // Sends an error if the contexts configuration file exists
+                if (is_file(APPPATH.'config'.DS.'contexts.config.php')) {
+                    $this->sendError(array(
+                        'error' => 'Context configuration error.',
+                        'exception' => $e,
+                    ));
+                }
+                // Otherwise redirects to the install script if the file exists
+                elseif (is_file(DOCROOT.'htdocs'.DS.'install.php')) {
+                    \Response::redirect($this->_base_href.'install.php');
+                }
+                throw $e;
             }
-            // Otherwise redirects to the install script if the file exists
-            elseif (is_file(DOCROOT.'htdocs'.DS.'install.php')) {
-                \Response::redirect($this->_base_href.'install.php');
-            }
-            throw $e;
         }
+        return static::$_contexts;
     }
 
     /**
@@ -1360,5 +1362,21 @@ class Controller_Front extends Controller
     public function deleteCache()
     {
         $this->_cache->delete();
+    }
+    
+    /**
+     * Makes $url absolute using $base_url (if it's not already the case)
+     * 
+     * @param string $url
+     * @return array
+     */
+    public static function makeUrlAbsolute($url, $base_url)
+    {
+        $base_url = rtrim($base_url, '/').'/';
+        $url = rtrim($url, '/').'/';
+        if (!\Str::starts_with($url, $base_url)) {
+            $url = $base_url.ltrim($url, '/');
+        }
+        return $url;
     }
 }
