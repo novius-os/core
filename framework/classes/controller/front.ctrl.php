@@ -298,7 +298,8 @@ class Controller_Front extends Controller
      * @param string $virtual_url
      * @return bool
      */
-    public function findContentByRoute($virtual_url) {
+    public function findContentByRoute($virtual_url)
+    {
         $virtual_url = trim($virtual_url, '/');
         $routes = \Nos\Config_Data::get('routes', array());
         foreach ($routes as $route) {
@@ -1247,7 +1248,8 @@ class Controller_Front extends Controller
      * 
      * @return Controller_Front
      */
-    public function disableBrowserCaching() {
+    public function disableBrowserCaching()
+    {
         $this->setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
         $this->setHeader('Pragma', 'no-cache');
         $this->setHeader('Expires', '0');
