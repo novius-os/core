@@ -14,6 +14,11 @@ class Attachment
 {
 
     /**
+     * @var  array  The extensions that identifies images.
+     */
+    protected static $image_extensions = array('jpg', 'png', 'gif', 'jpeg', 'bmp');
+
+    /**
      * @var  int|string  The ID of the object that the file is attached
      */
     protected $attached = null;
@@ -60,7 +65,7 @@ class Attachment
         }
 
         if (!empty($config['image']) && empty($config['extensions'])) {
-            $config['extensions'] = array('jpg', 'gif', 'png', 'jpeg');
+            $config['extensions'] = static::$image_extensions;
             unset($config['image']);
         }
 
@@ -143,9 +148,9 @@ class Attachment
      */
     public function isImage()
     {
-        $extension = $this->extension();
+        $extension = \Str::lower($this->extension());
 
-        return !empty($extension) ? in_array($extension, array('jpg', 'png', 'gif', 'jpeg', 'bmp')) : false;
+        return !empty($extension) ? in_array($extension, static::$image_extensions) : false;
     }
 
     /**
@@ -254,7 +259,7 @@ class Attachment
 
         return $this;
     }
-    
+
     /**
      * Get the ID of object
      *
