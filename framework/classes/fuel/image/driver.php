@@ -27,6 +27,23 @@ abstract class Image_Driver extends \Fuel\Core\Image_Driver
         return $this;
     }
 
+
+    /**
+     * Resizes the image only if too big
+     *
+     * @param   integer  $max_width   The new width of the image.
+     * @param   integer  $max_height  The new height of the image.
+     * @param   boolean  $keepar  If false, allows stretching of the image.
+     * @param   boolean  $pad     Adds padding to the image when resizing.
+     * @see parent::resize
+     * @return  Image_Driver
+     */
+    public function quality($quality)
+    {
+        $this->queue('quality', $quality);
+        return $this;
+    }
+
     /**
      * Executes the shrink event when the queue is ran.
      *
