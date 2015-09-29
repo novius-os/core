@@ -14,11 +14,6 @@ class Attachment
 {
 
     /**
-     * @var  array  The extensions that identifies images.
-     */
-    protected static $image_extensions = array('jpg', 'png', 'gif', 'jpeg', 'bmp');
-
-    /**
      * @var  int|string  The ID of the object that the file is attached
      */
     protected $attached = null;
@@ -64,14 +59,17 @@ class Attachment
             $config = \Config::load($config, true);
         }
 
+        $config = \Arr::merge(\Config::load('attachment', true), $config);
+
         if (!empty($config['image']) && empty($config['extensions'])) {
-            $config['extensions'] = static::$image_extensions;
+            $config['extensions'] = $config['image_extensions'];
             unset($config['image']);
         }
 
         if (empty($config['extensions']) || !is_array($config['extensions'])) {
             $config['extensions'] = !empty($config['extensions']) ? array($config['extensions']) : array();
         }
+
         $config['extensions'] = array_map(array('\Str', 'lower'), $config['extensions']);
 
         if (empty($config['dir'])) {
@@ -150,7 +148,7 @@ class Attachment
     {
         $extension = \Str::lower($this->extension());
 
-        return !empty($extension) ? in_array($extension, static::$image_extensions) : false;
+        return !empty($extension) ? in_array($extension, $this->config['image_extensions']) : false;
     }
 
     /**
