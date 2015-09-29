@@ -24,6 +24,7 @@ class Toolkit_Image
         'mask' => 'm',
         'rounded' => 'rou',
         'grayscale' => 'g',
+        'quality' => 'q',
     );
 
     /**
@@ -125,6 +126,23 @@ class Toolkit_Image
     public function crop($x1, $y1, $x2, $y2)
     {
         $this->_transformation(array('crop', $x1, $y1, $x2, $y2));
+
+        return $this;
+    }
+
+    /**
+     * Change the quality of an image.
+     * @param $quality An int between 1 and 100
+     *
+     *
+     * @return $this
+     */
+    public function quality($quality)
+    {
+        if ($quality <= 0 || $quality >= 100) {
+            $quality = 100;
+        }
+        $this->_transformation(array('quality', $quality));
 
         return $this;
     }
