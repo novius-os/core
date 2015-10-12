@@ -479,6 +479,14 @@ class Controller_Front extends Controller
     }
 
     /**
+     * @return string : The title of current HTML.
+     */
+    public function getTitle()
+    {
+        return $this->_title;
+    }
+
+    /**
      * Set a new h1 for the current HTML.
      *
      * @param string $h1        The new h1.
@@ -518,6 +526,14 @@ class Controller_Front extends Controller
     }
 
     /**
+     * @return string : The meta description of current html output.
+     */
+    public function getMetaDescription()
+    {
+        return $this->_meta_description;
+    }
+
+    /**
      * Set a meta keywords for the current HTML output.
      *
      * @param string $meta_keywords The new meta keywords.
@@ -536,6 +552,14 @@ class Controller_Front extends Controller
         ));
 
         return $this;
+    }
+
+    /**
+     * @return string : The meta keywords of current html output.
+     */
+    public function getMetaKeywords()
+    {
+        return $this->_meta_keywords;
     }
 
     /**
