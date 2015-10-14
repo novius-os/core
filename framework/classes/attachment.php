@@ -59,14 +59,17 @@ class Attachment
             $config = \Config::load($config, true);
         }
 
+        $config = \Arr::merge(\Config::load('attachment', true), $config);
+
         if (!empty($config['image']) && empty($config['extensions'])) {
-            $config['extensions'] = array('jpg', 'gif', 'png', 'jpeg');
+            $config['extensions'] = $config['image_extensions'];
             unset($config['image']);
         }
 
         if (empty($config['extensions']) || !is_array($config['extensions'])) {
             $config['extensions'] = !empty($config['extensions']) ? array($config['extensions']) : array();
         }
+
         $config['extensions'] = array_map(array('\Str', 'lower'), $config['extensions']);
 
         if (empty($config['dir'])) {
@@ -143,9 +146,9 @@ class Attachment
      */
     public function isImage()
     {
-        $extension = $this->extension();
+        $extension = \Str::lower($this->extension());
 
-        return !empty($extension) ? in_array($extension, array('jpg', 'png', 'gif', 'jpeg', 'bmp')) : false;
+        return !empty($extension) ? in_array($extension, $this->config['image_extensions']) : false;
     }
 
     /**
@@ -254,7 +257,7 @@ class Attachment
 
         return $this;
     }
-    
+
     /**
      * Get the ID of object
      *
