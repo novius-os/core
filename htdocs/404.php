@@ -161,10 +161,13 @@ if ($is_attachment) {
     if ($match) {
         list(, $alias, $attached, $filename, $extension) = $m;
 
+        \Event::trigger_function('404.attachmentMatch', array(array('alias' => &$alias, 'attached' => &$attached, 'filename' => &$filename, 'extension' => &$extension)));
+
         $attachments = \Nos\Config_Data::get("attachments", array());
         if (isset($attachments[$alias])) {
             $config = $attachments[$alias];
             $attachment = \Nos\Attachment::forge($attached, $config);
+
             $send_file = $attachment->path();
             if (!empty($send_file)) {
                 if (isset($config['check']) && is_callable($config['check'])) {

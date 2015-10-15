@@ -82,9 +82,8 @@ class Attachment
         }
         $config['alias'] = rtrim(str_replace(DS, '/', $config['alias']), '/').'/';
 
-        if(!empty($config['path_modifier']) && is_callable($config['path_modifier'])) {
-            $attached = $config['path_modifier']($attached, $config);
-            unset($config['path_modifier']);
+        if(!empty($config['attached_callback']) && is_callable($config['attached_callback'])) {
+            $attached = $config['attached_callback']($attached, $config);
         } else {
             $attached = preg_replace('`/`Uu', '_', $attached);
         }
@@ -257,6 +256,13 @@ class Attachment
     {
         $path = $this->path();
         $this->attached = $id;
+
+        if(!empty($config['attached_callback']) && is_callable($config['attached_callback'])) {
+            $this->attached = $config['attached_callback']($id);
+        } else {
+            $this->attached = $id;
+        }
+
         if ($path) {
             $this->set($path);
         }
