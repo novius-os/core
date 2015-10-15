@@ -56,10 +56,10 @@ class Attachment
     public function __construct($attached, $config)
     {
         if (!is_array($config)) {
-            $config = \Config::load($config, true);
+            $config = \Config::load($config, false);
         }
 
-        $config = \Arr::merge(\Config::load('attachment', true), $config);
+        $config = \Arr::merge(\Config::load('attachment', false), $config);
 
         if (!empty($config['image']) && empty($config['extensions'])) {
             $config['extensions'] = $config['image_extensions'];
@@ -82,7 +82,13 @@ class Attachment
         }
         $config['alias'] = rtrim(str_replace(DS, '/', $config['alias']), '/').'/';
 
-        $attached = preg_replace('`/`Uu', '_', $attached);
+        if(!empty($config['path_modifier']) && is_callable($config['path_modifier'])) {
+            $attached = $config['path_modifier']($attached, $config);
+            unset($config['path_modifier']);
+        } else {
+            $attached = preg_replace('`/`Uu', '_', $attached);
+        }
+
         if (empty($attached)) {
             throw new \InvalidArgumentException('No attached ID specified.');
         }
