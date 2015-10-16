@@ -56,10 +56,10 @@ class Attachment
     public function __construct($attached, $config)
     {
         if (!is_array($config)) {
-            $config = \Config::load($config, false);
+            $config = \Config::load($config, true);
         }
 
-        $config = \Arr::merge(\Config::load('attachment', false), $config);
+        $config = \Arr::merge(\Config::load('attachment', true), $config);
 
         if (!empty($config['image']) && empty($config['extensions'])) {
             $config['extensions'] = $config['image_extensions'];
