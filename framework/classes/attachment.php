@@ -257,8 +257,8 @@ class Attachment
         $path = $this->path();
         $this->attached = $id;
 
-        if(!empty($config['attached_callback']) && is_callable($config['attached_callback'])) {
-            $this->attached = $config['attached_callback']($id);
+        if(!empty($this->config['attached_callback']) && is_callable($this->config['attached_callback'])) {
+            $this->attached = $this->config['attached_callback']($id, $this->config);
         } else {
             $this->attached = $id;
         }
