@@ -205,7 +205,7 @@ return array(
 
     #: views/admin/media_edit.view.php:50
     #: views/admin/media_add.view.php:30
-    'The file size must not exceed {{size}}.' => 'La taille du fichier dépasse la limite {{size}}',
+    'The file size must not exceed {{size}}.' => 'La taille du fichier ne doit pas dépasser {{size}}o.',
 
     #: views/admin/media_edit.view.php:50
     #: views/admin/upload.view.php:83
