@@ -82,7 +82,12 @@ class Attachment
         }
         $config['alias'] = rtrim(str_replace(DS, '/', $config['alias']), '/').'/';
 
-        $attached = preg_replace('`/`Uu', '_', $attached);
+        if (!empty($config['attached_callback']) && is_callable($config['attached_callback'])) {
+            $attached = $config['attached_callback']($attached, $config);
+        } else {
+            $attached = preg_replace('`/`Uu', '_', $attached);
+        }
+
         if (empty($attached)) {
             throw new \InvalidArgumentException('No attached ID specified.');
         }
@@ -251,6 +256,13 @@ class Attachment
     {
         $path = $this->path();
         $this->attached = $id;
+
+        if (!empty($this->config['attached_callback']) && is_callable($this->config['attached_callback'])) {
+            $this->attached = $this->config['attached_callback']($id, $this->config);
+        } else {
+            $this->attached = $id;
+        }
+
         if ($path) {
             $this->set($path);
         }

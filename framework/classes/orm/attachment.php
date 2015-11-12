@@ -46,7 +46,7 @@ class Orm_Attachment extends \Orm\Relation
         $this->cascade_delete  = array_key_exists('cascade_delete', $config)
             ? $config['cascade_delete'] : $this->cascade_delete;
 
-        $attachment_config = array_diff($config, array('key_from' => '', 'cascade_save' => '', 'cascade_delete' => ''));
+        $attachment_config = \Arr::filter_keys($config, array('key_from', 'cascade_save', 'cascade_delete'), true);
         if (empty($attachment_config['dir'])) {
             $attachment_config['dir'] = strtolower(str_ireplace(array('\\', 'model_'), array(DS, ''), $from).DS.$name.DS);
         }
