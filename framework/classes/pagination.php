@@ -43,13 +43,15 @@ class Pagination
         'previous_start' => "<span class='previous'>",
         'previous_end'   => "</span>\n",
         'previous_mark'  => "&laquo;&nbsp;",
+        'previous_text'   => null,
         'next_start'     => "<span class='next'>",
         'next_end'       => "</span>\n",
         'next_mark'      => "&nbsp;&raquo;",
+        'next_text'   => null,
         'active_start'   => "<span class='active'>",
         'active_end'     => "</span>\n",
         'regular_start'   => "<span class='regular'>",
-        'regular_end'     => "</span>\n",
+        'regular_end'     => "</span>\n", 
     );
 
     /**
@@ -76,6 +78,14 @@ class Pagination
 
     public function __construct(array $config = array())
     {
+        // No break compatibility with previous version
+        if( is_null($this->template['previous_text']) ){
+            $this->template['previous_text'] = __('Previous');
+        }
+        if( is_null($this->template['next_text']) ){
+            $this->template['next_text'] = __('Next');
+        }
+
         $config = \Arr::merge(\Config::get('pagination', array()), $config);
 
         $this->set_config($config);
@@ -147,9 +157,9 @@ class Pagination
 
         $pagination  = $this->template['wrapper_start'];
         // Pagination
-        $pagination .= $this->prev_link(__('Previous'));
+        $pagination .= $this->prev_link( $this->template['previous_text'] );
         $pagination .= $this->page_links();
-        $pagination .= $this->next_link(__('Next'));
+        $pagination .= $this->next_link( $this->template['next_text'] );
         $pagination .= $this->template['wrapper_end'];
 
         if (!is_null($pagination_url)) {
