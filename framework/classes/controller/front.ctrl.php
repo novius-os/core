@@ -173,12 +173,19 @@ class Controller_Front extends Controller
             // Filter URLs enhanced : remove if not in possibles contexts, remove if url not match
             $url_enhanced = \Nos\Config_Data::get('url_enhanced', array());
             $base_href = $this->_base_href;
-            $url_enhanced = array_filter($url_enhanced, function ($page_params) use ($contexts_possibles, $base_href, $url) {
+            $url_enhanced = array_filter($url_enhanced, function (&$page_params) use ($contexts_possibles, $base_href, $url) {
                 if (!in_array($page_params['context'], array_keys($contexts_possibles))) {
                     return false;
                 }
                 $url_absolute = $contexts_possibles[$page_params['context']].$page_params['url'];
-                return mb_substr($base_href.$url.'/', 0, mb_strlen($url_absolute)) === $url_absolute;
+                $result = mb_substr($base_href.$url.'/', 0, mb_strlen($url_absolute)) === $url_absolute;
+                $page_params['depth'] = mb_substr_count($page_params['url'], '/');
+                return $result;
+            });
+
+            // Sorting the array to check the deepest urls at first
+            uasort($url_enhanced, function($a, $b) {
+                return $b['depth'] - $a['depth'];
             });
 
             // Add current url to URLs enhanced
