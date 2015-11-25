@@ -326,14 +326,20 @@ class Controller_Front extends Controller
         // Gets the enhanced URLs that match the url in the possible contexts
         $url_enhanced = \Nos\Config_Data::get('url_enhanced', array());
         $url_absolute = static::makeUrlAbsolute($virtual_url, $this->_base_href);
-        $url_enhanced = array_filter($url_enhanced, function ($page_params) use ($contexts, $url_absolute) {
+        $url_enhanced = array_filter($url_enhanced, function (&$page_params) use ($contexts, $url_absolute) {
             if (!in_array($page_params['context'], array_keys($contexts))) {
                 return false;
             }
             $enhanced_url_absolute = static::makeUrlAbsolute($page_params['url'], \Arr::get($contexts, $page_params['context']));
+            $page_params['depth'] = mb_substr_count($page_params['url'], '/');
             return \Str::starts_with($url_absolute, $enhanced_url_absolute);
         });
-            
+    
+        // Sorts the enhanced URLs to place the deeper URLs to the beginning
+        uasort($url_enhanced, function($a, $b) {
+            return $b['depth'] - $a['depth'];
+        });
+        
         // Loops through the enhanced URLs until we found one that matches
         foreach ($url_enhanced as $page_id => $page_params) {
 
