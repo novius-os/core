@@ -183,15 +183,16 @@ class Controller_Front extends Controller
                 return $result;
             });
 
+            // Add current url to URLs enhanced
+            $url_enhanced['current'] = array(
+                'url'   => $url.'/',
+                'depth' => mb_substr_count($url.'/', '/'),
+            );
+
             // Sorting the array to check the deepest urls at first
             uasort($url_enhanced, function($a, $b) {
                 return $b['depth'] - $a['depth'];
             });
-
-            // Add current url to URLs enhanced
-            $url_enhanced['current'] = array(
-                'url' => $url.'/',
-            );
 
             $_404 = true;
             // Loop URLs enhanced for one that not send a NotFoundException
