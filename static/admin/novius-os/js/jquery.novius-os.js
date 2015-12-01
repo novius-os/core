@@ -1169,18 +1169,31 @@ define('jquery-nos',
 
             nosFormAjax : function() {
                 var $context = this;
+                var $btn;
 
                 if (!$context.is('form')) {
                     $context = $context.find('form');
                 }
                 require(['jquery-form'], function() {
                     $context.ajaxForm({
+                        beforeSubmit: function(arr, $form, options) {
+                            $btn = $(document.activeElement);
+                            if ($context.prop('disabled')) {
+                                return false;
+                            }
+                            $btn.prop('disabled', true).addClass('ui-state-disabled');
+                            $context.prop('disabled', true);
+                        },
                         dataType: 'json',
                         success: function(json) {
+                            $context.prop('disabled', false);
+                            $btn.prop('disabled', false).removeClass('ui-state-disabled');
                             $context.nosAjaxSuccess(json)
                                 .triggerHandler('ajax_success', [json]);
                         },
                         error: function(x, e) {
+                            $context.prop('disabled', false);
+                            $btn.prop('disabled', false).removeClass('ui-state-disabled');
                             $context.nosAjaxError(x, e);
                         }
                     });
