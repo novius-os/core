@@ -157,7 +157,7 @@ if ($is_attachment) {
 
     $send_file = false;
     $check = false;
-    $match = preg_match('`(.+/)([^/]+)/([^/]+).([a-z]+)$`iUu', $attachment_url, $m);
+    $match = preg_match('`(.+/)([^/]+)/([^/]+).([a-z0-9]+)$`iUu', $attachment_url, $m);
     if ($match) {
         list(, $alias, $attached, $filename, $extension) = $m;
 
