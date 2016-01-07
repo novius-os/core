@@ -451,6 +451,7 @@ class Fieldset extends \Fuel\Core\Fieldset
 
         if ($options['save'] && (empty($options['form_name']) || \Input::post('form_name') == $options['form_name'])) {
             $fieldset->repopulate();
+            $fieldset->validation()->add_callable($item);
             if ($fieldset->validation()->run($fieldset->value())) {
                 $json = $fieldset->triggerComplete($item, $fieldset->validated(), $options);
                 \Response::json($json);
