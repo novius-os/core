@@ -340,6 +340,7 @@ class Controller_Front extends Controller
             $this->_context = $this->_page->get_context();
             $this->_context_url = $this->_contexts_possibles[$this->_context];
             I18n::setLocale(Tools_Context::localeCode($this->_context));
+            \Config::set('language', Tools_Context::langLocaleToLang($this->_context));
 
             \Fuel::$profiling && \Profiler::console('page_id = ' . $this->_page->page_id);
 
