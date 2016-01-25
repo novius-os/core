@@ -285,6 +285,8 @@ return array(
         'assets_minified' => Fuel::$env !== Fuel::DEVELOPMENT,
 
         'migration_config_file' => false,
+        
+        'enable_url_enhancers_on_root_pages' => true,
 
         'finder_paths' => array(
             APPPATH,

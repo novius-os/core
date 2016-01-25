@@ -188,11 +188,13 @@ class Controller_Front extends Controller
                 'url'   => $url.'/',
                 'depth' => mb_substr_count($url.'/', '/'),
             );
-
-            // Sorting the array to check the deepest urls at first
-            uasort($url_enhanced, function($a, $b) {
-                return $b['depth'] - $a['depth'];
-            });
+            
+            if (\Config::get('novius-os.enable_url_enhancers_on_root_pages', false)) {
+                // Sorting the array to check the deepest urls at first
+                uasort($url_enhanced, function($a, $b) {
+                    return $b['depth'] - $a['depth'];
+                });
+            }
 
             $_404 = true;
             // Loop URLs enhanced for one that not send a NotFoundException
