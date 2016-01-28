@@ -239,7 +239,7 @@ class Tools_Wysiwyg
 
         $options['nosenhancer_enhancers'] = $enhancers;
 
-        if(!empty($item)) {
+        if (!empty($item)) {
             $item->event('wysiwygOptions', array(&$options));
         }
         
