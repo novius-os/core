@@ -113,18 +113,27 @@ class Orm_Twinnable_ManyMany extends \Orm\ManyMany
         // If there is a context column then removes results that are not in this context (with a fallback on the main context)
         if ($this->column_context_to) {
             $result_context = array();
-            $context_to = $this->get_context_to($from->{$this->column_context_from});
+            $context_to = $this->get_context_to();
+            if (empty($context_to)) {
+                // if not front_context_fallback and not force_context_fallback, $from Model context is used
+                $context_to = $from->{$this->column_context_from};
+            }
+
+            // $resultTwinnable doesn't contain items with same common_id (remove items that are not in the context, with fallback on the main context)
+            $resultTwinnable = array();
             foreach ($result as $pk => $model) {
                 if (isset($result_context[$model->{$this->column_context_common_id_to}])) {
                     if ($model->{$this->column_context_to} !== $context_to) {
                         continue;
                     } else {
-                        unset($result[$result_context[$model->{$this->column_context_common_id_to}]]);
+                        unset($resultTwinnable[$result_context[$model->{$this->column_context_common_id_to}]]);
                     }
                 }
                 $result_context[$model->{$this->column_context_common_id_to}] = $pk;
-                $result[$pk] = $model;
+                $resultTwinnable[$pk] = $model;
             }
+
+            return $resultTwinnable;
         }
 
         return $result;
