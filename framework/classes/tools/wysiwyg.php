@@ -216,31 +216,33 @@ class Tools_Wysiwyg
                 'model' => $model,
                 'id' => $item->{$pk},
             );
-
-            $enhancers = Config_Data::get('enhancers', array());
-
-            if (!$urlEnhancers) {
-                $enhancers = array_filter($enhancers, function ($enhancer) {
-                    return empty($enhancer['urlEnhancer']);
-                });
-            }
-
-            foreach ($enhancers as $key => $enhancer) {
-                if (empty($enhancer['iconUrl']) && !empty($enhancer['application'])) {
-                    $enhancers[$key]['iconUrl'] = \Config::icon($enhancer['application'], 16);
-                }
-                if (!empty($enhancer['valid_container']) && is_callable($enhancer['valid_container']) &&
-                    call_user_func($enhancer['valid_container'], $enhancer, $item) === false) {
-
-                    unset($enhancers[$key]);
-                }
-            }
-
-            $options['nosenhancer_enhancers'] = $enhancers;
-
-            $item->event('wysiwygOptions', array(&$options));
         }
 
+        $enhancers = Config_Data::get('enhancers', array());
+
+        if (!$urlEnhancers) {
+            $enhancers = array_filter($enhancers, function ($enhancer) {
+                return empty($enhancer['urlEnhancer']);
+            });
+        }
+
+        foreach ($enhancers as $key => $enhancer) {
+            if (empty($enhancer['iconUrl']) && !empty($enhancer['application'])) {
+                $enhancers[$key]['iconUrl'] = \Config::icon($enhancer['application'], 16);
+            }
+            if (!empty($enhancer['valid_container']) && is_callable($enhancer['valid_container']) &&
+                call_user_func($enhancer['valid_container'], $enhancer, $item) === false) {
+
+                unset($enhancers[$key]);
+            }
+        }
+
+        $options['nosenhancer_enhancers'] = $enhancers;
+
+        if (!empty($item)) {
+            $item->event('wysiwygOptions', array(&$options));
+        }
+        
         return $options;
     }
 }
