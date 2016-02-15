@@ -286,7 +286,7 @@ return array(
 
         'migration_config_file' => false,
         
-        'enable_url_enhancers_on_root_pages' => true,
+        'enable_url_enhancers_on_root_pages' => false,
 
         'finder_paths' => array(
             APPPATH,
