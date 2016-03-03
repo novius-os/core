@@ -217,6 +217,7 @@ class Controller_Front extends Controller
                     $this->_contexts_possibles = $contexts_possibles;
                     $this->_page_id = null;
                     $this->_page_url = $temp_url;
+                    $this->_enhanced_url_path = $temp_url;
                 }
 
                 $_404 = false;
