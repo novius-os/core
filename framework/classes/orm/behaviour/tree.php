@@ -178,12 +178,12 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
     {
         $pk = \Arr::get($current_item->primary_key(), 0);
         $params = array();
-	    $isPositionnable = $current_item::behaviours('Novius\Positionable\Orm_Behaviour_Positionable');
-	    if ($isPositionnable) {
-		    $params["order_by"] = array(
-			    array($isPositionnable['position_property'])
-		    );
-	    }
+	$isPositionnable = $current_item::behaviours('Novius\Positionable\Orm_Behaviour_Positionable');
+	if ($isPositionnable) {
+	    $params["order_by"] = array(
+	        array($isPositionnable['position_property'])
+    	    );
+	}
         foreach ($current_item->get($children_relation, $params) as $child) {
             $array[] = $child->get($pk);
             static::_populate_id_children($child, $children_relation, $array);
