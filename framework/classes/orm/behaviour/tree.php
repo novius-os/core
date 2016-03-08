@@ -1,3 +1,20 @@
+Skip to content
+This repository  
+Search
+Pull requests
+Issues
+Gist
+ @SwithFr
+ Unwatch 1
+  Star 0
+ Fork 25 SwithFr/core
+forked from novius-os/core
+ Code  Pull requests 0  Wiki  Pulse  Graphs  Settings
+Branch: master/elche Find file Copy pathcore/framework/classes/orm/behaviour/tree.php
+bd7db0d  3 hours ago
+@SwithFr SwithFr correct indent
+2 contributors @felixgilles @SwithFr
+RawBlameHistory    237 lines (210 sloc)  7.34 KB
 <?php
 /**
  * NOVIUS OS - Web OS for digital communication
@@ -7,45 +24,36 @@
  *             http://www.gnu.org/licenses/agpl-3.0.html
  * @link http://www.novius-os.org
  */
-
 namespace Nos;
-
 class Orm_Behaviour_Tree extends Orm_Behaviour
 {
     public static function _init()
     {
         I18n::current_dictionary('nos::orm');
     }
-
     protected $_parent_relation = null;
     protected $_children_relation = null;
-
     /**
      * parent_relation
      * children_relation
      */
     protected $_properties = array();
-
     public function __construct($class)
     {
         parent::__construct($class);
         $this->_parent_relation = call_user_func($class . '::relations', $this->_properties['parent_relation']);
         $this->_children_relation = call_user_func($class . '::relations', $this->_properties['children_relation']);
-
         if (false === $this->_parent_relation) {
             throw new \Exception('Relation "parent" not found by tree behaviour: '.$this->_class);
         }
-
         if (false === $this->_children_relation) {
             throw new \Exception('Relation "children" not found by tree behaviour: '.$this->_class);
         }
     }
-
     public function parent_relation()
     {
         return $this->_parent_relation;
     }
-
     public function before_query(&$options)
     {
         $property = $this->_parent_relation->key_from[0];
@@ -63,7 +71,6 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
             return $condition;
         };
     }
-
     /**
      * Deletes all the children of the item (recursively)
      * (will only affect the current context, by design)
@@ -95,10 +102,8 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
             'where'    => $where,
             'order_by' => $order_by,
         ));
-
         return $item::find('all', $options);
     }
-
     /**
      * return the parent of the object
      *
@@ -109,7 +114,6 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
     {
         return $item->get($this->_properties['parent_relation']);
     }
-
     /**
      * Sets a new parent for the object
      *
@@ -130,7 +134,6 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
                     $this->_class
                 ));
             }
-
             if (!$item->is_new()) {
                 $children_ids = $this->get_ids_children($item, true);
                 if (in_array($parent->id, $children_ids)) {
@@ -141,11 +144,9 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
                 }
             }
         }
-
         $this->set_parent_no_observers($item, $parent);
         $item->observe('change_parent');
     }
-
     /**
      * Get the list of all IDs of the children
      *
@@ -159,10 +160,8 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
             $ids[] = $item->get(\Arr::get($item->primary_key(), 0));
         }
         $this->_populate_id_children($item, $this->_properties['children_relation'], $ids);
-
         return $ids;
     }
-
     public function find_children_recursive($item, $include_self = true)
     {
         // This is weird, but it doesn't work when called directly...
@@ -170,10 +169,8 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
         if (empty($ids)) {
             return array();
         }
-
         return $item::find('all', array('where' => array(array(\Arr::get($item->primary_key(), 0), 'IN', $ids))));
     }
-
     protected static function _populate_id_children($current_item, $children_relation, &$array)
     {
         $pk = \Arr::get($current_item->primary_key(), 0);
@@ -188,9 +185,7 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
             $array[] = $child->get($pk);
             static::_populate_id_children($child, $children_relation, $array);
         }
-
     }
-
     public function find_root($item)
     {
         $parent = $item;
@@ -198,17 +193,14 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
             $root = $parent;
             $parent = $this->get_parent($parent);
         }
-
         return $root !== $item ? $root : null;
     }
-
     public function set_parent_no_observers($item, $parent = null)
     {
         foreach ($this->_parent_relation->key_from as $i => $k) {
             $item->set($k, $parent === null ? null : $parent->get($this->_parent_relation->key_to[$i]));
             $item->set($this->_properties['parent_relation'], $parent);
         }
-
         if (!empty($this->_properties['level_property'])) {
             $item->{$this->_properties['level_property']} =
                 $parent === null ?
@@ -216,7 +208,6 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
                     $parent->{$this->_properties['level_property']} + 1;
         }
     }
-
     public function crudFields(&$fields, $crud)
     {
         if ($crud->behaviours['contextable']) {
@@ -234,3 +225,5 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
         }
     }
 }
+Status API Training Shop Blog About Pricing
+© 2016 GitHub, Inc. Terms Privacy Security Contact Help
