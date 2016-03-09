@@ -188,7 +188,7 @@ class Tools_Wysiwyg
         if (!empty($media_matches)) {
             $medias = \Nos\Media\Model_Media::find('all', array('where' => array(array('media_id', 'IN', $media_ids))));
             foreach ($media_matches as $media_match) {
-                $closureImage =\Arr::get($medias, $media_match['id'], null);
+                $closureImage = \Arr::get($medias, $media_match['id'], null);
                 \Event::trigger_function('front.parse_media', array(&$medias, &$media_match, &$closureImage));
 
                 $closure(
