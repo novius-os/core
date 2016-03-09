@@ -94,6 +94,7 @@ class Tools_Wysiwyg
                         if (!empty($params['height'])) {
                             $mediaToolkit = $mediaToolkit->resize($params['width'], $params['height']);
                         }
+                        \Event::trigger_function('front.parse_media_toolkit', array(&$mediaToolkit, $params));
                         $media_url = $mediaToolkit->url();
                     } else {
                         if (!empty($params['height'])) {
@@ -102,8 +103,6 @@ class Tools_Wysiwyg
                             $media_url = $media->url();
                         }
                     }
-                    \Event::trigger_function('front.parse_media_toolkit', array(&$mediaToolkit, $params));
-
                     $new_content = preg_replace('`'.preg_quote($params['url'], '`').'(?!\d)`u', Tools_Url::encodePath($media_url), $params['content']);
                     $content = str_replace($params['content'], $new_content, $content);
                 }
