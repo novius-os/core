@@ -89,11 +89,13 @@ class Tools_Wysiwyg
                         //$content = str_replace('href="'.$params['url'].'"', '', $content);
                     }
                 } else {
+                    $mediaToolkit = $media->getToolkitImage();
                     if (!empty($params['height'])) {
-                        $media_url = $media->urlResized($params['width'], $params['height']);
-                    } else {
-                        $media_url = $media->url();
+                        $mediaToolkit = $mediaToolkit->resize($params['width'], $params['height']);
                     }
+
+                    \Event::trigger_function('front.parse_media_toolkit', array(&$mediaToolkit, $params));
+                    $media_url = $mediaToolkit->url();
                     $new_content = preg_replace('`'.preg_quote($params['url'], '`').'(?!\d)`u', Tools_Url::encodePath($media_url), $params['content']);
                     $content = str_replace($params['content'], $new_content, $content);
                 }
@@ -186,8 +188,11 @@ class Tools_Wysiwyg
         if (!empty($media_matches)) {
             $medias = \Nos\Media\Model_Media::find('all', array('where' => array(array('media_id', 'IN', $media_ids))));
             foreach ($media_matches as $media_match) {
+                $closureImage = \Arr::get($medias, $media_match['id'], null);
+                \Event::trigger_function('front.parse_media', array(&$medias, &$media_match, &$closureImage));
+
                 $closure(
-                    \Arr::get($medias, $media_match['id'], null),
+                    $closureImage,
                     $media_match
                 );
             }
