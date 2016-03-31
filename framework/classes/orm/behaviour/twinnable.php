@@ -575,14 +575,8 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
     {
         $contexts = (array) $contexts;
 
-        // Build the query
-        $class = $this->_class;
-        $items = $class::query($options)
-            ->and_where_open()
-            ->where($this->_properties['context_property'], 'IN', $contexts)
-            ->or_where($this->_properties['is_main_property'], '=', 1)
-            ->and_where_close()
-            ->get();
+        $query = $this->getQueryContextOrMain($contexts, $options);
+        $items = $query->get();
 
         // Group items by common id
         $common_items = array();
@@ -607,6 +601,36 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
         }
 
         return $result;
+    }
+
+    /**
+     * Count items in the specified context(s) with a fallback on the main item
+     *
+     * If an item is available in several specified contexts, it will be returned in the
+     * context that is the highest in the list of specified contexts
+     *
+     * @param array|string $contexts
+     * @param array        $options
+     *
+     * @return the number of items
+     */
+    public function countContextOrMain($contexts, array $options = array())
+    {
+        $contexts = (array) $contexts;
+        $query    = $this->getQueryContextOrMain($contexts, $options);
+        return $query->count($this->_properties['common_id_property']);
+    }
+
+    protected function getQueryContextOrMain($contexts, array $options = array())
+    {
+        // Build the query
+        $class = $this->_class;
+        $query = $class::query($options)
+            ->and_where_open()
+            ->where($this->_properties['context_property'], 'IN', $contexts)
+            ->or_where($this->_properties['is_main_property'], '=', 1)
+            ->and_where_close();
+        return $query;
     }
 
     public function before_query(&$options)
