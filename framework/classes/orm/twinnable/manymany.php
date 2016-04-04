@@ -410,6 +410,7 @@ class Orm_Twinnable_ManyMany extends \Orm\ManyMany
         }
         $del_common_ids = $original_common_ids;
 
+        $order_through = 0;
         foreach ($models_to as $key => $model_to) {
             if (!$model_to instanceof $this->model_to) {
                 throw new \FuelException('Invalid Model instance added to relations in this model.');
@@ -422,28 +423,51 @@ class Orm_Twinnable_ManyMany extends \Orm\ManyMany
 
             $current_model_id = $model_to ? $model_to->implode_pk($model_to) : null;
 
+            // Builds the primary keys of the table through
+            $through_pks = array();
+            reset($this->key_from);
+            foreach ($this->key_through_from as $pk) {
+                $through_pks[$pk] = $model_from->{current($this->key_from)};
+                next($this->key_from);
+            }
+            reset($this->key_to);
+            foreach ($this->key_through_to as $pk) {
+                $through_pks[$pk] = $model_to->{current($this->key_to)};
+                next($this->key_to);
+            }
+
             // Check if the model was already assigned, if not INSERT relationships:
             if (!in_array($current_model_id, $original_model_ids)) {
-                $ids = array();
-                reset($this->key_from);
-                foreach ($this->key_through_from as $pk) {
-                    $ids[$pk] = $model_from->{current($this->key_from)};
-                    next($this->key_from);
-                }
+                $values = $through_pks;
 
-                reset($this->key_to);
-                foreach ($this->key_through_to as $pk) {
-                    $ids[$pk] = $model_to->{current($this->key_to)};
-                    next($this->key_to);
+                // Set the order
+                if (!empty($this->key_through_order)) {
+                    $values[$this->key_through_order] = $order_through;
                 }
 
                 if (!in_array($model_to->{$common_id_property}, $original_common_ids)) {
-                    \DB::insert($this->table_through)->set($ids)->execute(call_user_func(array($model_from, 'connection')));
+                    // Insert the relation
+                    \DB::insert($this->table_through)
+                        ->set($values)
+                        ->execute(call_user_func(array($model_from, 'connection')))
+                    ;
                 } else {
                     unset($del_common_ids[array_search($model_to->{$common_id_property}, $original_common_ids)]);
                 }
-                $original_model_ids[] = $current_model_id; // prevents inserting it a second time
+
+                // Prevents inserting it a second time
+                $original_model_ids[] = $current_model_id;
             } else {
+                // Set the order
+                if (!empty($this->key_through_order))
+                {
+                    \DB::update($this->table_through)
+                        ->value($this->key_through_order, $order_through)
+                        ->where($through_pks)
+                        ->execute(call_user_func(array($model_from, 'connection')))
+                    ;
+                }
+
                 // unset current model from from array of new relations
                 unset($del_common_ids[array_search($model_to->{$common_id_property}, $original_common_ids)]);
             }
@@ -459,6 +483,8 @@ class Orm_Twinnable_ManyMany extends \Orm\ManyMany
                 $model_from->_relate($rel);
                 $model_from->freeze();
             }
+
+            $order_through++;
         }
 
         // If any ids are left in $del_rels they are no longer assigned, DELETE the relationships:
