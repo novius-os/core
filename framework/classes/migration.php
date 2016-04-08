@@ -45,6 +45,10 @@ class Migration
                 \DB::query($query)->execute();
             }
         }
+        $fuelCachePath = NOSROOT.'public/cache/fuelphp';
+        if (file_exists($fuelCachePath)) {
+            \File::delete_dir($fuelCachePath, true, false);
+        }
     }
 
     public function down()
