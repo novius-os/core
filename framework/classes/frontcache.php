@@ -194,7 +194,8 @@ class FrontCache
                         $keys = (array) $handler['keys'];
                         foreach ($keys as $key) {
                             if (isset($_GET[$key])) {
-                                $suffixes[] = 'GET['.urlencode($key).']='.(is_array($_GET[$key]) ? http_build_query($_GET[$key]) : urlencode($_GET[$key]));
+                                $value = (is_array($_GET[$key]) ? http_build_query($_GET[$key]) : urlencode($_GET[$key]));
+                                $suffixes[] = 'GET['.urlencode($key).']='.(ctype_alnum($value) ? $value : 'md5-'.md5($value));
                             }
                         }
                     }
