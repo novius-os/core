@@ -143,6 +143,9 @@ class Tools_File
             } else {
                 $info = \File::file_info($file);
                 empty($mime) or $info['mimetype'] = $mime;
+                if ($info['mimetype'] == 'text/plain') {
+                    $info['mimetype'] = 'application/force-download';
+                }
 
                 \Event::register('fuel-shutdown', function () use ($info) {
 
