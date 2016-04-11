@@ -143,7 +143,7 @@ class Tools_File
             } else {
                 $info = \File::file_info($file);
                 empty($mime) or $info['mimetype'] = $mime;
-                if ($info['mimetype'] == 'text/plain') {
+                if ($info['mimetype'] === 'text/plain') {
                     $info['mimetype'] = 'application/force-download';
                 }
 
