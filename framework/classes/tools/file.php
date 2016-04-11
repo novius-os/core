@@ -143,9 +143,6 @@ class Tools_File
             } else {
                 $info = \File::file_info($file);
                 empty($mime) or $info['mimetype'] = $mime;
-                if ($info['mimetype'] === 'text/plain') {
-                    $info['mimetype'] = 'application/force-download';
-                }
 
                 \Event::register('fuel-shutdown', function () use ($info) {
 
@@ -156,6 +153,7 @@ class Tools_File
                     ini_get('zlib.output_compression') and ini_set('zlib.output_compression', 0);
                     ! ini_get('safe_mode') and set_time_limit(0);
 
+                    header('Content-Disposition: attachment; filename='.urlencode(\Arr::get($info, 'basename', '')));
                     header('Content-Type: '.$info['mimetype']);
                     header('Content-Length: '.$info['size']);
                     header('Content-Transfer-Encoding: binary');
