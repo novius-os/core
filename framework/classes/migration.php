@@ -26,6 +26,7 @@ class Migration
     {
         if (file_exists($this->sql_file)) {
             static::executeSqlFile($this->sql_file);
+            $this->clearFuelCache();
         }
     }
 
@@ -44,6 +45,14 @@ class Migration
                 // @todo: might not work for comments
                 \DB::query($query)->execute();
             }
+        }
+    }
+
+    protected function clearFuelCache()
+    {
+        $fuelCachePath = NOSROOT.'public/cache/fuelphp';
+        if (file_exists($fuelCachePath)) {
+            \File::delete_dir($fuelCachePath, true, false);
         }
     }
 
