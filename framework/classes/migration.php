@@ -50,8 +50,9 @@ class Migration
 
     protected function clearFuelCache()
     {
-        $fuelCachePath = NOSROOT.'public/cache/fuelphp';
-        if (file_exists($fuelCachePath)) {
+        $config = \Config::load('cache', true);
+        $fuelCachePath = \Arr::get($config, 'file.path');
+        if (!empty($fuelCachePath) && file_exists($fuelCachePath)) {
             \File::delete_dir($fuelCachePath, true, false);
         }
     }
