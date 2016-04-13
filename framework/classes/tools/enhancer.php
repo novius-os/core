@@ -121,9 +121,14 @@ class Tools_Enhancer
         if (!$context && Tools_Context::useCurrentContext()) {
             $contexts = Tools_Context::contexts();
             if (count($contexts) > 1) {
-                $controller = Nos::main_controller();
-                if (!empty($controller)) {
-                    $context = $controller->getContext();
+                // Try to get the current context from the main controller
+                if (Nos::main_controller() && method_exists(Nos::main_controller(), 'getContext')) {
+                    $context = Nos::main_controller()->getContext();
+                }
+                // Otherwise use the first defined context as default context
+                else {
+                    reset($contexts);
+                    $context = key($contexts);
                 }
             }
         }

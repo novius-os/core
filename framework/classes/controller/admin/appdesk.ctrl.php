@@ -41,6 +41,25 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
         return $this->config;
     }
 
+    /**
+     * Gets the current context. If there are multiple contexts, gets the first one.
+     *
+     * @return mixed|null
+     */
+    public function getContext() {
+        $selected_contexts = $this->getSelectedContexts();
+        return !empty($selected_contexts) ? reset($selected_contexts) : null;
+    }
+
+    /**
+     * Get the selected contexts
+     *
+     * @return mixed|null
+     */
+    public function getSelectedContexts() {
+        return (array) \Arr::get($this->config, 'selectedContexts', array());
+    }
+
     public function action_index($view = null)
     {
         if (empty($view)) {
