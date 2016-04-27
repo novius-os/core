@@ -134,7 +134,7 @@ class Config extends \Fuel\Core\Config
 
     public static function application($application_name)
     {
-        return static::load($application_name.'::config', true);
+        return static::load($application_name.'::config', false, true);
     }
 
     public static function actions($params = array())
