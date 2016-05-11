@@ -43,14 +43,29 @@ class Orm_Behaviour_Contextable extends Orm_Behaviour
     }
 
     /**
-     * Returns the locale of the current object
+     * @deprecated Please consider using getContext() instead.
      *
      * @param \Nos\Orm\Model $item
      * @return string
      */
     public function get_context(Orm\Model $item)
     {
-        return $item->get($this->_properties['context_property']);
+        return return $this->getContext($item);
+    }
+
+    /**
+     * Returns the context of the current object
+     *
+     * @param \Nos\Orm\Model $item
+     * @return string|null
+     */
+    public function getContext(Orm\Model $item)
+    {
+        if (!empty($this->_properties['context_property'])) {
+            return $item->get($this->_properties['context_property']);
+        } else {
+            return null;
+        }
     }
 
     public function form_fieldset_fields(Orm\Model $item, &$fieldset)
