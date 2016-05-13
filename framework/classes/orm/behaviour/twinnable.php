@@ -348,14 +348,14 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
     }
 
     /**
-     * @deprecated Please consider using isContextMain() instead.
+     * @deprecated Please consider using isMainContext() instead.
      *
      * @param \Nos\Orm\Model $item
      * @return bool
      */
     public function is_main_context(Orm\Model $item)
     {
-        return $this->isContextMain($item);
+        return $this->isMainContext($item);
     }
 
     /**
@@ -364,7 +364,7 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
      * @param \Nos\Orm\Model $item
      * @return bool|null
      */
-    public function isContextMain(Orm\Model $item)
+    public function isMainContext(Orm\Model $item)
     {
         if (!empty($this->_properties['is_main_property'])) {
             return (bool) $item->get($this->_properties['is_main_property']);
