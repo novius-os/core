@@ -23,7 +23,7 @@ class Renderer_Folder extends \Nos\Renderer_Selector
 
     public function build()
     {
-        if (\Arr::get($this->renderer_options, 'multiple', 0)) {
+        if (\Arr::get($this->renderer_options, 'multiple', false)) {
             $selected = array_map(function ($id) {
                 return array(
                     'id' => $id,
@@ -39,7 +39,7 @@ class Renderer_Folder extends \Nos\Renderer_Selector
         return $this->template(static::renderer(array(
             'input_name' => $this->name,
             'selected' => $selected,
-            'multiple' => \Arr::get($this->renderer_options, 'multiple', 0),
+            'multiple' => \Arr::get($this->renderer_options, 'multiple', flase),
             'treeOptions' => array(
                 'context' => \Arr::get($this->renderer_options, 'context', null),
             ),
@@ -64,7 +64,7 @@ class Renderer_Folder extends \Nos\Renderer_Selector
         );
         $view = 'inspector/modeltree_radio';
 
-        if (\Arr::get($params, 'multiple', 0)) {
+        if (\Arr::get($params, 'multiple', false)) {
             $defaultSelected = array($defaultSelected);
             $view = 'inspector/modeltree_checkbox';
         }
