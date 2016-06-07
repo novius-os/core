@@ -39,7 +39,7 @@ class Renderer_Folder extends \Nos\Renderer_Selector
         return $this->template(static::renderer(array(
             'input_name' => $this->name,
             'selected' => $selected,
-            'multiple' => \Arr::get($this->renderer_options, 'multiple', flase),
+            'multiple' => \Arr::get($this->renderer_options, 'multiple', false),
             'treeOptions' => array(
                 'context' => \Arr::get($this->renderer_options, 'context', null),
             ),
