@@ -23,11 +23,23 @@ class Renderer_Folder extends \Nos\Renderer_Selector
 
     public function build()
     {
+        if (\Arr::get($this->renderer_options, 'multiple', false)) {
+            $selected = array_map(function ($id) {
+                return array(
+                    'id' => $id,
+                    'model' => 'Nos\\Media\\Model_Folder',
+                );
+            }, (array)$this->value); // Casting to array in case the renderer is switched over from single to multiple
+        } else {
+            $selected = array(
+                // As a safety against changing from multiple to single, get the first value
+                'id' => is_array($this->value) ? reset($this->value) : $this->value,
+            );
+        }
         return $this->template(static::renderer(array(
             'input_name' => $this->name,
-            'selected' => array(
-                'id' => $this->value,
-            ),
+            'selected' => $selected,
+            'multiple' => \Arr::get($this->renderer_options, 'multiple', false),
             'treeOptions' => array(
                 'context' => \Arr::get($this->renderer_options, 'context', null),
             ),
@@ -42,18 +54,26 @@ class Renderer_Folder extends \Nos\Renderer_Selector
      * build() method should be overwritten to call the template() method on renderer() response
      * @static
      * @abstract
-     * @param array $options
+     * @param array $params
      */
-    public static function renderer($options = array())
+    public static function renderer($params = array())
     {
-        $options = \Arr::merge(array(
+        $defaultSelected = array(
+            'id' => null,
+            'model' => 'Nos\\Media\\Model_Folder',
+        );
+        $view = 'inspector/modeltree_radio';
+
+        if (\Arr::get($params, 'multiple', false)) {
+            $defaultSelected = array($defaultSelected);
+            $view = 'inspector/modeltree_checkbox';
+        }
+
+        $params = \Arr::merge(array(
             'urlJson' => 'admin/noviusos_media/inspector/folder/json',
             'reloadEvent' => 'Nos\\Media\\Model_Folder',
             'input_name' => null,
-            'selected' => array(
-                'id' => null,
-                'model' => 'Nos\\Media\\Model_Folder',
-            ),
+            'selected' => $defaultSelected,
             'columns' => array(
                 array(
                     'dataKey' => 'title',
@@ -64,15 +84,10 @@ class Renderer_Folder extends \Nos\Renderer_Selector
             ),
             'height' => '150px',
             'width' => null,
-        ), $options);
+        ), $params);
 
-        return (string) \Request::forge('admin/noviusos_media/inspector/folder/list')->execute(
-            array(
-                'inspector/modeltree_radio',
-                array(
-                    'params' => $options,
-                )
-            )
-        )->response();
+        return (string) \Request::forge('admin/noviusos_media/inspector/folder/list')
+            ->execute(array($view, compact('params')))
+            ->response();
     }
 }
