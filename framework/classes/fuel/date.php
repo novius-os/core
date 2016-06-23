@@ -11,19 +11,21 @@
 class Date extends \Fuel\Core\Date
 {
     /**
-     * Compare two dates without regard to hours.
+     * Compare two dates, with or without regard to hours.
      *
      * @param   int|Date    first date to compare.
      * @param   int|Date    second date to compare.
-     * @return  int			-1 If the first date is earlier, 1 if it's after, 0 if both dates are equal
+     * @param   boolean     true to include time in comparison, false to compare only date (default).
+     * @return  int         -1 If the first date is earlier, 1 if it's after, 0 if both dates are equal
      */
-    public static function compare($date1, $date2)
+    public static function compare($date1, $date2, $compareTime = false)
     {
         $date1 = ( ! $date1 instanceof Date) ? static::forge($date1) : $date1;
         $date2 = ( ! $date2 instanceof Date) ? static::forge($date2) : $date2;
 
-        $date1 = $date1->format('%Y-%m-%d');
-        $date2 = $date2->format('%Y-%m-%d');
+        $format = $compareTime ? '%Y-%m-%d %H:%M:%S' : '%Y:%m:%d';
+        $date1 = $date1->format($format);
+        $date2 = $date2->format($format);
         if ($date1 < $date2) {
             return -1;
         } elseif ($date1 > $date2) {
