@@ -846,7 +846,7 @@ define('jquery-nos',
                                     }
                                 }
                                 if (obj.action === 'window.open') {
-                                    window.open(url);
+                                    window.open(url, '_blank');
                                 } else {
                                     document.location.href = url;
                                 }
