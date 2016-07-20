@@ -55,7 +55,7 @@ define('jquery-nos-ostabs',
                     if (o.selected !== null) {
                         self._firePanelEvent(self.panels.eq(o.selected), $.Event('resizePanel'));
                     }
-		    self._resize();
+                    self._resize();
                 });
             },
 
