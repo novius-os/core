@@ -29,7 +29,7 @@ class Event_Instance extends Fuel\Core\Event_Instance
         // get any arguments passed
         $callback = func_get_args();
         $event    = array_shift($callback);
-        $priority = isset($callback[0]) and is_int($callback[0]) ? array_shift($callback) : 10;
+        $priority = (isset($callback[0]) and is_int($callback[0])) ? array_shift($callback) : 10;
 
         // if the arguments are valid, register the event
         if (is_string($event) and isset($callback[0]) and is_callable($callback[0])) {

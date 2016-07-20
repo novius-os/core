@@ -105,6 +105,7 @@ class Tools_Wysiwyg
                     }
                     $new_content = preg_replace('`'.preg_quote($params['url'], '`').'(?!\d)`u', Tools_Url::encodePath($media_url), $params['content']);
                     $content = str_replace($params['content'], $new_content, $content);
+                    \Event::trigger_function('front.after_parse_media', array(&$params, &$content, $new_content, $media, $media_url));
                 }
             }
         );
