@@ -55,7 +55,14 @@ define('jquery-nos-ostabs',
                     if (o.selected !== null) {
                         self._firePanelEvent(self.panels.eq(o.selected), $.Event('resizePanel'));
                     }
+                    self._resize();
                 });
+            },
+
+            _resize: function () {
+                var self = this;
+                self.tabsWidth = self.uiOstabsSuperPanel.width();
+                self._tabsWidth();
             },
 
             _setOption: function( key, value ) {
