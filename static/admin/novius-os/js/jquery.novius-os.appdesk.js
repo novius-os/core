@@ -800,7 +800,7 @@ define('jquery-nos-appdesk',
                         self._loadInspector($(this));
                     });
                 }
-                if (self.uiInspectorsHorizontal.data('wijmo-wijsplitter')) {
+                if (self.uiSplitterHorizontal.data('wijmo-wijsplitter')) {
                     self.uiInspectorsHorizontalLi = self.uiInspectorsHorizontal.find('> li');
                     self._resizeInspectorsH(true);
                     self.uiInspectorsHorizontalLi.each(function() {
