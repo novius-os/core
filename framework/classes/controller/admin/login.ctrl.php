@@ -18,10 +18,23 @@ class Controller_Admin_Login extends Controller
     {
         parent::before();
 
+        \Event::trigger_function('admin.beforeLoginAuthCheck', array(array(
+            'controllerInstance' => &$this,
+        )));
+
         // If user is already logged in, proceed
         if (\Nos\Auth::check()) {
+
+            \Event::trigger_function('admin.beforeLoginAuthCheckRedirect', array(array(
+                'controllerInstance' => &$this,
+            )));
+
             $this->redirect();
         }
+
+        \Event::trigger_function('admin.beforeLogin', array(array(
+            'controllerInstance' => &$this,
+        )));
 
         I18n::setLocale(\Input::get('lang', \Config::get('novius-os.default_locale', 'en_GB')));
         I18n::current_dictionary('nos::common');
@@ -42,19 +55,32 @@ class Controller_Admin_Login extends Controller
 
     public function action_popup()
     {
-        $error_msg = '';
         if (\Input::method() == 'POST') {
+
             $error_msg = $this->post_login();
+
             if ($error_msg === true) {
+                $notify = strtr(__('Welcome back, {{user}}.'), array(
+                    '{{user}}' => \Session::user()->user_firstname,
+                ));
+
+                \Event::trigger_function('admin.loginPopupSuccess', array(array(
+                    'controllerInstance' => &$this,
+                    'message' => &$notify,
+                )));
+
                 \Response::json(
                     array(
                         'closeDialog' => true,
-                        'notify' => strtr(__('Welcome back, {{user}}.'), array(
-                            '{{user}}' => \Session::user()->user_firstname,
-                        )),
+                        'notify' => $notify,
                     )
                 );
             } else {
+                \Event::trigger_function('admin.loginPopupFail', array(array(
+                    'controllerInstance' => $this,
+                    'message' => &$error_msg,
+                )));
+
                 \Response::json(
                     array(
                         'error' => $error_msg,
@@ -126,5 +152,13 @@ class Controller_Admin_Login extends Controller
         }
         \Event::trigger('admin.loginFail');
         return __('These details won’t get you in. Are you sure you’ve typed the correct email address and password? Please try again.');
+    }
+
+    public function sendResponse($data, $http_status = null)
+    {
+        $this->response = \Response::forge();
+        $this->response($data, $http_status);
+        $this->response->send(true);
+        exit();
     }
 }
