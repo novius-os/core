@@ -15,6 +15,8 @@ define('jquery-nos',
             $nos = window.$nos = $,
             $noviusos = undefined,
             login_popup_opened = false,
+            login_popup_dialog_id = null,
+            login_popup_dialog_element = null,
             nosActionsList= [],
             noviusos = function() {
                     if ($noviusos === undefined) {
@@ -974,12 +976,26 @@ define('jquery-nos',
                     try {
                         // If it's valid JSON, then we'll open the reconnect popup
                         var json =  $.parseJSON(x.responseText);
+
+                        json.login_popup_id = json.login_popup_id || 'default';
+
+                        // Closes the dialog if not the same identifier (prevents stacking)
+                        if (json.login_popup && json.login_popup_id && json.login_popup_id != login_popup_dialog_id) {
+                            if (login_popup_dialog_element) {
+                                login_popup_dialog_element.nosDialog('close');
+                            }
+                            login_popup_opened = false;
+                        }
+
+                        // Opens the dialog
                         if (json.login_popup && !login_popup_opened) {
                             json.login_popup['close'] = function() {
                                 login_popup_opened = false;
                             };
                             json.login_popup.contentUrl += '?lang=' + $.nosLang;
-                            $('body').nosDialog('open', json.login_popup);
+
+                            login_popup_dialog_element = $('body').nosDialog('open', json.login_popup);
+                            login_popup_dialog_id = json.login_popup_id;
                             login_popup_opened = true;
                         }
                         return;
