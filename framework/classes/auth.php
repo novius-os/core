@@ -30,14 +30,37 @@ class Auth
         $user = current($user);
         $user->user_last_connection = \Date::forge()->format('mysql');
         $user->save();
-        if ($user->check_password($password)) {
+
+        // Triggers an event to allow custom password check
+        $checked = null;
+        \Event::trigger_function('admin.checkLoginPassword', array(array(
+            'user' => &$user,
+            'login' => $login,
+            'password' => $password,
+            'checked' => &$checked,
+        )));
+
+        // Native password check
+        if (is_null($checked)) {
+            $checked = $user->check_password($password);
+        }
+
+        if ($checked) {
+            \Event::trigger_function('admin.beforeLoginSuccess', array(array(
+                'user' => &$user,
+                'login' => $login,
+                'password' => $password
+            )));
+
             \Session::set('logged_user_id', $user->id);
             \Session::set('logged_user_md5', $user->user_md5);
             \Cookie::set('remember_me', $remember_me, static::$default_cookie_lasting);
+
             if ($remember_me) {
                 \Cookie::set('logged_user_id', $user->id, static::$default_cookie_lasting);
                 \Cookie::set('logged_user_md5', $user->id, static::$default_cookie_lasting);
             }
+
             return true;
         }
         return false;
@@ -77,6 +100,10 @@ class Auth
             // It's a new session (= auto-login using Cookie)
             if (empty($session_user_id)) {
                 \Event::trigger('admin.loginFailWithCookie');
+                \Event::trigger_function('admin.loginFailWithCookie', array(array(
+                    'user' => $logged_user,
+                    'user_id' => $logged_user_id,
+                )));
             }
 
             return false;
@@ -85,6 +112,11 @@ class Auth
         \Session::setUser($logged_user);
         // Only extend the cookie duration for the main request (preventing N 'Set-Cookie' headers if we have N HMVC requests)
         if (!\Request::is_hmvc()) {
+
+            // It's a new session (= auto-login using Cookie)
+            if (empty($session_user_id)) {
+                \Event::trigger('admin.beforeLoginSuccessWithCookie');
+            }
 
             \Session::set('logged_user_id', $logged_user_id);
             \Session::set('logged_user_md5', $logged_user_md5);
@@ -98,6 +130,10 @@ class Auth
         // It's a new session (= auto-login using Cookie)
         if (empty($session_user_id)) {
             \Event::trigger('admin.loginSuccessWithCookie');
+            \Event::trigger_function('admin.loginFailWithCookie', array(array(
+                'user' => $logged_user,
+                'user_id' => $logged_user_id,
+            )));
         }
 
         return true;
