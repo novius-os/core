@@ -115,7 +115,11 @@ class Auth
 
             // It's a new session (= auto-login using Cookie)
             if (empty($session_user_id)) {
-                \Event::trigger('admin.beforeLoginSuccessWithCookie');
+                \Event::trigger_function('admin.beforeLoginSuccessWithCookie', array(array(
+                    'user' => &$logged_user,
+                    'user_id' => &$logged_user_id,
+                    'user_md5' => &$logged_user_md5,
+                )));
             }
 
             \Session::set('logged_user_id', $logged_user_id);
