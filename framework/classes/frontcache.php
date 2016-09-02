@@ -28,6 +28,16 @@ class FrontCache
     public static $cache_duration = 60;
 
     /**
+     * @var bool True when executing cache, to prevent echoing uncache strings
+     */
+    protected static $executing = false;
+
+    /**
+     * @var array The cache params
+     */
+    protected $cache_params = array();
+
+    /**
      * Loads any default caching settings when available
      */
     public static function _init()
@@ -60,11 +70,15 @@ class FrontCache
      */
     public static function callHmvcUncached($uri, $args = array())
     {
-        echo static::_phpBegin();
-        // Serialize allow to persist objects in the cache file
-        // API is Nos\Nos::hmvc('location', $args)
-        echo 'echo \Nos\Nos::hmvc('.var_export($uri, true).', unserialize('.var_export(serialize($args), true).'));';
-        echo '?>';
+        if (self::$executing) {
+            echo \Nos\Nos::hmvc($uri, $args);
+        } else {
+            echo static::_phpBegin();
+            // Serialize allow to persist objects in the cache file
+            // API is Nos\Nos::hmvc('location', $args)
+            echo 'echo \Nos\Nos::hmvc(' . var_export($uri, true) . ', unserialize(' . var_export(serialize($args), true) . '));';
+            echo '?>';
+        }
     }
 
     /**
@@ -76,10 +90,14 @@ class FrontCache
      */
     public static function viewForgeUncached($file = null, $data = null, $auto_filter = null)
     {
-        echo static::_phpBegin();
-        // Serialize allow to persist objects in the cache file
-        echo 'echo View::forge('.var_export($file, true).', unserialize('.var_export(serialize($data), true).'), '.var_export($auto_filter, true).');';
-        echo '?>';
+        if (self::$executing) {
+            echo \View::forge($file, $data, $auto_filter);
+        } else {
+            echo static::_phpBegin();
+            // Serialize allow to persist objects in the cache file
+            echo 'echo View::forge(' . var_export($file, true) . ', unserialize(' . var_export(serialize($data), true) . '), ' . var_export($auto_filter, true) . ');';
+            echo '?>';
+        }
     }
 
     public static function forge($path)
@@ -176,7 +194,8 @@ class FrontCache
                         $keys = (array) $handler['keys'];
                         foreach ($keys as $key) {
                             if (isset($_GET[$key])) {
-                                $suffixes[] = 'GET['.urlencode($key).']='.(is_array($_GET[$key]) ? http_build_query($_GET[$key]) : urlencode($_GET[$key]));
+                                $value = (is_array($_GET[$key]) ? http_build_query($_GET[$key]) : urlencode($_GET[$key]));
+                                $suffixes[] = 'GET['.urlencode($key).']='.(ctype_alnum($value) ? $value : 'md5-'.md5($value));
                             }
                         }
                     }
@@ -215,17 +234,23 @@ class FrontCache
         //flock($this->_lock_fp, LOCK_EX);
         if (!empty($this->_path) && is_file($this->_path)) {
             try {
+                self::$executing = true;
                 ob_start();
                 include $this->_path;
                 $this->content = ob_get_clean();
+                self::$executing = false;
                 //flock($this->_lock_fp, LOCK_UN);
                 return $this->content;
             } catch (CacheExpiredException $e) {
                 ob_end_clean();
                 @unlink($this->_path);
                 static::$opcache_invalidate && opcache_invalidate($this->_path, true);
+            } catch (\Exception $e) {
+                self::$executing = false;
+                throw $e;
             }
         }
+        self::$executing = false; // We may have executed a higher level page, make sure we don't inline uncached calls
         throw new CacheNotFoundException();
     }
 
@@ -236,14 +261,27 @@ class FrontCache
         $this->_level = ob_get_level();
     }
 
-    public static function checkExpires($expires, $initial_cache_duration = 0)
+    /**
+     * Checks if the cache has expired
+     *
+     * @param int $expires
+     * @param int $cache_duration
+     * @param array $cache_params
+     * @throws CacheExpiredException
+     */
+    public static function checkExpires($expires, $cache_duration = 0, $cache_params = array())
     {
+        // Invalidates the cache if the expiration timestamp has passed
         if ($expires > 0 && $expires <= time()) {
             throw new CacheExpiredException();
         }
-        if ($initial_cache_duration > static::$cache_duration) {
-            throw new CacheExpiredException();
-        }
+
+        // Triggers an event to allow custom cache invalidation
+        \Event::trigger('front.cache.checkExpires', array(
+            'expires' => $expires,
+            'cache_duration' => $cache_duration,
+            'cache_params' => $cache_params,
+        ));
     }
 
     public function save($duration = -1, $controller = null)
@@ -256,9 +294,15 @@ class FrontCache
             $this->_path = \Config::get('novius-os.temp_dir').DS.uniqid('page/').'.php';
         } else {
             $expires = time() + $duration;
+
+            // Gets the cache params and adds the cache path
+            $cache_params = \Arr::merge($this->getCacheParams(), array(
+                'cache_path' => $this->_path,
+            ));
+
             $prepend .= '<?php
 
-            '.__CLASS__.'::checkExpires('.$expires.', '.$duration.');'."\n";
+            '.__CLASS__.'::checkExpires('.$expires.', '.$duration.', unserialize('.var_export(serialize($cache_params), true).'));'."\n";
 
             if (!empty($controller)) {
                 if ($this->_path === $this->_init_path && !empty($this->_suffix_handlers)) {
@@ -503,5 +547,47 @@ class FrontCache
     {
         $url = (empty($url) ? 'index/' : $url);
         return 'pages'.DS.str_replace(array('http://', 'https://'), array('', ''), rtrim($base, '/')).DS.trim($url, '/');
+    }
+
+    /**
+     * Replaces the cache params with $params
+     *
+     * @param $params
+     */
+    public function resetCacheParams($params = array())
+    {
+        $this->cache_params = $params;
+    }
+
+    /**
+     * Sets the $value of the cache param $name
+     *
+     * @param $name
+     * @param $value
+     */
+    public function setCacheParam($name, $value)
+    {
+        \Arr::set($this->cache_params, $name, $value);
+    }
+
+    /**
+     * Returns the cache params
+     *
+     * @return mixed
+     */
+    public function getCacheParams()
+    {
+        return $this->cache_params;
+    }
+
+    /**
+     * Gets a cache param by $name
+     *
+     * @param $name
+     * @return mixed
+     */
+    public function getCacheParam($name)
+    {
+        return \Arr::get($this->cache_params, $name);
     }
 }

@@ -312,8 +312,12 @@ class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
                         '{{count}}' => $try,
                     ));
                     $clone->page_title = $main->page_title.$title_append;
+                    $clone->page_menu_title = $clone->page_title;
                     $clone->page_virtual_name = null;
                     $clone->page_virtual_url = null;
+                    if ($clone->behaviours('Nos\Orm_Behaviour_Sortable')) {
+                        $clone->move_to_last_position();
+                    }
                 }
                 $clone->save();
                 break;

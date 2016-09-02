@@ -18,13 +18,17 @@ foreach (\Nos\Config_Data::get('templates', array()) as $tpl_key => $template) {
     );
 }
 
+usort($templates, function($a, $b) {
+    return strcmp($a['title'], $b['title']);
+});
+
 return array(
     'data' => $templates,
     'input' => array(
         'key' => 'tpvar_template',
         'query' =>
             function ($value, $query) {
-                $query->where(array('tpvar_template', '=', $value));
+                $query->where(array('tpvar_template', '=', $value))->order_by('tpvar_default', 'DESC')->order_by('tpvar_title');
                 return $query;
             },
     ),

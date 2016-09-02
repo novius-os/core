@@ -5,7 +5,7 @@ return array(
         'image' => 'gif,png,jpg,jpeg,bmp',
         'document' => 'doc,xls,ppt,docx,xlsx,pptx,odt,odf,odp,pdf',
         'music' => 'mp3,ogg,wav',
-        'video' => 'avi,mkv,mpg,mpeg,mov',
+        'video' => 'avi,mkv,mpg,mpeg,mov,mp4',
         'archive' => 'zip,rar,tar,gz,7z',
         'text' => 'txt,xml,htm,html',
     ),

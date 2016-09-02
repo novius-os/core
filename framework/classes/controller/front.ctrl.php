@@ -91,15 +91,33 @@ class Controller_Front extends Controller
 
     protected $pageFoundAlreadyTriggered = false;
 
+    public static function _init() {
+        /**
+         * For pages that use the default cache duration, we need to invalidate the cache if the current default cache duration is smaller.
+         * For pages that use a custom cache duration, the cache is invalidated anyway when saving the page
+         */
+        \Event::register('front.cache.checkExpires', function($params) {
+            $cache_params = \Arr::get($params, 'cache_params', array());
+            // Only for pages that use the default cache duration
+            if (!empty($cache_params['page_id']) && empty($cache_params['page_cache_duration'])) {
+                // Checks if the cache duration is greater than the current default cache duration
+                if (\Arr::get($params, 'cache_duration') > \Nos\FrontCache::$cache_duration) {
+                    // Invalidates the cache
+                    throw new CacheExpiredException();
+                }
+            }
+        });
+    }
+
     public function before()
     {
         parent::before();
-        $this->_cache_duration = \Config::get('novius-os.cache_duration_page', 60);
+        $this->_cache_duration = \Config::get('novius-os.cache_duration_page', FrontCache::$cache_duration);
     }
 
     /**
      * Routes the specified $action
-     * 
+     *
      * @return \Response
      */
     public function router($action, $params, $status = 200)
@@ -116,11 +134,11 @@ class Controller_Front extends Controller
         if (!empty($this->_extension)) {
             $this->_virtual_url = \Str::sub($this->_virtual_url, 0, -\Str::length($this->_extension) - 1);
         }
-        
+
         try {
             // Why Session::get() instead of Auth::check()? See https://github.com/novius-os/core/pull/52#issuecomment-21237309
             $this->setPreview(\Input::get('_preview', false) && \Session::get('logged_user_id', false));
-    
+
             // POST or preview means no cache. Ever.
             // We don't want cache in DEV except if _cache=1
             if ($this->isPreview() || \Input::method() == 'POST' || !\Input::get('_cache', \Config::get('novius-os.cache', true))) {
@@ -128,32 +146,32 @@ class Controller_Front extends Controller
             } else {
                 $this->enableCaching();
             }
-    
+
             // Disable browser caching if it's a preview
             if ($this->isPreview()) {
                 $this->disableBrowserCaching();
             }
-            
+
             // Builds the default cache path
             $cache_path = $this->getCachePath();
-        
+
             // Front start
             \Event::trigger('front.start');
             \Event::trigger_function('front.start', array(
                 array(
-                    'url' => &$this->_virtual_url, 
+                    'url' => &$this->_virtual_url,
                     'cache_path' => &$cache_path,
                 )
             ));
-    
+
             // Initializes the cache
             $cache_path = \Nos\FrontCache::getPathFromUrl($this->_base_href, $cache_path);
             $this->_cache = FrontCache::forge($cache_path);
             \Nos\FrontCache::$cache_duration = $this->_cache_duration;
-    
+
             // Builds the content
             $this->buildContent();
-    
+
             \Event::trigger_function('front.response', array(
                 array(
                     'content'   => &$this->_content,
@@ -163,7 +181,7 @@ class Controller_Front extends Controller
                 )
             ));
         }
-            
+
         // A database exception occurred
         catch (\Database_Exception $e) {
             // No database configuration file is found
@@ -181,7 +199,7 @@ class Controller_Front extends Controller
             ), false);
             exit();
         }
-        
+
         // An exception occurred
         catch (\Exception $e) {
             //@todo : error page case
@@ -190,7 +208,7 @@ class Controller_Front extends Controller
 
         return \Response::forge($this->_content, $this->_status, $this->_headers);
     }
-    
+
     /**
      * Builds the content
      */
@@ -205,10 +223,10 @@ class Controller_Front extends Controller
         $this->_cache->start();
 
         try {
-            
+
             // Try to find the content
             if ($this->findContent()) {
-            
+
                 // Displays the content
                 \Event::trigger_function('front.display', array(
                     &$this->_content,
@@ -220,17 +238,17 @@ class Controller_Front extends Controller
                     'headers'   => &$this->_headers,
                     'params'    => $params,
                 ));
-                
+
                 // Saves the content in cache if enabled
                 if ($this->isCachingEnabled()) {
                     echo $this->_content;
                     $this->_cache->save($this->_cache_duration, $this);
                     $this->_content = $this->_cache->execute();
                 }
-                
+
                 return true;
             }
-            
+
             // Content not found
             $this->_cache->reset();
             $this->_status = 404;
@@ -252,7 +270,7 @@ class Controller_Front extends Controller
                 'params'    => $params,
             ));
         }
-        
+
         // An error occured while rendering the front content
         catch (FrontContentErrorException $e) {
             $this->_cache->reset();
@@ -265,7 +283,7 @@ class Controller_Front extends Controller
 
     /**
      * Try to find a content using several methods.
-     * 
+     *
      * @return bool
      */
     protected function findContent()
@@ -277,7 +295,7 @@ class Controller_Front extends Controller
             // Try to find a page that match the virtual url
             'findContentByPage',
         );
-        
+
         try {
             // Try several methods to find a content that match the URL
             foreach (static::$methods as $method) {
@@ -288,13 +306,13 @@ class Controller_Front extends Controller
         }
         // No content were found
         catch (FrontContentNotFoundException $e) {}
-                    
+
         return false;
     }
 
     /**
      * Try to find a route that match $virtual_url
-     * 
+     *
      * @param string $virtual_url
      * @return bool
      */
@@ -314,7 +332,7 @@ class Controller_Front extends Controller
 
     /**
      * Try to find an URL enhancer in a page that match $virtual_url
-     * 
+     *
      * @param string $virtual_url
      * @return bool
      */
@@ -334,12 +352,12 @@ class Controller_Front extends Controller
             $page_params['depth'] = mb_substr_count($page_params['url'], '/');
             return \Str::starts_with($url_absolute, $enhanced_url_absolute);
         });
-    
+
         // Sorts the enhanced URLs to place the deeper URLs to the beginning
         uasort($url_enhanced, function($a, $b) {
             return $b['depth'] - $a['depth'];
         });
-        
+
         // Loops through the enhanced URLs until we found one that matches
         foreach ($url_enhanced as $page_id => $page_params) {
 
@@ -352,9 +370,9 @@ class Controller_Front extends Controller
                 // No page found
                 continue;
             }
-            
+
             $this->_page_id = $page_id;
-            
+
             // Sets the URLs and paths
             if (in_array($page_params['url'], array('', '/'))) {
                 $this->_page_url = '';
@@ -380,13 +398,13 @@ class Controller_Front extends Controller
 
         $this->_enhanced_url_path = false;
         $this->_enhancer_url = false;
-        
+
         return false;
     }
 
     /**
      * Try to find a page that match the specified $virtual_url
-     * 
+     *
      * @param string $virtual_url
      * @return bool
      */
@@ -415,13 +433,13 @@ class Controller_Front extends Controller
             $this->_cache->reset();
             return false;
         }
-        
+
         return true;
     }
 
     /**
      * Gets a page by ID
-     * 
+     *
      * @param int $page_id
      * @return Page\Model_Page|null
      */
@@ -430,7 +448,7 @@ class Controller_Front extends Controller
         $where = \Arr::get($options, 'where', array());
 
         $where[] = array('page_id', $page_id);
-        
+
         // Search the page
         $page = Page\Model_Page::find('first', array(
             'where' => $where,
@@ -438,13 +456,13 @@ class Controller_Front extends Controller
                 'template_variation',
             ),
         ));
-        
+
         return $page;
     }
 
     /**
      * Gets a page by URL
-     * 
+     *
      * @param string $virtual_url
      * @return Page\Model_Page|null
      */
@@ -452,12 +470,12 @@ class Controller_Front extends Controller
     {
         $where = \Arr::get($options, 'where', array());
         $absolute_url = static::makeUrlAbsolute($virtual_url, \Uri::base(false));
-        
+
         // Try to search the page in each possible contexts until one matches
         foreach ($this->searchUrlContexts($absolute_url) as $context => $domain) {
             $where_context = $where;
             $where_context[] = array('page_context', $context);
-            
+
             // Builds the virtual url by removing the context part
             $virtual_url = rtrim(mb_substr($absolute_url, mb_strlen($domain)), '/');
             $virtual_url = !empty($virtual_url) ? $virtual_url.'.html' : null;
@@ -478,38 +496,38 @@ class Controller_Front extends Controller
                     ),
                 ),
             ));
-            
+
             // Page found
             if (!empty($page)) {
-                
+
                 // Prevents duplicate URLs for the entrance page
                 if ($page->page_entrance && !empty($virtual_url)) {
                     \Response::redirect($domain, 'location', 301);
                     exit();
                 }
-                
+
                 $this->_page_url = $virtual_url;
                 return $page;
             }
         }
-        
+
         return false;
     }
 
     /**
      * Renders the specified $page
-     * 
+     *
      * @param Page\Model_Page $page
      * @return bool|string
      */
     public function renderPage($page)
-    { 
+    {
         // Redirects if the page is an external link
         if ($page->page_type == \Nos\Page\Model_Page::TYPE_EXTERNAL_LINK) {
             \Response::redirect($page->page_external_link, 'location', 301);
             exit();
         }
-        
+
         // Sets the page as the displayed page
         $this->setPageDisplayed($page);
 
@@ -523,10 +541,10 @@ class Controller_Front extends Controller
             $this->_cache_duration = $page->page_cache_duration;
             \Nos\FrontCache::$cache_duration = $this->_cache_duration;
         }
-        
+
         // Loads the page template
         $this->loadPageTemplate($page);
-        
+
         try {
             // Renders the page's wysiwygs and assigns them to the template view
             $wysiwyg = array();
@@ -536,18 +554,18 @@ class Controller_Front extends Controller
             }
             $this->_wysiwyg_name = null;
             $this->_view->set('wysiwyg', $wysiwyg, false);
-            
+
             // Renders the template
             $this->renderTemplate();
         }
-            
+
         // Exception thrown to ignore the template
         catch (FrontIgnoreTemplateException $e) {}
     }
 
     /**
      * Set the specified $page as the displayed page
-     * 
+     *
      * @param Page\Model_Page $page
      * @return bool|string
      */
@@ -555,20 +573,20 @@ class Controller_Front extends Controller
     {
         $this->_page = $page;
 
-        // Be careful, this event can be triggered several times because of the logic based on 
-        // the "NotFoundException" exception thrown by URL enhancers to tell the controller 
+        // Be careful, this event can be triggered several times because of the logic based on
+        // the "NotFoundException" exception thrown by URL enhancers to tell the controller
         // that no content were found.
         \Event::trigger('front.pageFound', array(
             'page' => $page,
         ));
 
         \Fuel::$profiling && \Profiler::console('page_id = ' . $page->page_id);
-        
+
         // SEO no index
         if ($page->page_meta_noindex) {
             $this->setMetaRobots('noindex');
         }
-        
+
         // Sets the page as the displayed item
         $this->setItemDisplayed($page, array(
            'title' => $page->getMetaTitle() ?: $page->page_title,
@@ -579,7 +597,7 @@ class Controller_Front extends Controller
 
     /**
      * Loads the template of the specified $page
-     * 
+     *
      * @param Page\Model_Page $page
      * @return bool|string
      */
@@ -604,7 +622,7 @@ class Controller_Front extends Controller
 
     /**
      * Sets $file as the template view
-     * 
+     *
      * @param $file
      * @throws \Exception
      */
@@ -622,7 +640,7 @@ class Controller_Front extends Controller
         $this->_view->set('page', $this->_page, false);
         $this->_view->set('main_controller', $this, false);
     }
-    
+
     /**
      * Renders the template
      */
@@ -630,17 +648,17 @@ class Controller_Front extends Controller
     {
         // Renders the template view
         $template_content = $this->_view->render();
-    
+
         // Parses the content
         $template_content = $this->prepareHtmlContent($template_content);
-        
+
         // Sets as content
         $this->_content = $template_content;
     }
 
     /**
      * Searches the contexts that match the specified absolute url
-     * 
+     *
      * @param string $url
      * @return array
      */
@@ -658,10 +676,10 @@ class Controller_Front extends Controller
         }
         return $url_contexts;
     }
-    
+
     /**
      * Searches the base URL of the specified context
-     * 
+     *
      * @param string $context
      * @return string
      */
@@ -670,10 +688,10 @@ class Controller_Front extends Controller
         $domains = \Arr::get($this->getAvailableContexts(), $context);
         return reset($domains);
     }
-    
+
     /**
      * Returns the available contexts
-     * 
+     *
      * @return array
      */
     protected function getAvailableContexts()
@@ -840,11 +858,19 @@ class Controller_Front extends Controller
         }
 
         $this->_title = \Str::tr($template, array(
-            'title' => $title, 
+            'title' => $title,
             'page_title' => !empty($this->_page) ? $this->_page->page_title : null,
         ));
 
         return $this;
+    }
+
+    /**
+     * @return string : The title of current HTML.
+     */
+    public function getTitle()
+    {
+        return $this->_title;
     }
 
     /**
@@ -887,6 +913,14 @@ class Controller_Front extends Controller
     }
 
     /**
+     * @return string : The meta description of current html output.
+     */
+    public function getMetaDescription()
+    {
+        return $this->_meta_description;
+    }
+
+    /**
      * Set a meta keywords for the current HTML output.
      *
      * @param string $meta_keywords The new meta keywords.
@@ -905,6 +939,14 @@ class Controller_Front extends Controller
         ));
 
         return $this;
+    }
+
+    /**
+     * @return string : The meta keywords of current html output.
+     */
+    public function getMetaKeywords()
+    {
+        return $this->_meta_keywords;
     }
 
     /**
@@ -1008,7 +1050,7 @@ class Controller_Front extends Controller
     {
         return $this->_is_preview;
     }
-    
+
     /**
      * @param boolean $value True to enable or false to disable
      * @return boolean True if current page is requested in the preview mode.
@@ -1020,9 +1062,9 @@ class Controller_Front extends Controller
 
     /**
      * Prepares and returns the specified HTML $content
-     * 
+     *
      * Handles the HTML head/foot replacements (css/js/meta)
-     * 
+     *
      * @param string $content
      * @return string
      */
@@ -1128,7 +1170,7 @@ class Controller_Front extends Controller
         if (count($footer)) {
             $replace_fct('</body>', implode("\n", $footer)."\n</body>");
         }
-        
+
         return $content;
     }
 
@@ -1139,10 +1181,10 @@ class Controller_Front extends Controller
     {
         $this->_content = $this->parseContent($this->_content);
     }
-    
+
     /**
      * Try to find the content from the cache
-     * 
+     *
      * @return string The current context
      */
     protected function findCache()
@@ -1163,7 +1205,7 @@ class Controller_Front extends Controller
         if (empty($cache_path) {
             $cache_path = 'index/';
         }
-        // 404 are stored in a separate cache 
+        // 404 are stored in a separate cache
         if ($status == 404) {
             $cache_path = '404.error/'.$cache_path;
         }
@@ -1248,10 +1290,10 @@ class Controller_Front extends Controller
 
         return $this;
     }
-    
+
     /**
      * Disables the browser cache
-     * 
+     *
      * @return Controller_Front
      */
     public function disableBrowserCaching()
@@ -1338,7 +1380,7 @@ class Controller_Front extends Controller
 
     /**
      * Sends an error page and stop all threatments
-     * 
+     *
      * @param array() $params
      */
     public function sendError($params = array())
@@ -1371,10 +1413,10 @@ class Controller_Front extends Controller
     {
         $this->_cache->delete();
     }
-    
+
     /**
      * Makes $url absolute using $base_url (if it's not already the case)
-     * 
+     *
      * @param string $url
      * @return array
      */

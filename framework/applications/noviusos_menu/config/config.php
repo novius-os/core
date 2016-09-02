@@ -17,4 +17,12 @@ return array(
         'Nos\Menu\Menu_Item_Text',
         'Nos\Menu\Menu_Item_Html',
     ),
+
+    // Available templates for the enhancer
+    'views' => array(
+        'default' => array(
+            'title' => __('List'),
+            'view' => 'noviusos_menu::menu',
+        ),
+    ),
 );

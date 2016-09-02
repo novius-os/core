@@ -92,7 +92,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
 
             // If the response isn't a Response object, embed in the available one for BC
             // @deprecated  can be removed when $this->response is removed
-            if (!$response instanceof Response && $this->response->body == null) {
+            if (!$response instanceof \Response && $this->response->body == null) {
                 $this->response->body = $response;
                 $response = $this->response;
             }
@@ -195,7 +195,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
         $select = \Arr::get($model::primary_key(), 0);
         $select = (mb_strpos($select, '.') === false ? $query->alias().'.'.$select : $select);
         // Get the columns
-        $columns = \DB::expr('DISTINCT '.\Database_Connection::instance()->quote_identifier($select).' AS group_by_pk');
+        $columns = \DB::expr('DISTINCT '.\Database_Connection::instance($query->connection())->quote_identifier($select).' AS group_by_pk');
         // Remove the current select and
         $new_query = call_user_func('DB::select', $columns);
         // Set from table
@@ -509,6 +509,8 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                     $parent = $parent->find_context($from->get_context());
                 }
                 $from->set_parent($parent);
+            } elseif ($params['targetType'] === 'in') {
+            	$params['targetType'] = 'after';
             }
 
             // Change sort order
@@ -537,11 +539,13 @@ class Controller extends \Fuel\Core\Controller_Hybrid
             );
         }
 
-        \Response::json(
-            array(
-                'success' => true,
-            )
+        $json = array(
+            'success' => true,
         );
+        if (empty($behaviour_tree)) {
+            $json['no_tree'] = true;
+        }
+        \Response::json($json);
     }
 
     public function tree_selected(array $tree_config, array $params)

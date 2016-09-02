@@ -15,6 +15,7 @@ class Orm_Behaviour_Virtualpath extends Orm_Behaviour_Virtualname
     public static function _init()
     {
         I18n::current_dictionary('nos::orm');
+        parent::_init();
     }
 
     protected $_parent_relation = null;

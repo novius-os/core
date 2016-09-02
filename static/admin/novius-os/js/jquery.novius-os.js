@@ -15,6 +15,8 @@ define('jquery-nos',
             $nos = window.$nos = $,
             $noviusos = undefined,
             login_popup_opened = false,
+            login_popup_dialog_id = null,
+            login_popup_dialog_element = null,
             nosActionsList= [],
             noviusos = function() {
                     if ($noviusos === undefined) {
@@ -109,6 +111,15 @@ define('jquery-nos',
                 chooseMediaFile : 'Choose a media file',
                 chooseMediaImage : 'Choose a image',
                 errorImageNotfind : 'We’re afraid we cannot find this image.'
+            },
+
+            nosEscapeHtml: function(str) {
+                return str
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;");
             },
 
             nosI18nPlural: function(msgs, $n) {
@@ -339,7 +350,7 @@ define('jquery-nos',
                             .find('img')
                             .attr({
                                 src : media.path,
-                                title : media.title
+                                title : $.nosEscapeHtml(media.title)
                             })
                             .css({
                                 width : 0,
@@ -837,7 +848,7 @@ define('jquery-nos',
                                     }
                                 }
                                 if (obj.action === 'window.open') {
-                                    window.open(url);
+                                    window.open(url, '_blank');
                                 } else {
                                     document.location.href = url;
                                 }
@@ -965,12 +976,26 @@ define('jquery-nos',
                     try {
                         // If it's valid JSON, then we'll open the reconnect popup
                         var json =  $.parseJSON(x.responseText);
+
+                        json.login_popup_id = json.login_popup_id || 'default';
+
+                        // Closes the dialog if not the same identifier (prevents stacking)
+                        if (json.login_popup && json.login_popup_id && json.login_popup_id != login_popup_dialog_id) {
+                            if (login_popup_dialog_element) {
+                                login_popup_dialog_element.nosDialog('close');
+                            }
+                            login_popup_opened = false;
+                        }
+
+                        // Opens the dialog
                         if (json.login_popup && !login_popup_opened) {
                             json.login_popup['close'] = function() {
                                 login_popup_opened = false;
                             };
                             json.login_popup.contentUrl += '?lang=' + $.nosLang;
-                            $('body').nosDialog('open', json.login_popup);
+
+                            login_popup_dialog_element = $('body').nosDialog('open', json.login_popup);
+                            login_popup_dialog_id = json.login_popup_id;
                             login_popup_opened = true;
                         }
                         return;
@@ -978,7 +1003,7 @@ define('jquery-nos',
                 }
                 // http://www.maheshchari.com/jquery-ajax-error-handling/
                 if (x.status != 0) {
-                    $.nosNotify('Connection error!', 'error');
+                    $.nosNotify('An unexpected error has occurred.', 'error');
                 } else if (e == 'parsererror') {
                     $.nosNotify('Request seemed a success, but we could not read the answer.');
                 } else if (e == 'timeout') {
@@ -1003,15 +1028,16 @@ define('jquery-nos',
             nosMedia : function(data) {
 
                 data = data || {};
-                var contentUrls = {
-                        'all'   : 'admin/noviusos_media/appdesk?view=media_pick',
-                        'image' : 'admin/noviusos_media/appdesk?view=image_pick'
+                var $input = this,
+                    url = 'admin/noviusos_media/appdesk?current_id=' + $input.val(),
+                    contentUrls = {
+                        'all'   : url + '&view=media_pick',
+                        'image' : url + '&view=image_pick'
                     },
                     titles = {
                         'all'   : $.nosTexts.chooseMediaFile,
                         'image' : $.nosTexts.chooseMediaImage
-                    },
-                    $input = this;
+                    };
 
                 var options = $.extend({
                     title: $input.attr('title') || 'File',
@@ -1049,6 +1075,9 @@ define('jquery-nos',
                                         }
                                     });
                                 });
+                    },
+                    'delete': function() {
+                        $input.val('').trigger('change');
                     }
                 }, data.inputFileThumb || {});
 
@@ -1156,18 +1185,31 @@ define('jquery-nos',
 
             nosFormAjax : function() {
                 var $context = this;
+                var $btn;
 
                 if (!$context.is('form')) {
                     $context = $context.find('form');
                 }
                 require(['jquery-form'], function() {
                     $context.ajaxForm({
+                        beforeSubmit: function(arr, $form, options) {
+                            $btn = $(document.activeElement);
+                            if ($context.prop('disabled')) {
+                                return false;
+                            }
+                            $btn.prop('disabled', true).addClass('ui-state-disabled');
+                            $context.prop('disabled', true);
+                        },
                         dataType: 'json',
                         success: function(json) {
+                            $context.prop('disabled', false);
+                            $btn.prop('disabled', false).removeClass('ui-state-disabled');
                             $context.nosAjaxSuccess(json)
                                 .triggerHandler('ajax_success', [json]);
                         },
                         error: function(x, e) {
+                            $context.prop('disabled', false);
+                            $btn.prop('disabled', false).removeClass('ui-state-disabled');
                             $context.nosAjaxError(x, e);
                         }
                     });

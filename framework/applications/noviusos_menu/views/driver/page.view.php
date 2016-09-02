@@ -11,8 +11,8 @@ if (isset($item_driver->item) && isset($item_driver->item->mitem_page_id) && $it
     $page = \Nos\Page\Model_Page::find($item_driver->item->mitem_page_id);
     if (!empty($page)) {
         $params['text'] = e($item_driver->title());
-        if (method_exists(\Nos\Nos::main_controller(), 'getUrl') &&
-            \Nos\Nos::main_controller()->getUrl() === $page->url()) {
+        if (method_exists(\Nos\Nos::main_controller(), 'getPageUrl') &&
+            \Nos\Nos::main_controller()->getPageUrl() === $page->virtual_path()) {
             !isset($params['class']) && $params['class'] = '';
             $params['class'] .= ' '.\Arr::get($params, 'active_class', 'active');
         }

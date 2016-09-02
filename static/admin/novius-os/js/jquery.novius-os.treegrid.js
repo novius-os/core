@@ -467,7 +467,7 @@ define('jquery-nos-treegrid',
                     success : function (data, textStatus) {
                         if (data.success) {
                             self.draggedIndex = false;
-                            if (self.dropTarget === 'in') {
+                            if ((self.dropTarget === 'in') && (typeof data.no_tree == 'undefined')) {
                                 self._removeNode(dragNode);
                                 self._toggle(dropped, true);
                             } else {

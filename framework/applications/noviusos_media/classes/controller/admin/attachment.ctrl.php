@@ -93,7 +93,7 @@ class Controller_Admin_Attachment extends \Nos\Controller_Admin_Application
     protected function attachment($attachment_url)
     {
         $file = false;
-        $match = preg_match('`(.+/)([^/]+)/([^/]+).([a-z]+)$`Uu', $attachment_url, $m);
+        $match = preg_match('`(.+/)([^/]+)/([^/]+).([a-z]+)$`iUu', $attachment_url, $m);
         if ($match) {
             list(, $alias, $attached) = $m;
 

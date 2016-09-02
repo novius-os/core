@@ -166,14 +166,16 @@
                             var value = $img.attr(name);
                             args[name] = value;
                         });
-                        args['data-media-id'] = $img.data('media').id;
+                        args['data-media-id'] = $img.data('media')._id;
                         $(node).data('media-id', args['data-media-id']);
                         ed.dom.setAttribs(node, args);
                         ed.execCommand('mceRepaint');
                         ed.undoManager.add();
                     }
                 } else {
-                    var html = $('<div></div>').append($(img).addClass('nosMedia').attr('data-media-id', $(img).data('media').id)).html();
+                    var media_id = $(img).data('media')._id;
+                    var $img = $(img).attr('data-media-id', media_id).removeAttr('data-media');
+                    var html = $('<div></div>').append($img).html();
                     ed.execCommand('mceInsertContent', false, html, {skip_undo : 1});
                 }
                 ed.execCommand("mceEndUndoLevel");
