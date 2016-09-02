@@ -14,27 +14,6 @@ use Fuel\Core\Cache;
 use Fuel\Core\Config;
 use View;
 
-// @deprecated Please consider using FrontNotFoundException instead
-class NotFoundException extends \Exception
-{
-}
-
-class FrontNotFoundException extends NotFoundException
-{
-}
-
-class FrontContentNotFoundException extends \Exception
-{
-}
-
-class FrontContentErrorException extends NotFoundException
-{
-}
-
-class FrontIgnoreTemplateException extends \Exception
-{
-}
-
 class Controller_Front extends Controller
 {
     protected $_url = '';
@@ -177,7 +156,6 @@ class Controller_Front extends Controller
                     'content'   => &$this->_content,
                     'status'    => &$this->_status,
                     'headers'   => &$this->_headers,
-                    'params'    => $params,
                 )
             ));
         }
@@ -215,7 +193,7 @@ class Controller_Front extends Controller
     public function buildContent()
     {
         // Try to get the content from the cache
-        if ($this->findCache())) {
+        if ($this->findCache()) {
             return true;
         }
 
@@ -236,7 +214,6 @@ class Controller_Front extends Controller
                     'content'   => &$this->_content,
                     'status'    => &$this->_status,
                     'headers'   => &$this->_headers,
-                    'params'    => $params,
                 ));
 
                 // Saves the content in cache if enabled
@@ -267,12 +244,11 @@ class Controller_Front extends Controller
                 'content'   => &$this->_content,
                 'status'    => &$this->_status,
                 'headers'   => &$this->_headers,
-                'params'    => $params,
             ));
         }
 
         // An error occured while rendering the front content
-        catch (FrontContentErrorException $e) {
+        catch (Exception_FrontContentError $e) {
             $this->_cache->reset();
             echo $e->getMessage();
             exit();
@@ -299,13 +275,13 @@ class Controller_Front extends Controller
         try {
             // Try several methods to find a content that match the URL
             foreach (static::$methods as $method) {
-                if (call_user_func(array($this, $method)), $this->_virtual_url) {
+                if (call_user_func(array($this, $method), $this->_virtual_url)) {
                     return true;
                 }
             }
         }
         // No content were found
-        catch (FrontContentNotFoundException $e) {}
+        catch (Exception_FrontContentNotFound $e) {}
 
         return false;
     }
@@ -441,9 +417,10 @@ class Controller_Front extends Controller
      * Gets a page by ID
      *
      * @param int $page_id
+     * @param array $options
      * @return Page\Model_Page|null
      */
-    protected function getPageById($page_id)
+    protected function getPageById($page_id, $options = array())
     {
         $where = \Arr::get($options, 'where', array());
 
@@ -560,7 +537,7 @@ class Controller_Front extends Controller
         }
 
         // Exception thrown to ignore the template
-        catch (FrontIgnoreTemplateException $e) {}
+        catch (Exception_FrontIgnoreTemplate $e) {}
     }
 
     /**
@@ -1202,11 +1179,11 @@ class Controller_Front extends Controller
     public function getCachePath()
     {
         $cache_path = $this->_url;
-        if (empty($cache_path) {
+        if (empty($cache_path)) {
             $cache_path = 'index/';
         }
         // 404 are stored in a separate cache
-        if ($status == 404) {
+        if ($this->_status == 404) {
             $cache_path = '404.error/'.$cache_path;
         }
         return $cache_path;
@@ -1369,19 +1346,20 @@ class Controller_Front extends Controller
      * Replace the template by a specific content and stop treatments
      *
      * @param mixed $content The new content, can be a string or a View
-     * @throws FrontIgnoreTemplateException Internal exception for stopping treatments
+     * @throws Exception_FrontIgnoreTemplate Internal exception for stopping treatments
      */
     public function sendContent($content)
     {
         $this->_content = $content;
 
-        throw new FrontIgnoreTemplateException();
+        throw new Exception_FrontIgnoreTemplate();
     }
 
     /**
      * Sends an error page and stop all threatments
      *
-     * @param array() $params
+     * @param array $params
+     * @throws Exception_FrontContentError
      */
     public function sendError($params = array())
     {
@@ -1392,7 +1370,7 @@ class Controller_Front extends Controller
         // Renders the error view
         $content = \View::forge('nos::errors/blank_slate_front', $params, false);
 
-        throw new FrontContentErrorException($content);
+        throw new Exception_FrontContentError($content);
     }
 
     /**
