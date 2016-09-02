@@ -50,7 +50,7 @@ class Orm_Behaviour_Contextable extends Orm_Behaviour
      */
     public function get_context(Orm\Model $item)
     {
-        return return $this->getContext($item);
+        return $this->getContext($item);
     }
 
     /**
