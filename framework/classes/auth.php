@@ -134,7 +134,7 @@ class Auth
         // It's a new session (= auto-login using Cookie)
         if (empty($session_user_id)) {
             \Event::trigger('admin.loginSuccessWithCookie');
-            \Event::trigger_function('admin.loginFailWithCookie', array(array(
+            \Event::trigger_function('admin.loginSuccessWithCookie', array(array(
                 'user' => $logged_user,
                 'user_id' => $logged_user_id,
             )));
