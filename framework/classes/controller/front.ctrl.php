@@ -272,9 +272,9 @@ class Controller_Front extends Controller
             'findContentByPage',
         );
 
+        // Tries several methods to find a content that match the URL
         try {
-            // Try several methods to find a content that match the URL
-            foreach (static::$methods as $method) {
+            foreach ($methods as $method) {
                 if (call_user_func(array($this, $method), $this->_virtual_url)) {
                     return true;
                 }
@@ -295,11 +295,12 @@ class Controller_Front extends Controller
     public function findContentByRoute($virtual_url)
     {
         $virtual_url = trim($virtual_url, '/');
-        $routes = \Nos\Config_Data::get('routes', array());
-        foreach ($routes as $route) {
-            // @todo use a real routing system
-            if ($route['route'] === $virtual_url) {
-                $this->_content = Nos::hmvc($route['controller']);
+
+        // @todo implement a real routing system
+        $routes = (array) \Config::load('front/routes', true);
+        foreach ($routes as $path => $controller) {
+            if ($path === $virtual_url) {
+                $this->_content = Nos::hmvc($controller);
                 return true;
             }
         }
