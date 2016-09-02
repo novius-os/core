@@ -348,15 +348,44 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
     }
 
     /**
-     * Returns null if the Model is not twinnable. Returns true or false whether the object is in the main context.
+     * @deprecated Please consider using isMainContext() instead.
      *
      * @param \Nos\Orm\Model $item
      * @return bool
      */
     public function is_main_context(Orm\Model $item)
     {
-        // use !! for cast to boolean
-        return !!$item->get($this->_properties['is_main_property']);
+        return $this->isMainContext($item);
+    }
+
+    /**
+     * Returns true or false whether the object is in the main context.
+     *
+     * @param \Nos\Orm\Model $item
+     * @return bool|null
+     */
+    public function isMainContext(Orm\Model $item)
+    {
+        if (!empty($this->_properties['is_main_property'])) {
+            return (bool) $item->get($this->_properties['is_main_property']);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Returns the locale of the current object
+     *
+     * @param \Nos\Orm\Model $item
+     * @return mixed|null
+     */
+    public function getContextCommonId(Orm\Model $item)
+    {
+        if (!empty($this->_properties['common_id_property'])) {
+            return $item->get($this->_properties['common_id_property']);
+        } else {
+            return null;
+        }
     }
 
     /**
