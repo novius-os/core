@@ -61,7 +61,7 @@ if (!MBSTRING) {
         'Cache_Storage_File' => FUEL_EXTEND_PATH.'cache'.DIRECTORY_SEPARATOR.'storage'.DIRECTORY_SEPARATOR.'file.php',
         'Date' => FUEL_EXTEND_PATH.'date.php',
         'Debug' => FUEL_EXTEND_PATH.'debug.php',
-        'Event_Instance' => FUEL_EXTEND_PATH.'event/instance.php',
+        'Event_Instance' => FUEL_EXTEND_PATH.'event'.DIRECTORY_SEPARATOR.'instance.php',
         'Email' => FUEL_EXTEND_PATH.'email.php',
         'Email_Driver' => FUEL_EXTEND_PATH.'email'.DIRECTORY_SEPARATOR.'driver.php',
         'Fuel' => FUEL_EXTEND_PATH.'fuel.php',
@@ -90,6 +90,8 @@ if (!MBSTRING) {
         'Nos\Orm\Model' => FUEL_EXTEND_PATH.'orm'.DIRECTORY_SEPARATOR.'model.php',
         'Nos\Orm\Query' => FUEL_EXTEND_PATH.'orm'.DIRECTORY_SEPARATOR.'query.php',
         'Nos\Tasks\Migrate' => FUEL_EXTEND_PATH.'tasks'.DIRECTORY_SEPARATOR.'migrate.php',
+        'Nos\FrontIgnoreTemplateException' => NOSPATH.'classes'.DIRECTORY_SEPARATOR.'exception'.DIRECTORY_SEPARATOR.'frontignoretemplate.php',
+        'Nos\NotFoundException' => NOSPATH.'classes'.DIRECTORY_SEPARATOR.'exception'.DIRECTORY_SEPARATOR.'notfound.php',
     )
 );
 

@@ -366,6 +366,32 @@ class Model_Page extends \Nos\Orm\Model
         return $url;
     }
 
+    /**
+     * Gets the meta title
+     * 
+     * @return bool|string
+     */
+    public function getMetaTitle() {
+        return !$this->page_meta_noindex ? $this->page_meta_title : null;
+    }
+
+    /**
+     * Gets the meta description
+     * 
+     * @return bool|string
+     */
+    public function getMetaDescription() {
+        return !$this->page_meta_noindex ? $this->page_meta_description : null;
+    }
+
+    /**
+     * Gets the meta keywords
+     * 
+     * @return bool|string
+     */
+    public function getMetaKeywords() {
+        return !$this->page_meta_noindex ? $this->page_meta_keywords : null;
+    }
 
     /**
      *  Delete the cache for this page
