@@ -372,7 +372,7 @@ class Model_Page extends \Nos\Orm\Model
      * @return bool|string
      */
     public function getMetaTitle() {
-        return !$page->page_meta_noindex ? $page->page_meta_title : null;
+        return !$this->page_meta_noindex ? $this->page_meta_title : null;
     }
 
     /**
@@ -381,7 +381,7 @@ class Model_Page extends \Nos\Orm\Model
      * @return bool|string
      */
     public function getMetaDescription() {
-        return !$page->page_meta_noindex ? $page->page_meta_description : null;
+        return !$this->page_meta_noindex ? $this->page_meta_description : null;
     }
 
     /**
@@ -390,7 +390,7 @@ class Model_Page extends \Nos\Orm\Model
      * @return bool|string
      */
     public function getMetaKeywords() {
-        return !$page->page_meta_noindex ? $page->page_meta_keywords : null;
+        return !$this->page_meta_noindex ? $this->page_meta_keywords : null;
     }
 
     /**

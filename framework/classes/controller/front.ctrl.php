@@ -23,7 +23,6 @@ class Controller_Front extends Controller
     protected $_enhancer_url = false;
     protected $_enhanced_url_path = false;
     protected $_context = '';
-    protected $_contexts = null;
 
     protected $_template;
     protected $_view;
@@ -58,6 +57,7 @@ class Controller_Front extends Controller
     protected $_headers = array();
 
     protected $_custom_data_cached = array();
+    protected static $_contexts_cached = null;
     protected static $_properties_cached = array(
         '_page',
         '_context',
@@ -204,7 +204,6 @@ class Controller_Front extends Controller
 
             // Try to find the content
             if ($this->findContent()) {
-
                 // Displays the content
                 \Event::trigger_function('front.display', array(
                     &$this->_content,
@@ -339,7 +338,7 @@ class Controller_Front extends Controller
         foreach ($url_enhanced as $page_id => $page_params) {
 
             // Searches the page by ID
-            $page = $this->getPageById($this->_page_id, array(
+            $page = $this->getPageById($page_id, array(
                 // The page has to be published, except for a preview
                 'where' => !$this->isPreview() ? array(array('published', 1)) : array(),
             ));
@@ -674,9 +673,9 @@ class Controller_Front extends Controller
      */
     protected function getAvailableContexts()
     {
-        if (is_null(static::$_contexts)) {
+        if (is_null(static::$_contexts_cached)) {
             try {
-                static::$_contexts = Tools_Context::contexts();
+                static::$_contexts_cached = Tools_Context::contexts();
             } catch (\RuntimeException $e) {
                 // Sends an error if the contexts configuration file exists
                 if (is_file(APPPATH.'config'.DS.'contexts.config.php')) {
@@ -692,7 +691,7 @@ class Controller_Front extends Controller
                 throw $e;
             }
         }
-        return static::$_contexts;
+        return static::$_contexts_cached;
     }
 
     /**
