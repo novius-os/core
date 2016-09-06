@@ -864,16 +864,16 @@ class Model extends \Orm\Model
             $rel = $obj->relations($val_name);
             if (!empty($rel)) {
                 $obj = &$obj->get($val_name);
-                if (empty($obj)) {
-                    $model_to = $rel->model_to;
-                    $related = $model_to::forge();
+                $model_to = $rel->model_to;
+                $related = $model_to::forge();
+                if (!empty($obj)) {
                     if ($rel->singular) {
                         $obj->{$val_name} = $related;
                     } else {
                         $obj->{$val_name}[] = $related;
                     }
-                    $obj = $related;
                 }
+                $obj = $related;
             } else if (array_key_exists($val_name, $obj::properties())) {
                 $obj->set($val_name, $value);
             }
