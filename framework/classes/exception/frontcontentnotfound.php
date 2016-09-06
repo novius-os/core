@@ -17,6 +17,6 @@ namespace Nos;
  *
  * @package Nos
  */
-class Exception_FrontContentNotFound extends FrontIgnoreTemplateException
+class Exception_FrontContentNotFound extends \Exception
 {
 }
