@@ -233,6 +233,8 @@ class Controller_Front extends Controller
 
                     $this->_content = $this->_view->render();
 
+                    \Event::trigger_function('front.beforeDisplay', array(&$this->_content));
+
                     $this->_handleHead();
 
                     \Event::trigger_function('front.display', array(&$this->_content));
