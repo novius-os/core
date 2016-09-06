@@ -7,9 +7,7 @@
  *             http://www.gnu.org/licenses/agpl-3.0.html
  * @link http://www.novius-os.org
  */
-
 namespace Nos;
-
 class Orm_Behaviour_Tree extends Orm_Behaviour
 {
     public static function _init()
@@ -19,7 +17,6 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
 
     protected $_parent_relation = null;
     protected $_children_relation = null;
-
     /**
      * parent_relation
      * children_relation
@@ -31,13 +28,11 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
         parent::__construct($class);
         $this->_parent_relation = call_user_func($class . '::relations', $this->_properties['parent_relation']);
         $this->_children_relation = call_user_func($class . '::relations', $this->_properties['children_relation']);
-
         if (false === $this->_parent_relation) {
-            throw new \Exception('Relation "parent" not found by tree behaviour: '.$this->_class);
+            throw new \Exception('Relation "parent" not found by tree behaviour: ' . $this->_class);
         }
-
         if (false === $this->_children_relation) {
-            throw new \Exception('Relation "children" not found by tree behaviour: '.$this->_class);
+            throw new \Exception('Relation "children" not found by tree behaviour: ' . $this->_class);
         }
     }
 
@@ -78,13 +73,14 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
         // Reset the relation, since we deleted the children manually
         unset($item->{$this->_properties['children_relation']});
     }
+
     /**
      * Returns all the direct children of the object
      *
      * @param  \Nos\Orm\Model $item
-     * @param  array          $where
-     * @param  array          $order_by
-     * @param  array          $options
+     * @param  array $where
+     * @param  array $order_by
+     * @param  array $options
      * @return array(\Nos\Orm\Model)
      */
     public function find_children($item, $where = array(), $order_by = array(), $options = array())
@@ -92,10 +88,9 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
         // Search items whose parent is self
         $where[] = array('parent', $item);
         $options = \Arr::merge($options, array(
-            'where'    => $where,
+            'where' => $where,
             'order_by' => $order_by,
         ));
-
         return $item::find('all', $options);
     }
 
@@ -125,12 +120,11 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
             if (get_class($parent) != $this->_parent_relation->model_to) {
                 throw new \Exception(sprintf(
                     'Cannot set "parent" to object of type %s in tree behaviour (expected %s): %s',
-                    (string) get_class($parent),
+                    (string)get_class($parent),
                     $this->_parent_relation->model_to,
                     $this->_class
                 ));
             }
-
             if (!$item->is_new()) {
                 $children_ids = $this->get_ids_children($item, true);
                 if (in_array($parent->id, $children_ids)) {
@@ -141,7 +135,6 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
                 }
             }
         }
-
         $this->set_parent_no_observers($item, $parent);
         $item->observe('change_parent');
     }
@@ -149,7 +142,7 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
     /**
      * Get the list of all IDs of the children
      *
-     * @param  bool  $include_self
+     * @param  bool $include_self
      * @return array
      */
     public function get_ids_children($item, $include_self = true)
@@ -159,7 +152,6 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
             $ids[] = $item->get(\Arr::get($item->primary_key(), 0));
         }
         $this->_populate_id_children($item, $this->_properties['children_relation'], $ids);
-
         return $ids;
     }
 
@@ -170,18 +162,23 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
         if (empty($ids)) {
             return array();
         }
-
         return $item::find('all', array('where' => array(array(\Arr::get($item->primary_key(), 0), 'IN', $ids))));
     }
 
     protected static function _populate_id_children($current_item, $children_relation, &$array)
     {
         $pk = \Arr::get($current_item->primary_key(), 0);
-        foreach ($current_item->get($children_relation) as $child) {
+        $params = array();
+        $isPositionnable = $current_item::behaviours('Novius\Positionable\Orm_Behaviour_Positionable');
+        if ($isPositionnable) {
+            $params["order_by"] = array(
+                array($isPositionnable['position_property'])
+            );
+        }
+        foreach ($current_item->get($children_relation, $params) as $child) {
             $array[] = $child->get($pk);
             static::_populate_id_children($child, $children_relation, $array);
         }
-
     }
 
     public function find_root($item)
@@ -191,7 +188,6 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
             $root = $parent;
             $parent = $this->get_parent($parent);
         }
-
         return $root !== $item ? $root : null;
     }
 
@@ -201,7 +197,6 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
             $item->set($k, $parent === null ? null : $parent->get($this->_parent_relation->key_to[$i]));
             $item->set($this->_properties['parent_relation'], $parent);
         }
-
         if (!empty($this->_properties['level_property'])) {
             $item->{$this->_properties['level_property']} =
                 $parent === null ?
