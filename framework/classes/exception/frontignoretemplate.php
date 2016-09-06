@@ -24,7 +24,7 @@ class Exception_FrontIgnoreTemplate extends FrontIgnoreTemplateException
 /**
  * Class FrontIgnoreTemplateException
  *
- * @deprecated Please consider using Exception_FrontNotFound instead
+ * @deprecated Please consider using Exception_FrontIgnoreTemplate instead
  *
  * @package Nos
  */
