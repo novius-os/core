@@ -20,7 +20,8 @@
                 $t.tagit({
                     animate: false,
                     caseSensitive: false,
-                    availableTags: <?= \Format::forge($labels)->to_json() ?>
+                    availableTags: <?= \Format::forge($labels)->to_json() ?>,
+                    allowSpaces: <?= json_encode($allow_spaces) ?>
                 });
             });
         });

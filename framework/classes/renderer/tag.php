@@ -39,7 +39,10 @@ class Renderer_Tag extends Renderer
 
     public function before_save($item, $data)
     {
-        $tags_from = str_replace(' ', ',', $this->value);
+        $tags_from = $this->value;
+        if (!\Arr::get($this->renderer_options, 'allow_spaces', false)) {
+            $tags_from = str_replace(' ', ',', $tags_from);
+        }
         $tags_from = explode(',', $tags_from);
         $tags = array();
         foreach ($tags_from as $tag) {
@@ -107,7 +110,8 @@ class Renderer_Tag extends Renderer
 
         return \View::forge('renderer/tag', array(
             'id' => $this->get_attribute('id'),
-            'labels' => $labels
+            'labels' => $labels,
+            'allow_spaces' => \Arr::get($this->renderer_options, 'allow_spaces', false),
         ), false);
     }
 
