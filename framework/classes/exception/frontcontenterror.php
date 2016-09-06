@@ -17,6 +17,6 @@ namespace Nos;
  *
  * @package Nos
  */
-class Exception_FrontContentError extends FrontIgnoreTemplateException
+class Exception_FrontContentError extends \Exception
 {
 }
