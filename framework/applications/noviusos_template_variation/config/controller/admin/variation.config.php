@@ -38,7 +38,7 @@ return array(
         ),
     ),
     'fields' => array(
-        'tpvar_id' => array (
+        'tpvar_id' => array(
             'label' => 'ID: ',
             'form' => array(
                 'type' => 'hidden',

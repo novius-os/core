@@ -127,7 +127,7 @@ class Controller_Admin_Media extends \Nos\Controller_Admin_Crud
             } else {
                 throw new \Exception(__('You have a problem here: Your Novius OS isn’t authorised to save files on this server. This is something your developer or system administrator can fix for you.'));
             }
-        } else if ($is_renamed) {
+        } elseif ($is_renamed) {
             // From existing file
             \File::rename($this->clone->path(), $dest);
         }

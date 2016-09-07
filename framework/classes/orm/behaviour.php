@@ -23,7 +23,7 @@ abstract class Orm_Behaviour extends \Orm\Observer
     public function __construct($class)
     {
         $this->_class = $class;
-        $this->_properties = call_user_func($class . '::observers', get_class($this));
+        $this->_properties = call_user_func($class.'::observers', get_class($this));
     }
 
     protected function _config()

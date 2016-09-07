@@ -111,7 +111,7 @@ class Finder extends Fuel\Core\Finder
                     }
                 }
 
-            } else if ($is_extend_allowed && ($dir === 'config' || ($dir === 'lang' && $dir_app !== 'local'))) {
+            } elseif ($is_extend_allowed && ($dir === 'config' || ($dir === 'lang' && $dir_app !== 'local'))) {
                 $paths_add = static::pathsExtended($dir, $dir_app, substr($file, $pos + 2));
             }
 

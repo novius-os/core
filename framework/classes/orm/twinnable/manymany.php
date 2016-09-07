@@ -172,7 +172,7 @@ class Orm_Twinnable_ManyMany extends \Orm\ManyMany
      */
     public function join($alias_from, $rel_name, $alias_to_nr, $conditions = array())
     {
-	// Consider as a classical many_many relation if no column context defined
+    // Consider as a classical many_many relation if no column context defined
         if (!$this->column_context_to) {
             // @todo throw an exception in a future major release ?
             return parent::join($alias_from, $rel_name, $alias_to_nr, $conditions);

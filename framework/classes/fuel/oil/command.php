@@ -72,7 +72,7 @@ class Command extends \Oil\Command
 
                 case 'c':
                 case 'console':
-                    new \Nos\Oil\Console;
+                    new \Nos\Oil\Console();
                     // comment for coding style
 
                 case 'r':

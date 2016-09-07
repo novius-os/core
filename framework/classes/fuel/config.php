@@ -328,7 +328,7 @@ class Config extends \Fuel\Core\Config
                 $value = $retrieveFromData($matches[1], $remove_unset ? '' : false);
                 return $value === false ? $matches[0] : htmlspecialchars($value);
             }, $to_be_replaced);
-        } else if (is_array($to_be_replaced)) {
+        } elseif (is_array($to_be_replaced)) {
             foreach ($to_be_replaced as $key => $value) {
                 $new_key = static::placeholderReplace($key, $placeholders, $remove_unset);
                 $to_be_replaced[$new_key] = static::placeholderReplace($value, $placeholders, $remove_unset);

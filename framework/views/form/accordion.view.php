@@ -57,7 +57,7 @@ foreach ((array) $accordions as $options) {
                 $content[] = strtr($options['field_template'], array('{field}' => $field->build()));
             }
         } catch (\Exception $e) {
-            throw new \Exception("Field $field : " . $e->getMessage(), $e->getCode(), $e);
+            throw new \Exception("Field $field : ".$e->getMessage(), $e->getCode(), $e);
         }
     }
 

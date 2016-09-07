@@ -10,7 +10,6 @@
 
 namespace Nos;
 
-
 /**
  * @deprecated This class is deprecated.  Please use \Nos\Media\Renderer_Media instead.
  */

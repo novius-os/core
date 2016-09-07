@@ -128,11 +128,11 @@ class Tools_RSS
             if ($key === 'pubDate') {
                 if (is_a($value, 'Fuel\\Core\\Date')) {
                     $value = $value->get_timestamp();
-                } else if (!is_numeric($value)) {
+                } elseif (!is_numeric($value)) {
                     $value = strtotime($value);
                 }
                 $xml .= date('r', $value);
-            } else if (htmlspecialchars($value) !== $value) {
+            } elseif (htmlspecialchars($value) !== $value) {
                 $xml .= '<![CDATA['.$value.']]>';
             } else {
                 $xml .= $value;

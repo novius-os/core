@@ -61,7 +61,7 @@ class Filter
             $column = self::getColumnFromKey($query, $key, $config);
             if (isset($config['dataset'][$key]['sorting_callback'])) {
                 $config['dataset'][$key]['sorting_callback']($query, $sorting[$i]['sortDirection'] == 'ascending' ? 'ASC' : 'DESC');
-            } else if ($column != null) {
+            } elseif ($column != null) {
                 $query->order_by($column, $sorting[$i]['sortDirection'] == 'ascending' ? 'ASC' : 'DESC');
             }
         }

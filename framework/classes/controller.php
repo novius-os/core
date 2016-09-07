@@ -510,7 +510,7 @@ class Controller extends \Fuel\Core\Controller_Hybrid
                 }
                 $from->set_parent($parent);
             } elseif ($params['targetType'] === 'in') {
-            	$params['targetType'] = 'after';
+                $params['targetType'] = 'after';
             }
 
             // Change sort order
@@ -716,10 +716,10 @@ class Controller extends \Fuel\Core\Controller_Hybrid
 
             if (is_callable($data)) {
                 $item[$key] = call_user_func($data, $object);
-            } else if (is_array($data)) {
+            } elseif (is_array($data)) {
                 if (isset($data['method'])) {
                     $item[$key] = $object->{$data['method']}();
-                } else if (isset($data['column'])) {
+                } elseif (isset($data['column'])) {
                     $item[$key] = $object->get($data['column']);
                 }
             } else {

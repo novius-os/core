@@ -119,7 +119,7 @@ class Orm_Behaviour_Virtualpath extends Orm_Behaviour_Virtualname
                 $parent = $class::find($item->{$this->_parent_relation->key_from[0]});
             }
             $dir_name_virtual_path = ($parent !== null ? $parent->virtual_path(true) : '');
-        } else if (!empty($diff[1][$virtual_name_property]) || $old_extension != $new_extension) {
+        } elseif (!empty($diff[1][$virtual_name_property]) || $old_extension != $new_extension) {
             // Item's virtual name has changed : set virtual path dir name
             $old_virtual_name = empty($diff[0][$virtual_name_property]) ? $this->virtual_name($item) : $diff[0][$virtual_name_property];
             $old_virtual_path = empty($diff[0][$virtual_path_property]) ? $item->{$virtual_path_property} : $diff[0][$virtual_path_property];

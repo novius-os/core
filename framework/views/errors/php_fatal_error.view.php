@@ -105,7 +105,7 @@ if (is_array($debug_lines)) {
     ?>
     <pre class="fuel_debug_source"><?php
     foreach ($debug_lines as $line_num => $line_content) { ?>
-        <span<?= ($line_num == $error_line) ? ' class="fuel_line fuel_current_line"' : ' class="fuel_line"' ?>><span class="fuel_line_number"><?= str_pad($line_num, (mb_strlen(count($debug_lines))), ' ', STR_PAD_LEFT) ?></span><span class="fuel_line_content"><?= $line_content . PHP_EOL ?>
+        <span<?= ($line_num == $error_line) ? ' class="fuel_line fuel_current_line"' : ' class="fuel_line"' ?>><span class="fuel_line_number"><?= str_pad($line_num, (mb_strlen(count($debug_lines))), ' ', STR_PAD_LEFT) ?></span><span class="fuel_line_content"><?= $line_content.PHP_EOL ?>
         </span></span><?php
     } ?></pre>
     <?php
@@ -124,7 +124,7 @@ foreach ($backtrace as $trace) {
                 <div id="backtrace_<?php echo $id; ?>" class="backtrace_block">
                 <pre class="fuel_debug_source"><?php
     foreach ($debug_lines as $line_num => $line_content) { ?>
-                <span<?= ($line_num == $trace['line']) ? ' class="fuel_line fuel_current_line"' : ' class="fuel_line"' ?>><span class="fuel_line_number"><?= str_pad($line_num, (mb_strlen(count($debug_lines))), ' ', STR_PAD_LEFT) ?></span><span class="fuel_line_content"><?= $line_content . PHP_EOL ?>
+                <span<?= ($line_num == $trace['line']) ? ' class="fuel_line fuel_current_line"' : ' class="fuel_line"' ?>><span class="fuel_line_number"><?= str_pad($line_num, (mb_strlen(count($debug_lines))), ' ', STR_PAD_LEFT) ?></span><span class="fuel_line_content"><?= $line_content.PHP_EOL ?>
                 </span></span><?php
     } ?></pre>
                 </div>
@@ -150,7 +150,7 @@ if (count($non_fatal) > 0) {
                 <div id="non_fatal_<?php echo $id; ?>" class="backtrace_block">
                 <pre class="fuel_debug_source"><?php
         foreach ($debug_lines as $line_num => $line_content) { ?>
-                <span<?= ($line_num == $error_line) ? ' class="fuel_line fuel_current_line"' : ' class="fuel_line"' ?>><span class="fuel_line_number"><?= str_pad($line_num, (mb_strlen(count($debug_lines))), ' ', STR_PAD_LEFT) ?></span><span class="fuel_line_content"><?= $line_content . PHP_EOL ?>
+                <span<?= ($line_num == $error_line) ? ' class="fuel_line fuel_current_line"' : ' class="fuel_line"' ?>><span class="fuel_line_number"><?= str_pad($line_num, (mb_strlen(count($debug_lines))), ' ', STR_PAD_LEFT) ?></span><span class="fuel_line_content"><?= $line_content.PHP_EOL ?>
                 </span></span><?php
         } ?></pre>
                 </div>

@@ -507,7 +507,7 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
         );
 
         $query = call_user_func_array('\Db::select', $properties)
-                 ->from(call_user_func($this->_class . '::table'))
+                 ->from(call_user_func($this->_class.'::table'))
                  ->group_by($common_id_property);
 
         foreach ($where as $field_name => $value) {
@@ -588,7 +588,7 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
         $result = array();
         foreach ($common_items as $items) {
             // Sort items by specified context order
-            uasort($items, function($a, $b) use ($contexts) {
+            uasort($items, function ($a, $b) use ($contexts) {
                 $a_context = array_search($a->get_context(), $contexts);
                 $b_context = array_search($b->get_context(), $contexts);
                 if ($a_context === false xor $b_context === false) {

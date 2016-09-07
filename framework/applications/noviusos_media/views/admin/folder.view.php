@@ -53,7 +53,7 @@ foreach ($fieldset->field() as $field) {
                 <?= $fieldset->field('medif_parent_id')->build(); ?>
 <?php
 if (!$item->is_new()) {
-    echo ('<strong class="warning_folder">'.__('Warning: moving a folder changes the URL of all the files it contains.').'</strong>');
+    echo('<strong class="warning_folder">'.__('Warning: moving a folder changes the URL of all the files it contains.').'</strong>');
 }
 ?>
             </td>

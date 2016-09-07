@@ -60,7 +60,7 @@ class Controller_Admin_Role extends \Nos\Controller_Admin_Crud
                     // If the role has no longer access to the application, remove old authorisations related to this application
                     if ($app_removed) {
                         $old->delete();
-                    } else if (!in_array($old->perm_category_key, $allowed)) {
+                    } elseif (!in_array($old->perm_category_key, $allowed)) {
                         $old->delete();
                     } else {
                         $existing[] = $old->perm_category_key;

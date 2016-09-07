@@ -29,7 +29,7 @@ class Renderer_Folder extends \Nos\Renderer_Selector
                     'id' => $id,
                     'model' => 'Nos\\Media\\Model_Folder',
                 );
-            }, (array)$this->value); // Casting to array in case the renderer is switched over from single to multiple
+            }, (array) $this->value); // Casting to array in case the renderer is switched over from single to multiple
         } else {
             $selected = array(
                 // As a safety against changing from multiple to single, get the first value

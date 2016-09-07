@@ -74,7 +74,7 @@ class Controller_Front extends Controller
          * For pages that use the default cache duration, we need to invalidate the cache if the current default cache duration is smaller.
          * For pages that use a custom cache duration, the cache is invalidated anyway when saving the page
          */
-        \Event::register('front.cache.checkExpires', function($params) {
+        \Event::register('front.cache.checkExpires', function ($params) {
             $cache_params = \Arr::get($params, 'cache_params', array());
             // Only for pages that use the default cache duration
             if (!empty($cache_params['page_id']) && empty($cache_params['page_cache_duration'])) {
@@ -191,7 +191,7 @@ class Controller_Front extends Controller
             
             if (\Config::get('novius-os.enable_url_enhancers_on_root_pages', false)) {
                 // Sorting the array to check the deepest urls at first
-                uasort($url_enhanced, function($a, $b) {
+                uasort($url_enhanced, function ($a, $b) {
                     return $b['depth'] - $a['depth'];
                 });
             }
@@ -352,7 +352,7 @@ class Controller_Front extends Controller
             I18n::setLocale(Tools_Context::localeCode($this->_context));
             \Config::set('language', Tools_Context::langLocaleToLang($this->_context));
 
-            \Fuel::$profiling && \Profiler::console('page_id = ' . $this->_page->page_id);
+            \Fuel::$profiling && \Profiler::console('page_id = '.$this->_page->page_id);
 
             // Sets the page ID as cache param
             $this->_cache->setCacheParam('page_id', $this->_page->page_id);
@@ -877,7 +877,7 @@ class Controller_Front extends Controller
         if (empty($this->_template['file'])) {
             throw new \Exception(
                 'The template file for '.
-                (\Arr::get($this->_template, 'title') ?: $this->_page->template_variation->tpvar_template ).' is not defined.'
+                (\Arr::get($this->_template, 'title') ?: $this->_page->template_variation->tpvar_template).' is not defined.'
             );
         }
 

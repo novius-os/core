@@ -11,6 +11,6 @@
 return array(
 
     'file'  => array(
-        'path'  =>	APPPATH.'cache/fuelphp/',
+        'path'  =>    APPPATH.'cache/fuelphp/',
     ),
 );

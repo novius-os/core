@@ -76,7 +76,7 @@ class FrontCache
             echo static::_phpBegin();
             // Serialize allow to persist objects in the cache file
             // API is Nos\Nos::hmvc('location', $args)
-            echo 'echo \Nos\Nos::hmvc(' . var_export($uri, true) . ', unserialize(' . var_export(serialize($args), true) . '));';
+            echo 'echo \Nos\Nos::hmvc('.var_export($uri, true).', unserialize('.var_export(serialize($args), true).'));';
             echo '?>';
         }
     }
@@ -95,7 +95,7 @@ class FrontCache
         } else {
             echo static::_phpBegin();
             // Serialize allow to persist objects in the cache file
-            echo 'echo View::forge(' . var_export($file, true) . ', unserialize(' . var_export(serialize($data), true) . '), ' . var_export($auto_filter, true) . ');';
+            echo 'echo View::forge('.var_export($file, true).', unserialize('.var_export(serialize($data), true).'), '.var_export($auto_filter, true).');';
             echo '?>';
         }
     }

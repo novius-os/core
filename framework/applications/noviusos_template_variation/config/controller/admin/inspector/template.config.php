@@ -18,7 +18,7 @@ foreach (\Nos\Config_Data::get('templates', array()) as $tpl_key => $template) {
     );
 }
 
-usort($templates, function($a, $b) {
+usort($templates, function ($a, $b) {
     return strcmp($a['title'], $b['title']);
 });
 
