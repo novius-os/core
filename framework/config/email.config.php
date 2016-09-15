@@ -13,7 +13,7 @@ return array(
         /**
          * Mail useragent string
          */
-        'useragent'	=> 'Novius OS',
+        'useragent'    => 'Novius OS',
 
         /**
          * Attachment paths

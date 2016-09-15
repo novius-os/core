@@ -141,7 +141,7 @@ foreach ($others as $app) {
         ?>
                             <em><?php echo __('No metadata found') ?>.</em>
         <?php
-    } else if ($can_install) {
+    } elseif ($can_install) {
         ?>
                              <a href="#" data-app="<?= htmlspecialchars(\Format::forge(array('name' => $app->folder, 'action' => 'add'))->to_json()) ?>" onclick="return false;"><button data-icon="arrowthick-1-n"><?= __('Install') ?></button></a></td>
         <?php

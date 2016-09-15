@@ -16,9 +16,9 @@ namespace Nos;
  */
 class Tools_Context
 {
-    static protected $_contexts = null;
-    static protected $_sites = null;
-    static protected $_locales = null;
+    protected static $_contexts = null;
+    protected static $_sites = null;
+    protected static $_locales = null;
 
     /**
      * get an array of all contexts Novius OS instance

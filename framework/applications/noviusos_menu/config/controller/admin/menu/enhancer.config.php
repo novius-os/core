@@ -50,7 +50,7 @@ return array(
     ),
     'preview' => array(
         'params' => array(
-            'title' => function($args) {
+            'title' => function ($args) {
                 $menu_id = \Arr::get($args, 'menu_id');
                 if (!empty($menu_id)) {
                     $menu = \Nos\Menu\Model_Menu::find($menu_id);

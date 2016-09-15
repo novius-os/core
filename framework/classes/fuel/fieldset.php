@@ -132,7 +132,7 @@ class Fieldset extends \Fuel\Core\Fieldset
                     $error = $error->get_message();
                     preg_match_all('`:param:(\d+)`u', $error, $m);
                     foreach ($m[1] as $int) {
-                        $error = str_replace(':param:'.$int, '{' . ($int - 1).'}', $error);
+                        $error = str_replace(':param:'.$int, '{'.($int - 1).'}', $error);
                     }
                     $json['messages'][$f->name][$js_name] = $error;
                 }
@@ -395,7 +395,7 @@ class Fieldset extends \Fuel\Core\Fieldset
 
         $fieldset = \Fieldset::forge(uniqid(), array(
             'inline_errors'  => true,
-            'auto_id'		 => true,
+            'auto_id'         => true,
             'required_mark'  => '&nbsp;<span style="font-size: 1.5em; line-height: 1em; font-weight: bold">*</span>',
             'error_template' => '{error_msg}',
             'error_class'    => 'error',

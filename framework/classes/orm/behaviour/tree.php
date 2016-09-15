@@ -29,8 +29,8 @@ class Orm_Behaviour_Tree extends Orm_Behaviour
     public function __construct($class)
     {
         parent::__construct($class);
-        $this->_parent_relation = call_user_func($class . '::relations', $this->_properties['parent_relation']);
-        $this->_children_relation = call_user_func($class . '::relations', $this->_properties['children_relation']);
+        $this->_parent_relation = call_user_func($class.'::relations', $this->_properties['parent_relation']);
+        $this->_children_relation = call_user_func($class.'::relations', $this->_properties['children_relation']);
 
         if (false === $this->_parent_relation) {
             throw new \Exception('Relation "parent" not found by tree behaviour: '.$this->_class);

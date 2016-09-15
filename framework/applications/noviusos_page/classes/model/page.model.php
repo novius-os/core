@@ -420,7 +420,7 @@ class Model_Page extends \Nos\Orm\Model
         $context = $this->get_context();
         foreach ($url_enhanced as $page_id => $enhanced) {
             if ($context == $enhanced['context'] && \Str::starts_with($enhanced['url'], $old_virtual_path)) {
-                $url_enhanced[$page_id]['url'] = $new_virtual_path . \Str::sub($url_enhanced[$page_id]['url'], \Str::length($old_virtual_path));
+                $url_enhanced[$page_id]['url'] = $new_virtual_path.\Str::sub($url_enhanced[$page_id]['url'], \Str::length($old_virtual_path));
             }
         }
         \Nos\Config_Data::save('url_enhanced', $url_enhanced);
@@ -466,7 +466,7 @@ class Model_Page extends \Nos\Orm\Model
                     $page_enhanced[$enhancer][$page->page_id] = array(
                         // (array) json_decode(strtr($data_config, array('&quot;' => '"',))) doesn't
                         // recursively transform an object to an array
-                        'config' => json_decode(strtr($data_config, array('&quot;' => '"',)), true),
+                        'config' => json_decode(strtr($data_config, array('&quot;' => '"', )), true),
                         'context' => $page->page_context,
                         'published' => $page->planificationStatus() == 2 ? array(
                             'start' => $page->publicationStart(),

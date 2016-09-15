@@ -198,7 +198,7 @@ if ($is_attachment) {
                 Log::error($e->getMessage());
                 $send_file = false;
             }
-        } else if ($send_file) {
+        } elseif ($send_file) {
             $target_relative = $attachment->url(false);
         }
     }

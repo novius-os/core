@@ -72,12 +72,12 @@ class Controller_Inspector extends Controller_Admin_Application
                     if ($key !== 'actions' && (!isset($value['visible']) || $value['visible'])) {
                         if ($key == 'context') {
                             $config['appdesk'][$gridKey]['columns'][$key] = array('context' => true);
-                        } else if ($key == 'published') {
+                        } elseif ($key == 'published') {
                             $config['appdesk'][$gridKey]['columns']['published'] = array(
                                 'headerText' => __('Status'),
                                 'dataKey' => 'publication_status'
                             );
-                        } else if (!empty($value['headerText'])) {
+                        } elseif (!empty($value['headerText'])) {
                             $config['appdesk'][$gridKey]['columns'][$key]['headerText'] = $value['headerText'];
                             $config['appdesk'][$gridKey]['columns'][$key]['dataKey'] = $key;
                         }

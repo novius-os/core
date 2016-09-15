@@ -3,7 +3,7 @@
 Nos\I18n::current_dictionary(array('noviusos_page::common'));
 
 return array(
-    'behaviours' => array (
+    'behaviours' => array(
         'Nos\Orm_Behaviour_Sharable' => array(
             'data' => array(
                 \Nos\DataCatcher::TYPE_TITLE => array(

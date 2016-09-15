@@ -31,7 +31,7 @@ class Orm_Attachment extends \Orm\Relation
     /**
      * @var  array  Cache for Attachment
      */
-    static protected $cache = array();
+    protected static $cache = array();
 
     public function __construct($from, $name, array $config)
     {

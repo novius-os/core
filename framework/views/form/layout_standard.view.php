@@ -186,7 +186,7 @@ if (!empty($menus)) {
         foreach ($menus as $key => $menu) {
             if (isset($menu['fields'])) {
                 $accordions[$key] = array_merge(array('title' => $key), $menu);
-            } else if (!\Arr::is_assoc($menu)) {
+            } elseif (!\Arr::is_assoc($menu)) {
                 $accordions[$key] = array('title' => $key, 'fields' => $menu);
             } else {
                 $accordions[$key] = $menu;

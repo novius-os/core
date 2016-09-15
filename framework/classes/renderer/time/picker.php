@@ -12,7 +12,7 @@ namespace Nos;
 
 class Renderer_Time_Picker extends Renderer
 {
-    static protected $DEFAULT_RENDERER_OPTIONS = array(
+    protected static $DEFAULT_RENDERER_OPTIONS = array(
         'timeFormat' => 'HH:mm',
     );
 

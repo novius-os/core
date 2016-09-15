@@ -91,4 +91,3 @@ echo \View::forge('noviusos_user::admin/password_strength', array(
     'uniqid' => $uniqid,
     'input_name' => 'password_reset',
 ), false);
-

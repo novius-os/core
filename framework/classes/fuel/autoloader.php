@@ -161,7 +161,7 @@ class Autoloader extends Fuel\Core\Autoloader
     {
         if ($name == 'nos' && $type == 'package') {
             return 'Nos\\'.$suffix.'\\';
-        } else if ($type == 'module') {
+        } elseif ($type == 'module') {
             $namespace = \Nos\Config_Data::get('app_installed.'.$name.'.namespace', null);
             if ($namespace === null) {
                 return false;

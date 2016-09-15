@@ -34,7 +34,7 @@ return array(
         'delete' => 'noviusos_media::admin/media_delete',
     ),
     'fields' => array(
-        'id' => array (
+        'id' => array(
             'label' => 'ID: ',
             'renderer' => 'Nos\Renderer_Text',
         ),

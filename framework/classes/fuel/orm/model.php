@@ -874,7 +874,7 @@ class Model extends \Orm\Model
                     }
                     $obj = $related;
                 }
-            } else if (array_key_exists($val_name, $obj::properties())) {
+            } elseif (array_key_exists($val_name, $obj::properties())) {
                 $obj->set($val_name, $value);
             }
         }
@@ -991,7 +991,7 @@ class Model extends \Orm\Model
                 // fix coming from the latest version of 1.6/master orm (unable to merge at the moment)
                 $new_pk = null;
                 if (empty($this->_original_relations[$key]) !== empty($val)
-                    or ( ! empty($this->_original_relations[$key]) and ! empty($val)
+                    or (! empty($this->_original_relations[$key]) and ! empty($val)
                         and $this->_original_relations[$key] !== $new_pk = $val->implode_pk($val)
                     )) {
                     $diff[0][$key] = isset($this->_original_relations[$key]) ? $this->_original_relations[$key] : null;

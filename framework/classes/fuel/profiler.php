@@ -88,7 +88,7 @@ class Profiler extends \Fuel\Core\Profiler
         static $realnosroot = '';
 
         if ($realnosroot == '') {
-            $realnosroot = realpath(NOSROOT) . '/';
+            $realnosroot = realpath(NOSROOT).'/';
         }
 
         $debug_backtrace = debug_backtrace();
@@ -105,12 +105,12 @@ class Profiler extends \Fuel\Core\Profiler
             if ($label) {
                 \Profiler::mark(
                     $label
-                    . ' - Δt: ' . $dt . 'ms'
+                    .' - Δt: '.$dt.'ms'
                 );
             } else {
                 \Profiler::mark(
-                    ($bt_start['file'] == $bt['file'] ? ($bt['file'] . ':' . $bt_start['line'] . '-' . $bt['line']) : ($bt['file'] . ':' . $bt['line']))
-                    . ' - Δt: ' . $dt . 'ms'
+                    ($bt_start['file'] == $bt['file'] ? ($bt['file'].':'.$bt_start['line'].'-'.$bt['line']) : ($bt['file'].':'.$bt['line']))
+                    .' - Δt: '.$dt.'ms'
                 );
             }
 
