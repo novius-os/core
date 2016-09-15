@@ -1,0 +1,20 @@
+language: php
+
+php:
+  - 7.0
+
+sudo: false
+
+env:
+  - PHPCSFIXER_PATH=$HOME/phar/php-cs-fixer.phar
+
+cache:
+    directories:
+      - $HOME/phar/
+
+before_script:
+  - 'if [ ! -f $PHPCSFIXER_PATH ]; then mkdir -p `dirname $PHPCSFIXER_PATH` && curl -o $PHPCSFIXER_PATH http://get.sensiolabs.org/php-cs-fixer.phar; fi'
+  - php $PHPCSFIXER_PATH -V
+
+script: 
+  - php $PHPCSFIXER_PATH fix . -vv --diff --config-file ./.php_cs
