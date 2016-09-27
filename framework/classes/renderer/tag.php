@@ -54,7 +54,10 @@ class Renderer_Tag extends Renderer
 
         $tag_class = $this->renderer_options['model'];
 
-        $item->{$this->renderer_options['relation_name']} = $tag_class::find('all', array('where' => array(array($this->renderer_options['label_column'], 'IN', array_keys($tags)))));
+        $relation = $item->relations($this->renderer_options['relation_name']);
+        if ($relation instanceof \Orm\ManyMany) {
+            $item->{$this->renderer_options['relation_name']} = $tag_class::find('all', array('where' => array(array($this->renderer_options['label_column'], 'IN', array_keys($tags)))));
+        }
         $item_class = get_class($item);
         $twinnable = $item_class::behaviours('Nos\Orm_Behaviour_Twinnable', array());
         $contextable = $item_class::behaviours('Nos\Orm_Behaviour_Contextable', $twinnable);
