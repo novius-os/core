@@ -111,6 +111,15 @@ define('jquery-nos',
                 errorImageNotfind : 'We’re afraid we cannot find this image.'
             },
 
+            nosEscapeHtml: function(str) {
+                return str
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;");
+            },
+
             nosI18nPlural: function(msgs, $n) {
                 var plural_indice;
                 if (!$.isArray(msgs)) {
@@ -339,7 +348,7 @@ define('jquery-nos',
                             .find('img')
                             .attr({
                                 src : media.path,
-                                title : media.title
+                                title : $.nosEscapeHtml(media.title)
                             })
                             .css({
                                 width : 0,
@@ -837,7 +846,7 @@ define('jquery-nos',
                                     }
                                 }
                                 if (obj.action === 'window.open') {
-                                    window.open(url);
+                                    window.open(url, '_blank');
                                 } else {
                                     document.location.href = url;
                                 }
@@ -978,7 +987,7 @@ define('jquery-nos',
                 }
                 // http://www.maheshchari.com/jquery-ajax-error-handling/
                 if (x.status != 0) {
-                    $.nosNotify('Connection error!', 'error');
+                    $.nosNotify('An unexpected error has occurred.', 'error');
                 } else if (e == 'parsererror') {
                     $.nosNotify('Request seemed a success, but we could not read the answer.');
                 } else if (e == 'timeout') {
@@ -1050,6 +1059,9 @@ define('jquery-nos',
                                         }
                                     });
                                 });
+                    },
+                    'delete': function() {
+                        $input.val('').trigger('change');
                     }
                 }, data.inputFileThumb || {});
 
@@ -1157,18 +1169,31 @@ define('jquery-nos',
 
             nosFormAjax : function() {
                 var $context = this;
+                var $btn;
 
                 if (!$context.is('form')) {
                     $context = $context.find('form');
                 }
                 require(['jquery-form'], function() {
                     $context.ajaxForm({
+                        beforeSubmit: function(arr, $form, options) {
+                            $btn = $(document.activeElement);
+                            if ($context.prop('disabled')) {
+                                return false;
+                            }
+                            $btn.prop('disabled', true).addClass('ui-state-disabled');
+                            $context.prop('disabled', true);
+                        },
                         dataType: 'json',
                         success: function(json) {
+                            $context.prop('disabled', false);
+                            $btn.prop('disabled', false).removeClass('ui-state-disabled');
                             $context.nosAjaxSuccess(json)
                                 .triggerHandler('ajax_success', [json]);
                         },
                         error: function(x, e) {
+                            $context.prop('disabled', false);
+                            $btn.prop('disabled', false).removeClass('ui-state-disabled');
                             $context.nosAjaxError(x, e);
                         }
                     });

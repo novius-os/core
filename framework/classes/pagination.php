@@ -5,7 +5,7 @@
  * @copyright  2011 Novius
  * @license    GNU Affero General Public License v3 or (at your option) any later version
  *             http://www.gnu.org/licenses/agpl-3.0.html
- * @link http://www.novius-os.org
+ * @link       http://www.novius-os.org
  */
 
 namespace Nos;
@@ -43,13 +43,15 @@ class Pagination
         'previous_start' => "<span class='previous'>",
         'previous_end'   => "</span>\n",
         'previous_mark'  => "&laquo;&nbsp;",
+        'previous_text'  => null,
         'next_start'     => "<span class='next'>",
         'next_end'       => "</span>\n",
         'next_mark'      => "&nbsp;&raquo;",
+        'next_text'      => null,
         'active_start'   => "<span class='active'>",
         'active_end'     => "</span>\n",
-        'regular_start'   => "<span class='regular'>",
-        'regular_end'     => "</span>\n",
+        'regular_start'  => "<span class='regular'>",
+        'regular_end'    => "</span>\n",
     );
 
     /**
@@ -63,7 +65,7 @@ class Pagination
     protected $num_links = 5;
 
     /**
-     * @var	mixed	The pagination URL
+     * @var    mixed    The pagination URL
      */
     protected $pagination_url;
 
@@ -76,6 +78,14 @@ class Pagination
 
     public function __construct(array $config = array())
     {
+        // No break compatibility with previous version
+        if (is_null($this->template['previous_text'])) {
+            $this->template['previous_text'] = __('Previous');
+        }
+        if (is_null($this->template['next_text'])) {
+            $this->template['next_text'] = __('Next');
+        }
+
         $config = \Arr::merge(\Config::get('pagination', array()), $config);
 
         $this->set_config($config);
@@ -87,7 +97,9 @@ class Pagination
      * Sets the configuration for pagination
      *
      * @access public
+     *
      * @param  array $config The configuration array
+     *
      * @return void
      */
     public function set_config($config)
@@ -114,7 +126,7 @@ class Pagination
      */
     protected function initialize()
     {
-        $this->total_pages = ceil($this->total_items / $this->per_page) ?: 1;
+        $this->total_pages = ceil($this->total_items / $this->per_page) ? : 1;
 
         if ($this->current_page > $this->total_pages) {
             $this->current_page = $this->total_pages;
@@ -145,11 +157,11 @@ class Pagination
             $this->pagination_url = $pagination_url;
         }
 
-        $pagination  = $this->template['wrapper_start'];
+        $pagination = $this->template['wrapper_start'];
         // Pagination
-        $pagination .= $this->prev_link(__('Previous'));
+        $pagination .= $this->prev_link($this->template['previous_text']);
         $pagination .= $this->page_links();
-        $pagination .= $this->next_link(__('Next'));
+        $pagination .= $this->next_link($this->template['next_text']);
         $pagination .= $this->template['wrapper_end'];
 
         if (!is_null($pagination_url)) {
@@ -179,7 +191,7 @@ class Pagination
         $start = (($this->current_page - $this->num_links) > 0) ? $this->current_page - ($this->num_links - 1) : 1;
 
         // Let's get the ending page number
-        $end   = (($this->current_page + $this->num_links) < $this->total_pages) ? $this->current_page + $this->num_links : $this->total_pages;
+        $end = (($this->current_page + $this->num_links) < $this->total_pages) ? $this->current_page + $this->num_links : $this->total_pages;
 
         for ($i = $start; $i <= $end; $i++) {
             if ($this->current_page == $i) {
@@ -198,7 +210,9 @@ class Pagination
      * Pagination "Next" link
      *
      * @access public
+     *
      * @param  string $value The text displayed in link
+     *
      * @return mixed  The next link
      */
     public function next_link($value)
@@ -211,7 +225,7 @@ class Pagination
 
         if ($this->current_page != $this->total_pages) {
             $next_page = $this->current_page + 1;
-            $url = call_user_func($this->pagination_url, $next_page);
+            $url       = call_user_func($this->pagination_url, $next_page);
 
             $pagination = '<a href="'.Tools_Url::encodePath($url).'">'.$pagination.'</a>';
         }
@@ -225,7 +239,9 @@ class Pagination
      * Pagination "Previous" link
      *
      * @access public
+     *
      * @param  string $value The text displayed in link
+     *
      * @return mixed  The previous link
      */
     public function prev_link($value)
@@ -238,7 +254,7 @@ class Pagination
 
         if ($this->current_page != 1) {
             $previous_page = $this->current_page - 1;
-            $url = call_user_func($this->pagination_url, $previous_page);
+            $url           = call_user_func($this->pagination_url, $previous_page);
 
             $pagination = '<a href="'.Tools_Url::encodePath($url).'">'.$pagination.'</a>';
         }

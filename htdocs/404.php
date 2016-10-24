@@ -36,6 +36,7 @@ $is_media = preg_match('`^(?:cache/)?media/`', $nos_url);
 if ($is_media) {
     $is_resized = \Str::sub($nos_url, 0, 6) === 'cache/';
 
+    $media_url = '';
     if ($is_resized) {
         $pathinfo = pathinfo($nos_url);
         // Remove 12 characteres for cache/media/
@@ -43,13 +44,13 @@ if ($is_media) {
             $pathinfo['dirname'].(empty($pathinfo['extension']) ? '' : '.'.$pathinfo['extension']),
             12
         );
-    } else {
-        $media_url = str_replace('media/', '', $nos_url);
+    } elseif (\Str::starts_with($nos_url, 'media/')) {
+        $media_url = \Str::sub($nos_url, \Str::length('media/'));
     }
 
     $media = false;
     $res = \DB::select()->from(\Nos\Media\Model_Media::table())->where(array(
-        array('media_path', '=', '/'.$media_url),
+        array('media_path', '=', '/'.parse_url($media_url, PHP_URL_PATH)),
     ))->execute()->as_array();
 
     if (!empty($res)) {
@@ -145,24 +146,28 @@ $is_attachment = preg_match('`^(?:cache/)?data/files/`', $nos_url);
 if ($is_attachment) {
     $is_resized = \Str::sub($nos_url, 0, 6) === 'cache/';
 
+    $attachment_url = '';
     if ($is_resized) {
         $pathinfo = pathinfo($nos_url);
         // Remove 12 characteres for cache/data/files/
         $attachment_url = \Str::sub($pathinfo['dirname'].'.'.$pathinfo['extension'], 17);
-    } else {
-        $attachment_url = str_replace('data/files/', '', $nos_url);
+    } elseif (\Str::starts_with($nos_url, 'data/files/')) {
+        $attachment_url = \Str::sub($nos_url, \Str::length('data/files/'));
     }
 
     $send_file = false;
     $check = false;
-    $match = preg_match('`(.+/)([^/]+)/([^/]+).([a-z]+)$`Uu', $attachment_url, $m);
+    $match = preg_match('`(.+/)([^/]+)/([^/]+).([a-z0-9]+)$`iUu', $attachment_url, $m);
     if ($match) {
         list(, $alias, $attached, $filename, $extension) = $m;
+
+        \Event::trigger_function('404.attachmentMatch', array(array('alias' => &$alias, 'attached' => &$attached, 'filename' => &$filename, 'extension' => &$extension)));
 
         $attachments = \Nos\Config_Data::get("attachments", array());
         if (isset($attachments[$alias])) {
             $config = $attachments[$alias];
             $attachment = \Nos\Attachment::forge($attached, $config);
+
             $send_file = $attachment->path();
             if (!empty($send_file)) {
                 if (isset($config['check']) && is_callable($config['check'])) {

@@ -59,14 +59,17 @@ class Attachment
             $config = \Config::load($config, true);
         }
 
+        $config = \Arr::merge(\Config::load('attachment', true), $config);
+
         if (!empty($config['image']) && empty($config['extensions'])) {
-            $config['extensions'] = array('jpg', 'gif', 'png', 'jpeg');
+            $config['extensions'] = $config['image_extensions'];
             unset($config['image']);
         }
 
         if (empty($config['extensions']) || !is_array($config['extensions'])) {
             $config['extensions'] = !empty($config['extensions']) ? array($config['extensions']) : array();
         }
+
         $config['extensions'] = array_map(array('\Str', 'lower'), $config['extensions']);
 
         if (empty($config['dir'])) {
@@ -79,7 +82,12 @@ class Attachment
         }
         $config['alias'] = rtrim(str_replace(DS, '/', $config['alias']), '/').'/';
 
-        $attached = preg_replace('`/`Uu', '_', $attached);
+        if (!empty($config['attached_callback']) && is_callable($config['attached_callback'])) {
+            $attached = $config['attached_callback']($attached, $config);
+        } else {
+            $attached = preg_replace('`/`Uu', '_', $attached);
+        }
+
         if (empty($attached)) {
             throw new \InvalidArgumentException('No attached ID specified.');
         }
@@ -143,9 +151,9 @@ class Attachment
      */
     public function isImage()
     {
-        $extension = $this->extension();
+        $extension = \Str::lower($this->extension());
 
-        return !empty($extension) ? in_array($extension, array('jpg', 'png', 'gif', 'jpeg', 'bmp')) : false;
+        return !empty($extension) ? in_array($extension, $this->config['image_extensions']) : false;
     }
 
     /**
@@ -248,11 +256,28 @@ class Attachment
     {
         $path = $this->path();
         $this->attached = $id;
+
+        if (!empty($this->config['attached_callback']) && is_callable($this->config['attached_callback'])) {
+            $this->attached = $this->config['attached_callback']($id, $this->config);
+        } else {
+            $this->attached = $id;
+        }
+
         if ($path) {
             $this->set($path);
         }
 
         return $this;
+    }
+
+    /**
+     * Get the ID of object
+     *
+     * @return string
+     */
+    public function getId()
+    {
+        return $this->attached;
     }
 
     /**
@@ -278,10 +303,37 @@ class Attachment
             $this->new_file = null;
             $this->new_file_name = null;
 
+            $this->deleteCache();
+
             return true;
         }
 
         return false;
+    }
+
+    /**
+     * Delete all caches of the attachment
+     */
+    public function deleteCache()
+    {
+        try {
+            $file_url = $this->url(false);
+            $pathinfo = pathinfo($file_url);
+            $path = ltrim($pathinfo['dirname'], '/').DS.$pathinfo['filename'];
+
+            $path_public = DOCROOT.$file_url;
+            $path_public_cache = DOCROOT.'cache'.DS.$path;
+            $path_private_cache = \Config::get('cache_dir').$path;
+
+            \File::is_link($path_public) and \File::delete($path_public);
+            is_dir($path_public_cache) and \File::delete_dir($path_public_cache, true, true);
+            is_dir($path_private_cache) and \File::delete_dir($path_private_cache, true, true);
+        } catch (\Exception $e) {
+            \Log::exception($e, 'Error while deleting the cache of attachment '.$this->filename().' ('.$path.'). ');
+            if (\Fuel::$env == \Fuel::DEVELOPMENT) {
+                throw $e;
+            }
+        }
     }
 
     /**

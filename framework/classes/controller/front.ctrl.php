@@ -69,10 +69,28 @@ class Controller_Front extends Controller
 
     protected $pageFoundAlreadyTriggered = false;
 
+    public static function _init() {
+        /**
+         * For pages that use the default cache duration, we need to invalidate the cache if the current default cache duration is smaller.
+         * For pages that use a custom cache duration, the cache is invalidated anyway when saving the page
+         */
+        \Event::register('front.cache.checkExpires', function($params) {
+            $cache_params = \Arr::get($params, 'cache_params', array());
+            // Only for pages that use the default cache duration
+            if (!empty($cache_params['page_id']) && empty($cache_params['page_cache_duration'])) {
+                // Checks if the cache duration is greater than the current default cache duration
+                if (\Arr::get($params, 'cache_duration') > \Nos\FrontCache::$cache_duration) {
+                    // Invalidates the cache
+                    throw new CacheExpiredException();
+                }
+            }
+        });
+    }
+
     public function before()
     {
         parent::before();
-        $this->_cache_duration = \Config::get('novius-os.cache_duration_page', 60);
+        $this->_cache_duration = \Config::get('novius-os.cache_duration_page', FrontCache::$cache_duration);
     }
 
     public function router($action, $params, $status = 200)
@@ -110,7 +128,6 @@ class Controller_Front extends Controller
         \Event::trigger_function('front.start', array(array('url' => &$url, 'cache_path' => &$cache_path)));
 
         $cache_path = \Nos\FrontCache::getPathFromUrl($this->_base_href, $cache_path);
-
         $this->_cache = FrontCache::forge($cache_path);
         \Nos\FrontCache::$cache_duration = $this->_cache_duration;
 
@@ -156,18 +173,28 @@ class Controller_Front extends Controller
             // Filter URLs enhanced : remove if not in possibles contexts, remove if url not match
             $url_enhanced = \Nos\Config_Data::get('url_enhanced', array());
             $base_href = $this->_base_href;
-            $url_enhanced = array_filter($url_enhanced, function ($page_params) use ($contexts_possibles, $base_href, $url) {
+            $url_enhanced = array_filter($url_enhanced, function (&$page_params) use ($contexts_possibles, $base_href, $url) {
                 if (!in_array($page_params['context'], array_keys($contexts_possibles))) {
                     return false;
                 }
                 $url_absolute = $contexts_possibles[$page_params['context']].$page_params['url'];
-                return mb_substr($base_href.$url.'/', 0, mb_strlen($url_absolute)) === $url_absolute;
+                $result = mb_substr($base_href.$url.'/', 0, mb_strlen($url_absolute)) === $url_absolute;
+                $page_params['depth'] = mb_substr_count($page_params['url'], '/');
+                return $result;
             });
 
             // Add current url to URLs enhanced
             $url_enhanced['current'] = array(
-                'url' => $url.'/',
+                'url'   => $url.'/',
+                'depth' => mb_substr_count($url.'/', '/'),
             );
+            
+            if (\Config::get('novius-os.enable_url_enhancers_on_root_pages', false)) {
+                // Sorting the array to check the deepest urls at first
+                uasort($url_enhanced, function($a, $b) {
+                    return $b['depth'] - $a['depth'];
+                });
+            }
 
             $_404 = true;
             // Loop URLs enhanced for one that not send a NotFoundException
@@ -323,12 +350,18 @@ class Controller_Front extends Controller
             $this->_context = $this->_page->get_context();
             $this->_context_url = $this->_contexts_possibles[$this->_context];
             I18n::setLocale(Tools_Context::localeCode($this->_context));
+            \Config::set('language', Tools_Context::langLocaleToLang($this->_context));
 
             \Fuel::$profiling && \Profiler::console('page_id = ' . $this->_page->page_id);
 
+            // Sets the page ID as cache param
+            $this->_cache->setCacheParam('page_id', $this->_page->page_id);
+
+            // Sets the page's custom cache duration
             if (!empty($this->_page->page_cache_duration)) {
                 $this->_cache_duration = $this->_page->page_cache_duration;
                 \Nos\FrontCache::$cache_duration = $this->_cache_duration;
+                $this->_cache->setCacheParam('page_cache_duration', true);
             }
         }
 
@@ -457,6 +490,14 @@ class Controller_Front extends Controller
     }
 
     /**
+     * @return string : The title of current HTML.
+     */
+    public function getTitle()
+    {
+        return $this->_title;
+    }
+
+    /**
      * Set a new h1 for the current HTML.
      *
      * @param string $h1        The new h1.
@@ -496,6 +537,14 @@ class Controller_Front extends Controller
     }
 
     /**
+     * @return string : The meta description of current html output.
+     */
+    public function getMetaDescription()
+    {
+        return $this->_meta_description;
+    }
+
+    /**
      * Set a meta keywords for the current HTML output.
      *
      * @param string $meta_keywords The new meta keywords.
@@ -514,6 +563,14 @@ class Controller_Front extends Controller
         ));
 
         return $this;
+    }
+
+    /**
+     * @return string : The meta keywords of current html output.
+     */
+    public function getMetaKeywords()
+    {
+        return $this->_meta_keywords;
     }
 
     /**
@@ -820,7 +877,7 @@ class Controller_Front extends Controller
         if (empty($this->_template['file'])) {
             throw new \Exception(
                 'The template file for '.
-                ($this->_template['title'] ?: $this->_page->template_variation->tpvar_template ).' is not defined.'
+                (\Arr::get($this->_template, 'title') ?: $this->_page->template_variation->tpvar_template ).' is not defined.'
             );
         }
 

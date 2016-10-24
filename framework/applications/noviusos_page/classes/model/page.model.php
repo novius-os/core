@@ -430,9 +430,19 @@ class Model_Page extends \Nos\Orm\Model
     {
         \Nos\Config_Data::load('enhancers');
 
+        //Get the wysiwyg keys used into the page template
+        $wysiwyg_keys = array();
+        if (!empty($this->template_variation)) {
+            $template = $this->template_variation->configCompiled();
+            $wysiwyg_keys = array_keys(\Arr::get($template, 'layout', array()));
+        }
+
         $content = '';
-        foreach ($this->wysiwygs as $text) {
-            $content .= $text;
+        foreach ($this->wysiwygs as $key => $text) {
+            //If no keys are defined (variation problem ?) take in count all wysiwygs
+            if (empty($wysiwyg_keys) || in_array($key, $wysiwyg_keys)) {
+                $content .= $text;
+            }
         }
 
         static::_remove_url_enhanced($this->page_id);

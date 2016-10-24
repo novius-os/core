@@ -42,7 +42,20 @@ class Orm_Behaviour_Sortable extends Orm_Behaviour
 
     public function move_to_last_position($item)
     {
-        $this->_move($item, 10000);
+        $itemClass = get_class($item);
+        $lastItem = $itemClass::query()
+            ->order_by($this->_properties['sort_property'], 'DESC')
+            ->limit(1);
+        $tree = $item->behaviours('Nos\Orm_Behaviour_Tree');
+        if (!empty($tree)) {
+            $lastItem->where('parent', $item->get_parent());
+        }
+        $lastItem = $lastItem->get_one();
+        if ($lastItem) {
+        $this->move_after($item, $lastItem);
+        } else {
+            $this->_move($item, 1);
+        }
     }
 
     public function get_sort(\Nos\Orm\Model $item)

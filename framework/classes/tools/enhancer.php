@@ -83,7 +83,8 @@ class Tools_Enhancer
         $url_enhanced = Config_Data::get('url_enhanced', array());
 
         $urlPath = \Arr::get($params, 'urlPath', false);
-        $preview = \Arr::get($params, 'preview', false);
+        $mainController = Nos::main_controller();
+        $preview = \Arr::get($params, 'preview', (!empty($mainController) && method_exists($mainController, 'isPreview') ? Nos::main_controller()->isPreview() : false));
 
         $callback = array($namespace.'\\'.$controller_name, 'getUrlEnhanced');
 
@@ -120,9 +121,14 @@ class Tools_Enhancer
         if (!$context && Tools_Context::useCurrentContext()) {
             $contexts = Tools_Context::contexts();
             if (count($contexts) > 1) {
-                $controller = Nos::main_controller();
-                if (!empty($controller)) {
-                    $context = $controller->getContext();
+                // Try to get the current context from the main controller
+                if (Nos::main_controller() && method_exists(Nos::main_controller(), 'getContext')) {
+                    $context = Nos::main_controller()->getContext();
+                }
+                // Otherwise use the first defined context as default context
+                else {
+                    reset($contexts);
+                    $context = key($contexts);
                 }
             }
         }

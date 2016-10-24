@@ -210,10 +210,8 @@
                         }), {skip_undo : 1});
                         edit = ed.dom.get('__mce_tmp');
                     }
-                    $(edit).attr({
-                            'data-config':$.type(json.config) === 'string' ? json.config : JSON.stringify(json.config),
-                            'data-enhancer': metadata.id
-                        })
+                    $(edit).attr('data-enhancer', metadata.id)
+                        .attr('data-config', $.type(json.config) === 'string' ? json.config : JSON.stringify(json.config))
                         .removeAttr('id')
                         .html($.trim(json.preview));
 

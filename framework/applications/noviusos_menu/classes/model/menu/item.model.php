@@ -117,7 +117,9 @@ class Model_Menu_Item extends Model
             'model_to' => '\Nos\Menu\Model_Menu_Item',
             'key_to' => 'mitem_parent_id',
             'conditions' => array(
-                'order_by' => array(array('mitem_sort' => 'ASC')),
+               'order_by' => array(
+                    'mitem_sort' => 'ASC'
+                ),
             ),
             'cascade_save' => false,
             'cascade_delete' => false,
