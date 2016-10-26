@@ -106,7 +106,7 @@ class Renderer_Virtualname extends Renderer
             // Otherwise try to get from the main controller config
             $main_controller = \Nos\Nos::main_controller();
             list($app, $file_name) = \Config::configFile(get_class($main_controller));
-            $config = \Config::load($app . '::' . $file_name, true);
+            $config = \Config::load($app.'::'.$file_name, true);
             $controller_url = \Arr::get($config, 'controller_url');
             $controller_url .= '/virtualname';
         }
