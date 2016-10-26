@@ -252,6 +252,9 @@ class Model_Page extends \Nos\Orm\Model
             'virtual_name_property' => 'page_virtual_name',
             'virtual_path_property' => 'page_virtual_url',
             'extension_property' => '.html',
+            'populate_property' => 'getVirtualName',
+            'populate_observe_fields' => array('page_id', 'page_title'), // @todo
+            'regenerate_after_creation' => true,
         ),
         'Nos\Orm_Behaviour_Sortable' => array(
             'sort_property' => 'page_sort',
@@ -279,6 +282,11 @@ class Model_Page extends \Nos\Orm\Model
 
     const LOCK_UNLOCKED = 0;
     const LOCK_DELETION = 1;
+
+    public function getVirtualName()
+    {
+        return $this->virtual_name($this->id.'-'.$this->title_item());
+    }
 
     public static function find($id = null, array $options = array())
     {

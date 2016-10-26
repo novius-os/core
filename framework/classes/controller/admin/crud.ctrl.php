@@ -660,4 +660,74 @@ class Controller_Admin_Crud extends Controller_Admin_Application
     public function delete()
     {
     }
+
+    /**
+     * Handles the AJAX request to generate the virtual name for the renderer
+     *
+     * @param null $id The item ID
+     */
+    public function action_virtualname($id = null)
+    {
+        try {
+            // Gets the model
+            $model = \Arr::get($this->config, 'model', \Input::post('model'));
+            if (empty($model)) {
+                throw new \Exception(__('No model specified.'));
+            }
+            if (!class_exists($model)) {
+                throw new \Exception(str_replace('{{model}}', $model, __('Model `{{model}}` not found.')));
+            }
+
+            // Gets the item
+            $this->item = $this->crud_item($id);
+            $this->clone = clone $this->item;
+            $this->is_new = $this->item->is_new();
+            if ($this->is_new) {
+                $this->init_item();
+            }
+
+            // Checks permission
+            $this->checkPermission($this->is_new ? 'add' : 'edit');
+
+            // Populates the fieldset
+            $fields = $this->fields($this->config['fields']);
+
+            $options = \Arr::merge(array(
+                'csrf' => true,
+                'save' => false,
+                'instance' => $this->item,
+            ), $this->build_from_config());
+
+            // Builds the fieldset from config
+            $fieldset = \Fieldset::forgeFromConfig($fields, $this->item, $options);
+            $fieldset = $this->fieldset($fieldset);
+
+            // Runs the validation
+            $fieldset->repopulate();
+            $fieldset->validation()->add_callable($this->item);
+            $fieldset->validation()->run($fieldset->value());
+
+            // Merges the post data with the validated data
+            $data = \Arr::merge($fieldset->validated(), array_intersect_key((array) \Input::post(), $fields));
+
+            // Populates the fields on the item
+            $fieldset->triggerComplete($this->item, $data, array(
+                'dont_save' => true,
+            ));
+
+            // Generates the new virtual name
+            $this->item->virtual_name($this->item->getDefaultVirtualName());
+
+            \Response::json(array(
+                'virtual_name' => $this->item->virtual_name(),
+            ));
+        }
+
+        // Handles errors
+        catch (\Exception $e) {
+            \Response::json(array(
+                'error' => $e->getMessage(),
+            ));
+        }
+    }
 }

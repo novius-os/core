@@ -14,6 +14,8 @@ class Orm_Behaviour_Virtualname extends Orm_Behaviour
 {
     protected static $_friendly_slug_always_last = array();
 
+    protected $regenerate_after_creation = false;
+
     public static function _init()
     {
         I18n::current_dictionary('nos::orm');
@@ -38,44 +40,102 @@ class Orm_Behaviour_Virtualname extends Orm_Behaviour
     public function before_save(\Nos\Orm\Model $item)
     {
         $diff = $item->get_diff();
-
         // If we have a new item or the virtual name has changed
         if ($item->is_new() || !empty($diff[0][$this->_properties['virtual_name_property']])) {
 
-            // Enforce virtual name restrictions
-            $item->virtual_name($item->{$this->_properties['virtual_name_property']});
+            // Sets the virtual name properly
+            $item->setVirtualName($item->{$this->_properties['virtual_name_property']});
+        }
 
-            // If the virtual name is empty, generate a default one
-            if (empty($item->{$this->_properties['virtual_name_property']})) {
-                $item->virtual_name($item->virtual_name_populate_value());
+        if ($item->is_new() && !empty($this->_properties['regenerate_after_creation'])) {
+            $this->regenerate_after_creation = true;
+        }
+    }
+
+    public function after_save(\Nos\Orm\Model $item)
+    {
+        // Regenerates the virtual name after creation
+        if (!empty($this->_properties['regenerate_after_creation']) && $this->regenerate_after_creation) {
+            $item->resetVirtualName();
+
+            // Update the virtual name in database
+            $query = \DB::update()
+                ->table($item::table())
+                ->value($this->_properties['virtual_name_property'], $item->virtual_name());
+            foreach ($item::primary_key() as $pk) {
+                $query->where($pk, $item->{$pk});
+            }
+            $query->execute();
+        }
+        $this->regenerate_after_creation = false;
+    }
+
+    /**
+     * Updates the virtual name with the specified value or generates a default one
+     *
+     * @param Orm\Model $item
+     * @param null $virtual_name
+     * @throws BehaviourDuplicateException
+     * @throws \Exception
+     */
+    public function setVirtualName(\Nos\Orm\Model $item, $virtual_name = null)
+    {
+        $virtual_name_property = $this->_properties['virtual_name_property'];
+
+        if (empty($virtual_name)) {
+            $virtual_name = $item->{$virtual_name_property};
+        }
+
+        // Enforce virtual name restrictions
+        $item->virtual_name($virtual_name);
+
+        // If the virtual name is empty then generate a default one
+        if (empty($item->{$virtual_name_property})) {
+            $item->virtual_name($item->getDefaultVirtualName());
+        }
+
+        // If it's still empty, we have an error
+        if (empty($item->{$virtual_name_property})) {
+            throw new \Exception(__('An URL is needed.'));
+        }
+
+        // Check uniqueness if needed
+        if ($this->_properties['unique']) {
+            $where = array(
+                array($virtual_name_property, $item->{$virtual_name_property})
+            );
+            if (is_array($this->_properties['unique']) && !empty($this->_properties['unique']['context_property'])) {
+                $where[] = array($this->_properties['unique']['context_property'], '=', $item->{$this->_properties['unique']['context_property']});
+            }
+            if (!$item->is_new()) {
+                $pk = \Arr::get($item::primary_key(), 0);
+                $where[] = array($pk, '!=', $item->{$pk});
             }
 
-            // If it's still empty, we have an error
-            if (empty($item->{$this->_properties['virtual_name_property']})) {
-                throw new \Exception(__('An URL is needed.'));
-            }
-
-            // Check uniqueness if needed
-            if ($this->_properties['unique']) {
-                $where = array(
-                    array($this->_properties['virtual_name_property'], $item->{$this->_properties['virtual_name_property']})
-                );
-                if (is_array($this->_properties['unique']) && !empty($this->_properties['unique']['context_property'])) {
-                    $where[] = array($this->_properties['unique']['context_property'], '=', $item->{$this->_properties['unique']['context_property']});
-                }
-                if (!$item->is_new()) {
-                    $pk = \Arr::get($item::primary_key(), 0);
-                    $where[] = array($pk, '!=', $item->{$pk});
-                }
-
-                $duplicate = $item::find('all', (array('where' => $where)));
-                if (!empty($duplicate)) {
-                    throw new BehaviourDuplicateException(__('This URL is already used. Since an URL must be unique, you’ll have to choose another one. Sorry about that.'));
-                }
+            $duplicate = $item::find('all', (array('where' => $where)));
+            if (!empty($duplicate)) {
+                throw new BehaviourDuplicateException(__('This URL is already used. Since an URL must be unique, you’ll have to choose another one. Sorry about that.'));
             }
         }
     }
 
+    /**
+     * Resets the virtual name of the specified item to its default value
+     *
+     * @param Orm\Model $item
+     */
+    public function resetVirtualName(\Nos\Orm\Model $item)
+    {
+        $this->setVirtualName($item, $item->getDefaultVirtualName());
+    }
+
+    /**
+     * Formats and updates the virtual name
+     *
+     * @param Orm\Model $item
+     * @param null $virtual_name
+     * @return mixed|Orm\Model|null
+     */
     public function virtual_name(\Nos\Orm\Model $item, $virtual_name = null)
     {
         if (empty($virtual_name)) {
@@ -105,13 +165,28 @@ class Orm_Behaviour_Virtualname extends Orm_Behaviour
         return $item->{$this->_properties['virtual_name_property']};
     }
 
-    public function virtual_name_populate_value(\Nos\Orm\Model $item)
+    /**
+     * Generates the default virtual name
+     *
+     * @param Orm\Model $item
+     * @return mixed|Orm\Model|null|string
+     */
+    public function getDefaultVirtualName(\Nos\Orm\Model $item)
     {
-        if (!empty($this->_properties['populate_property'])) {
-            if (isset($item->{$this->_properties['populate_property']})) {
-                return $item->{$this->_properties['populate_property']};
-            } elseif (method_exists($item, $this->_properties['populate_property'])) {
-                return call_user_func($item, $this->_properties['populate_property']);
+        $populate_property = \Arr::get($this->_properties, 'populate_property');
+
+        if (!empty($populate_property)) {
+            // Property
+            if (isset($item->{$populate_property})) {
+                return $item->{$populate_property};
+            }
+            // Callable
+            elseif (is_callable($populate_property)) {
+                return call_user_func($populate_property, $item);
+            }
+            // Method on the item
+            elseif (method_exists($item, $populate_property)) {
+                return call_user_func(array($item, $populate_property), $item);
             }
         }
         return $item->title_item();

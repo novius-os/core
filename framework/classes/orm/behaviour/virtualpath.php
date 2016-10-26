@@ -98,6 +98,7 @@ class Orm_Behaviour_Virtualpath extends Orm_Behaviour_Virtualname
     public function before_save(\Nos\Orm\Model $item)
     {
         parent::before_save($item);
+
         $diff = $item->get_diff();
 
         $virtual_path_property = $this->_properties['virtual_path_property'];
@@ -111,7 +112,7 @@ class Orm_Behaviour_Virtualpath extends Orm_Behaviour_Virtualname
         $dir_name_virtual_path = false;
         $old_extension = $this->extension($item, true);
         $new_extension = $this->extension($item);
-        if ($item->is_new() || $parent_has_changed) {
+        if ($item->is_new() || $parent_has_changed || $this->regenerate_after_creation) {
             // Item is new or its parent has changed : retrieve virtual path dir name
             $class = $this->_parent_relation->model_to;
             $parent = null;
@@ -141,6 +142,8 @@ class Orm_Behaviour_Virtualpath extends Orm_Behaviour_Virtualname
 
     public function after_save(\Nos\Orm\Model $item)
     {
+        parent::after_save($item);
+
         $tree = $item::behaviours('Nos\Orm_Behaviour_Tree', false);
         // Class not have tree behaviour, don't have children to update
         if (empty($tree)) {
