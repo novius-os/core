@@ -443,11 +443,10 @@ class Application
     {
         if (!$this->canUninstall()) {
             $dependents = $this->installedDependentApplications();
-            throw new \Exception(
-                'Application '.$this->folder.
-                ' can\'t be uninstalled because it is required by the following applications: '.
-                implode(', ', $dependents).'.'
-            );
+            foreach($dependents as $dependent_name) {
+                $dependent = static::forge($dependent_name);
+                $dependent->uninstall();
+            }
         }
         $old_metadata = \Arr::get(static::$rawAppInstalled, $this->folder);
         $new_metadata = array();
