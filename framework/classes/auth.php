@@ -20,7 +20,7 @@ class Auth
             'all',
             array(
                 'where' => array(
-                    'user_email' => $login,
+                    'user_email' => (string) $login,
                 ),
             )
         );

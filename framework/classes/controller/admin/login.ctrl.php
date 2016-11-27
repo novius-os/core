@@ -142,7 +142,7 @@ class Controller_Admin_Login extends Controller
 
     protected function post_login()
     {
-        if (\Nos\Auth::login($_POST['email'], $_POST['password'], (bool) \Input::post('remember_me', false))) {
+        if (\Nos\Auth::login((string) $_POST['email'], (string) $_POST['password'], (bool) \Input::post('remember_me', false))) {
             if (\Event::has_events('user_login')) {
                 \Log::deprecated('Event "user_login" is deprecated, use "admin.loginSuccess" instead.', 'Chiba.2');
                 \Event::trigger('user_login');
