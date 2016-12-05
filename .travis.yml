@@ -6,14 +6,14 @@ php:
 sudo: false
 
 env:
-  - PHPCSFIXER_PATH=$HOME/phar/php-cs-fixer.phar
+  - PHPCSFIXER_PATH=$HOME/phar/php-cs-fixer-1.13.phar
 
 cache:
     directories:
       - $HOME/phar/
 
 before_script:
-  - 'if [ ! -f $PHPCSFIXER_PATH ]; then mkdir -p `dirname $PHPCSFIXER_PATH` && curl -o $PHPCSFIXER_PATH http://get.sensiolabs.org/php-cs-fixer.phar; fi'
+  - 'if [ ! -f $PHPCSFIXER_PATH ]; then mkdir -p `dirname $PHPCSFIXER_PATH` && curl -L -o $PHPCSFIXER_PATH https://github.com/FriendsOfPHP/PHP-CS-Fixer/releases/download/v1.13.1/php-cs-fixer.phar; fi'
   - php $PHPCSFIXER_PATH -V
 
 script: 
