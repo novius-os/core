@@ -41,6 +41,9 @@ return array(
     // cookie path  (optional, default = '/')
     'cookie_path'        => ini_get('session.cookie_path'),
 
+    // cookie secure flag  (optional, default = use the cookie class default)
+    'cookie_secure'     => ini_get('session.cookie_secure'),
+
     // cookie http_only flag  (optional, default = use the cookie class default)
     'cookie_http_only'    => ini_get('session.cookie_httponly'),
 
