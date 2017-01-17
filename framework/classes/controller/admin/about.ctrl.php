@@ -10,7 +10,7 @@
 
 namespace Nos;
 
-class Controller_Admin_About extends \Nos\Controller
+class Controller_Admin_About extends Controller_Admin_Auth
 {
     public function action_index()
     {
