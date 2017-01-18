@@ -153,6 +153,7 @@ class Tools_File
                     ini_get('zlib.output_compression') and ini_set('zlib.output_compression', 0);
                     ! ini_get('safe_mode') and set_time_limit(0);
 
+                    header('Content-Disposition: attachment; filename='.urlencode(\Arr::get($info, 'basename', '')));
                     header('Content-Type: '.$info['mimetype']);
                     header('Content-Length: '.$info['size']);
                     header('Content-Transfer-Encoding: binary');
