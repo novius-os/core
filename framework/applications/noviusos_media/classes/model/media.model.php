@@ -374,7 +374,7 @@ class Model_Media extends \Nos\Orm\Model
      */
     public function url($absolute = true)
     {
-        return ($absolute ? \Uri::base(false) : '').static::$public_path.$this->_getVirtualPath();
+        return ($absolute ? \Uri::base(false) : '').static::$public_path.urlencode($this->_getVirtualPath());
     }
 
     /**
