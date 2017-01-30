@@ -111,12 +111,12 @@ class Orm_Twinnable_BelongsTo extends \Orm\BelongsTo
         if ($this->front_context_fallback && (NOS_ENTRY_POINT == Nos::ENTRY_POINT_FRONT)) {
             //front context is used
             $context_to = Nos::main_controller()->getContext();
-        } elseif (empty($this->force_context_fallback)) {
+        } elseif (!empty($this->force_context_fallback)) {
+            //specified context is used
+            $context_to = $this->force_context_fallback;
+        } else {
             //model context is used
             $context_to = $from->{$this->column_context_from};
-        } else {
-            //default context is used
-            $context_to = $this->force_context_fallback;
         }
         $context_to = \DB::expr(\DB::quote($context_to));
 
@@ -186,12 +186,12 @@ class Orm_Twinnable_BelongsTo extends \Orm\BelongsTo
         if ($this->front_context_fallback && (NOS_ENTRY_POINT == Nos::ENTRY_POINT_FRONT)) {
             //front context is used
             $context_to = \DB::expr(\DB::quote(Nos::main_controller()->getContext()));
-        } elseif (empty($this->force_context_fallback)) {
+        } elseif (!empty($this->force_context_fallback)) {
+            //specified context is used
+            $context_to = \DB::expr(\DB::quote($this->force_context_fallback));
+        } else {
             //model context is used
             $context_to = $alias_from.'.'.$this->column_context_from;
-        } else {
-            //default context is used
-            $context_to = \DB::expr(\DB::quote($this->force_context));
         }
 
 
