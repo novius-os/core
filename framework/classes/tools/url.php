@@ -64,9 +64,10 @@ class Tools_Url
      * Encode the path part of an URL
      *
      * @param string $url Url to encode
+     * @param bool $absolute Whether or not a complete url must be built
      * @return string
      */
-    public static function encodePath($url)
+    public static function encodePath($url, $absolute = true)
     {
         if (empty($url)) {
             return $url;
@@ -81,6 +82,10 @@ class Tools_Url
             }
             $parse['path'] = implode('/', $path);
         }
-        return http_build_url($parse);
+
+        if ($absolute) {
+            return http_build_url($parse);
+        }
+        return isset($parse['path']) ? $parse['path'] : '';
     }
 }
