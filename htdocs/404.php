@@ -79,21 +79,28 @@ if ($is_media) {
                 error_log("Can't create dir ".$dir);
                 exit("Can't create dir ".$dir);
             }
-            if (file_exists($lock_file)) {
-                $time = file_get_contents($lock_file);
-                if ((time() - $time) < 120) {
-                    if (isset($_SERVER['REDIRECT_QUERY_STRING']) && $_SERVER['REDIRECT_QUERY_STRING'] === 'lock') {
-                        header('HTTP/1.0 503 Service Unavailable');
-                        header('HTTP/1.1 503 Service Unavailable');
-                        exit();
-                    }
-                    sleep(2);
-                    \Response::redirect(\Uri::base(false).$nos_url.'?lock');
-                    exit();
-                }
-            }
-            file_put_contents($lock_file, time(), LOCK_EX);
 
+            // Creating/Opening the lock file with (non blocking) exclusive access
+            $lock_file_resource = fopen($lock_file, 'a+');
+            $has_got_the_lock = flock($lock_file_resource, LOCK_EX | LOCK_NB);
+            if (!$has_got_the_lock) {
+                // Another process has got the lock and is generating the file
+                $config = \Config::load('cache', true);
+                $timeout = \Arr::get($config, 'media.generation.timeout', '+45 seconds');
+                $lock_end_time = strtotime($timeout, filemtime($lock_file));
+                fclose($lock_file_resource);
+                if ($lock_end_time > time()) {
+                    // Redirecting every x seconds to avoid blocking the server processes while waiting
+                    sleep(\Arr::get($config, 'media.generation.retry_delay', 2));
+                } else {
+                    // The file has been locked for too long: resetting it
+                    @unlink($lock_file);
+                }
+                \Response::redirect(\Uri::base(false).$nos_url.'?t='.time());
+                exit();
+            }
+
+            // Now got an exclusive lock, we can safely generate the file
             try {
                 $send_file = $toolkit_image->save();
                 $target = $toolkit_image->url(false);
@@ -101,7 +108,11 @@ if ($is_media) {
                 Log::error($e->getMessage());
                 $send_file = false;
             }
-            unlink($lock_file);
+
+            // Properly releasing and deleting the lock
+            flock($lock_file_resource, LOCK_UN);
+            fclose($lock_file_resource);
+            @unlink($lock_file);
         } else {
             $send_file = $media->path();
             $target = $media->url(false);
