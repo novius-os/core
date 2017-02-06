@@ -444,7 +444,7 @@ class Toolkit_Image
         }
 
         // Check if hash part matched and if all transformations exist
-        if ($this->url(false) !== $image_url) {
+        if ($this->url(false) !== $image_url && $this->url(false) !== Tools_Url::encodePath($pathinfo['dirname'], false).DS.$pathinfo['basename']) {
             return false;
         }
         return true;
