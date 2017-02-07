@@ -12,7 +12,10 @@ Nos\I18n::current_dictionary(array('noviusos_page::common', 'nos::common'));
 
 return array(
     'model' => 'Nos\Page\Model_Page',
-    'search_text' => 'page_title',
+    'search_text' => array(
+        'page_title',
+        'page_virtual_url',
+    ),
     'selectedView' => 'default',
     'views' => array(
         'default' => array(
