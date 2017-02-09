@@ -41,6 +41,33 @@ require(
                         }
                     })
             );
+
+            // Filter for launchers
+            $container.nosToolbar(
+                $('<input type="search" placeholder="<?= htmlspecialchars(__('Search a launcher')) ?>" name="the_search">')
+                    .on('change paste keyup', function() {
+                        var $apps   = $(".app");
+                        var $val = $(this).val();
+                        $apps.css({
+                            "position": "absolute",
+                            "display": "inline-block"
+                        });
+                        if ($val.length > 0) {
+                            $apps.each(function(){
+                                var $this = $(this);
+                                var $text = $this.find(".text").text();
+                                if ($text.toLowerCase().search($val.toLowerCase()) < 0) {
+                                    $this.hide();
+                                } else {
+                                    $this.show();
+                                    $this.css({
+                                        "position": "static"
+                                    });
+                                }
+                            });
+                        }
+                    })
+            );
         });
     });
 </script>
