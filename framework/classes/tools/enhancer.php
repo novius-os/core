@@ -111,7 +111,7 @@ class Tools_Enhancer
             }
             if (!$preview) {
                 $published = $item::behaviours('Nos\Orm_Behaviour_Publishable');
-                if (!empty($published) && !$item->published()) {
+                if (!empty($published) && !$item->published() && !\Arr::get($published, 'allow_urls_to_unpublished_items', false)) {
                     return array();
                 }
             }
