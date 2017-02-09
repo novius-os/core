@@ -34,6 +34,10 @@ class Migrate extends \Fuel\Core\Migrate
             \Config::set('migrations.version', array());
             \Config::set('migrations.table', 'nos_migration');
         }
+
+        // Reset internal state
+        static::$migrations = array();
+
         parent::_init();
     }
 
