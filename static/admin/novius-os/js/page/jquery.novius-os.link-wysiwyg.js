@@ -53,8 +53,9 @@ define('jquery-nos-link-wysiwyg',
                                     if (link_type === 'external' && !/^\w+\:/.test($input_url.val())) {
                                         $input_url.val('http://' + $input_url.val());
                                     }
+                                    var url_params = $input_url_params.val().charAt(0) === '?' ? $input_url_params.val() : '?' + $input_url_params.val();
                                     var a = {
-                                        href : $input_url.val() + (link_type === 'internal' ? $input_url_params.val() : ''),
+                                        href : $input_url.val() + (link_type === 'internal' ? url_params : ''),
                                         title : $input_title.val()
                                     };
                                     if ($.inArray('target', types_properties[link_type]) !== -1) {
@@ -225,6 +226,7 @@ define('jquery-nos-link-wysiwyg',
                                         $real_url.text(page.url);
                                     }
                                 });
+                                $input_url.val('nos://page/' + found[1]);
                                 $input_url_params.val(found[2]);
                             }
                         } else if (href.substr(0, 12) === 'nos://media/') {
