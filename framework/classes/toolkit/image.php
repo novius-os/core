@@ -22,6 +22,7 @@ class Toolkit_Image
         'watermark' => 'w',
         'border' => 'b',
         'mask' => 'm',
+        'blur' => 'bl',
         'rounded' => 'rou',
         'grayscale' => 'g',
         'quality' => 'q',
@@ -262,6 +263,21 @@ class Toolkit_Image
     public function mask($maskimage)
     {
         $this->_transformation(array('mask', $maskimage));
+
+        return $this;
+    }
+
+    /**
+     * Adds a blur effect to the image.
+     *
+     * @param   float  $radius
+     * @param   float  $sigma
+     * @return  Toolkit_Image
+     * @see \Fuel\Core\Image::blur()
+     */
+    public function blur($radius, $sigma)
+    {
+        $this->_transformation(array('blur', $radius, $sigma));
 
         return $this;
     }
