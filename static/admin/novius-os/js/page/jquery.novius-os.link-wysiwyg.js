@@ -53,7 +53,10 @@ define('jquery-nos-link-wysiwyg',
                                     if (link_type === 'external' && !/^\w+\:/.test($input_url.val())) {
                                         $input_url.val('http://' + $input_url.val());
                                     }
-                                    var url_params = $input_url_params.val().charAt(0) === '?' ? $input_url_params.val() : '?' + $input_url_params.val();
+                                    var url_params = $input_url_params.val();
+                                    if (url_params.charAt(0) !== '?') {
+                                        url_params = '?' + url_params;
+                                    }
                                     var a = {
                                         href : $input_url.val() + (link_type === 'internal' ? url_params : ''),
                                         title : $input_title.val()
