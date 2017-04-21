@@ -385,7 +385,27 @@ class Model extends \Orm\Model
         }
 
         if ($specific) {
-            return \Arr::get(static::$_behaviours_cached[$class], $specific, $default);
+            $behaviours = static::$_behaviours_cached[$class];
+
+            // The $specific argument is not dotated and may contain some keys to return in the behaviour config
+            $specific_fragments = explode('.', $specific, 2);
+            $specific_class = $specific_fragments[0];
+            $specific_key = \Arr::get($specific_fragments, 1, null);
+
+            // To keep backward-compatibility, we have to handle the case where a behaviour exists multiple times in the same array,
+            // with one as a sub-class of $specific, and the other as the exact required class
+            if (isset($behaviours[$specific_class])) {
+                return \Arr::get($behaviours, $specific, $default);
+            }
+
+            // We have to test every key since the required behaviour may be declared through a sub-class
+            foreach ($behaviours as $behaviour_class => $behaviour) {
+                if (is_a($behaviour_class, $specific_class, true)) {
+                    return empty($specific_key) ? $behaviour : \Arr::get($behaviour, $specific_key, $default);
+                }
+            }
+
+            return $default;
         }
 
         return static::$_behaviours_cached[$class];
