@@ -348,7 +348,7 @@ class Model extends \Orm\Model
     /**
      * Get the class's behaviours and what they observe
      *
-     * @param string $specific Behaviour to retrieve info of, allows direct param access by using dot notation
+     * @param string|array $specific Behaviour to retrieve info of, allows direct param access by using dot notation
      * @param mixed $default Return value when specific key wasn't found
      * @throws UnknownBehaviourException
      * @return array The specific behaviour if it exist and is requested or the defaut value. Else, array of all behaviours.
@@ -385,30 +385,45 @@ class Model extends \Orm\Model
         }
 
         if ($specific) {
-            $behaviours = static::$_behaviours_cached[$class];
-
-            // The $specific argument is not dotated and may contain some keys to return in the behaviour config
-            $specific_fragments = explode('.', $specific, 2);
-            $specific_class = $specific_fragments[0];
-            $specific_key = \Arr::get($specific_fragments, 1, null);
-
-            // To keep backward-compatibility, we have to handle the case where a behaviour exists multiple times in the same array,
-            // with one as a sub-class of $specific, and the other as the exact required class
-            if (isset($behaviours[$specific_class])) {
-                return \Arr::get($behaviours, $specific, $default);
-            }
-
-            // We have to test every key since the required behaviour may be declared through a sub-class
-            foreach ($behaviours as $behaviour_class => $behaviour) {
-                if (is_a($behaviour_class, $specific_class, true)) {
-                    return empty($specific_key) ? $behaviour : \Arr::get($behaviour, $specific_key, $default);
+            if (is_array($specific)) {
+                $return = array();
+                foreach ($specific as $behaviour) {
+                    $return[$behaviour] = static::findChildBehaviour($behaviour, $default);
                 }
+            } else {
+                $return = static::findChildBehaviour($specific, $default);
             }
 
-            return $default;
+            return $return;
         }
 
         return static::$_behaviours_cached[$class];
+    }
+
+    protected static function findChildBehaviour($specific, $default)
+    {
+        $class = get_called_class();
+        $behaviours = static::$_behaviours_cached[$class];
+
+        // The $specific argument is not dotated and may contain some keys to return in the behaviour config
+        $specific_fragments = explode('.', $specific, 2);
+        $specific_class = $specific_fragments[0];
+        $specific_key = \Arr::get($specific_fragments, 1, null);
+
+        // To keep backward-compatibility, we have to handle the case where a behaviour exists multiple times in the same array,
+        // with one as a sub-class of $specific, and the other as the exact required class
+        if (isset($behaviours[$specific_class])) {
+            return \Arr::get($behaviours, $specific, $default);
+        }
+
+        // We have to test every key since the required behaviour may be declared through a sub-class
+        foreach ($behaviours as $behaviour_class => $behaviour) {
+            if (is_a($behaviour_class, $specific_class, true)) {
+                return empty($specific_key) ? $behaviour : \Arr::get($behaviour, $specific_key, $default);
+            }
+        }
+
+        return $default;
     }
 
     /**
