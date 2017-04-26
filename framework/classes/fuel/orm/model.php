@@ -388,10 +388,10 @@ class Model extends \Orm\Model
             if (is_array($specific)) {
                 $return = array();
                 foreach ($specific as $behaviour) {
-                    $return[$behaviour] = self::findChildBehaviour($behaviour, $default);
+                    $return[$behaviour] = static::findChildBehaviour($behaviour, $default);
                 }
             } else {
-                $return = self::findChildBehaviour($specific, $default);
+                $return = static::findChildBehaviour($specific, $default);
             }
 
             return $return;
