@@ -10,8 +10,32 @@
 
 Nos\I18n::current_dictionary(array('nos::common'));
 
+if (empty($publishable) && !empty($item)) {
+    $publishable = $item->behaviours('Nos\Orm_Behaviour_Publishable');
+}
+
 if (empty($publishable)) {
     return;
+}
+
+if (!isset($allow_publish) || $allow_publish === null) {
+    if (isset($publishable['options']) && isset($publishable['options']['allow_publish'])) {
+        $allow_publish = \Config::processCallbackValue($publishable['options']['allow_publish'], true, $item['item']);
+    } else {
+        // No configuration = it's allowed
+        $allow_publish = true;
+    }
+}
+
+$state_property     = !empty($publishable['publication_state_property']) ? $publishable['publication_state_property'] : (!empty($publishable['publication_bool_property']) ? $publishable['publication_bool_property'] : '');
+$yes_no_mode        = ($state_property !== '');
+$planification_mode = !empty($publishable['publication_start_property']) && !empty($publishable['publication_end_property']);
+
+if (isset($populate) && is_callable($populate)) {
+    // The selected status may be forced to another via a standard 'populate' callback
+    $planification_status = call_user_func($populate, $item);
+} else {
+    $planification_status = $item->planificationStatus();
 }
 ?>
 <td class="c3">
@@ -39,8 +63,31 @@ if ($planification_mode) {
     echo '<span></span>';
 }
 ?>
-                <div style="width:<?= (empty($state_property) ? 0 : 50) + ($planification_mode ? 25 : 0) ?>px;">
+                <div style="width:<?= ($yes_no_mode ? 50 : 0) + ($planification_mode ? 25 : 0) ?>px;">
 <?php
+    $radio_options = \Arr::merge(array(
+        'no' => array(
+            'visible'    => $yes_no_mode,
+            'attributes' => array(
+                'id'       => uniqid('no_'),
+                'disabled' => (!$allow_publish && $planification_status != 0) ? 'disabled' : false,
+            ),
+        ),
+        'planned' => array(
+            'visible'    => $planification_mode,
+            'attributes' => array(
+                'id'       => uniqid('planned_'),
+                'disabled' => !$allow_publish ? 'disabled' : false,
+            ),
+        ),
+        'yes' => array(
+            'visible'    => $yes_no_mode,
+            'attributes' => array(
+                'id'       => uniqid('yes_'),
+                'disabled' => !$allow_publish ? 'disabled' : false,
+            ),
+        ),
+    ), $radio_options);
     foreach ($radio_options as $radio) {
         if (\Arr::get($radio, 'visible', true)) {
             echo \Form::radio($state_property, $radio['value'], $planification_status == $radio['value'], $radio['attributes']);
