@@ -31,8 +31,12 @@ $state_property     = !empty($publishable['publication_state_property']) ? $publ
 $yes_no_mode        = ($state_property !== '');
 $planification_mode = !empty($publishable['publication_start_property']) && !empty($publishable['publication_end_property']);
 
-$planification_status = $item->planificationStatus();
-$published = !empty($item) ? $item->published() : false;
+if (isset($populate) && is_callable($populate)) {
+    // The selected status may be forced to another via a standard 'populate' callback
+    $planification_status = call_user_func($populate, $item);
+} else {
+    $planification_status = $item->planificationStatus();
+}
 ?>
 <td class="c3">
     <table class="publishable" id="<?= $publishable_id = uniqid('publishable_') ?>">
@@ -61,21 +65,46 @@ if ($planification_mode) {
 ?>
                 <div style="width:<?= ($yes_no_mode ? 50 : 0) + ($planification_mode ? 25 : 0) ?>px;">
 <?php
-if ($yes_no_mode) {
-    ?>
-    <input type="radio" name="<?= $state_property ?>" class="notransform" value="0" id="<?= $uniqid_no = uniqid('no_') ?>" <?= $planification_status == 0 ? 'checked' : ''; ?> <?= (!$allow_publish && $planification_status != 0) ? 'disabled' : '' ?> /><label for="<?= $uniqid_no ?>"><img src="static/novius-os/admin/novius-os/img/icons/status-red.png" /></label>
-    <?php
-}
-if ($planification_mode) {
-    ?>
-    <input type="radio" name="<?= $state_property ?>" class="notransform" value="2" id="<?= $uniqid_planned = uniqid('planned_') ?>" <?= $planification_status == 2 ? 'checked' : ''; ?> <?= !$allow_publish ? 'disabled' : '' ?> /><label for="<?= $uniqid_planned ?>"><span class="ui-icon ui-icon-clock" /></label>
-    <?php
-}
-if ($yes_no_mode) {
-    ?>
-    <input type="radio" name="<?= $state_property ?>" class="notransform" value="1" id="<?= $uniqid_yes = uniqid('yes_') ?>" <?= $planification_status == 1 ? 'checked' : ''; ?> <?= !$allow_publish ? 'disabled' : '' ?> /><label for="<?= $uniqid_yes ?>"><img src="static/novius-os/admin/novius-os/img/icons/status-green.png" /></label>
-    <?php
-}
+    $radio_options = \Arr::merge(array(
+        'no' => array(
+            'value'      => '0',
+            'content'    => '<img src="static/novius-os/admin/novius-os/img/icons/status-red.png" />',
+            'visible'    => $yes_no_mode,
+            'attributes' => array(
+                'class'    => 'notransform',
+                'id'       => uniqid('no_'),
+                'disabled' => (!$allow_publish && $planification_status != 0) ? 'disabled' : false,
+            ),
+        ),
+        'planned' => array(
+            'value'      => '2',
+            'content'    => '<span class="ui-icon ui-icon-clock" />',
+            'visible'    => $planification_mode,
+            'attributes' => array(
+                'class'    => 'notransform',
+                'id'       => uniqid('planned_'),
+                'disabled' => !$allow_publish ? 'disabled' : false,
+            ),
+        ),
+        'yes' => array(
+            'value'      => '1',
+            'content'    => '<img src="static/novius-os/admin/novius-os/img/icons/status-green.png" />',
+            'visible'    => $yes_no_mode,
+            'attributes' => array(
+                'class'    => 'notransform',
+                'id'       => uniqid('yes_'),
+                'disabled' => !$allow_publish ? 'disabled' : false,
+            ),
+        ),
+    ), $radio_options);
+    foreach ($radio_options as $radio) {
+        if (\Arr::get($radio, 'visible', true)) {
+            echo \Form::radio($state_property, $radio['value'], $planification_status == $radio['value'], $radio['attributes']);
+            ?>
+            <label for="<?= $radio['attributes']['id'] ?>"><?= $radio['content'] ?></label>
+            <?php
+        }
+    }
 ?>
                 </div>
             </td>
