@@ -24,9 +24,68 @@ class Renderer_Publishable extends Renderer
      */
     public function build()
     {
-        if (empty($this->renderer_options['item'])) {
-            $this->renderer_options['item'] = $this->fieldset()->getInstance();
+        $options = &$this->renderer_options;
+
+        if (empty($options['item'])) {
+            $options['item'] = $this->fieldset()->getInstance();
         }
-        return $this->template((string) \View::forge($this->renderer_options['view'], $this->renderer_options, false));
+
+        if (empty($options['publishable']) && !empty($options['item'])) {
+            $options['publishable'] = $options['item']->behaviours('Nos\Orm_Behaviour_Publishable');
+        }
+
+        if (!\Arr::get($options, 'allow_publish', false)) {
+            if (\Arr::get($options, 'publishable.options.allow_publish', false)) {
+                $options['allow_publish'] = \Config::processCallbackValue(\Arr::get($options, 'publishable.options.allow_publish'), true, $options['item']['item']);
+            } else {
+                // No configuration = it's allowed
+                $options['allow_publish'] = true;
+            }
+        }
+            
+        if (isset($options['populate']) && is_callable($options['populate'])) {
+            // The selected status may be forced to another via a standard 'populate' callback
+            $options['planification_status'] = call_user_func($options['populate'], $options['item']);
+        } else {
+            $options['planification_status'] = $options['item']->planificationStatus();
+        }
+
+        $options['planification_mode'] = !empty($options['publishable']['publication_start_property']) && !empty($options['publishable']['publication_end_property']);
+        $options['state_property'] = \Arr::get($options, 'publishable.publication_state_property', \Arr::get($options, 'publishable.publication_bool_property', ''));
+
+        $options['radio_options'] = \Arr::merge(array(
+            'no' => array(
+                'value'      => '0',
+                'content'    => '<img src="static/novius-os/admin/novius-os/img/icons/status-red.png" />',
+                'visible'    => !empty($options['state_property']),
+                'attributes' => array(
+                    'class'    => 'notransform',
+                    'id'       => uniqid('no_'),
+                    'disabled' => (!$options['allow_publish'] && $options['planification_status'] != 0) ? 'disabled' : false,
+                ),
+            ),
+            'planned' => array(
+                'value'      => '2',
+                'content'    => '<span class="ui-icon ui-icon-clock" />',
+                'visible'    => $options['planification_mode'],
+                'attributes' => array(
+                    'class'    => 'notransform',
+                    'id'       => uniqid('planned_'),
+                    'disabled' => !$options['allow_publish'] ? 'disabled' : false,
+                ),
+            ),
+            'yes' => array(
+                'value'      => '1',
+                'content'    => '<img src="static/novius-os/admin/novius-os/img/icons/status-green.png" />',
+                'visible'    => !empty($options['state_property']),
+                'attributes' => array(
+                    'class'    => 'notransform',
+                    'id'       => uniqid('yes_'),
+                    'disabled' => !$options['allow_publish'] ? 'disabled' : false,
+                ),
+            ),
+        ), \Arr::get($options, 'radio_options', array()));
+        
+        return $this->template((string) \View::forge($options['view'], $options, false));
     }
 }
