@@ -15,6 +15,30 @@ class Renderer_Publishable extends Renderer
     protected static $DEFAULT_RENDERER_OPTIONS = array(
         'item' => null,
         'view' => 'nos::renderer/publishable',
+        'populate' => null, // Callback allowing the selected value to be changed
+        'radio_options' => array(
+            'no' => array(
+                'value'      => '0',
+                'content'    => '<img src="static/novius-os/admin/novius-os/img/icons/status-red.png" />',
+                'attributes' => array(
+                    'class' => 'notransform',
+                ),
+            ),
+            'planned' => array(
+                'value'      => '2',
+                'content'    => '<span class="ui-icon ui-icon-clock" />',
+                'attributes' => array(
+                    'class' => 'notransform',
+                ),
+            ),
+            'yes' => array(
+                'value'      => '1',
+                'content'    => '<img src="static/novius-os/admin/novius-os/img/icons/status-green.png" />',
+                'attributes' => array(
+                    'class' => 'notransform',
+                ),
+            ),
+        ),
     );
 
     /**
