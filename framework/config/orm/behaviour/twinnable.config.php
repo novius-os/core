@@ -56,7 +56,7 @@ if (count($contexts) > 1) {
                     $main_context = $item->find_main_context();
                     foreach ($contexts as $context) {
 
-                        if ($item->{$behaviours['Nos\Orm_Behaviour_Twinnable']['context_property']} === $context) {
+                        if ($item->{$item::behaviours('Nos\Orm_Behaviour_Twinnable.context_property')} === $context) {
                             continue;
                         }
                         $item_context = $item->find_context($context);
