@@ -49,7 +49,6 @@ if (count($contexts) > 1) {
                 'menus' => function ($item) use ($contexts, $locales, $sites) {
                     $actions = array();
                     $class = get_class($item);
-                    $behaviours = $class::behaviours();
                     $common_config = \Nos\Config_Common::load($class);
                     $controller_base_url = $common_config['placeholders']['controller_base_url'];
 
