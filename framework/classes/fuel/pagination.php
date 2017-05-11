@@ -29,4 +29,18 @@ class Pagination extends Fuel\Core\Pagination
 
         return parent::_make_link($page);
     }
+
+    public function render($raw = false)
+    {
+        // To avoid SEO duplicates, we set the canonical href (`foo.html` vs `foo.html?page=1`)
+        if ($this->config['calculated_page'] == 1 && !empty($this->config['pagination_url_first_page'])) {
+            $url = str_replace('{page}', $this->config['calculated_page'], $this->config['pagination_url_first_page']);
+            $mainController = \Nos\Nos::main_controller();
+            if (!empty($mainController)) {
+                $mainController->addMeta('<link rel="canonical" href="'.e($url).'">');
+            }
+        }
+
+        return parent::render($raw);
+    }
 }
