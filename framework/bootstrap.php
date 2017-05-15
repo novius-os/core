@@ -77,6 +77,7 @@ if (!MBSTRING) {
         'Migrate' => FUEL_EXTEND_PATH.'migrate.php',
         'Module' => FUEL_EXTEND_PATH.'module.php',
         'ModuleNotFoundException' => FUEL_EXTEND_PATH.'module.php',
+        'Pagination' => FUEL_EXTEND_PATH.'pagination.php',
         'Profiler' => FUEL_EXTEND_PATH.'profiler.php',
         'Refine' => FUEL_EXTEND_PATH.'oil'.DIRECTORY_SEPARATOR.'refine.php',
         'Response' => FUEL_EXTEND_PATH.'response.php',
