@@ -251,8 +251,13 @@ class Model_User extends \Nos\Orm\Model
     {
         if (!$this->user_configuration) {
             return array();
-        } else {
-            return unserialize($this->user_configuration);
         }
+
+        $userConfiguration = unserialize($this->user_configuration);
+        if (!is_array($userConfiguration)) {
+            return array();
+        }
+
+        return $userConfiguration;
     }
 }
