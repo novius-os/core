@@ -709,6 +709,10 @@ class Application
             return;
         }
 
+        if (\Config::get('novius-os.users.disable_automatic_roles_creation', false)) {
+            return;
+        }
+
         // Multi-roles: create a role dedicated to this application if needed
         if (\Config::get('novius-os.users.enable_roles', false)) {
             $permission = \Nos\User\Model_Permission::find('first', array(
