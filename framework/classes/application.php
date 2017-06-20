@@ -417,7 +417,7 @@ class Application
 
         // Load application' classes namespaces to use these in migrations
         $applicationPath = static::get_application_path($this->folder);
-        if (is_dir($applicationPath) && is_dir($applicationPath.'/classes/')) {
+        if ($applicationPath !== false && is_dir($applicationPath.'/classes/')) {
             \Autoloader::add_namespace($new_metadata['namespace'], $applicationPath.'/classes/');
         }
 
