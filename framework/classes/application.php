@@ -415,6 +415,12 @@ class Application
             $this->symlink('static') && $this->symlink('htdocs');
         }
 
+        // Load application' classes namespaces to use these in migrations
+        $applicationPath = static::get_application_path($this->folder);
+        if ($applicationPath !== false && is_dir($applicationPath.'/classes/')) {
+            \Autoloader::add_namespace($new_metadata['namespace'], $applicationPath.'/classes/');
+        }
+
         // Cache the metadata used to install the application
         $config['app_installed'] = static::$rawAppInstalled;
         $config['app_installed'][$this->folder] = $new_metadata;
