@@ -256,6 +256,12 @@ class Tools_Wysiwyg
             $item->event('wysiwygOptions', array(&$options));
         }
 
+        \Event::trigger_function('wysiwygs.jsOptions', array(array(
+            'options' => &$options,
+            'item' => $item,
+            'urlEnhancers' => $urlEnhancers,
+        )));
+
         return $options;
     }
 }
