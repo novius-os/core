@@ -188,7 +188,7 @@ class Orm_Behaviour_Twinnable extends Orm_Behaviour_Contextable
         foreach ($w_keys as $i) {
             // Remove empty wysiwyg
             if (empty($item->linked_shared_wysiwygs_context[$i]->wysiwyg_text)) {
-                $this->linked_shared_wysiwygs_context[$i]->delete();
+                $item->linked_shared_wysiwygs_context[$i]->delete();
                 unset($item->linked_shared_wysiwygs_context[$i]);
             }
         }
