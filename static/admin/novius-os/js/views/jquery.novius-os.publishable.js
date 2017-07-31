@@ -91,10 +91,18 @@ define('jquery-nos-publishable',
                                 var $radio = $(this),
                                     $img = $buttonset.find('label[for=' + $radio.attr('id') + '] img');
 
-                                $img.attr({
-                                    title: params.texts[params.initialStatus][$radio.val()],
-                                    alt: params.texts[params.initialStatus][$radio.val()]
-                                });
+                                $img
+                                    .attr({
+                                        title: params.texts[params.initialStatus][$radio.val()],
+                                        alt: params.texts[params.initialStatus][$radio.val()]
+                                    })
+                                    .css({
+                                        // This property is required as a workaround for a bug specific to IE11/Edge.
+                                        // Clicking on an <img> inside a <label> doesn't properly triggers the click event to the label/input.
+                                        // https://connect.microsoft.com/IE/feedback/details/813665/ie11-image-in-label-clicking-on-it-doesnt-trigger-the-focus-check-of-the-input
+                                        // https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/630943/
+                                        pointerEvents: "none",
+                                    });
                             });
                         };
 
