@@ -1,18 +1,15 @@
 <?php
 Nos\I18n::current_dictionary('nos::common');
-?><p class="check_all">
+?>
+<p class="check_all">
     <label><input type="checkbox" class="check_all" /> <?= __('Check all') ?></label>
 </p>
 <ul class="applications">
 <?php
-
+// Gets all the installed apps including core apps
 \Nos\Application::cleanApplications();
 $applications = \Nos\Application::search_all(false);
-
-
 $app_installed = array();
-$app_others = array();
-
 foreach ($applications as $app) {
     if ($app->is_installed()) {
         $app_installed[$app->folder] = $app;
