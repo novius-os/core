@@ -157,11 +157,11 @@ class Application
      * @param  string[]    $repositories
      * @return Application
      */
-    public static function search_all()
+    public static function search_all($visible = true)
     {
         $applications = array();
         foreach (static::$repositories as $repository) {
-            if ($repository['visible']) {
+            if (!$visible || $repository['visible']) {
                 $list = \File::read_dir($repository['path'], 1);
 
                 // idc = I don't care

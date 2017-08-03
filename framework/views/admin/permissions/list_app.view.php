@@ -5,19 +5,33 @@ Nos\I18n::current_dictionary('nos::common');
 </p>
 <ul class="applications">
 <?php
-foreach (\Nos\Config_Data::get('app_installed') as $app_name => $app) {
-    if (!isset($app['permission'])) {
+
+\Nos\Application::cleanApplications();
+$applications = \Nos\Application::search_all(false);
+
+
+$app_installed = array();
+$app_others = array();
+
+foreach ($applications as $app) {
+    if ($app->is_installed()) {
+        $app_installed[$app->folder] = $app;
+    }
+}
+
+foreach ($app_installed as $app) {
+    if (!isset($app->metadata['permission'])) {
         continue;
     }
-    $icon = Config::icon($app_name, 32);
     ?>
     <li class="application ui-corner-all ui-widget-content">
         <div class="checkbox_hit_area ui-corner-tl ui-corner-bl">
-            <input type="checkbox" name="<?= $checkbox_name ?>" value="<?= $app_name ?>" <?= $role->checkPermission($permission_name, $app_name) ? 'checked' : '' ?> />
+            <input type="checkbox" name="<?= $checkbox_name ?>" value="<?= $app->folder ?>" <?= $role->checkPermission($permission_name, $app->folder) ? 'checked' : '' ?> />
         </div>
-        <?= empty($icon) ? '' : '<img class="app_icon" src="'.$icon.'"  />' ?> &nbsp; <?= $app['name'] ?>
+        <img class="app_icon" src="<?= Config::icon($app->folder, 32) ?: 'static/novius-os/admin/novius-os/img/32/application.png' ?>"  />
+        &nbsp; <?= e($app->get_name_translated()); ?>
     </li>
     <?php
 }
 ?>
-<ul>
+</ul>
