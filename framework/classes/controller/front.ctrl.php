@@ -116,11 +116,10 @@ class Controller_Front extends Controller
         }
 
         // POST or preview means no cache. Ever.
-        // We don't want cache in DEV except if _cache=1
         if ($this->_is_preview || \Input::method() == 'POST') {
             $this->_use_cache = false;
         } else {
-            $this->_use_cache = \Input::get('_cache', \Config::get('novius-os.cache', true));
+            $this->_use_cache = \Config::get('novius-os.cache', true);
         }
 
         \Event::trigger('front.start');
