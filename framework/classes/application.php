@@ -155,14 +155,14 @@ class Application
     /**
      * Searches all applications
      *
-     * @param  bool $visible Includes visible apps or not (like core apps)
+     * @param  bool $visibleAppsOnly Only includes visible apps (core apps are considered as not visible)
      * @return Application
      */
-    public static function search_all($visible = true)
+    public static function search_all($visibleAppsOnly = true)
     {
         $applications = array();
         foreach (static::$repositories as $repository) {
-            if (!$visible || $repository['visible']) {
+            if (!$visibleAppsOnly || $repository['visible']) {
                 $list = \File::read_dir($repository['path'], 1);
 
                 // idc = I don't care
