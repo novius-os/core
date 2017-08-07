@@ -154,7 +154,7 @@ class Application
 
     /**
      * Searches all applications
-     
+     *
      * @param  bool $visible Includes visible apps or not (like core apps)
      * @return Application
      */
