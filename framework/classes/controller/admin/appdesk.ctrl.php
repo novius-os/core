@@ -175,6 +175,7 @@ class Controller_Admin_Appdesk extends Controller_Admin_Application
             $inspectors_class_prefix = implode('_', $inspectors_class_prefix).'_';
 
             $application_config = \Nos\Config_Data::get('app_installed.'.$application);
+            \Nos\Config_Data::translateMetadataConfig($application_config, $application);
 
             $behaviours = array(
                 'contextable' => $config['model']::behaviours('Nos\Orm_Behaviour_Contextable', false),
