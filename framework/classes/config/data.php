@@ -132,10 +132,9 @@ class Config_Data
     public static function translateMetadataConfig(&$config, $application)
     {
         // Translates base config
-        $tmpConfig = array();
-        $tmpConfig[$application] = $config;
+        $tmpConfig = array($application => $config);
         static::onLoadAppInstalled($tmpConfig);
-        $config = reset($tmpConfig);
+        $config = $tmpConfig[$application];
 
         // Translates sections config
         foreach (array('launchers', 'enhancers', 'templates') as $section) {
@@ -150,10 +149,9 @@ class Config_Data
             }
 
             // Executes the callback
-            $tmpConfig = array();
-            $tmpConfig[$application] = $config;
+            $tmpConfig = array($application => $config);
             static::$callback($tmpConfig, $section);
-            $config = reset($tmpConfig);
+            $config = $tmpConfig[$application];
         }
     }
 
