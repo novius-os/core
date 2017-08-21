@@ -111,13 +111,12 @@ class Config_Common
 
     public static function process_tab($application_name, $config)
     {
-        $application_config = \Nos\Config_Data::get('app_installed.'.$application_name);
         if (!isset($config['tab'])) {
             $config['tab'] = array();
         }
 
         if (!isset($config['tab']['label'])) {
-            $config['tab']['label'] = $application_config['name'];
+            $config['tab']['label'] = Application::forge($application_name)->get_name_translated();
         }
 
         return $config['tab'];

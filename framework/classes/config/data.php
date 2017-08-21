@@ -125,23 +125,45 @@ class Config_Data
     }
 
     /**
+     * Translates the appropriate keys for a metadata config
+     *
+     * @param $config
+     */
+    public static function translateMetadataConfig(&$config, $application)
+    {
+        // Translates base config
+        $tmpConfig = array($application => $config);
+        static::onLoadAppInstalled($tmpConfig);
+        $config = $tmpConfig[$application];
+
+        // Translates sections config
+        foreach (array('launchers', 'enhancers', 'templates') as $section) {
+            if (!isset($config[$section]) || !isset(static::$metadata_files[$section])) {
+                continue;
+            }
+
+            // Gets the callback that translates this section
+            $callback = \Arr::get(static::$metadata_files, $section);
+            if (empty($callback)) {
+                continue;
+            }
+
+            // Executes the callback
+            $tmpConfig = array($application => $config);
+            static::$callback($tmpConfig, $section);
+            $config = $tmpConfig[$application];
+        }
+    }
+
+    /**
      * Translate the appropriate keys for app_installed
      *
      * @param  array  $config  The loaded app_installed configuration
      */
     public static function onLoadAppInstalled(&$config)
     {
-        foreach ($config as &$app) {
-            $i18n_file = \Arr::get($app, 'i18n_file', false);
-            if (!empty($i18n_file)) {
-                try {
-                    $i18n = \Nos\I18n::dictionary($i18n_file);
-                    $app['name'] = $i18n($app['name']);
-                } catch (\Fuel\Core\ModuleNotFoundException $e) {
-                    // Application does not exist, don't translate
-                }
-            }
-        }
+        // Translates each app config
+        static::_translate($config, array('name', 'tab.label'));
     }
 
     /**
@@ -182,16 +204,15 @@ class Config_Data
      */
     protected static function _translate(&$config, $keys)
     {
-        foreach ($config as &$item) {
-            $application = \Arr::get($item, 'i18n_application', false);
+        foreach ($config as $application => &$item) {
+            $application = \Arr::get($item, 'i18n_application', \Arr::get($item, 'application', $application));
             $i18n_file = static::get('app_installed.'.$application.'.i18n_file', false);
             if (!empty($i18n_file)) {
                 try {
                     $i18n = \Nos\I18n::dictionary($i18n_file);
                     foreach ($keys as $key) {
-                        $val = \Arr::get($item, $key, false);
-                        if ($val !== false) {
-                            \Arr::set($item, $key, $i18n($val));
+                        if (\Arr::key_exists($item, $key)) {
+                            \Arr::set($item, $key, $i18n(\Arr::get($item, $key)));
                         }
                     }
                 } catch (\Fuel\Core\ModuleNotFoundException $e) {
