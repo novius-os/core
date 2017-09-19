@@ -117,6 +117,10 @@ define('jquery-nos-appdesk',
                 var self = this,
                     o = self.options;
 
+                var hasVerticalInspector = o.inspectors.some(function (inspector) {
+                    return inspector.vertical;
+                });
+
                 self.uiSplitterVertical = $('<div></div>').addClass('nos-appdesk-splitter-v')
                     .appendTo(self.element);
                 self.uiSplitterVerticalLeft = $('<div></div>').appendTo(self.uiSplitterVertical);
@@ -131,6 +135,11 @@ define('jquery-nos-appdesk',
                     .appendTo(self.uiSplitterHorizontalTop);
                 self.uiSplitterHorizontalBottom = $('<div></div>').addClass('nos-appdesk-hpanel-bottom')
                     .appendTo(self.uiSplitterHorizontal);
+
+                if (!hasVerticalInspector) {
+                    self.uiSplitterVerticalRight.css('height', '100%');
+                    self.uiSplitterHorizontal.css('height', '100%');
+                }
 
                 self.uiSearchBar = $('<div><form><div></div></form></div>')
                     .addClass('nos-appdesk-searchbar-container wijmo-wijgrid ui-widget ui-widget-header ui-state-default')
@@ -700,6 +709,7 @@ define('jquery-nos-appdesk',
             _uiSplitters : function() {
                 var self = this,
                     hasVerticalInspector = !self.uiInspectorsVertical.is(':empty'),
+                    hasHorizontalInspector = !self.uiInspectorsHorizontal.is(':empty'),
                     verticalSplitter = $.extend(true, {
                             orientation: "vertical",
                             splitterDistance: 200,
@@ -752,9 +762,10 @@ define('jquery-nos-appdesk',
                         });
                 }
 
-                if (!self.uiInspectorsHorizontal.is(':empty')) {
+                if (hasHorizontalInspector) {
                     self.uiSplitterHorizontal.wijsplitter(horizontalSplitter);
                 } else {
+                    self.uiSplitterHorizontalTop.remove();
                     self.uiSplitterHorizontal.add(self.uiSplitterHorizontalBottom)
                         .css({
                             position: 'absolute',
@@ -762,7 +773,6 @@ define('jquery-nos-appdesk',
                             bottom: 0,
                             width: '100%'
                         });
-                    self.uiSplitterHorizontalTop.remove();
                 }
 
                 return self;
@@ -1440,11 +1450,23 @@ define('jquery-nos-appdesk',
                 var self = this;
 
                 if (self.uiSplitterVertical.data('wijmo-wijsplitter')) {
-                    self.uiInspectorsVerticalLi.css({
-                            width: '100%',
-                            height: (self.uiInspectorsVertical.height() / self.uiInspectorsVerticalLi.length) + 'px'
-                        })
-                        .trigger(reload ? 'widgetReload' : 'widgetResize');
+                    self.uiInspectorsVerticalLi.each(function () {
+                        var inspectorConfig = $(this).data('inspector');
+
+                        if (typeof(inspectorConfig.height) === 'undefined') {
+                            $(this).css({
+                                width: '100%',
+                                height: (self.uiInspectorsVertical.height() / self.uiInspectorsVerticalLi.length) + 'px'
+                            });
+                        } else {
+                            $(this).css({
+                                width: '100%',
+                                height: inspectorConfig.height,
+                            });
+                        }
+
+                        $(this).trigger(reload ? 'widgetReload' : 'widgetResize');
+                    });
                 }
 
                 return self;
@@ -1454,11 +1476,23 @@ define('jquery-nos-appdesk',
                 var self = this;
 
                 if (self.uiSplitterHorizontal.data('wijmo-wijsplitter')) {
-                    self.uiInspectorsHorizontalLi.css({
-                            width: (self.uiInspectorsHorizontal.width() / self.uiInspectorsHorizontalLi.length) + 'px',
-                            height: '100%'
-                        })
-                        .trigger(reload ? 'widgetReload' : 'widgetResize');
+                    self.uiInspectorsHorizontalLi.each(function () {
+                        var inspectorConfig = $(this).data('inspector');
+
+                        if (typeof(inspectorConfig.width) === 'undefined') {
+                            $(this).css({
+                                width: (self.uiInspectorsHorizontal.width() / self.uiInspectorsHorizontalLi.length) + 'px',
+                                height: '100%'
+                            });
+                        } else {
+                            $(this).css({
+                                width: inspectorConfig.width,
+                                height: '100%'
+                            });
+                        }
+
+                        $(this).trigger(reload ? 'widgetReload' : 'widgetResize');
+                    });
                 }
 
                 return self;
