@@ -79,8 +79,10 @@ define('jquery-nos-inspector-model',
                                 loading: function (dataSource, userData) {
                                     var r = userData.data.paging;
                                     dataSource.proxy.options.data.context = connector.data('nosContext') || '';
-                                    dataSource.proxy.options.data.offset = r.pageIndex * r.pageSize;
-                                    dataSource.proxy.options.data.limit = r.pageSize;
+                                    if (typeof(inspectorData.grid.allowPaging) === 'undefined' || inspectorData.grid.allowPaging) {
+                                        dataSource.proxy.options.data.offset = r.pageIndex * r.pageSize;
+                                        dataSource.proxy.options.data.limit = r.pageSize;
+                                    }
                                 },
                                 reader: {
                                     read: function (dataSource) {
