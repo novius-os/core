@@ -1451,21 +1451,22 @@ define('jquery-nos-appdesk',
 
                 if (self.uiSplitterVertical.data('wijmo-wijsplitter')) {
                     self.uiInspectorsVerticalLi.each(function () {
-                        var inspectorConfig = $(this).data('inspector');
+                        var $this = $(this);
+                        var inspectorConfig = $this.data('inspector');
 
                         if (typeof(inspectorConfig.height) === 'undefined') {
-                            $(this).css({
+                            $this.css({
                                 width: '100%',
                                 height: (self.uiInspectorsVertical.height() / self.uiInspectorsVerticalLi.length) + 'px'
                             });
                         } else {
-                            $(this).css({
+                            $this.css({
                                 width: '100%',
                                 height: inspectorConfig.height,
                             });
                         }
 
-                        $(this).trigger(reload ? 'widgetReload' : 'widgetResize');
+                        $this.trigger(reload ? 'widgetReload' : 'widgetResize');
                     });
                 }
 
@@ -1477,21 +1478,22 @@ define('jquery-nos-appdesk',
 
                 if (self.uiSplitterHorizontal.data('wijmo-wijsplitter')) {
                     self.uiInspectorsHorizontalLi.each(function () {
-                        var inspectorConfig = $(this).data('inspector');
+                        var $this = $(this);
+                        var inspectorConfig = $this.data('inspector');
 
                         if (typeof(inspectorConfig.width) === 'undefined') {
-                            $(this).css({
+                            $this.css({
                                 width: (self.uiInspectorsHorizontal.width() / self.uiInspectorsHorizontalLi.length) + 'px',
                                 height: '100%'
                             });
                         } else {
-                            $(this).css({
+                            $this.css({
                                 width: inspectorConfig.width,
                                 height: '100%'
                             });
                         }
 
-                        $(this).trigger(reload ? 'widgetReload' : 'widgetResize');
+                        $this.trigger(reload ? 'widgetReload' : 'widgetResize');
                     });
                 }
 
