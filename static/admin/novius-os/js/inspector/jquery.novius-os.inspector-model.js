@@ -55,7 +55,7 @@ define('jquery-nos-inspector-model',
                             height : '100%',
                             width : '100%'
                         })
-                        .noslistgrid({
+                        .noslistgrid($.extend({
                             columnsAutogenerationMode : 'none',
                             showFilter: showFilter,
                             allowSorting: true,
@@ -66,7 +66,6 @@ define('jquery-nos-inspector-model',
                             allowColSizing : true,
                             allowColMoving : true,
                             loadingText: inspectorData.loadingText || 'Loading...',
-                            columns : inspectorData.grid.columns,
                             data: new wijdatasource({
                                 dynamic: true,
                                 proxy: new wijhttpproxy({
@@ -80,8 +79,10 @@ define('jquery-nos-inspector-model',
                                 loading: function (dataSource, userData) {
                                     var r = userData.data.paging;
                                     dataSource.proxy.options.data.context = connector.data('nosContext') || '';
-                                    dataSource.proxy.options.data.offset = r.pageIndex * r.pageSize;
-                                    dataSource.proxy.options.data.limit = r.pageSize;
+                                    if (typeof(inspectorData.grid.allowPaging) === 'undefined' || inspectorData.grid.allowPaging) {
+                                        dataSource.proxy.options.data.offset = r.pageIndex * r.pageSize;
+                                        dataSource.proxy.options.data.limit = r.pageSize;
+                                    }
                                 },
                                 reader: {
                                     read: function (dataSource) {
@@ -107,7 +108,7 @@ define('jquery-nos-inspector-model',
                                 rendered = true;
                                 inspector.css('height', 'auto').noslistgrid("currentCell", -1, -1);
                             }
-                        });
+                        }, inspectorData.grid));
                 });
             }
         });
