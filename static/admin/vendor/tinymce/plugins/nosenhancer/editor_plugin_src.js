@@ -44,8 +44,8 @@
 
             function enhancerEmptyPreview(content) {
                 // Empty enhancer previews (data and useful informations are stored as html attributes on the higest div)
-                content.filter('.nosEnhancer, .nosEnhancerInline').empty();
-                content.find('.nosEnhancer, .nosEnhancerInline').empty();
+                content.filter('.nosEnhancer, .nosEnhancerInline').html('&#8291;');
+                content.find('.nosEnhancer, .nosEnhancerInline').html('&#8291;');
             }
 
             function enhancerRestorePreview(content) {
