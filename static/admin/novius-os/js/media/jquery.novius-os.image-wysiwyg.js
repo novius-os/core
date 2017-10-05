@@ -14,13 +14,13 @@ define('jquery-nos-image-wysiwyg',
         $.fn.extend({
             nosImageWysiwyg : function(params) {
                 params = params || {
-                        newImg: true,
-                        appdeskView: '',
-                        base_url: '',
-                        texts: {
-                            imageFirst: 'Please choose an image first'
-                        }
-                    };
+                    newImg: true,
+                    appdeskView: '',
+                    base_url: '',
+                    texts: {
+                        imageFirst: 'Please choose an image first'
+                    }
+                };
                 return this.each(function() {
                     var $container = $(this)
                             .find('> form')
@@ -41,7 +41,7 @@ define('jquery-nos-image-wysiwyg',
                                 var img = $('<img />');
 
                                 if (!media || !media._id) {
-                                    $.nosNotify(params.texts.imageFirst, 'error');
+                                        $.nosNotify(params.texts.imageFirst, 'error');
 
                                     return;
                                 }
@@ -64,7 +64,7 @@ define('jquery-nos-image-wysiwyg',
                             .find('> ul')
                             .css({
                                 width : '18%'
-                            })
+                                })
                             .end(),
                         $dialog = $container.closest('.ui-dialog-content')
                             .bind('select_media', function(e, data) {
@@ -98,8 +98,8 @@ define('jquery-nos-image-wysiwyg',
                         $width = $container.find('input[data-id=width]')
                             .bind('change keyup', function() {
                                 if ($proportional.is(':checked') && media && media.width && media.height) {
-                                    var width = $width.val();
-                                    $height.val(width == '' ? '' : Math.round(width * media.height / media.width));
+                                var width = $width.val();
+                                $height.val(width == '' ? '' : Math.round(width * media.height / media.width));
                                 }
                             }),
                         $title = $container.find('input[data-id=title]')
@@ -151,208 +151,207 @@ define('jquery-nos-image-wysiwyg',
                                 }
                                 $title.triggerHandler('change');
                             }),
-
                         $class = $container.find('input[data-id=class]'),
                         media = null,
                         updateStyle = function() {
-                            var v,
-                                $img = $('<img style="' + $style.val() + '" />');
+                                var v,
+                                    $img = $('<img style="' + $style.val() + '" />');
 
-                            // Handle align
-                            v = $align.val();
-                            if (v) {
-                                if (v == 'left' || v == 'right') {
-                                    $img.css('float', v);
-                                    $img.css('vertical-align', '');
+                                // Handle align
+                                v = $align.val();
+                                if (v) {
+                                    if (v == 'left' || v == 'right') {
+                                        $img.css('float', v);
+                                        $img.css('vertical-align', '');
+                                    } else {
+                                        $img.css('vertical-align', v);
+                                        $img.css('float', '');
+                                    }
                                 } else {
-                                    $img.css('vertical-align', v);
                                     $img.css('float', '');
+                                    $img.css('vertical-align', '');
                                 }
-                            } else {
-                                $img.css('float', '');
-                                $img.css('vertical-align', '');
-                            }
 
-                            // Handle border
-                            v = $border.val();
-                            if (v && v !== '0') {
-                                $img.css('border-width', v + 'px');
-                                if (!$img.css('border') && !$img.css('border-color') && !$img.css('border-style')) {
-                                    $img.css('border', v + 'px solid black');
+                                // Handle border
+                                v = $border.val();
+                                if (v && v !== '0') {
+                                    $img.css('border-width', v + 'px');
+                                    if (!$img.css('border') && !$img.css('border-color') && !$img.css('border-style')) {
+                                        $img.css('border', v + 'px solid black');
+                                    }
+                                } else {
+                                    $img.css('border', '');
                                 }
-                            } else {
-                                $img.css('border', '');
-                            }
 
-                            $img.css('margin', '');
-                            // Handle hspace
-                            v = $hspace.val();
-                            if (v && v !== '0') {
-                                $img.css('margin-left', v + 'px');
-                                $img.css('margin-right', v + 'px');
-                            }
+                                $img.css('margin', '');
+                                // Handle hspace
+                                v = $hspace.val();
+                                if (v && v !== '0') {
+                                    $img.css('margin-left', v + 'px');
+                                    $img.css('margin-right', v + 'px');
+                                }
 
-                            // Handle vspace
-                            v = $vspace.val();
-                            if (v && v !== '0') {
-                                $img.css('margin-top', v + 'px');
-                                $img.css('margin-bottom', v + 'px');
-                            }
+                                // Handle vspace
+                                v = $vspace.val();
+                                if (v && v !== '0') {
+                                    $img.css('margin-top', v + 'px');
+                                    $img.css('margin-bottom', v + 'px');
+                                }
 
-                            $style.val($img.attr('style'));
-                        },
+                                $style.val($img.attr('style'));
+                            },
                         getAttrib = function(ele, attr) {
-                            var v, v2;
+                                var v, v2;
 
-                            switch (attr) {
-                                case 'align':
-                                    v = $(ele).css('float');
-                                    if (v  && v != 'none') {
-                                        return v;
-                                    }
-                                    if (v = $(ele).css('vertical-align')) {
-                                        return v;
-                                    }
-                                    break;
-
-                                case 'hspace':
-                                    v = $(ele).css('margin-left');
-                                    v2 = $(ele).css('margin-right');
-                                    if (v && v == v2) {
-                                        v = parseInt(v.replace(/[^0-9]/g, ''));
-                                        return v || '';
-                                    }
-                                    break;
-
-                                case 'vspace':
-                                    v = $(ele).css('margin-top');
-                                    v2 = $(ele).css('margin-bottom');
-                                    if (v && v == v2) {
-                                        v = parseInt(v.replace(/[^0-9]/g, ''));
-                                        return v || '';
-                                    }
-                                    break;
-
-                                case 'border':
-                                    v = 0;
-                                    $.each(['top', 'right', 'bottom', 'left'], function(i, val) {
-                                        val = $(ele).css('border-' + val + '-width');
-                                        if (!val || (val != v && v !== 0)) {
-                                            v = 0;
-                                            return false;
+                                switch (attr) {
+                                    case 'align':
+                                        v = $(ele).css('float');
+                                        if (v  && v != 'none') {
+                                            return v;
                                         }
-                                        if (val) {
-                                            v = val;
+                                        if (v = $(ele).css('vertical-align')) {
+                                            return v;
                                         }
-                                    });
-                                    if (v) {
-                                        v = parseInt(v.replace(/[^0-9]/g, ''));
-                                        return v || '';
-                                    }
-                                    break;
-                            }
-                            return '';
-                        },
-                        tinymce_image_select = function(media_json, image_dom) {
-                            media = media_json;
+                                        break;
 
-                            if (media && media.thumbnail) {
-                                $thumb.attr('src', media.thumbnail.replace(/64/g, '128'))
+                                    case 'hspace':
+                                        v = $(ele).css('margin-left');
+                                        v2 = $(ele).css('margin-right');
+                                        if (v && v == v2) {
+                                            v = parseInt(v.replace(/[^0-9]/g, ''));
+                                            return v || '';
+                                        }
+                                        break;
+
+                                    case 'vspace':
+                                        v = $(ele).css('margin-top');
+                                        v2 = $(ele).css('margin-bottom');
+                                        if (v && v == v2) {
+                                            v = parseInt(v.replace(/[^0-9]/g, ''));
+                                            return v || '';
+                                        }
+                                        break;
+
+                                    case 'border':
+                                        v = 0;
+                                        $.each(['top', 'right', 'bottom', 'left'], function(i, val) {
+                                            val = $(ele).css('border-' + val + '-width');
+                                            if (!val || (val != v && v !== 0)) {
+                                                v = 0;
+                                                return false;
+                                            }
+                                            if (val) {
+                                                v = val;
+                                            }
+                                        });
+                                        if (v) {
+                                            v = parseInt(v.replace(/[^0-9]/g, ''));
+                                            return v || '';
+                                        }
+                                        break;
+                                }
+                                return '';
+                            },
+                    tinymce_image_select = function(media_json, image_dom) {
+                                media = media_json;
+
+                                if (media && media.thumbnail) {
+                                    $thumb.attr('src', media.thumbnail.replace(/64/g, '128'))
                                     .show();
-                            }
+                                }
 
-                            if (image_dom == null) {
-                                $height.val(media_json.height);
-                                $width.val(media_json.width);
-                                $title.val(media_json.title);
-                                $alt.val(media_json.title);
-                                $align.val('');
-                                $border.val('');
-                                $vspace.val('');
-                                $hspace.val('');
-                                $style.val('');
-                                $class.val('');
+                                if (image_dom == null) {
+                                    $height.val(media_json.height);
+                                    $width.val(media_json.width);
+                                    $title.val(media_json.title);
+                                    $alt.val(media_json.title);
+                                    $align.val('');
+                                    $border.val('');
+                                    $vspace.val('');
+                                    $hspace.val('');
+                                    $style.val('');
+                                    $class.val('');
 
-                                $container.wijtabs('enableTab', 1)
-                                    .wijtabs('select', 1);
+                                    $container.wijtabs('enableTab', 1)
+                                        .wijtabs('select', 1);
 
-                                return;
-                            }
+                                    return;
+                                }
 
-                            $height.val(image_dom.attr('height'));
-                            $width.val(image_dom.attr('width'));
-                            $title.val(image_dom.attr('title'));
-                            $alt.val(image_dom.attr('alt'));
-                            $align.val(getAttrib(image_dom, 'align'));
-                            $border.val(getAttrib(image_dom, 'border'));
-                            $vspace.val(getAttrib(image_dom, 'vspace'));
-                            $hspace.val(getAttrib(image_dom, 'hspace'));
-                            $style.val(image_dom.attr('style'));
-                            $class.val(image_dom.attr('class'));
-                            updateStyle();
+                                $height.val(image_dom.attr('height'));
+                                $width.val(image_dom.attr('width'));
+                                $title.val(image_dom.attr('title'));
+                                $alt.val(image_dom.attr('alt'));
+                                $align.val(getAttrib(image_dom, 'align'));
+                                $border.val(getAttrib(image_dom, 'border'));
+                                $vspace.val(getAttrib(image_dom, 'vspace'));
+                                $hspace.val(getAttrib(image_dom, 'hspace'));
+                                $style.val(image_dom.attr('style'));
+                                $class.val(image_dom.attr('class'));
+                                updateStyle();
 
-                            if (media && (Math.round($width.val() * media.height / media.width) != $height.val())) {
-                                $proportional.prop('checked', false).change();
-                            }
+                                if (media && (Math.round($width.val() * media.height / media.width) != $height.val())) {
+                                    $proportional.prop('checked', false).change();
+                                }
 
-                            if ($title.val() != $alt.val()) {
-                                $same_title_alt.prop('checked', false).change();
-                            }
-                        },
+                                if ($title.val() != $alt.val()) {
+                                    $same_title_alt.prop('checked', false).change();
+                                }
+                            },
                         ed = $dialog.data('tinymce'),
                         e = ed.selection.getNode();
 
-                    // Editing the current image
-                    if (e.nodeName == 'IMG') {
-                        var $img = $(e),
+                        // Editing the current image
+                        if (e.nodeName == 'IMG') {
+                            var $img = $(e),
                             media_id = $img.data('media-id');
 
-                        // No data available yet, we need to fetch them
-                        if (media_id) {
-                            $.ajax({
-                                method: 'GET',
-                                url: params.base_url + 'admin/noviusos_media/appdesk/info/' + media_id,
-                                dataType: 'json',
-                                success: function(item) {
-                                    tinymce_image_select(item, $img);
+                            // No data available yet, we need to fetch them
+                            if (media_id) {
+                                $.ajax({
+                                    method: 'GET',
+                                    url: params.base_url + 'admin/noviusos_media/appdesk/info/' + media_id,
+                                    dataType: 'json',
+                                    success: function(item) {
+                                        tinymce_image_select(item, $img);
+                                    }
+                                });
+                            } else {
+                                tinymce_image_select($img.data('media'), $img);
+                            }
+                        }
+
+                        $container.wijtabs({
+                                alignment: 'left',
+                                load: function(e, ui) {
+                                    var margin = $(ui.panel).outerHeight(true) - $(ui.panel).innerHeight();
+                                    $(ui.panel).height($dialog.height() - margin);
+                                },
+                                disabledIndexes: params.newImg ? [1] : [],
+                                show: function(e, ui) {
+                                    $(ui.panel).nosOnShow();
                                 }
-                            });
+                            })
+                            .find('.wijmo-wijtabs-content')
+                            .css({
+                                width: '81%',
+                                position: 'relative'
+                            })
+                            .addClass('box-sizing-border')
+                            .end()
+                            .nosFormUI();
+
+                        $proportional.triggerHandler('change');
+                        $same_title_alt.triggerHandler('change');
+
+                        if (!params.newImg) {
+                            $container.wijtabs('select', 1)
+                                .bind('wijtabsshow', function() {
+                                    $library.html(params.appdeskView);
+                                });
                         } else {
-                            tinymce_image_select($img.data('media'), $img);
+                            $library.html(params.appdeskView);
                         }
-                    }
-
-                    $container.wijtabs({
-                        alignment: 'left',
-                        load: function(e, ui) {
-                            var margin = $(ui.panel).outerHeight(true) - $(ui.panel).innerHeight();
-                            $(ui.panel).height($dialog.height() - margin);
-                        },
-                        disabledIndexes: params.newImg ? [1] : [],
-                        show: function(e, ui) {
-                            $(ui.panel).nosOnShow();
-                        }
-                    })
-                        .find('.wijmo-wijtabs-content')
-                        .css({
-                            width: '81%',
-                            position: 'relative'
-                        })
-                        .addClass('box-sizing-border')
-                        .end()
-                        .nosFormUI();
-
-                    $proportional.triggerHandler('change');
-                    $same_title_alt.triggerHandler('change');
-
-                    if (!params.newImg) {
-                        $container.wijtabs('select', 1)
-                            .bind('wijtabsshow', function() {
-                                $library.html(params.appdeskView);
-                            });
-                    } else {
-                        $library.html(params.appdeskView);
-                    }
                 });
             }
         });
