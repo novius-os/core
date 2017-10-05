@@ -284,6 +284,9 @@ return array(
     'Style:' => 'Style&nbsp;:',
 
     #: views/admin/wysiwyg_image.view.php:86
+    'CSS classes:' => 'Classes CSS :',
+
+    #: views/admin/wysiwyg_image.view.php:86
     'Update this image' => 'Mettre à jour cette image',
 
     #: views/admin/wysiwyg_image.view.php:86
