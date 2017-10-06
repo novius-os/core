@@ -55,16 +55,16 @@ $id_properties = $uniqid.'_properties';
                 <tr>
                     <th><label for="<?= $uniqid ?>_align"><?= __('Alignment:') ?> </label></th>
                     <td><select name="align" data-id="align" id="<?= $uniqid ?>_align">
-                            <option value=""></option>
-                            <option value="baseline"><?= __('Baseline') ?></option>
-                            <option value="top"><?= __('Top') ?></option>
-                            <option value="middle"><?= __('Middle') ?></option>
-                            <option value="bottom"><?= __('Bottom') ?></option>
-                            <option value="text-top"><?= __('Text Top') ?></option>
-                            <option value="text-bottom"><?= __('Text Bottom') ?></option>
-                            <option value="left"><?= __('Left') ?></option>
-                            <option value="right"><?= __('Right') ?></option>
-                        </select></td>
+                        <option value=""></option>
+                        <option value="baseline"><?= __('Baseline') ?></option>
+                        <option value="top"><?= __('Top') ?></option>
+                        <option value="middle"><?= __('Middle') ?></option>
+                        <option value="bottom"><?= __('Bottom') ?></option>
+                        <option value="text-top"><?= __('Text Top') ?></option>
+                        <option value="text-bottom"><?= __('Text Bottom') ?></option>
+                        <option value="left"><?= __('Left') ?></option>
+                        <option value="right"><?= __('Right') ?></option>
+                    </select></td>
                 </tr>
                 <tr>
                     <th><label for="<?= $uniqid ?>_border"><?= __('Border:') ?> </label></th>
@@ -95,18 +95,18 @@ $id_properties = $uniqid.'_properties';
     </form>
 </div>
 <script type="text/javascript">
-    require(
-        ['jquery-nos-image-wysiwyg'],
-        function($) {
-            $(function() {
-                $('#<?= $uniqid ?>').nosImageWysiwyg({
-                    newImg: !'<?= $edit ?>',
-                    appdeskView: <?= \Format::forge()->to_json($appdeskview) ?>,
-                    base_url: '<?= \Uri::base(true) ?>',
-                    texts: {
-                        imageFirst: <?= \Format::forge()->to_json(__('This is unusual: It seems that no image has been selected. Please try again. Contact your developer or Novius OS if the problem persists. We apologise for the inconvenience caused.')) ?>
-                    }
-                });
+require(
+    ['jquery-nos-image-wysiwyg'],
+    function($) {
+        $(function() {
+            $('#<?= $uniqid ?>').nosImageWysiwyg({
+                newImg: !'<?= $edit ?>',
+                appdeskView: <?= \Format::forge()->to_json($appdeskview) ?>,
+                base_url: '<?= \Uri::base(true) ?>',
+                texts: {
+                    imageFirst: <?= \Format::forge()->to_json(__('This is unusual: It seems that no image has been selected. Please try again. Contact your developer or Novius OS if the problem persists. We apologise for the inconvenience caused.')) ?>
+                }
             });
         });
+    });
 </script>
