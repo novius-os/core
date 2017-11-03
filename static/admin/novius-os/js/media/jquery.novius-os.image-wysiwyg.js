@@ -51,6 +51,7 @@ define('jquery-nos-image-wysiwyg',
                                 img.attr('title',  $title.val());
                                 img.attr('alt',    $alt.val());
                                 img.attr('style',  $style.val());
+                                img.attr('class',  $class.val());
 
                                 img.attr('data-media', JSON.stringify(media));
                                 img.attr('src', media.path);
@@ -150,6 +151,7 @@ define('jquery-nos-image-wysiwyg',
                                 }
                                 $title.triggerHandler('change');
                             }),
+                        $class = $container.find('input[data-id=class]'),
                         media = null,
                         updateStyle = function() {
                                 var v,
@@ -268,6 +270,7 @@ define('jquery-nos-image-wysiwyg',
                                     $vspace.val('');
                                     $hspace.val('');
                                     $style.val('');
+                                    $class.val('');
 
                                     $container.wijtabs('enableTab', 1)
                                         .wijtabs('select', 1);
@@ -284,6 +287,7 @@ define('jquery-nos-image-wysiwyg',
                                 $vspace.val(getAttrib(image_dom, 'vspace'));
                                 $hspace.val(getAttrib(image_dom, 'hspace'));
                                 $style.val(image_dom.attr('style'));
+                                $class.val(image_dom.attr('class'));
                                 updateStyle();
 
                                 if (media && (Math.round($width.val() * media.height / media.width) != $height.val())) {

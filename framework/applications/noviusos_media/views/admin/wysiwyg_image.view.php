@@ -83,6 +83,10 @@ $id_properties = $uniqid.'_properties';
                     <td><input type="text" name="style" data-id="style" id="<?= $uniqid ?>_style" /></td>
                 </tr>
                 <tr>
+                    <th><label for="<?= $uniqid ?>_class"><?= __('CSS classes:') ?> </label></th>
+                    <td><input type="text" name="class" data-id="class" id="<?= $uniqid ?>_class" /></td>
+                </tr>
+                <tr>
                     <th></th>
                     <td> <button type="submit" class="ui-priority-primary" data-icon="check" data-id="save"><?= $edit ? __('Update this image') : __('Insert this image') ?></button> &nbsp; <?= __('or') ?> &nbsp; <a data-id="close" href="#"><?= __('Cancel') ?></a></td>
                 </tr>

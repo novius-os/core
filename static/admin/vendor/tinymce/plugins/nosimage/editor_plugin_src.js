@@ -162,7 +162,7 @@
                     var node = ed.selection.getNode();
                     if (node.nodeName == 'IMG') {
                         var args = {};
-                        $.each('src title alt width height style'.split(' '), function(i, name) {
+                        $.each('src title alt width height style class'.split(' '), function(i, name) {
                             var value = $img.attr(name);
                             args[name] = value;
                         });
