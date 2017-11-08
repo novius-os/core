@@ -12,6 +12,7 @@ namespace Nos\Menu;
 
 use Nos\Controller_Admin_Crud;
 use Nos\User\Permission;
+use Nos\Nos;
 
 class Controller_Admin_Menu_Crud extends Controller_Admin_Crud
 {
@@ -134,7 +135,7 @@ class Controller_Admin_Menu_Crud extends Controller_Admin_Crud
             }
             // If only one context is active popup will not be shown
             if (count($contexts) === 1 || !empty($duplicateContext)) {
-                $context = !empty($duplicateContext) ? $duplicateContext : $menu->menu_context;
+                $context = !empty($duplicateContext) ? $duplicateContext : Nos::main_controller()->getContext();
                 $menu->duplicate($context);
                 // Send response
                 \Response::json(array(
@@ -143,7 +144,7 @@ class Controller_Admin_Menu_Crud extends Controller_Admin_Crud
                         'action' => 'insert',
                         'context' => $context,
                     ),
-                    'notify' => __('Here you are ! The menu has just been duplicated.'),
+                    'notify' => __('Here you are! The menu has just been duplicated.'),
                 ));
             } else {
                 \Response::json(array(

@@ -10,6 +10,7 @@
 
 namespace Nos\Menu;
 
+use Fuel\Core\Log;
 use Nos\Orm\Model;
 use Nos\Page\Model_Page;
 
@@ -212,24 +213,22 @@ class Model_Menu extends Model
     /**
      * @param Model_Menu $menu : The original menu, items will duplicate FROM
      * @param Model_Menu $duplicatedMenu : The duplicated menu, fields will duplicate TO
+     * @param null $mitem_parent_id
+     * @param null $cloned_mitem_parent_id
      */
-    protected static function duplicateMenuItems(Model_Menu $menu, Model_Menu $duplicatedMenu)
+    protected static function duplicateMenuItems(Model_Menu $menu, Model_Menu $duplicatedMenu, $mitem_parent_id = null, $cloned_mitem_parent_id = null)
     {
-        $menuItems = $menu->items;
-        foreach ($menuItems as $item) {
-            /**
-             * @var $item Model_Menu_Item
-             */
+        $items = $menu->branch($mitem_parent_id);
+
+        foreach ($items as $item) {
             $clone = clone $item;
+            $clone->mitem_menu_id = $duplicatedMenu->menu_id;
+            $clone->mitem_parent_id = $cloned_mitem_parent_id;
+            $clone->save();
 
-            $clone->mitem_menu_id = $duplicatedMenu->id;
-
-            if ($clone->save()) {
-                static::duplicateItemsAttributes($item, $clone);
-            }
+            static::duplicateItemsAttributes($item, $clone);
+            static::duplicateMenuItems($menu, $duplicatedMenu, $item->mitem_id, $clone->mitem_id);
         }
-
-        $duplicatedMenu->save();
     }
 
     /**
@@ -239,12 +238,13 @@ class Model_Menu extends Model
     protected static function duplicateItemsAttributes(Model_Menu_Item $item, Model_Menu_Item $duplicatedItem)
     {
         $itemsAttributes = $item->attributes;
+
         foreach ($itemsAttributes as $attribute) {
             /**
              * @var $attribute Model_Menu_Item
              */
             $clone = clone $attribute;
-            $clone->mitem_menu_id = $duplicatedItem->id;
+            $clone->miat_mitem_id = $duplicatedItem->mitem_id;
             $clone->save();
         }
     }

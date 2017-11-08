@@ -18,7 +18,7 @@ $id = $uniqid = uniqid('form_');
             ?>
             <input type="radio" name="duplicate_context"
                    value="<?= $context ?>" <?= $item->menu_context === $context ? 'checked' : '' ?> />
-            <?= \Nos\Tools_Context::contextLabel($context, array('short' => false,)) ?>
+            <?= \Nos\Tools_Context::contextLabel($context, array('short' => false, )) ?>
         </label>
         <br/>
     <?php endforeach; ?>
