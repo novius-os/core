@@ -11,12 +11,18 @@
 namespace Nos\Menu;
 
 use Nos\Controller_Admin_Crud;
-use Nos\Tools_Context;
+use Nos\User\Permission;
 
 class Controller_Admin_Menu_Crud extends Controller_Admin_Crud
 {
 
     protected $menu_items = array();
+
+    public function before()
+    {
+        parent::before();
+        \Nos\I18n::current_dictionary('noviusos_menu::common', 'nos::common');
+    }
 
     public function before_save($menu, $data)
     {
@@ -111,5 +117,73 @@ class Controller_Admin_Menu_Crud extends Controller_Admin_Crud
                 ->render().$fieldset->build_append();
 
         return strtr($return, $replaces);
+    }
+
+    public function action_duplicate($id = null)
+    {
+        try {
+            /**
+             * @var $menu Model_Menu
+             */
+            $menu = $this->crud_item($id);
+            $contexts = Permission::contexts();
+            $duplicateContext = (string) \Input::post('duplicate_context');
+            // Check context permission with selected context target
+            if (!empty($duplicateContext) && !array_key_exists($duplicateContext, $contexts)) {
+                throw new \Exception(__('Invalid context selected.'));
+            }
+            // If only one context is active popup will not be shown
+            if (count($contexts) === 1 || !empty($duplicateContext)) {
+                $context = !empty($duplicateContext) ? $duplicateContext : $menu->menu_context;
+                $menu->duplicate($context);
+                // Send response
+                \Response::json(array(
+                    'dispatchEvent' => array(
+                        'name' => 'Nos\Menu\Model_Menu',
+                        'action' => 'insert',
+                        'context' => $context,
+                    ),
+                    'notify' => __('Here you are ! The menu has just been duplicated.'),
+                ));
+            } else {
+                \Response::json(array(
+                    'action' => array(
+                        'action' => 'nosDialog',
+                        'dialog' => array(
+                            'ajax' => true,
+                            'contentUrl' => 'admin/noviusos_menu/menu/crud/popup_duplicate/'.$id,
+                            'title' => strtr(__('Duplicating the menu "{{title}}"'), array(
+                                '{{title}}' => \Str::truncate($menu->title_item(), 40),
+                            )),
+                            'width' => 500,
+                            'height' => 200,
+                        ),
+                    ),
+                ));
+            }
+        } catch (\Exception $e) {
+            $this->send_error($e);
+        }
+    }
+
+    /**
+     * Return popup content to ask the target context of duplication
+     *
+     * @param null $id : the ID of Model_Form to duplicate
+     * @return \Fuel\Core\View
+     */
+    public function action_popup_duplicate($id = null)
+    {
+        /**
+         * @var $menu Model_Menu
+         */
+        $menu = $this->crud_item($id);
+        $contexts_list = array_keys(Permission::contexts());
+
+        return \View::forge('noviusos_menu::admin/popup_duplicate', array(
+            'item' => $menu,
+            'action' => 'admin/noviusos_menu/menu/crud/duplicate/'.$id,
+            'contexts_list' => $contexts_list,
+        ), false);
     }
 }

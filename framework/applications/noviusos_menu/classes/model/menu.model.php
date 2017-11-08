@@ -175,4 +175,78 @@ class Model_Menu extends Model
         }
         return $items;
     }
+
+    /**
+     * @param $targetContext : the context target wanted for the duplicated menu
+     * @throws \Exception
+     */
+    public function duplicate($targetContext)
+    {
+        $clone = clone $this;
+        $try = 1;
+        do {
+            try {
+                $title_append = __(' (copy)');
+                $clone->menu_title = $this->title_item().$title_append;
+                $clone->menu_context = $targetContext;
+                $clone->menu_context_common_id = $clone->menu_id;
+
+                if ($clone->save()) {
+                    static::duplicateMenuItems($this, $clone);
+                }
+
+                break;
+            } catch (\Nos\BehaviourDuplicateException $e) {
+                $try++;
+
+                if ($try > 5) {
+                    throw new \Exception(__(
+                        'You\'ve already duplicated this menu 5 times . '.
+                        'Edit them before creating more duplications.'
+                    ));
+                }
+            }
+        } while ($try <= 5);
+    }
+
+    /**
+     * @param Model_Menu $menu : The original menu, items will duplicate FROM
+     * @param Model_Menu $duplicatedMenu : The duplicated menu, fields will duplicate TO
+     */
+    protected static function duplicateMenuItems(Model_Menu $menu, Model_Menu $duplicatedMenu)
+    {
+        $menuItems = $menu->items;
+        foreach ($menuItems as $item) {
+            /**
+             * @var $item Model_Menu_Item
+             */
+            $clone = clone $item;
+
+            $clone->mitem_menu_id = $duplicatedMenu->id;
+
+            if ($clone->save()) {
+                static::duplicateItemsAttributes($item, $clone);
+            }
+        }
+
+        $duplicatedMenu->save();
+    }
+
+    /**
+     * @param Model_Menu_Item $item : The original item, attributes will duplicate FROM
+     * @param Model_Menu_Item $duplicatedField : The duplicated field, attributes will duplicate TO
+     */
+    protected static function duplicateItemsAttributes(Model_Menu_Item $item, Model_Menu_Item $duplicatedItem)
+    {
+        $itemsAttributes = $item->attributes;
+        foreach ($itemsAttributes as $attribute) {
+            /**
+             * @var $attribute Model_Menu_Item
+             */
+            $clone = clone $attribute;
+            $clone->mitem_menu_id = $duplicatedItem->id;
+            $clone->save();
+        }
+    }
+
 }
