@@ -120,7 +120,7 @@ class Controller_Admin_Menu_Crud extends Controller_Admin_Crud
         return strtr($return, $replaces);
     }
 
-    public function action_duplicate($id = null)
+    public function action_duplicate($id)
     {
         try {
             /**

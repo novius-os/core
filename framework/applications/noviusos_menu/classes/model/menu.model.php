@@ -10,6 +10,7 @@
 
 namespace Nos\Menu;
 
+use Fuel\Core\Log;
 use Nos\Orm\Model;
 use Nos\Page\Model_Page;
 
@@ -192,7 +193,7 @@ class Model_Menu extends Model
                 $clone->menu_context_common_id = $clone->menu_id;
 
                 if ($clone->save()) {
-                    static::duplicateMenuItems($this, $clone);
+                    $this->duplicateMenuItems($this, $clone);
                 }
 
                 break;
@@ -215,37 +216,13 @@ class Model_Menu extends Model
      * @param null $mitem_parent_id
      * @param null $cloned_mitem_parent_id
      */
-    protected static function duplicateMenuItems(Model_Menu $menu, Model_Menu $duplicatedMenu, $mitem_parent_id = null, $cloned_mitem_parent_id = null)
+    protected function duplicateMenuItems(Model_Menu $menu, Model_Menu $duplicatedMenu, $mitem_parent_id = null, $cloned_mitem_parent_id = null)
     {
         $items = $menu->branch($mitem_parent_id);
 
         foreach ($items as $item) {
-            $clone = clone $item;
-            $clone->mitem_menu_id = $duplicatedMenu->menu_id;
-            $clone->mitem_parent_id = $cloned_mitem_parent_id;
-            $clone->save();
-
-            static::duplicateItemsAttributes($item, $clone);
-            static::duplicateMenuItems($menu, $duplicatedMenu, $item->mitem_id, $clone->mitem_id);
+            $clone = $item->duplicate($item, $duplicatedMenu, $cloned_mitem_parent_id);
+            $this->duplicateMenuItems($menu, $duplicatedMenu, $item->mitem_id, $clone->mitem_id);
         }
     }
-
-    /**
-     * @param Model_Menu_Item $item : The original item, attributes will duplicate FROM
-     * @param Model_Menu_Item $duplicatedField : The duplicated field, attributes will duplicate TO
-     */
-    protected static function duplicateItemsAttributes(Model_Menu_Item $item, Model_Menu_Item $duplicatedItem)
-    {
-        $itemsAttributes = $item->attributes;
-
-        foreach ($itemsAttributes as $attribute) {
-            /**
-             * @var $attribute Model_Menu_Item
-             */
-            $clone = clone $attribute;
-            $clone->miat_mitem_id = $duplicatedItem->mitem_id;
-            $clone->save();
-        }
-    }
-
 }

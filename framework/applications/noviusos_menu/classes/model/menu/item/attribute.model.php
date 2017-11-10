@@ -40,4 +40,15 @@ class Model_Menu_Item_Attribute extends Model
             'null' => false,
         ),
     );
+
+    /**
+     * @param Model_Menu_Item $item : The original item, attributes will duplicate FROM
+     * @param integer $duplicatedItemId
+     */
+    public function duplicate(Model_Menu_Item_Attribute $attribute, $duplicatedItemId)
+    {
+        $clone = clone $attribute;
+        $clone->miat_mitem_id = $duplicatedItemId;
+        $clone->save();
+    }
 }
