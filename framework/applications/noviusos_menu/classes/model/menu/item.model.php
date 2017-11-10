@@ -11,7 +11,6 @@
 namespace Nos\Menu;
 
 use Nos\Orm\Model;
-use Nos\Menu\Model_Menu_Item_Attribute;
 
 class Model_Menu_Item extends Model
 {

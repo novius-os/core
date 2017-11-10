@@ -10,7 +10,6 @@
 
 namespace Nos\Menu;
 
-use Fuel\Core\Log;
 use Nos\Orm\Model;
 use Nos\Page\Model_Page;
 
