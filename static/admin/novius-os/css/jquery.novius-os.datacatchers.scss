@@ -7,6 +7,19 @@
  * @link http://www.novius-os.org
  */
 
+.nos-dark-theme.ui-widget-content,
+.nos-dark-theme .ui-widget-content {
+    &.nos-datacatchers {
+        width: 100%;
+        background: transparentize(black, 0.25);
+
+        .ui-widget-content {
+            background: white;
+            color: black;
+        }
+    }
+}
+
 .nos-datacatchers {
     height : auto;
     z-index: 1000;
