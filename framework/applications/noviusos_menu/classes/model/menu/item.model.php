@@ -195,7 +195,7 @@ class Model_Menu_Item extends Model
             foreach ($itemsAttributes as $attribute) {
                 $attribute->duplicate($attribute, $clone->mitem_id);
             }
-        };
+        }
 
         return $clone;
     }

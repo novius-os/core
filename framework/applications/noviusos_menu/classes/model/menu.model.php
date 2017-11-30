@@ -186,7 +186,9 @@ class Model_Menu extends Model
         $try = 1;
         do {
             try {
-                $title_append = __(' (copy)');
+                $title_append = strtr(__(' (copy {{count}})'), array(
+                    '{{count}}' => $try,
+                ));
                 $clone->menu_title = $this->title_item().$title_append;
                 $clone->menu_context = $targetContext;
                 $clone->menu_context_common_id = $clone->menu_id;

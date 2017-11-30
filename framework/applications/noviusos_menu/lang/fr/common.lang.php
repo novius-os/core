@@ -247,7 +247,7 @@ return array(
 
     'or' => 'ou',
 
-    '(copy)' => '(copie)',
+    ' (copy {{count}})' => ' (copie {{count}})',
 
     'Cancel' => 'Fermer',
 );
