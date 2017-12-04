@@ -65,15 +65,26 @@ define('jquery-nos-context-common-fields',
                                 .data('dialog_context_common_field', dialog)
                                 .bind('context_common_field', function(e, click, $el) {
                                     var positioning = function() {
+                                            var $inputPositionReference = $el;
+
+                                            // If our input uses an item picker renderer
+                                            // We need to use the renderer's position instead of the
+                                            // original input's position to position the "common field overlay"
+                                            var isItemPicker = $el.hasClass('item_picker');
+                                            // Check our input is an item picker and if it has been initaliazed
+                                            if (isItemPicker && $el.next('.nos-itempicker').length) {
+                                                $inputPositionReference = $el.next('.nos-itempicker');
+                                            }
+
                                             $div.css({
                                                 position: 'absolute',
-                                                width: $el.outerWidth() + 'px',
-                                                height: $el.outerHeight() + 'px'
+                                                width: $inputPositionReference.outerWidth() + 'px',
+                                                height: $inputPositionReference.outerHeight() + 'px'
                                             }).position({
                                                 my: 'top left',
                                                 at: 'top left',
                                                 collision: 'none',
-                                                of: $el
+                                                of: $inputPositionReference
                                             });
                                         };
                                     if ($element.is(':checkbox') && $element.is(':checked')) {
