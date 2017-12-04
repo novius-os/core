@@ -235,4 +235,19 @@ return array(
     #: views/admin/renderer/menu/items.view.php:18
     'Delete this item' => 'Supprimer cet item',
 
+    'You\'ve already duplicated this menu 5 times. Edit them before creating more duplications.' => 'Vous avez dupliqué ce menu cinq fois. Modifiez les copies existantes avant d\'en créer de nouvelles .',
+
+    'Here you are! The menu has just been duplicated.' => 'Le menu a bien été dupliqué.',
+
+    'Duplicating the menu "{{title}}"' => 'Duplication du menu "{{title}}"',
+
+    'Duplication target :' => 'Cible de la duplication :',
+
+    'Duplicate' => 'Dupliquer',
+
+    'or' => 'ou',
+
+    ' (copy {{count}})' => ' (copie {{count}})',
+
+    'Cancel' => 'Fermer',
 );

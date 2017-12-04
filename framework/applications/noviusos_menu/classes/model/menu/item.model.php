@@ -178,4 +178,25 @@ class Model_Menu_Item extends Model
             throw $e;
         }
     }
+
+    /**
+     * @param Model_Menu $menu : The original menu, items will duplicate FROM
+     * @param Model_Menu $duplicatedMenu : The duplicated menu, fields will duplicate TO
+     * @param null $cloned_mitem_parent_id
+     */
+    public function duplicate(Model_Menu_Item $item, Model_Menu $duplicatedMenu, $cloned_mitem_parent_id)
+    {
+        $clone = clone $item;
+        $clone->mitem_menu_id = $duplicatedMenu->menu_id;
+        $clone->mitem_parent_id = $cloned_mitem_parent_id;
+
+        if ($clone->save()) {
+            $itemsAttributes = $item->attributes;
+            foreach ($itemsAttributes as $attribute) {
+                $attribute->duplicate($attribute, $clone->mitem_id);
+            }
+        }
+
+        return $clone;
+    }
 }

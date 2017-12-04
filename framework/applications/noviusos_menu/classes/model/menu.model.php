@@ -175,4 +175,55 @@ class Model_Menu extends Model
         }
         return $items;
     }
+
+    /**
+     * @param $targetContext : the context target wanted for the duplicated menu
+     * @throws \Exception
+     */
+    public function duplicate($targetContext)
+    {
+        $clone = clone $this;
+        $try = 1;
+        do {
+            try {
+                $title_append = strtr(__(' (copy {{count}})'), array(
+                    '{{count}}' => $try,
+                ));
+                $clone->menu_title = $this->title_item().$title_append;
+                $clone->menu_context = $targetContext;
+                $clone->menu_context_common_id = $clone->menu_id;
+
+                if ($clone->save()) {
+                    $this->duplicateMenuItems($this, $clone);
+                }
+
+                break;
+            } catch (\Nos\BehaviourDuplicateException $e) {
+                $try++;
+
+                if ($try > 5) {
+                    throw new \Exception(__(
+                        'You\'ve already duplicated this menu 5 times . '.
+                        'Edit them before creating more duplications.'
+                    ));
+                }
+            }
+        } while ($try <= 5);
+    }
+
+    /**
+     * @param Model_Menu $menu : The original menu, items will duplicate FROM
+     * @param Model_Menu $duplicatedMenu : The duplicated menu, fields will duplicate TO
+     * @param null $mitem_parent_id
+     * @param null $cloned_mitem_parent_id
+     */
+    protected function duplicateMenuItems(Model_Menu $menu, Model_Menu $duplicatedMenu, $mitem_parent_id = null, $cloned_mitem_parent_id = null)
+    {
+        $items = $menu->branch($mitem_parent_id);
+
+        foreach ($items as $item) {
+            $clone = $item->duplicate($item, $duplicatedMenu, $cloned_mitem_parent_id);
+            $this->duplicateMenuItems($menu, $duplicatedMenu, $item->mitem_id, $clone->mitem_id);
+        }
+    }
 }

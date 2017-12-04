@@ -230,4 +230,5 @@ return array(
     #: views/admin/renderer/menu/items.view.php:18
     'Delete this item' => 'アイテムを削除',
 
+    ' (copy {{count}})' => ' (複製 {{count}})',
 );
