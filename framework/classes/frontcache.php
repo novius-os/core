@@ -58,7 +58,7 @@ class FrontCache
             return static::$_php_begin;
         }
         \Config::load('crypt', true);
-        static::$_php_begin = md5(\Config::get('crypt.hmac').'begin');
+        static::$_php_begin = md5(\Config::get('crypt.crypto_hmac').'begin');
         return static::$_php_begin;
     }
 
