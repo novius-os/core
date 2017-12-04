@@ -765,6 +765,11 @@ textarea, select {
   &:disabled {
     opacity: .35;
     filter: Alpha(Opacity=35);
+
+      &.item_picker + .nos-itempicker {
+          opacity: .35;
+          filter: Alpha(Opacity=35);
+      }
   }
 }
 
