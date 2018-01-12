@@ -24,6 +24,14 @@ class Controller_Front_Application extends Controller
     {
         $this->main_controller = Nos::main_controller();
 
+        // Permanently redirects URLs ending with a slash or with a slash followed by .html
+        if (\Config::get('novius-os.redirect_urlenhancer_trailing_slash', false)) {
+            if (preg_match('`/(\.html)?$`', $this->main_controller->getRelativeUrl(), $match)) {
+                $urlWithHtmlExtension = \Str::sub($this->main_controller->getRelativeUrl(), 0, -\Str::length($match[0])).'.html';
+                \Response::redirect($urlWithHtmlExtension, 'location', 301);
+            }
+        }
+
         return parent::before();
     }
 
