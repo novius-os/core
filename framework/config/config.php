@@ -288,6 +288,11 @@ return array(
         
         'enable_url_enhancers_on_root_pages' => false,
 
+        /**
+         * Whether to redirect an enhanced URL with a trailing slash to the same URL with an .html extension.
+         */
+        'redirect_urlenhancer_trailing_slash_to_html' => false,
+
         'finder_paths' => array(
             APPPATH,
             NOSPATH,

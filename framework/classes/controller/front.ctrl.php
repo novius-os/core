@@ -394,6 +394,14 @@ class Controller_Front extends Controller
     }
 
     /**
+     * @return string Current relative URL.
+     */
+    public function getRelativeUrl()
+    {
+        return $this->_url;
+    }
+
+    /**
      * @return string Relative (to getContextUrl()) URL of the current page.
      */
     public function getPageUrl()
