@@ -291,7 +291,7 @@ return array(
         /**
          * Whether to redirect an enhanced URL with a trailing slash to the same URL with an .html extension.
          */
-        'redirect_urlenhancer_trailing_slash_to_html' => false,
+        'redirect_urlenhancer_trailing_slash' => false,
 
         'finder_paths' => array(
             APPPATH,
