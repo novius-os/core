@@ -50,8 +50,27 @@ define('jquery-nos-link-wysiwyg',
                             .find('> form')
                             .nosFormValidate({
                                 submitHandler : function() {
+                                    // Cleaning up external URLs when scheme is missing
                                     if (link_type === 'external' && !/^\w+\:/.test($input_url.val())) {
-                                        $input_url.val('http://' + $input_url.val());
+                                        var match = params.base_url.match(/^(\w+\:\/\/)(.*)\/$/),
+                                            scheme = match[1],
+                                            domain = match[2],
+                                            url = $input_url.val();
+
+                                        // Current domain found
+                                        if (url.indexOf(domain) != -1) {
+                                            // use current scheme
+                                            $input_url.val(scheme + url);
+                                        }
+                                        // External domain found
+                                        else if(/^\w+\:\/\/[a-z0-9][a-z0-9-]*\.[a-z]{2,6}/.test(url)) {
+                                            // Use http
+                                            $input_url.val('http://' + url);
+                                        }
+                                        // No domain found
+                                        else {
+                                            // don’t touch anything
+                                        }
                                     }
                                     var url_params = $input_url_params.val();
                                     if (url_params.charAt(0) !== '?') {
