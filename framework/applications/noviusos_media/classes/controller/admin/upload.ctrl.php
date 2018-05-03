@@ -71,7 +71,17 @@ class Controller_Admin_Upload extends \Nos\Controller_Admin_Application
                         throw new \Exception(__('You have a problem here: Your Novius OS isn’t authorised to save files on this server. This is something your developer or system administrator can fix for you.'));
                     }
 
-                    $unzip->extract($tmp_name, $tempdir);
+                    if (\Config::get('unzip_medias_with_cmd')) {
+                        // Unzip with system command
+                        $cmd_unzip = \Config::get('cmd_unzip');
+                        if (is_null($cmd_unzip)) {
+                            throw new \Exception(__('The unzip command is not configured.'));
+                        }
+                        exec($cmd_unzip.' '.escapeshellarg($tmp_name).' -d '.escapeshellarg($tempdir));
+                    } else {
+                        // Unzip with PHP class
+                        (new \Unzip())->extract($tmp_name, $tempdir);
+                    }
 
                     $files = \File::read_dir($tempdir, -1, null, $area);
                     $this->_importFiles($files, $tempdir.'/', $folder);
