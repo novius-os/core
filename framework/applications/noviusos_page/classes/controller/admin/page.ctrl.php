@@ -401,6 +401,8 @@ class Controller_Admin_Page extends \Nos\Controller_Admin_Crud
             }
         }
 
+        \Event::trigger_function('page.afterDuplicate', array($item, &$clone));
+
         return $common_id;
     }
 }
