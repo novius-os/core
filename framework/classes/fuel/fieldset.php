@@ -373,26 +373,8 @@ class Fieldset extends \Fuel\Core\Fieldset
         $this->require_js = array_merge($this->require_js, $require_js);
     }
 
-    public static function build_from_config($config, $item = null, $options = array())
+    public static function forgeFromConfig(&$config, $instance = null, &$options = array())
     {
-        $instance = null;
-        if (is_object($item)) {
-            $instance = $item;
-            empty($options['action']) && $options['action'] = 'edit';
-        } elseif (is_string($item)) {
-            $instance = null;
-            empty($options['action']) && $options['action'] = 'add';
-        } elseif (is_array($item)) {
-            $options = $item;
-            $instance = null;
-        }
-        $options['instance'] = $instance;
-
-        $options = \Arr::merge(array(
-            'csrf' => true,
-            'save' => \Input::method() == 'POST',
-        ), $options);
-
         $fieldset = \Fieldset::forge(uniqid(), array(
             'inline_errors'  => true,
             'auto_id'         => true,
@@ -448,6 +430,32 @@ class Fieldset extends \Fuel\Core\Fieldset
         if (isset($instance)) {
             $fieldset->populate_with_instance($instance);
         }
+
+        return $fieldset;
+    }
+
+    public static function build_from_config($config, $item = null, $options = array())
+    {
+        $instance = null;
+        if (is_object($item)) {
+            $instance = $item;
+            empty($options['action']) && $options['action'] = 'edit';
+        } elseif (is_string($item)) {
+            $instance = null;
+            empty($options['action']) && $options['action'] = 'add';
+        } elseif (is_array($item)) {
+            $options = $item;
+            $instance = null;
+        }
+        $options['instance'] = $instance;
+
+        $options = \Arr::merge(array(
+            'csrf' => true,
+            'save' => \Input::method() == 'POST',
+        ), $options);
+
+        // Builds the fieldset from config
+        $fieldset = static::forgeFromConfig($config, $instance, $options);
 
         if ($options['save'] && (empty($options['form_name']) || \Input::post('form_name') == $options['form_name'])) {
             $fieldset->repopulate();
@@ -553,11 +561,6 @@ class Fieldset extends \Fuel\Core\Fieldset
 
     public static function defaultComplete($data, $item, $fields, $options)
     {
-        if (isset($options['fieldset'])) {
-            $fieldset = $options['fieldset'];
-        } else {
-            $fieldset = false;
-        }
         if (!is_object($item)) {
             return;
         }
@@ -614,28 +617,30 @@ class Fieldset extends \Fuel\Core\Fieldset
                 call_user_func($options['before_save'], $item, $data);
             }
 
-            if (!empty($options['success']) && is_callable($options['success'])) {
-                $item->save();
-                $json_user = call_user_func($options['success'], $item, $data);
-                $json_response = \Arr::merge($json_response, $json_user);
-            } else {
-                $item->save();
-                $json_response['notify'] = __('OK, it’s done.');
-            }
-
-            foreach ($fields as $name => $config) {
-                if (!empty($config['renderer']) && in_array($config['renderer'], array('Nos\Renderer_Text', 'Nos\Renderer_Empty'))) {
-                    continue;
-                }
-                $type = \Arr::get($config, 'form.type', null);
-
-                if ($type == 'submit') {
-                    continue;
+            if (!\Arr::get($options, 'dont_save')) {
+                if (!empty($options['success']) && is_callable($options['success'])) {
+                    $item->save();
+                    $json_user = call_user_func($options['success'], $item, $data);
+                    $json_response = \Arr::merge($json_response, $json_user);
+                } else {
+                    $item->save();
+                    $json_response['notify'] = __('OK, it’s done.');
                 }
 
-                if (!empty($config['success']) && is_callable($config['success'])) {
-                    $json_field = call_user_func($config['success'], $item, $data);
-                    $json_response = \Arr::merge($json_response, $json_field);
+                foreach ($fields as $name => $config) {
+                    if (!empty($config['renderer']) && in_array($config['renderer'], array('Nos\Renderer_Text', 'Nos\Renderer_Empty'))) {
+                        continue;
+                    }
+                    $type = \Arr::get($config, 'form.type', null);
+
+                    if ($type == 'submit') {
+                        continue;
+                    }
+
+                    if (!empty($config['success']) && is_callable($config['success'])) {
+                        $json_field = call_user_func($config['success'], $item, $data);
+                        $json_response = \Arr::merge($json_response, $json_field);
+                    }
                 }
             }
 

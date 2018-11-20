@@ -11,35 +11,68 @@ define('jquery-nos-virtualname',
     function($) {
         "use strict";
 
+        /**
+         * Throttle request helper
+         *
+         * @param updateThreshold
+         * @constructor
+         */
+        function ThrottleRequest(updateThreshold) {
+            var running, queuedRequest, lastTime;
+            if (typeof updateThreshold !== 'number') {
+                updateThreshold = 1000;
+            }
+            var throttle = function(request) {
+                running = true;
+                var doneCallback = function triggerRequestEnd() {
+                    running = false;
+                    lastTime = +new Date;
+                    // Executes the next request with a delay
+                    if (queuedRequest) {
+                        queuedRequest();
+                        queuedRequest = null;
+                    }
+                };
+                if (lastTime) {
+                    var diff = (+new Date) - lastTime;
+                    if (diff < updateThreshold) {
+                        setTimeout(function () {
+                            request(doneCallback);
+                        }, updateThreshold - diff);
+                        return;
+                    }
+                }
+                request(doneCallback);
+            };
+
+            /**
+             * Runs a throttled request
+             *
+             * @param request
+             */
+            this.request = function(request) {
+                if (running) {
+                    queuedRequest = function() { throttle(request); };
+                } else {
+                    throttle(request);
+                }
+            };
+        }
+
+        /**
+         * Virtual Name module
+         */
         $.fn.extend({
-            nosVirtualName : function(options) {
-                var replace_url = function(str) {
-                        if (!str) {
-                            return str;
-                        }
-                        var i = 0, regexps;
+            nosVirtualName : function(options, config) {
+                var lastValue;
+                config = typeof config === 'object' ? config : {};
 
-                        for (i; i < options.length; i++) {
-                            regexps = options[i];
-                            $.each(regexps, function(regexp, replacement) {
-                                if (!isNaN(regexp) && replacement === 'lowercase') {
-                                    str = str.toLowerCase();
-                                } else if ($.isPlainObject(replacement)) {
-                                    var flags = (replacement['flags'] || '').replace('g', '') + 'g';
-                                    var replacement = replacement['replacement'] || '';
-                                    var re = new RegExp(regexp, flags);
-                                    str = str.replace(re, replacement);
-                                } else {
-                                    var re = new RegExp(regexp, 'g');
-                                    str = str.replace(re, replacement);
-                                }
-                            });
-                        }
-
-                        return str;
-                    };
+                // Updates the virtual name (debounced)
 
                 return this.each(function() {
+
+                    var throttle = new ThrottleRequest(800);
+
                     var $virtual_name = $(this).bind('context_common_field', function() {
                             var $div,
                                 $el = $(this),
@@ -68,16 +101,17 @@ define('jquery-nos-virtualname',
                                     width: $use_title_checkbox.outerWidth() + 'px',
                                     height: $use_title_checkbox.outerHeight() + 'px'
                                 }).position({
-                                        my: 'top left',
-                                        at: 'top left',
-                                        collision: 'none',
-                                        of: $use_title_checkbox
+                                    my: 'top left',
+                                    at: 'top left',
+                                    collision: 'none',
+                                    of: $use_title_checkbox
                                 });
                             }).trigger('mousemove');
                         }),
                         id = $virtual_name.attr('id'),
                         $use_title_checkbox = $('#' + id + '__use_title_checkbox'),
                         $title = $virtual_name.closest('form').find('input.ui-priority-primary');
+
 
                     var useTitle = $virtual_name.data('usetitle');
 
@@ -88,17 +122,76 @@ define('jquery-nos-virtualname',
                     $use_title_checkbox.change(function() {
                         if ($(this).is(':checked')) {
                             $virtual_name.attr('readonly', true).addClass('ui-state-disabled');
-                            $title.triggerHandler('change');
+                            $title.triggerHandler('refresh');
                         } else {
                             $virtual_name.removeAttr('readonly').removeClass('ui-state-disabled');
                         }
                     }).triggerHandler('change');
 
-                    $title.bind('change keyup', function() {
-                        if ($use_title_checkbox.is(':checked')) {
-                            $virtual_name.val(replace_url($title.val()));
-                        }
-                    });
+                    lastValue = $title.val();
+                    $title
+                        .bind('change keyup', function() {
+                            if ($use_title_checkbox.is(':checked')) {
+                                if (lastValue !== $title.val()) {
+                                    $title.triggerHandler('refresh');
+                                }
+                            }
+                        })
+                        .bind('refresh', function() {
+                            refreshVirtualName($virtual_name);
+                        });
+
+                    /**
+                     * Refresh the virtual name
+                     *
+                     * @param $virtual_name
+                     */
+                    function refreshVirtualName($virtual_name)
+                    {
+                        $virtual_name.addClass('regenerating');
+                        requestVirtualName($virtual_name).done(function(data) {
+                            if (data.error) {
+                                console.log(data.error);
+                            }
+                            if (data.virtual_name) {
+                                // Updates the virtual name with the new value
+                                $virtual_name.val(data.virtual_name);
+                                $virtual_name.removeClass('regenerating');
+                                lastValue = $title.val();
+                            }
+                        });
+                    }
+
+                    /**
+                     * Requests the server to generate the virtual name
+                     *
+                     * @param $virtual_name
+                     */
+                    function requestVirtualName($virtual_name) {
+                        var url = config.controller_url+'/'+(config.item_id || '');
+
+                        // Gets the form
+                        var $form = $virtual_name.closest('form');
+
+                        // Gets the form data
+                        var data = $form.serialize();
+
+                        // Builds the request params
+                        var requestParams = {
+                            url : url,
+                            method : 'POST',
+                            data : data
+                        };
+
+                        return $.Deferred(function(defer) {
+                            throttle.request(function(done) {
+                                $form.nosAjax(requestParams).then(defer.resolve, defer.reject)
+                                    .always(function () {
+                                        done();
+                                    });
+                            });
+                        }).promise();
+                    }
                 });
             }
         });

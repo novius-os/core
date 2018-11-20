@@ -76,10 +76,42 @@ class Renderer_Virtualname extends Renderer
             $options_compiled[] = static::_regexpsCompiled($regexps);
         }
 
+        // Gets the controller url
+        $controller_url = $this->getControllerUrl();
+
+        // Gets the field id
+        $field_id = $this->get_attribute('id');
+
         return \View::forge('renderer/virtualname/js', array(
             'id' => $this->get_attribute('id'),
             'options' => $options_compiled,
+            'config' => array(
+                'id' => $field_id,
+                'controller_url' => $controller_url,
+                'item_id' => $this->fieldset()->getInstance()->id,
+            ),
         ), false);
+    }
+
+    /**
+     * Gets the controller url for the ajax request
+     *
+     * @return mixed
+     */
+    public function getControllerUrl()
+    {
+        // Gets from the renderer options
+        $controller_url = \Arr::get($this->renderer_options, 'controller_url');
+        if (empty($controller_url)) {
+            // Otherwise try to get from the main controller config
+            $main_controller = \Nos\Nos::main_controller();
+            list($app, $file_name) = \Config::configFile(get_class($main_controller));
+            $config = \Config::load($app.'::'.$file_name, true);
+            $controller_url = \Arr::get($config, 'controller_url');
+            $controller_url .= '/virtualname';
+        }
+
+        return $controller_url;
     }
 
     protected static function _regexpsCompiled($regexps)

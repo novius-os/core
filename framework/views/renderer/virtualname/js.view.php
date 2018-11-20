@@ -12,6 +12,6 @@
     require(
         ['jquery-nos-virtualname'],
         function($) {
-            $("#<?= $id ?>").nosVirtualName(<?= \Format::forge($options)->to_json() ?>);
+            $("#<?= $id ?>").nosVirtualName(<?= \Format::forge($options)->to_json() ?>, <?= \Format::forge($config)->to_json() ?>);
         });
 </script>
