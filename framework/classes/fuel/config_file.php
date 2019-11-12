@@ -2,10 +2,10 @@
 
 abstract class Config_File extends \Fuel\Core\Config_File
 {
-    public function load($overwrite = false)
+    public function load($overwrite = false, $cache = true)
     {
         try {
-            $config = parent::load($overwrite);
+            $config = parent::load($overwrite, $cache);
         } catch (\ConfigException $e) {
             $config = array();
         }
